@@ -8,7 +8,7 @@
 
 #include <fastcgi++/request.hpp>
 
-class RequestHandler : public Fastcgipp::Request<wchar_t> {
+class RequestHandler : public Fastcgipp::Request<char> {
     friend class QsfRequest;
     bool response();
 };

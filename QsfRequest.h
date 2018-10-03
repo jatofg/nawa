@@ -4,6 +4,9 @@
 
 #ifndef QSF_QSFREQUEST_H
 #define QSF_QSFREQUEST_H
+#define QSF_REQ_GET 1
+#define QSF_REQ_POST 2
+#define QSF_REQ_COOKIE 3
 
 #include <string>
 #include <fastcgi++/request.hpp>
@@ -12,26 +15,35 @@
 class QsfRequest {
 public:
     class Env {
+    protected:
         RequestHandler& request;
     public:
         Env(RequestHandler& request) : request(request) {}
-        std::wstring operator [](std::string envVar);
+        std::string operator [](std::string envVar);
     };
-    class Get {
+    class GPC {
+    protected:
         RequestHandler& request;
+        uint source;
+        std::multimap<std::basic_string<char>, std::basic_string<char>> data;
     public:
-        Get(RequestHandler& request) : request(request) {}
+        GPC(RequestHandler& request, uint source);
+        virtual ~GPC() {}
+        std::string operator [](std::string gpcVar);
+        std::vector<std::string> getVector(std::string gpcVar);
     };
-    class Post {
-        RequestHandler& request;
+    class Post: public GPC {
     public:
-        Post(RequestHandler& request) : request(request) {}
+        Post(RequestHandler& request);
+        virtual ~Post() {}
+        std::string getRaw();
     };
+    /* TODO cookie setting (fits better in Response, probably) */
     const QsfRequest::Env env;
-    const QsfRequest::Get get;
+    const QsfRequest::GPC get;
     const QsfRequest::Post post;
-public:
-    QsfRequest(RequestHandler& request) : env(request), get(request), post(request) {}
+    const QsfRequest::GPC cookie;
+    QsfRequest(RequestHandler& request);
 };
 
 
