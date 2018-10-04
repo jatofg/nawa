@@ -29,8 +29,8 @@ public:
     public:
         GPC(RequestHandler& request, uint source);
         virtual ~GPC() {}
-        std::string operator [](std::string gpcVar);
-        std::vector<std::string> getVector(std::string gpcVar);
+        std::string operator [](std::string gpcVar) const;
+        std::vector<std::string> getVector(std::string gpcVar) const;
     };
     class Post: public GPC {
     public:

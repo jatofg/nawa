@@ -28,13 +28,13 @@ QsfRequest::GPC::GPC(RequestHandler &request, uint source)
     }
 }
 
-std::string QsfRequest::GPC::operator[](std::string gpcVar) {
+std::string QsfRequest::GPC::operator[](std::string gpcVar) const {
     auto e = data.find(gpcVar);
     if(e != data.end()) return e->second;
     else return "";
 }
 
-std::vector<std::string> QsfRequest::GPC::getVector(std::string gpcVar) {
+std::vector<std::string> QsfRequest::GPC::getVector(std::string gpcVar) const {
     std::vector<std::string> ret;
     auto e = data.equal_range(gpcVar);
     for(auto it = e.first; it != e.second; ++it) {
