@@ -8,10 +8,13 @@
 
 #include <fastcgi++/request.hpp>
 
-class RequestHandler : public Fastcgipp::Request<char> {
-    friend class QsfRequest;
-    bool response();
-};
+namespace Qsf {
+    class Request;
+    class RequestHandler : public Fastcgipp::Request<char> {
+        friend class Qsf::Request;
+        bool response();
+    };
+}
 
 
 #endif //QSF_REQUESTHANDLER_H
