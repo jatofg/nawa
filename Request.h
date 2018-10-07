@@ -21,6 +21,8 @@ namespace Qsf {
         public:
             Env(RequestHandler& request) : request(request) {}
             std::string operator [](std::string envVar);
+            std::vector<std::string> getAcceptLanguages();
+            std::vector<std::string> getPathInfo();
         };
         class GPC {
         protected:
