@@ -12,10 +12,21 @@ bool Qsf::RequestHandler::response() {
 
     out << "<!DOCTYPE html>\n"
            "<html><head><title>Test</title></head><body>"
-           "<p>Hello World, GET test = "<< Fastcgipp::Encoding::HTML << request.get["test"]
-           << Fastcgipp::Encoding::NONE << "</p>"
-           "<p>Current uid: " << getuid() << " - Current gid: " << getgid() << "</p>"
+           "<p>Hello World, GET test = "<< Fastcgipp::Encoding::HTML << request.get["test"]  << Fastcgipp::Encoding::NONE << "</p>"
+           "<p>POST test = " << Fastcgipp::Encoding :: HTML << request.post["test"] << Fastcgipp::Encoding::NONE << "</p>"
+           "<form name=\"testform\" method=\"post\" action=\"\"><p><input type=\"test\" name=\"test\" />"
+           "<input type=\"submit\" name=\"submit\" value=\"Send\" /></p></form>"
            "</body></html>";
 
     return true;
+}
+
+size_t Qsf::RequestHandler::postMax = 0;
+
+void Qsf::RequestHandler::setPostMax(size_t pm) {
+    postMax = pm;
+}
+
+Qsf::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {
+
 }

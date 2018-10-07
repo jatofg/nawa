@@ -40,9 +40,46 @@ int main() {
         std::cerr << "WARNING: Not starting as root, cannot set privileges" << std::endl;
     }
 
+    // set post max
+    Qsf::RequestHandler::setPostMax((size_t)reader.GetInteger("post", "max_size", 0) * 1024);
+
     Fastcgipp::Manager<Qsf::RequestHandler> manager;
     manager.setupSignals();
-    manager.listen("127.0.0.1", "8000");
+
+    // socket handling
+    std::string mode = reader.Get("fastcgi", "mode", "none");
+    if(mode == "tcp") {
+        if(!manager.listen(reader.Get("fastcgi", "listen", "127.0.0.1").c_str(),
+                reader.Get("fastcgi", "port", "8000").c_str())) {
+            std::cerr << "Fatal Error: Could not create TCP socket" << std::endl;
+            return 1;
+        }
+    }
+    else if(mode == "unix") {
+        uint32_t permissions = 0xffffffffUL;
+        std::string permStr = reader.Get("fastcgi", "permissions", "-1");
+        // convert the value from the config file
+        if(permStr != "-1") {
+            const char* psptr = permStr.c_str();
+            char* endptr;
+            long perm = strtol(psptr, &endptr, 8);
+            if(*endptr == '\0') {
+                permissions = (uint32_t) perm;
+            }
+        }
+        std::string ownerStr = reader.Get("fastcgi", "owner", "-1");
+        std::string groupStr = reader.Get("fastcgi", "group", "-1");
+        if(!manager.listen(reader.Get("fastcgi", "path", "/etc/qsf/sock.d/qsf.sock").c_str(), permissions,
+                (ownerStr == "-1") ? nullptr : ownerStr.c_str(), (groupStr == "-1") ? nullptr : groupStr.c_str() )) {
+            std::cerr << "Fatal Error: Could not create UNIX socket" << std::endl;
+            return 1;
+        }
+    }
+    else {
+        std::cerr << "Fatal Error: Unknown FastCGI socket mode in config.ini" << std::endl;
+        return 1;
+    }
+
     manager.start();
     manager.join();
     return 0;

@@ -11,8 +11,12 @@
 namespace Qsf {
     class Request;
     class RequestHandler : public Fastcgipp::Request<char> {
+        static size_t postMax;
         friend class Qsf::Request;
         bool response();
+    public:
+        static void setPostMax(size_t pm);
+        RequestHandler();
     };
 }
 
