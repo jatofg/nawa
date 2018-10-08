@@ -16,6 +16,9 @@ bool Qsf::RequestHandler::response() {
            "<p>POST test = " << Fastcgipp::Encoding :: HTML << request.post["test"] << Fastcgipp::Encoding::NONE << "</p>"
            "<form name=\"testform\" method=\"post\" action=\"\"><p><input type=\"test\" name=\"test\" />"
            "<input type=\"submit\" name=\"submit\" value=\"Send\" /></p></form>"
+           "<p>Server Address: " << Fastcgipp::Encoding::HTML << request.env["serverAddress"] << Fastcgipp::Encoding::NONE << "</p>"
+           "<p>Client Address: " << Fastcgipp::Encoding::HTML << request.env["remoteAddress"] << Fastcgipp::Encoding::NONE << "</p>"
+           "<p>Raw Post: " << Fastcgipp::Encoding::HTML << request.post.getRaw() << Fastcgipp::Encoding::NONE << "</p>"
            "</body></html>";
 
     return true;

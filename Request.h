@@ -13,17 +13,51 @@
 #include "RequestHandler.h"
 
 namespace Qsf {
+    /**
+     * Represents request objects.
+     */
     class Request {
     public:
+        /**
+         * Accessor for environment variables.
+         */
         class Env {
         protected:
             RequestHandler& request;
         public:
             Env(RequestHandler& request) : request(request) {}
-            std::string operator [](std::string envVar);
-            std::vector<std::string> getAcceptLanguages();
-            std::vector<std::string> getPathInfo();
+            /**
+             * Get an environment variable.
+             * @param envVar Name of the environment variable.
+             * @return Content of the environment variable. Empty string if not set.
+             */
+            std::string operator [](std::string envVar) const;
+            /**
+             * Receive the languages accepted by the client (from HTTP Header).
+             * @return Vector of strings containing the accepted languages. Empty if not set.
+             */
+            std::vector<std::string> getAcceptLanguages() const;
+            /**
+             * Request path.
+             * @return Vector of strings containing the elements of the path.
+             */
+            std::vector<std::string> getPathInfo() const;
+            /**
+             * Get the server address as a libfastcgipp Address object. Use ["serverAddress"] to access it as a string.
+             * @return The Address object.
+             * @deprecated
+             */
+            Fastcgipp::Http::Address getServerAddr() const;
+            /**
+             * Get the remote address as a libfastcgipp Address object. Use ["remoteAddress"] to access it as a string.
+             * @return  The Address object.
+             * @deprecated
+             */
+            Fastcgipp::Http::Address getRemoteAddr() const;
         };
+        /**
+         * Accessor for GET, POST, and COOKIE variables.
+         */
         class GPC {
         protected:
             RequestHandler& request;
@@ -32,20 +66,46 @@ namespace Qsf {
         public:
             GPC(RequestHandler& request, uint source);
             virtual ~GPC() {}
+            /**
+             * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
+             * only one of them (usually the first definition) will be returned. For accessing all definitions,
+             * please use getVector().
+             * @param gpcVar Name of the variable.
+             * @return Value of the variable. Empty string if not set (or empty - use count() for checking whether the variable is set).
+             */
             std::string operator [](std::string gpcVar) const;
+            /**
+             * Get all GET, POST, or COOKIE variables with the given name.
+             * @param gpcVar Name of the variables.
+             * @return Vector of values. Empty if not set.
+             */
             std::vector<std::string> getVector(std::string gpcVar) const;
+            /**
+             * Get the number of submitted GET, POST, or COOKIE variables with the given name.
+             * @param gpcVar Name of the variables.
+             * @return Number of occurrences.
+             */
+            unsigned long count(std::string gpcVar) const;
         };
+        /**
+         * Specialized accessor for POST that also allows accessing the raw POST data.
+         */
         class Post: public GPC {
         public:
             Post(RequestHandler& request);
             virtual ~Post() {}
-            std::string getRaw();
+            /**
+             * Get the raw POST data. Not implemented yet.
+             * @return Empty string.
+             * @todo Implementation.
+             */
+            std::string getRaw() const;
         };
         /* TODO cookie setting (fits better in Response, probably) */
-        const Request::Env env;
-        const Request::GPC get;
-        const Request::Post post;
-        const Request::GPC cookie;
+        const Request::Env env; /**< The Env object you should use to access environment variables. */
+        const Request::GPC get; /**< The GPC object you should use to access GET variables. */
+        const Request::Post post; /**< The Post object you should use to access POST variables. */
+        const Request::GPC cookie; /**< The GPC object you should use to access COOKIE variables. */
         Request(RequestHandler& request);
     };
 }

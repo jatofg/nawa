@@ -43,7 +43,14 @@ int main() {
     // set post max
     Qsf::RequestHandler::setPostMax((size_t)reader.GetInteger("post", "max_size", 0) * 1024);
 
-    Fastcgipp::Manager<Qsf::RequestHandler> manager;
+    // concurrency
+    auto cReal = std::max(1.0, reader.GetReal("system", "threads", 1.0));
+    if(reader.Get("system", "concurrency", "fixed") == "hardware") {
+        cReal = std::max(1.0, std::thread::hardware_concurrency()*cReal);
+    }
+    auto cInt = static_cast<unsigned int>(cReal);
+
+    Fastcgipp::Manager<Qsf::RequestHandler> manager(cInt);
     manager.setupSignals();
 
     // socket handling

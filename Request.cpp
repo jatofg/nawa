@@ -5,7 +5,7 @@
 #include "Request.h"
 #include "Exception.h"
 
-std::string Qsf::Request::Env::operator[](std::string envVar) {
+std::string Qsf::Request::Env::operator[](std::string envVar) const {
     std::string ret;
     if(envVar == "host") ret = request.environment().host; // server hostname
     else if(envVar == "userAgent") ret = request.environment().userAgent; // user agent string
@@ -64,12 +64,20 @@ std::string Qsf::Request::Env::operator[](std::string envVar) {
     return ret;
 }
 
-std::vector<std::string> Qsf::Request::Env::getAcceptLanguages() {
+std::vector<std::string> Qsf::Request::Env::getAcceptLanguages() const {
     return request.environment().acceptLanguages;
 }
 
-std::vector<std::string> Qsf::Request::Env::getPathInfo() {
+std::vector<std::string> Qsf::Request::Env::getPathInfo() const {
     return request.environment().pathInfo;
+}
+
+Fastcgipp::Http::Address Qsf::Request::Env::getServerAddr() const {
+    return request.environment().serverAddress;
+}
+
+Fastcgipp::Http::Address Qsf::Request::Env::getRemoteAddr() const {
+    return request.environment().remoteAddress;
 }
 
 Qsf::Request::GPC::GPC(RequestHandler &request, uint source)
@@ -104,6 +112,10 @@ std::vector<std::string> Qsf::Request::GPC::getVector(std::string gpcVar) const 
     return ret;
 }
 
+unsigned long Qsf::Request::GPC::count(std::string gpcVar) const {
+    return data.count(gpcVar);
+}
+
 Qsf::Request::Request(RequestHandler &request)
         : env(request), get(request, QSF_REQ_GET), post(request), cookie(request, QSF_REQ_COOKIE) {
 
@@ -113,8 +125,10 @@ Qsf::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {
 
 }
 
-std::string Qsf::Request::Post::getRaw() {
-    auto postBuffer = request.environment().postBuffer();
-    std::string ret(postBuffer.data(), postBuffer.size());
-    return ret;
+std::string Qsf::Request::Post::getRaw() const {
+    // does not work
+    //auto postBuffer = request.environment().postBuffer();
+    //std::string ret(postBuffer.data(), postBuffer.size());
+    //return ret;
+    return std::string();
 }
