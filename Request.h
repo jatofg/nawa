@@ -18,6 +18,40 @@ namespace Qsf {
      */
     class Request {
     public:
+
+        /**
+         * Container for POST-submitted files.
+         */
+        class File {
+        public:
+            /**
+             * Constructs the object from a libfastcgipp File container.
+             * @param file libfastcgipp File container
+             */
+            explicit File(const Fastcgipp::Http::File<char>& file);
+            /**
+             * Constructs the object from a data pointer.
+             * @param dataPtr Pointer to the first byte of the memory area containing the file
+             * @param size Size of the file in bytes
+             */
+            File(std::unique_ptr<char[]>& dataPtr, size_t size);
+            std::string filename; /**< Original file name (submitted by sender) */
+            std::string contentType; /**< Content-Type string */
+            size_t size; /**< File size in bytes */
+            const std::unique_ptr<char[]>& dataPtr; /**< Reference to a unique_ptr to the first byte of the memory area */
+            /**
+             * Copy the file into a std::string
+             * @return std::string containing the whole file
+             */
+            std::string copyFile();
+            /**
+             * Write the file to disk.
+             * @param path File name and path where to write the file.
+             * @return true on success, false on failure
+             */
+            bool writeFile(std::string path);
+        };
+
         /**
          * Accessor for environment variables.
          */
@@ -25,7 +59,7 @@ namespace Qsf {
         protected:
             RequestHandler& request;
         public:
-            Env(RequestHandler& request) : request(request) {}
+            explicit Env(RequestHandler& request) : request(request) {}
             /**
              * Get an environment variable.
              * @param envVar Name of the environment variable.
@@ -88,11 +122,11 @@ namespace Qsf {
             unsigned long count(std::string gpcVar) const;
         };
         /**
-         * Specialized accessor for POST that also allows accessing the raw POST data.
+         * Specialized accessor for POST that also allows accessing files (and in future, maybe, the raw POST data).
          */
         class Post: public GPC {
         public:
-            Post(RequestHandler& request);
+            explicit Post(RequestHandler& request);
             virtual ~Post() {}
             /**
              * Get the raw POST data. Not implemented yet.
@@ -100,7 +134,14 @@ namespace Qsf {
              * @todo Implementation.
              */
             std::string getRaw() const;
+            /**
+             * Get all POST files with the given name.
+             * @param postVar Name of the files.
+             * @return Vector of files. Empty if no file with the given name exists.
+             */
+            std::vector<Request::File> getFileVector(std::string postVar) const;
         };
+
         /* TODO cookie setting (fits better in Response, probably) */
         const Request::Env env; /**< The Env object you should use to access environment variables. */
         const Request::GPC get; /**< The GPC object you should use to access GET variables. */

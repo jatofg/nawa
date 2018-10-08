@@ -2,6 +2,7 @@
 // Created on 30/09/18. All rights reserved.
 //
 
+#include <fstream>
 #include "Request.h"
 #include "Exception.h"
 
@@ -117,13 +118,9 @@ unsigned long Qsf::Request::GPC::count(std::string gpcVar) const {
 }
 
 Qsf::Request::Request(RequestHandler &request)
-        : env(request), get(request, QSF_REQ_GET), post(request), cookie(request, QSF_REQ_COOKIE) {
+        : env(request), get(request, QSF_REQ_GET), post(request), cookie(request, QSF_REQ_COOKIE) {}
 
-}
-
-Qsf::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {
-
-}
+Qsf::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {}
 
 std::string Qsf::Request::Post::getRaw() const {
     // does not work
@@ -131,4 +128,38 @@ std::string Qsf::Request::Post::getRaw() const {
     //std::string ret(postBuffer.data(), postBuffer.size());
     //return ret;
     return std::string();
+}
+
+std::vector<Qsf::Request::File> Qsf::Request::Post::getFileVector(std::string postVar) const {
+    std::vector<Qsf::Request::File> ret;
+    auto e = request.environment().files.equal_range(postVar);
+    for(auto it = e.first; it != e.second; ++it) {
+        Qsf::Request::File tmp(it->second);
+        ret.push_back(tmp);
+    }
+    return ret;
+}
+
+Qsf::Request::File::File(const Fastcgipp::Http::File<char> &file) : filename(file.filename),
+        contentType(file.contentType), size(file.size), dataPtr(file.data) {}
+
+Qsf::Request::File::File(std::unique_ptr<char[]>& dataPtr, size_t size) : dataPtr(dataPtr), size(size) {}
+
+std::string Qsf::Request::File::copyFile() {
+    return std::string(dataPtr.get(), size);
+}
+
+bool Qsf::Request::File::writeFile(std::string path) {
+    std::ofstream outfile;
+    std::ios_base::iostate exceptionMask = outfile.exceptions() | std::ios::failbit;
+    outfile.exceptions(exceptionMask);
+    try {
+        outfile.open(path, std::ofstream::out | std::ofstream::binary);
+        outfile.write(dataPtr.get(), size);
+        outfile.close();
+    }
+    catch(std::ios_base::failure& e) {
+        return false;
+    }
+    return true;
 }
