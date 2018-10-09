@@ -21,24 +21,41 @@ bool Qsf::RequestHandler::response() {
            "<input type=\"submit\" name=\"submit\" value=\"Send\" /></p></form>"
            "<p>Server Address: " << Fastcgipp::Encoding::HTML << request.env["serverAddress"] << Fastcgipp::Encoding::NONE << "</p>"
            "<p>Client Address: " << Fastcgipp::Encoding::HTML << request.env["remoteAddress"] << Fastcgipp::Encoding::NONE << "</p>"
-           "<p>Raw Post: " << Fastcgipp::Encoding::HTML << request.post.getRaw() << Fastcgipp::Encoding::NONE << "</p>"
+           "<p>Post Content Type: " << Fastcgipp::Encoding::HTML << request.post.getContentType() << Fastcgipp::Encoding::NONE << "<br>"
+           "Raw Post: " << Fastcgipp::Encoding::HTML << request.post.getRaw() << Fastcgipp::Encoding::NONE << "</p>"
            "</body></html>";
 
     auto uploadedFiles = request.post.getFileVector("testfile");
-    if(uploadedFiles.size() >= 1) {
-        uploadedFiles[0].writeFile("/home/tinyp/" + uploadedFiles[0].filename);
-        std::cout << uploadedFiles[0].filename << std::endl;
-    }
+//    if(uploadedFiles.size() >= 1) {
+//        uploadedFiles[0].writeFile("/home/tinyp/" + uploadedFiles[0].filename);
+//        std::cout << uploadedFiles[0].filename << std::endl;
+//    }
 
     return true;
 }
 
 size_t Qsf::RequestHandler::postMax = 0;
+uint Qsf::RequestHandler::rawPostAccess = 1;
 
-void Qsf::RequestHandler::setPostMax(size_t pm) {
+void Qsf::RequestHandler::setPostConfig(size_t pm, uint rpa) {
     postMax = pm;
+    rawPostAccess = rpa;
 }
 
 Qsf::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {
 
+}
+
+bool Qsf::RequestHandler::inProcessor() {
+    postContentType = environment().contentType;
+    if(rawPostAccess == QSF_RAWPOST_NEVER) {
+        return false;
+    }
+    else if (rawPostAccess == QSF_RAWPOST_NONSTANDARD &&
+            (postContentType == "multipart/form-data" || postContentType == "application/x-www-form-urlencoded")) {
+        return false;
+    }
+    auto postBuffer = environment().postBuffer();
+    rawPost = std::string(postBuffer.data(), postBuffer.size());
+    return false;
 }

@@ -122,12 +122,8 @@ Qsf::Request::Request(RequestHandler &request)
 
 Qsf::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {}
 
-std::string Qsf::Request::Post::getRaw() const {
-    // does not work
-    //auto postBuffer = request.environment().postBuffer();
-    //std::string ret(postBuffer.data(), postBuffer.size());
-    //return ret;
-    return std::string();
+std::string& Qsf::Request::Post::getRaw() const {
+    return request.rawPost;
 }
 
 std::vector<Qsf::Request::File> Qsf::Request::Post::getFileVector(std::string postVar) const {
@@ -140,13 +136,15 @@ std::vector<Qsf::Request::File> Qsf::Request::Post::getFileVector(std::string po
     return ret;
 }
 
-Qsf::Request::File::File(const Fastcgipp::Http::File<char> &file) : filename(file.filename),
-        contentType(file.contentType), size(file.size), dataPtr(file.data) {}
+std::string Qsf::Request::Post::getContentType() const {
+    return request.postContentType;
+}
 
-Qsf::Request::File::File(std::unique_ptr<char[]>& dataPtr, size_t size) : dataPtr(dataPtr), size(size) {}
+Qsf::Request::File::File(const Fastcgipp::Http::File<char> &file) : filename(file.filename),
+        contentType(file.contentType), size(file.size), dataPtrRef(file.data) {}
 
 std::string Qsf::Request::File::copyFile() {
-    return std::string(dataPtr.get(), size);
+    return std::string(dataPtrRef.get(), size);
 }
 
 bool Qsf::Request::File::writeFile(std::string path) {
@@ -155,7 +153,7 @@ bool Qsf::Request::File::writeFile(std::string path) {
     outfile.exceptions(exceptionMask);
     try {
         outfile.open(path, std::ofstream::out | std::ofstream::binary);
-        outfile.write(dataPtr.get(), size);
+        outfile.write(dataPtrRef.get(), size);
         outfile.close();
     }
     catch(std::ios_base::failure& e) {

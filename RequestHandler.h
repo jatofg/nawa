@@ -4,6 +4,9 @@
 
 #ifndef QSF_REQUESTHANDLER_H
 #define QSF_REQUESTHANDLER_H
+#define QSF_RAWPOST_NEVER 0
+#define QSF_RAWPOST_NONSTANDARD 1
+#define QSF_RAWPOST_ALWAYS 2
 
 
 #include <fastcgi++/request.hpp>
@@ -11,11 +14,15 @@
 namespace Qsf {
     class Request;
     class RequestHandler : public Fastcgipp::Request<char> {
-        static size_t postMax;
         friend class Qsf::Request;
-        bool response();
+        static size_t postMax;
+        static uint rawPostAccess;
+        std::string postContentType;
+        std::string rawPost;
     public:
-        static void setPostMax(size_t pm);
+        bool response() override;
+        bool inProcessor() override;
+        static void setPostConfig(size_t pm, uint rpa);
         RequestHandler();
     };
 }

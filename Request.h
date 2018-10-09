@@ -20,7 +20,8 @@ namespace Qsf {
     public:
 
         /**
-         * Container for POST-submitted files.
+         * Container for POST-submitted files. This class cannot currently be used for storing files not provided
+         * by libfastcgipp, however, this is scheduled to change with v1.
          */
         class File {
         public:
@@ -29,16 +30,10 @@ namespace Qsf {
              * @param file libfastcgipp File container
              */
             explicit File(const Fastcgipp::Http::File<char>& file);
-            /**
-             * Constructs the object from a data pointer.
-             * @param dataPtr Pointer to the first byte of the memory area containing the file
-             * @param size Size of the file in bytes
-             */
-            File(std::unique_ptr<char[]>& dataPtr, size_t size);
             std::string filename; /**< Original file name (submitted by sender) */
             std::string contentType; /**< Content-Type string */
             size_t size; /**< File size in bytes */
-            const std::unique_ptr<char[]>& dataPtr; /**< Reference to a unique_ptr to the first byte of the memory area */
+            const std::unique_ptr<char[]>& dataPtrRef; /**< Reference to a unique_ptr to the first byte of the memory area */
             /**
              * Copy the file into a std::string
              * @return std::string containing the whole file
@@ -129,11 +124,15 @@ namespace Qsf {
             explicit Post(RequestHandler& request);
             virtual ~Post() {}
             /**
-             * Get the raw POST data. Not implemented yet.
-             * @return Empty string.
-             * @todo Implementation.
+             * Get the raw POST data (availability depends on the raw_access setting in the config).
+             * @return Reference to a string containing the raw POST data if available, otherwise the string is empty.
              */
-            std::string getRaw() const;
+            std::string& getRaw() const;
+            /**
+             * Get the POST content type as submitted by the browser
+             * @return String containing the POST content type
+             */
+            std::string getContentType() const;
             /**
              * Get all POST files with the given name.
              * @param postVar Name of the files.

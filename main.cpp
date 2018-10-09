@@ -40,8 +40,11 @@ int main() {
         std::cerr << "WARNING: Not starting as root, cannot set privileges" << std::endl;
     }
 
-    // set post max
-    Qsf::RequestHandler::setPostMax((size_t)reader.GetInteger("post", "max_size", 0) * 1024);
+    // set post config
+    // raw_access is translated to an integer according to the macros defined in RequestHandler.h
+    std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
+    uint rawPost = (rawPostStr == "never") ? 0 : ((rawPostStr == "nonstandard") ? 1 : 2);
+    Qsf::RequestHandler::setPostConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost);
 
     // concurrency
     auto cReal = std::max(1.0, reader.GetReal("system", "threads", 1.0));
