@@ -98,7 +98,8 @@ namespace Qsf {
             /**
              * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
              * only one of them (usually the first definition) will be returned. For accessing all definitions,
-             * please use getVector().
+             * please use getVector(). Complexity is logarithmic, so if you want to access a value multiple times,
+             * saving it as a variable is a good idea.
              * @param gpcVar Name of the variable.
              * @return Value of the variable. Empty string if not set (or empty - use count() for checking whether the variable is set).
              */
