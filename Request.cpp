@@ -117,6 +117,18 @@ unsigned long Qsf::Request::GPC::count(std::string gpcVar) const {
     return data.count(gpcVar);
 }
 
+std::multimap<std::string, std::string>& Qsf::Request::GPC::getMultimap() {
+    return data;
+}
+
+std::multimap<std::string, std::string>::const_iterator Qsf::Request::GPC::begin() const {
+    return data.begin();
+}
+
+std::multimap<std::string, std::string>::const_iterator Qsf::Request::GPC::end() const {
+    return data.end();
+}
+
 Qsf::Request::Request(RequestHandler &request)
         : env(request), get(request, QSF_REQ_GET), post(request), cookie(request, QSF_REQ_COOKIE) {}
 

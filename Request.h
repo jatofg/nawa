@@ -10,6 +10,7 @@
 
 #include <string>
 #include <fastcgi++/request.hpp>
+#include <bits/valarray_before.h>
 #include "RequestHandler.h"
 
 namespace Qsf {
@@ -93,6 +94,14 @@ namespace Qsf {
             uint source;
             std::multimap<std::basic_string<char>, std::basic_string<char>> data;
         public:
+//            class iterator {
+//            public:
+//                using value_type = std::string;
+//                using reference = std::string&;
+//                using pointer = std::string*;
+//                using difference_type = std::ptrdiff_t;
+//                using iterator_category = std::input_iterator_tag;
+//            };
             GPC(RequestHandler& request, uint source);
             virtual ~GPC() {}
             /**
@@ -116,6 +125,13 @@ namespace Qsf {
              * @return Number of occurrences.
              */
             unsigned long count(std::string gpcVar) const;
+            /**
+             * Get a reference to the GET, POST, or COOKIE multimap.
+             * @return Reference to the multimap.
+             */
+            std::multimap<std::string, std::string>& getMultimap();
+            std::multimap<std::string, std::string>::const_iterator begin() const;
+            std::multimap<std::string, std::string>::const_iterator end() const;
         };
         /**
          * Specialized accessor for POST that also allows accessing files (and in future, maybe, the raw POST data).
