@@ -10,7 +10,6 @@
 
 #include <string>
 #include <fastcgi++/request.hpp>
-#include <bits/valarray_before.h>
 #include "RequestHandler.h"
 
 namespace Qsf {

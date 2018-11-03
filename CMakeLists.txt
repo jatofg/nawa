@@ -3,5 +3,6 @@ project(qsf)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(qsf main.cpp Request.cpp Request.h RequestHandler.cpp RequestHandler.h Exception.cpp Exception.h Types/Compound.h Response.cpp Response.h)
+# ... Exception.h Types/Compound.h Response.cpp ...
+add_executable(qsf main.cpp Request.cpp Request.h RequestHandler.cpp RequestHandler.h Exception.cpp Exception.h Response.cpp Response.h)
 target_link_libraries(qsf -lfastcgipp)
