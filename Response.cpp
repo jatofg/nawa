@@ -6,7 +6,7 @@
 #include "Response.h"
 
 void Qsf::Response::setBody(std::string content) {
-    body = std::move(content);
+    bodyString = std::move(content);
     clearStream();
 }
 
@@ -39,22 +39,27 @@ std::string Qsf::Response::getRaw() {
     }
     raw << "\r\n";
 
-    raw << body;
+    raw << bodyString;
     return raw.str();
 }
 
 void Qsf::Response::mergeStream() {
-    body += bodyStream.str();
+    bodyString += body.str();
     clearStream();
 }
 
 void Qsf::Response::clearStream() {
-    bodyStream.str(std::string());
-    bodyStream.clear();
+    body.str(std::string());
+    body.clear();
+}
+
+Qsf::Response& Qsf::Response::operator<<(std::string s) {
+    body << s;
+    return *this;
 }
 
 Qsf::Response& Qsf::Response::operator<<(std::ostream &(*f)(std::ostream &)) {
-    bodyStream << f;
+    body << f;
     return *this;
 }
 
@@ -62,13 +67,13 @@ Qsf::Response::Response() {
     headers["content-type"] = "text/html; charset=utf-8";
 }
 
-Qsf::Response::Response(Request& request, int cookieMode) {
+Qsf::Response::Response(Request& request, int cookieMode) : Response() {
     switch(cookieMode) {
         case QSF_COOKIES_SESSION:
             // TODO set session cookie here - this may not be what we want?
             // TODO session cookie name in config
-            if(request.cookie.count("Session") > 0) {
-                setCookie("Session", Cookie(request.cookie["Session"]));
+            if(request.cookie.count("SESSION") > 0) {
+                setCookie("SESSION", Cookie(request.cookie["SESSION"]));
             }
             break;
         case QSF_COOKIES_ALL:

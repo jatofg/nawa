@@ -129,7 +129,15 @@ namespace Qsf {
              * @return Reference to the multimap.
              */
             std::multimap<std::string, std::string>& getMultimap();
+            /**
+             * Get constant begin iterator to the multimap containing all GET, POST, or COOKIE data.
+             * @return Iterator to the first element of the multimap.
+             */
             std::multimap<std::string, std::string>::const_iterator begin() const;
+            /**
+             * Get constant end iterator to the multimap containing all GET, POST, or COOKIE data.
+             * @return Iterator to the end of the multimap.
+             */
             std::multimap<std::string, std::string>::const_iterator end() const;
         };
         /**

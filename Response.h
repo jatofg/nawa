@@ -36,8 +36,7 @@ namespace Qsf {
      * Response objects to be passed back to QSF.
      */
     class Response {
-        std::string body;
-        std::stringstream bodyStream;
+        std::string bodyString;
         std::map<std::string, std::string> headers;
         std::map<std::string, Cookie> cookies;
         // set body
@@ -45,12 +44,13 @@ namespace Qsf {
         // add/remove/set headers
         // handling of html special chars (in some other [static] class?)
         // cookie setting
-        // export of data to fcgi++ (must merge bodyStream into body) => getRaw (?)
+        // export of data to fcgi++ (must merge body into bodyString) => getRaw (?)
         // constructor should set cookies (?)
         // automatic handling of session cookies
         void clearStream();
         void mergeStream();
     public:
+        std::stringstream body; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
         /**
          * Create a Response object without importing any cookies from the request.
          */
@@ -112,11 +112,16 @@ namespace Qsf {
          */
         std::string getRaw();
         /**
-         * You can use the Response object like an ostream by adding content to the HTTP body like this:\n
-         * response << "Some HTML content";
-         * @param f Something that can be added to an output stream.
+         * You can add strings and a few other things to the body like this:\n
+         * response << "Some HTML content";\n
+         * Please note, however, that Response is not a full-featured ostream. In case of problems, please
+         * address the stream directly:\n
+         * response.body << "Some HTML content";\n
+         * This feature might be removed at any time from v0.
+         * @param s Something that can be added to an output stream.
          * @return A reference to the Response object itself so you can add more using another "<<".
          */
+        Response& operator<<(std::string s);
         Response& operator<<(std::ostream&(*f)(std::ostream&));
     };
 }

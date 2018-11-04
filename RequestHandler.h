@@ -13,6 +13,7 @@
 
 namespace Qsf {
     class Request;
+    class Response;
     class RequestHandler : public Fastcgipp::Request<char> {
         friend class Qsf::Request;
         static size_t postMax;
@@ -21,6 +22,7 @@ namespace Qsf {
         std::string rawPost;
     public:
         bool response() override;
+        void flush(Qsf::Response& request);
         bool inProcessor() override;
         static void setPostConfig(size_t pm, uint rpa);
         RequestHandler();
