@@ -39,6 +39,8 @@ namespace Qsf {
         std::string bodyString;
         std::map<std::string, std::string> headers;
         std::map<std::string, Cookie> cookies;
+        Qsf::Request& request;
+        bool isFlushed = false;
         // set body
         // operator << and >> overloads for stream handling (body)
         // add/remove/set headers
@@ -51,10 +53,6 @@ namespace Qsf {
         void mergeStream();
     public:
         std::stringstream body; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
-        /**
-         * Create a Response object without importing any cookies from the request.
-         */
-        Response();
         // TODO create enum instead of define macros?
         // TODO add cookie options to constructor?
         // TODO deliver cookies in Request as Cookie struct? (possibly bad idea because of missing options)
@@ -123,6 +121,13 @@ namespace Qsf {
          */
         Response& operator<<(std::string s);
         Response& operator<<(std::ostream&(*f)(std::ostream&));
+        /**
+         * Flush the Response object, i.e., send headers and body to the client and reset it.
+         * Please note that you cannot set cookies and headers anymore after flushing.
+         * Attempts to do so will be silently ignored.\n
+         * NOTE: Flushing might not work as expected with Apache 2.4 and mod_proxy_fcgi
+         */
+        void flush();
     };
 }
 

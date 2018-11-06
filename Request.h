@@ -83,6 +83,10 @@ namespace Qsf {
              * @deprecated
              */
             Fastcgipp::Http::Address getRemoteAddr() const;
+
+            // mark Response as a friend so it can access RequestHandler through Env
+            // TODO find another solution as this looks a bit like a dirty hack?
+            friend Response;
         };
         /**
          * Accessor for GET, POST, and COOKIE variables.

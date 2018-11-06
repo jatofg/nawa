@@ -27,17 +27,19 @@ std::string Qsf::Response::getRaw() {
     mergeStream();
     std::stringstream raw;
 
-    // include headers
-    for(auto const &e: headers) {
-        raw << e.first << ": " << e.second << "\r\n";
+    // include headers and cookies, but only when flushing for the first time
+    if(!isFlushed) {
+        for(auto const &e: headers) {
+            raw << e.first << ": " << e.second << "\r\n";
+        }
+        // include cookies
+        for(auto const &e: cookies) {
+            // TODO checking and escaping?
+            // TODO respect cookie options
+            raw << "Cookie: " << e.first << "=" << e.second.content << "\r\n";
+        }
+        raw << "\r\n";
     }
-    // include cookies
-    for(auto const &e: cookies) {
-        // TODO checking and escaping?
-        // TODO respect cookie options
-        raw << "Cookie: " << e.first << "=" << e.second.content << "\r\n";
-    }
-    raw << "\r\n";
 
     raw << bodyString;
     return raw.str();
@@ -63,11 +65,8 @@ Qsf::Response& Qsf::Response::operator<<(std::ostream &(*f)(std::ostream &)) {
     return *this;
 }
 
-Qsf::Response::Response() {
+Qsf::Response::Response(Request& request, int cookieMode) : request(request) {
     headers["content-type"] = "text/html; charset=utf-8";
-}
-
-Qsf::Response::Response(Request& request, int cookieMode) : Response() {
     switch(cookieMode) {
         case QSF_COOKIES_SESSION:
             // TODO set session cookie here - this may not be what we want?
@@ -95,4 +94,13 @@ void Qsf::Response::setCookie(std::string key, Qsf::Cookie cookie) {
 
 void Qsf::Response::unsetCookie(std::string key) {
     cookies.erase(key);
+}
+
+void Qsf::Response::flush() {
+    // access RequestHandler through Request::Env, which declares Response as a friend
+    request.env.request.flush(*this);
+    // now that headers and cookies have been sent to the client, make sure they are not included anymore
+    isFlushed = true;
+    // also, empty the Response object, so that content will not be sent more than once
+    setBody("");
 }

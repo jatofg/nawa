@@ -4,6 +4,8 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include "RequestHandler.h"
 #include "Request.h"
 #include "Response.h"
@@ -12,13 +14,20 @@ bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
     Qsf::Response response(request);
 
-    response.body << "<!DOCTYPE html>\n"
+    response << "<!DOCTYPE html>\n"
                 "<html><head><title>Test</title></head><body>"
-                "<p>Hello World!</p>"
+                "<p>Hello World!</p>";
+
+    response.flush();
+
+    // wait a few secs, then print more
+    //std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    response << "<p>Hello World 2!</p>"
                 "</body></html>";
 
-    auto raw = response.getRaw();
-    dump(raw.c_str(), raw.size());
+    response.flush();
+
     //out << raw;
     //std::cout << raw << std::flush;
 
