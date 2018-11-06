@@ -29,6 +29,27 @@ std::string Qsf::Response::getRaw() {
 
     // include headers and cookies, but only when flushing for the first time
     if(!isFlushed) {
+        // import cookies from request depending on the cookieMode
+        switch(cookieMode) {
+            case QSF_COOKIES_SESSION:
+                // TODO set session cookie here - this may not be what we want?
+                // TODO session cookie name in config
+                if(request.cookie.count("SESSION") > 0) {
+                    setCookie("SESSION", Cookie(request.cookie["SESSION"]));
+                }
+                break;
+            case QSF_COOKIES_ALL:
+                //for()
+                // TODO iterators in Request
+                for(auto const& c: request.cookie) {
+                    // TODO cookie options (should be set automatically?)?
+                    setCookie(c.first, Cookie(c.second));
+                }
+                break;
+            default:
+                break;
+        }
+        // Add headers to the raw HTTP source
         for(auto const &e: headers) {
             raw << e.first << ": " << e.second << "\r\n";
         }
@@ -41,6 +62,7 @@ std::string Qsf::Response::getRaw() {
         raw << "\r\n";
     }
 
+    // And of course, add the body
     raw << bodyString;
     return raw.str();
 }
@@ -65,27 +87,8 @@ Qsf::Response& Qsf::Response::operator<<(std::ostream &(*f)(std::ostream &)) {
     return *this;
 }
 
-Qsf::Response::Response(Request& request, int cookieMode) : request(request) {
+Qsf::Response::Response(Request& request) : request(request) {
     headers["content-type"] = "text/html; charset=utf-8";
-    switch(cookieMode) {
-        case QSF_COOKIES_SESSION:
-            // TODO set session cookie here - this may not be what we want?
-            // TODO session cookie name in config
-            if(request.cookie.count("SESSION") > 0) {
-                setCookie("SESSION", Cookie(request.cookie["SESSION"]));
-            }
-            break;
-        case QSF_COOKIES_ALL:
-            //for()
-            // TODO iterators in Request
-            for(auto const& c: request.cookie) {
-                // TODO cookie options (should be set automatically?)?
-                setCookie(c.first, Cookie(c.second));
-            }
-            break;
-        default:
-            break;
-    }
 }
 
 void Qsf::Response::setCookie(std::string key, Qsf::Cookie cookie) {
@@ -103,4 +106,8 @@ void Qsf::Response::flush() {
     isFlushed = true;
     // also, empty the Response object, so that content will not be sent more than once
     setBody("");
+}
+
+void Qsf::Response::setCookieMode(int cm) {
+    cookieMode = cm;
 }
