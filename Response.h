@@ -30,14 +30,15 @@ namespace Qsf {
             content = std::move(c);
         }
         std::string content; /**< Content of the cookie. */
-        std::time_t expires = 0;
-        bool secure = false;
-        bool httpOnly = false;
-        std::string domain;
-        bool sameSite = false;
-        // TODO add options/flags here
+        std::time_t expires = 0; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
+        uint maxAge = 0; /**< Set Max-Age attribute. */
+        std::string domain; /**< Set Domain attribute. */
+        std::string path; /**< Set Path attribute. */
+        bool secure = false; /**< Set Secure attribute. */
+        bool httpOnly = false; /**< Set HttpOnly attribute. */
+        bool sameSite = false;  /**< Set SameSite attribute. */
         // TODO something like makeCookie() in Response to actually make default options matter?
-        // TODO and, of course, create the setCookieOptions() if it can somehow make sense
+        // TODO and, of course, create the setCookiePolicy() if it can somehow make sense
     };
     /**
      * Response objects to be passed back to QSF.
@@ -49,6 +50,7 @@ namespace Qsf {
         Qsf::Request& request;
         bool isFlushed = false;
         int cookieMode = QSF_COOKIES_SESSION;
+        Cookie cookiePolicy;
         // set body
         // operator << and >> overloads for stream handling (body)
         // add/remove/set headers
@@ -86,6 +88,11 @@ namespace Qsf {
          */
         void setBody(std::string content);
         /**
+         * Set the HTTP status code. It will be passed to the web server without checking for validity.
+         * @param status The HTTP status code to pass to the web server.
+         */
+        void setStatus(uint status);
+        /**
          * Set an HTTP header or overwrite an existing one with the same key (keys are case-insensitive and will be
          * converted to lowercase). Please note that the content-type header will be automatically set to
          * "text/html; charset=utf-8", but can be overwritten, of course.
@@ -116,6 +123,15 @@ namespace Qsf {
          * @param key Key of the cookie.
          */
         void unsetCookie(std::string key);
+        /**
+         * This method can be used to set default attributes for cookies. Setting a boolean attribute to true means
+         * that the corresponding attribute will be sent for all cookies, regardless of the value specified in the
+         * Cookie object itself. Values of string attributes will be used as default values if the corresponding
+         * attributes are not customized in the Cookie object and ignored otherwise. The content attribute will be
+         * ignored.
+         * @param policy Cookie object containing the default attributes.
+         */
+        void setCookiePolicy(Cookie policy);
         /**
          * Get the raw HTTP source of the request. This function is intended to be used primarily by QSF itself.
          * @return A string containing the raw HTTP source (containing headers, incl. cookies, and the body)

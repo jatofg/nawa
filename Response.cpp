@@ -3,6 +3,7 @@
 //
 
 #include <algorithm>
+#include <iomanip>
 #include "Response.h"
 
 void Qsf::Response::setBody(std::string content) {
@@ -56,8 +57,16 @@ std::string Qsf::Response::getRaw() {
         // include cookies
         for(auto const &e: cookies) {
             // TODO checking and escaping?
-            // TODO respect cookie options
-            raw << "Cookie: " << e.first << "=" << e.second.content << "\r\n";
+            raw << "Set-Cookie: " << e.first << "=" << e.second.content;
+            // include options
+            if(e.second.expires > 0 || cookiePolicy.expires > 0) {
+                time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
+                tm* gmt = gmtime(&expiry);
+                // TODO make sure local en_US.UTF-8 (or sth like that) exists and set it accordingly
+                raw << "; Expires=" << std::put_time(gmt, "%a, %d %b %Y %H:%M:%S GMT");
+            }
+            // CONTINUE HERE
+            raw << "\r\n";
         }
         raw << "\r\n";
     }
@@ -110,4 +119,12 @@ void Qsf::Response::flush() {
 
 void Qsf::Response::setCookieMode(int cm) {
     cookieMode = cm;
+}
+
+void Qsf::Response::setStatus(uint status) {
+    headers["status"] = std::to_string(status);
+}
+
+void Qsf::Response::setCookiePolicy(Cookie policy) {
+    cookiePolicy = std::move(policy);
 }
