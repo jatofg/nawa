@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <locale>
 #include "Response.h"
 
 void Qsf::Response::setBody(std::string content) {
@@ -56,16 +57,45 @@ std::string Qsf::Response::getRaw() {
         }
         // include cookies
         for(auto const &e: cookies) {
-            // TODO checking and escaping?
+            // TODO checking and especially escaping?
             raw << "Set-Cookie: " << e.first << "=" << e.second.content;
-            // include options
-            if(e.second.expires > 0 || cookiePolicy.expires > 0) {
-                time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
-                tm* gmt = gmtime(&expiry);
-                // TODO make sure local en_US.UTF-8 (or sth like that) exists and set it accordingly
-                raw << "; Expires=" << std::put_time(gmt, "%a, %d %b %Y %H:%M:%S GMT");
+            // Domain option
+            const std::string& domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
+            if(!domain.empty()) {
+                raw << "; Domain=" << domain;
             }
-            // CONTINUE HERE
+            // Path option
+            const std::string& path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
+            if(!path.empty()) {
+                raw << "; Path=" << path;
+            }
+            // Expires option
+            time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
+            if(expiry > 0) {
+                // reset locale to C for correct Expires string and reset it afterwards
+                // (in case the app modified the locale)
+                std::locale tmp;
+                std::locale::global(std::locale::classic());
+                raw << "; Expires=" << std::put_time(gmtime(&expiry), "%a, %d %b %Y %H:%M:%S GMT");
+                std::locale::global(tmp);
+            }
+            // Max-Age option
+            uint maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
+            if(maxAge > 0) {
+                raw << "; Max-Age=" << maxAge;
+            }
+            // Secure option
+            if(e.second.secure || cookiePolicy.secure) {
+                raw << "; Secure";
+            }
+            // HttpOnly option
+            if(e.second.httpOnly || cookiePolicy.httpOnly) {
+                raw << "; HttpOnly";
+            }
+            // SameSite option
+            if(e.second.sameSite || cookiePolicy.sameSite) {
+                raw << "; SameSite";
+            }
             raw << "\r\n";
         }
         raw << "\r\n";

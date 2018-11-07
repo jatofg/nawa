@@ -14,6 +14,11 @@ bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
     Qsf::Response response(request);
 
+    response.setCookie("TEST", Cookie("test"));
+    Cookie policy;
+    policy.httpOnly = true;
+    response.setCookiePolicy(policy);
+
     response << "<!DOCTYPE html>\n"
                 "<html><head><title>Test</title></head><body>"
                 "<p>Hello World!</p>";
