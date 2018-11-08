@@ -31,26 +31,6 @@ std::string Qsf::Response::getRaw() {
 
     // include headers and cookies, but only when flushing for the first time
     if(!isFlushed) {
-        // import cookies from request depending on the cookieMode
-        switch(cookieMode) {
-            case QSF_COOKIES_SESSION:
-                // TODO set session cookie here - this may not be what we want?
-                // TODO session cookie name in config
-                if(request.cookie.count("SESSION") > 0) {
-                    setCookie("SESSION", Cookie(request.cookie["SESSION"]));
-                }
-                break;
-            case QSF_COOKIES_ALL:
-                //for()
-                // TODO iterators in Request
-                for(auto const& c: request.cookie) {
-                    // TODO cookie options (should be set automatically?)?
-                    setCookie(c.first, Cookie(c.second));
-                }
-                break;
-            default:
-                break;
-        }
         // Add headers to the raw HTTP source
         for(auto const &e: headers) {
             raw << e.first << ": " << e.second << "\r\n";
@@ -145,10 +125,6 @@ void Qsf::Response::flush() {
     isFlushed = true;
     // also, empty the Response object, so that content will not be sent more than once
     setBody("");
-}
-
-void Qsf::Response::setCookieMode(int cm) {
-    cookieMode = cm;
 }
 
 void Qsf::Response::setStatus(uint status) {

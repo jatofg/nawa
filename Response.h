@@ -4,9 +4,6 @@
 
 #ifndef QSF_RESPONSE_H
 #define QSF_RESPONSE_H
-#define QSF_COOKIES_NONE 0
-#define QSF_COOKIES_SESSION 1
-#define QSF_COOKIES_ALL 2
 
 #include <string>
 #include <map>
@@ -49,7 +46,6 @@ namespace Qsf {
         std::map<std::string, Cookie> cookies;
         Qsf::Request& request;
         bool isFlushed = false;
-        int cookieMode = QSF_COOKIES_SESSION;
         Cookie cookiePolicy;
         // set body
         // operator << and >> overloads for stream handling (body)
@@ -71,16 +67,6 @@ namespace Qsf {
          * @param request Reference to the request object (needed to import cookies and flush the response).
          */
         explicit Response(Request& request);
-        /**
-         * Select which cookies to import from the request.
-         * @param cm Which cookies to import, QSF_COOKIES_ALL (all cookies),
-         * QSF_COOKIES_SESSION (default, only session cookie), or QSF_COOKIES_NONE (do not import cookies).
-         * Cookies will always be added according to the default policy which can be set using setCookieOptions(),
-         * therefore permanent cookies will become temporary ones when using QSF_COOKIES_ALL. In addition, you can
-         * not rely on the client of course. Therefore, please set all cookies except for the session cookie manually
-         * and do not use QSF_COOKIES_ALL, except in cases in which you know what you're doing.
-         */
-        void setCookieMode(int cm);
         /**
          * Set the HTTP response body (everything that comes after the headers). This will overwrite everything
          * that was set previously. You can use the Response object as an ostream instead.

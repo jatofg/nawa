@@ -14,30 +14,44 @@ bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
     Qsf::Response response(request);
 
-    response.setCookie("TEST", Cookie("test"));
-    Cookie policy;
-    policy.httpOnly = true;
-    response.setCookiePolicy(policy);
+    // run application
+    // TODO maybe do something with return value in future
+    handleRequestApp(request, response);
 
-    response << "<!DOCTYPE html>\n"
-                "<html><head><title>Test</title></head><body>"
-                "<p>Hello World!</p>";
-
+    // flush response
     response.flush();
-
-    // wait a few secs, then print more
-    //std::this_thread::sleep_for(std::chrono::seconds(3));
-
-    response << "<p>Hello World 2!</p>"
-                "</body></html>";
-
-    response.flush();
-
-    //out << raw;
-    //std::cout << raw << std::flush;
 
     return true;
 }
+
+//bool Qsf::RequestHandler::response() {
+//    Qsf::Request request(*this);
+//    Qsf::Response response(request);
+//
+//    response.setCookie("TEST", Cookie("test"));
+//    Cookie policy;
+//    policy.httpOnly = true;
+//    response.setCookiePolicy(policy);
+//
+//    response << "<!DOCTYPE html>\n"
+//                "<html><head><title>Test</title></head><body>"
+//                "<p>Hello World!</p>";
+//
+//    response.flush();
+//
+//    // wait a few secs, then print more
+//    //std::this_thread::sleep_for(std::chrono::seconds(3));
+//
+//    response << "<p>Hello World 2!</p>"
+//                "</body></html>";
+//
+//    response.flush();
+//
+//    //out << raw;
+//    //std::cout << raw << std::flush;
+//
+//    return true;
+//}
 
 void Qsf::RequestHandler::flush(Qsf::Response& response) {
     auto raw = response.getRaw();
@@ -96,4 +110,9 @@ bool Qsf::RequestHandler::inProcessor() {
     auto postBuffer = environment().postBuffer();
     rawPost = std::string(postBuffer.data(), postBuffer.size());
     return false;
+}
+
+void Qsf::RequestHandler::setAppPointers(Qsf::init_t *init_f, Qsf::handleRequest_t *handleRequest_f) {
+    initApp = init_f;
+    handleRequestApp = handleRequest_f;
 }

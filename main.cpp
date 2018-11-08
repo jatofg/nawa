@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
+#include <dlfcn.h>
 #include "RequestHandler.h"
 #include "inih/INIReader.h"
 
@@ -45,6 +46,35 @@ int main() {
     std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
     uint rawPost = (rawPostStr == "never") ? 0 : ((rawPostStr == "nonstandard") ? 1 : 2);
     Qsf::RequestHandler::setPostConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost);
+
+    // load application
+    std::string appPath = reader.Get("application", "path", "");
+    if(appPath.empty()) {
+        std::cerr << "Fatal Error: Application path not set in config file" << std::endl;
+        return 1;
+    }
+    void* appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
+    if(!appOpen) {
+        std::cerr << "Fatal Error: Application file could not be loaded" << std::endl;
+        return 1;
+    }
+    // reset dl errors
+    dlerror();
+    // load symbols and check for errors
+    auto appInit = (Qsf::init_t*) dlsym(appOpen, "init");
+    const char* dlsymErr = dlerror();
+    if(dlsymErr) {
+        std::cerr << "Fatal Error: Could not load init function from application: " << dlsymErr << std::endl;
+        return 1;
+    }
+    auto appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
+    dlsymErr = dlerror();
+    if(dlsymErr) {
+        std::cerr << "Fatal Error: Could not load handleRequest function from application: " << dlsymErr << std::endl;
+        return 1;
+    }
+    // set pointers in RequestHandler
+    Qsf::RequestHandler::setAppPointers(appInit, appHandleRequest);
 
     // concurrency
     auto cReal = std::max(1.0, reader.GetReal("system", "threads", 1.0));
@@ -89,6 +119,9 @@ int main() {
         std::cerr << "Fatal Error: Unknown FastCGI socket mode in config.ini" << std::endl;
         return 1;
     }
+
+    // before manager starts, init app
+    Qsf::RequestHandler::initApp();
 
     manager.start();
     manager.join();
