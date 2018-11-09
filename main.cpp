@@ -50,7 +50,7 @@ int main() {
     }
     void* appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if(!appOpen) {
-        std::cerr << "Fatal Error: Application file could not be loaded" << std::endl;
+        std::cerr << "Fatal Error: Application file could not be loaded (main): " << dlerror() << std::endl;
         return 1;
     }
     // reset dl errors
@@ -68,13 +68,12 @@ int main() {
         std::cerr << "Fatal Error: Could not load handleRequest function from application: " << dlsymErr << std::endl;
         return 1;
     }
-    dlclose(appOpen);
 
     // set post config and pass application path to RequestHandler so it can load appHandleRequest
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
     std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
     uint rawPost = (rawPostStr == "never") ? 0 : ((rawPostStr == "nonstandard") ? 1 : 2);
-    Qsf::RequestHandler::setConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost, appPath);
+    Qsf::RequestHandler::setConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost, appOpen);
 
     // concurrency
     auto cReal = std::max(1.0, reader.GetReal("system", "threads", 1.0));
@@ -122,8 +121,11 @@ int main() {
 
     // before manager starts, init app
     appInit();
+    //dlclose(appOpen);
 
     manager.start();
     manager.join();
+
+    dlclose(appOpen);
     return 0;
 }

@@ -29,7 +29,7 @@ namespace Qsf {
         bool response() override;
         void flush(Qsf::Response& response);
         bool inProcessor() override;
-        static void setConfig(size_t pm, uint rpa, std::string appPath);
+        static void setConfig(size_t pm, uint rpa, void* appOpen);
         RequestHandler();
     };
 }
