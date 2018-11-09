@@ -6,9 +6,12 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <dlfcn.h>
 #include "RequestHandler.h"
 #include "Request.h"
 #include "Response.h"
+
+static Qsf::handleRequest_t* appHandleRequest;
 
 bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
@@ -16,7 +19,7 @@ bool Qsf::RequestHandler::response() {
 
     // run application
     // TODO maybe do something with return value in future
-    handleRequestApp(request, response);
+    appHandleRequest(request, response);
 
     // flush response
     response.flush();
@@ -89,9 +92,24 @@ void Qsf::RequestHandler::flush(Qsf::Response& response) {
 size_t Qsf::RequestHandler::postMax = 0;
 uint Qsf::RequestHandler::rawPostAccess = 1;
 
-void Qsf::RequestHandler::setPostConfig(size_t pm, uint rpa) {
+void Qsf::RequestHandler::setConfig(size_t pm, uint rpa, std::string appPath) {
     postMax = pm;
     rawPostAccess = rpa;
+
+    // load appHandleRequest function
+    void* appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
+    if(!appOpen) {
+        std::cerr << "Fatal Error: Application file could not be loaded" << std::endl;
+        exit(1);
+    }
+    dlerror();
+    appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
+    auto dlsymErr = dlerror();
+    if(dlsymErr) {
+        std::cerr << "Fatal Error: Could not load handleRequest function from application: " << dlsymErr << std::endl;
+        exit(1);
+    }
+    dlclose(appOpen);
 }
 
 Qsf::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {
@@ -110,9 +128,4 @@ bool Qsf::RequestHandler::inProcessor() {
     auto postBuffer = environment().postBuffer();
     rawPost = std::string(postBuffer.data(), postBuffer.size());
     return false;
-}
-
-void Qsf::RequestHandler::setAppPointers(Qsf::init_t *init_f, Qsf::handleRequest_t *handleRequest_f) {
-    initApp = init_f;
-    handleRequestApp = handleRequest_f;
 }

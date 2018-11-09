@@ -41,14 +41,9 @@ int main() {
         std::cerr << "WARNING: Not starting as root, cannot set privileges" << std::endl;
     }
 
-    // set post config
-    // raw_access is translated to an integer according to the macros defined in RequestHandler.h
-    std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
-    uint rawPost = (rawPostStr == "never") ? 0 : ((rawPostStr == "nonstandard") ? 1 : 2);
-    Qsf::RequestHandler::setPostConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost);
-
-    // load application
+    // load application init function
     std::string appPath = reader.Get("application", "path", "");
+
     if(appPath.empty()) {
         std::cerr << "Fatal Error: Application path not set in config file" << std::endl;
         return 1;
@@ -62,7 +57,7 @@ int main() {
     dlerror();
     // load symbols and check for errors
     auto appInit = (Qsf::init_t*) dlsym(appOpen, "init");
-    const char* dlsymErr = dlerror();
+    auto dlsymErr = dlerror();
     if(dlsymErr) {
         std::cerr << "Fatal Error: Could not load init function from application: " << dlsymErr << std::endl;
         return 1;
@@ -73,8 +68,13 @@ int main() {
         std::cerr << "Fatal Error: Could not load handleRequest function from application: " << dlsymErr << std::endl;
         return 1;
     }
-    // set pointers in RequestHandler
-    Qsf::RequestHandler::setAppPointers(appInit, appHandleRequest);
+    dlclose(appOpen);
+
+    // set post config and pass application path to RequestHandler so it can load appHandleRequest
+    // raw_access is translated to an integer according to the macros defined in RequestHandler.h
+    std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
+    uint rawPost = (rawPostStr == "never") ? 0 : ((rawPostStr == "nonstandard") ? 1 : 2);
+    Qsf::RequestHandler::setConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost, appPath);
 
     // concurrency
     auto cReal = std::max(1.0, reader.GetReal("system", "threads", 1.0));
@@ -121,7 +121,7 @@ int main() {
     }
 
     // before manager starts, init app
-    Qsf::RequestHandler::initApp();
+    appInit();
 
     manager.start();
     manager.join();

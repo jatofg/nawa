@@ -22,16 +22,14 @@ namespace Qsf {
         friend class Qsf::Request;
         static size_t postMax;
         static uint rawPostAccess;
-        static handleRequest_t* handleRequestApp;
+        //static handleRequest_t* appHandleRequest;
         std::string postContentType;
         std::string rawPost;
     public:
-        static init_t* initApp;
         bool response() override;
         void flush(Qsf::Response& response);
         bool inProcessor() override;
-        static void setPostConfig(size_t pm, uint rpa);
-        static void setAppPointers(init_t* init_f, handleRequest_t* handleRequest_f);
+        static void setConfig(size_t pm, uint rpa, std::string appPath);
         RequestHandler();
     };
 }
