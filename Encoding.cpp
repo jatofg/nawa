@@ -5,12 +5,16 @@
 #include <boost/algorithm/string.hpp>
 #include <codecvt>
 #include <sstream>
+#include <regex>
+#include <boost/regex.hpp>
 #include "Encoding.h"
+#include "Utils.h"
 
 namespace {
     //std::unordered_map<char16_t, std::u16string> htmlEntities;
     std::unordered_map<char32_t, std::u32string> htmlEntities;
     std::unordered_map<char32_t, std::pair<char32_t, std::u32string>> htmlLookaheads;
+    std::unordered_map<std::u32string, std::pair<char32_t, char32_t>> htmlDecodeTable;
 
     void initializeEntities() {
 
@@ -494,6 +498,22 @@ namespace {
 
     }
 
+    void initializeDecodeTable() {
+        // initialize entities
+        if(htmlEntities.empty()) initializeEntities();
+        // add entities
+        for(auto &e: htmlEntities) {
+            // if string is empty, we need to look at htmlLookahead
+            if(!e.second.empty()) {
+                htmlDecodeTable.insert(std::make_pair(e.second, std::make_pair(e.first, U'\0')));
+            }
+            else if(htmlLookaheads.count(e.first) == 1) {
+                char32_t secondChar = htmlLookaheads.at(e.first).first;
+                htmlDecodeTable.insert(std::make_pair(e.second, std::make_pair(e.first, secondChar)));
+            }
+        }
+    }
+
 }
 
 std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
@@ -553,5 +573,41 @@ std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
 
 std::string Qsf::Encoding::htmlDecode(std::string input) {
     // replace with regular expressions
-    return std::__cxx11::string();
+    // TODO code points syntax
+
+    initializeDecodeTable();
+
+    // using boost as std::regex does not support callbacks
+    std::regex matchEntity(R"(&[A-Za-z0-9]{1,25}?;)");
+
+    // callback function
+    //auto replaceEntity = [](boost::smatch const &what) -> std::string {
+    auto replaceEntity = [](std::string s) -> std::string {
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
+        //auto entity32 = cv.from_bytes(what[0].str());
+        auto entity32 = cv.from_bytes(s);
+        if(htmlDecodeTable.count(entity32) != 1) {
+            //return s;
+            return ":(";
+        }
+        else {
+            std::basic_stringstream<char32_t> ret;
+            ret << htmlDecodeTable.at(entity32).first;
+            auto secondChar = htmlDecodeTable.at(entity32).second;
+            if(secondChar != '\0') {
+                ret << secondChar;
+            }
+            return cv.to_bytes(ret.str());
+        }
+    };
+
+    // run replacement
+    //boost::regex_replace(input, matchEntity, replaceEntity);
+    regex_replace_callback(input, matchEntity, replaceEntity);
+
+    // replacing by unicode: no lookup required actually, just print the corresponding unicode char if possible
+    // if not, look up in htmlEntities map (will not catch them all)
+    // warn in dox that entities in unicode notation will not be checked for validity
+
+    return input;
 }
