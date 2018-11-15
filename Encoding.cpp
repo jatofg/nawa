@@ -6,7 +6,9 @@
 #include <codecvt>
 #include <sstream>
 #include <regex>
-#include <boost/regex.hpp>
+#include <unordered_map>
+#include <unordered_set>
+#include <iomanip>
 #include "Encoding.h"
 #include "Utils.h"
 
@@ -15,8 +17,9 @@ namespace {
     std::unordered_map<char32_t, std::u32string> htmlEntities;
     std::unordered_map<char32_t, std::pair<char32_t, std::u32string>> htmlLookaheads;
     std::unordered_map<std::u32string, std::pair<char32_t, char32_t>> htmlDecodeTable;
+    std::unordered_set<char> urlUnreserved;
 
-    void initializeEntities() {
+    void initializeHtmlEntities() {
 
         htmlEntities = {{U'\u00C1',U"&Aacute;"},{U'\u00E1',U"&aacute;"},{U'\u0102',U"&Abreve;"},{U'\u0103',U"&abreve;"},
                         {U'\u223E',U"&ac;"},{U'\u223F',U"&acd;"},{U'\u223E',U""},{U'\u00C2',U"&Acirc;"},
@@ -498,9 +501,9 @@ namespace {
 
     }
 
-    void initializeDecodeTable() {
+    void initializeHtmlDecodeTable() {
         // initialize entities
-        if(htmlEntities.empty()) initializeEntities();
+        if(htmlEntities.empty()) initializeHtmlEntities();
         // add entities
         for(auto &e: htmlEntities) {
             // if string is empty, we need to look at htmlLookahead
@@ -514,6 +517,13 @@ namespace {
         }
     }
 
+    void initializeUrlUnreserved() {
+        urlUnreserved = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+                         'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4',
+                         '5', '6', '7', '8', '9', '-', '_', '.', '~'};
+    }
+
 }
 
 std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
@@ -525,7 +535,7 @@ std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
     }
     else {
         // initialize entities
-        if(htmlEntities.empty()) initializeEntities();
+        if(htmlEntities.empty()) initializeHtmlEntities();
         // convert to utf32 to iterate through the characters
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
         std::u32string uinput = cv.from_bytes(input);
@@ -573,9 +583,8 @@ std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
 
 std::string Qsf::Encoding::htmlDecode(std::string input) {
 
-    initializeDecodeTable();
+    if(htmlDecodeTable.empty()) initializeHtmlDecodeTable();
 
-    // using boost as std::regex does not support callbacks
     std::regex matchEntity(R"(&[A-Za-z0-9]{1,25}?;)");
 
     // callback function
@@ -600,7 +609,7 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
     regex_replace_callback(input, matchEntity, replaceEntity);
 
     // unicode replacement
-    std::regex matchUnicode(R"(&#(x([A-Ea-e0-9]{1,5})|([0-9]{1,6}));)");
+    std::regex matchUnicode(R"(&#(x([A-Fa-f0-9]{1,5})|([0-9]{1,6}));)");
     auto replaceUnicode = [](const std::vector<std::string>& matches) -> std::string {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
         // first alternative: decimal
@@ -618,11 +627,46 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
         else {
             return "";
         }
-        std::basic_stringstream<char32_t> out;
-        out << c;
-        return cv.to_bytes(out.str());
+//        std::basic_stringstream<char32_t> out;
+//        out << c;
+        std::u32string outs(1, c);
+        return cv.to_bytes(outs);
     };
     regex_replace_callback(input, matchUnicode, replaceUnicode);
+
+    return input;
+}
+
+std::string Qsf::Encoding::urlEncode(std::string input) {
+    if(urlUnreserved.empty()) initializeUrlUnreserved();
+    std::stringstream out;
+
+    // check if character is valid, unreserved URL character, otherwise apply url encoding
+    for(char c: input) {
+        if(urlUnreserved.count(c) == 1) {
+            out << c;
+        }
+        else {
+            std::ios init(nullptr);
+            init.copyfmt(out);
+            out << '%' << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)c;
+            out.copyfmt(init);
+        }
+    }
+
+    return out.str();
+}
+
+std::string Qsf::Encoding::urlDecode(std::string input) {
+    // match url codes by regex
+    std::regex matchCode(R"(%([0-9A-F]{2}))");
+
+    // replacement function
+    auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
+        return std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
+    };
+
+    regex_replace_callback(input, matchCode, replaceCode);
 
     return input;
 }
