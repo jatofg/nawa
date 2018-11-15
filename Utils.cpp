@@ -8,9 +8,10 @@ void
 Qsf::regex_replace_callback(std::string &s, const std::regex &rgx, std::function<std::string(std::string)> fmt) {
     std::sregex_token_iterator begin(s.begin(), s.end(), rgx, {-1, 0}), end;
     std::stringstream out;
-    for(auto it = begin; it != end; ++it) {
-        // does matched really behave like expected?
-        if(it->matched) {
+    // prefixes and matches (should) alternate
+    bool match = false;
+    for(auto it = begin; it != end; ++it, match = !match) {
+        if(match) {
             out << fmt(it->str());
         }
         else {

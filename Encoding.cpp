@@ -587,8 +587,7 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
         //auto entity32 = cv.from_bytes(what[0].str());
         auto entity32 = cv.from_bytes(s);
         if(htmlDecodeTable.count(entity32) != 1) {
-            //return s;
-            return ":(";
+            return s;
         }
         else {
             std::basic_stringstream<char32_t> ret;
