@@ -5,17 +5,36 @@
 #include "Utils.h"
 
 void
-Qsf::regex_replace_callback(std::string &s, const std::regex &rgx, std::function<std::string(std::string)> fmt) {
-    std::sregex_token_iterator begin(s.begin(), s.end(), rgx, {-1, 0}), end;
+Qsf::regex_replace_callback(std::string &s, const std::regex &rgx, std::function<std::string(const std::vector<std::string>&)> fmt) {
+    // how many submatches do we have to deal with?
+    int marks = rgx.mark_count();
+    // we want to iterate through all submatches (to collect them in a vector passed to fmt())
+    std::vector<int> submatchList;
+    for(int i = -1; i <= marks; ++i) {
+        submatchList.push_back(i);
+    }
+
+    std::sregex_token_iterator begin(s.begin(), s.end(), rgx, submatchList), end;
     std::stringstream out;
-    // prefixes and matches (should) alternate
-    bool match = false;
-    for(auto it = begin; it != end; ++it, match = !match) {
-        if(match) {
-            out << fmt(it->str());
+
+    // prefixes and submatches (should) alternate
+    int submatch = -1;
+    std::vector<std::string> submatchVector;
+    for(auto it = begin; it != end; ++it) {
+        if(submatch == -1) {
+            out << it->str();
+            ++submatch;
         }
         else {
-            out << it->str();
+            submatchVector.push_back(it->str());
+            if(submatch < marks) {
+                ++submatch;
+            }
+            else {
+                out << fmt(submatchVector);
+                submatchVector.clear();
+                submatch = -1;
+            }
         }
     }
     s = out.str();

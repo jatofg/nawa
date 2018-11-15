@@ -9,7 +9,16 @@
 #include <regex>
 
 namespace Qsf {
-    void regex_replace_callback(std::string& s, const std::regex& rgx, std::function<std::string(std::string)> fmt);
+    /**
+     * ASCII (byte-)string based regex_replace variant which takes a callback function as format parameter. This
+     * function may be used to generate individual replacements for each match.
+     * @param s String in which the replacements should take place.
+     * @param rgx std::regex object containing the regular expression to use for replacement.
+     * @param fmt Callback function taking a reference to a string vector as a parameter and returning the replacement
+     * as a string. The vector contains the full match at index 0 and, if capturing groups are used in the expression,
+     * the submatches at the following indexes (capturing group 1 at index 1, ...)
+     */
+    void regex_replace_callback(std::string& s, const std::regex& rgx, std::function<std::string(const std::vector<std::string>&)> fmt);
 }
 
 #endif //QSF_UTILS_H

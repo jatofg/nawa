@@ -572,8 +572,6 @@ std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
 }
 
 std::string Qsf::Encoding::htmlDecode(std::string input) {
-    // replace with regular expressions
-    // TODO code points syntax
 
     initializeDecodeTable();
 
@@ -581,13 +579,11 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
     std::regex matchEntity(R"(&[A-Za-z0-9]{1,25}?;)");
 
     // callback function
-    //auto replaceEntity = [](boost::smatch const &what) -> std::string {
-    auto replaceEntity = [](std::string s) -> std::string {
+    auto replaceEntity = [](const std::vector<std::string>& matches) -> std::string {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
-        //auto entity32 = cv.from_bytes(what[0].str());
-        auto entity32 = cv.from_bytes(s);
+        auto entity32 = cv.from_bytes(matches.at(0));
         if(htmlDecodeTable.count(entity32) != 1) {
-            return s;
+            return matches.at(0);
         }
         else {
             std::basic_stringstream<char32_t> ret;
@@ -601,12 +597,32 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
     };
 
     // run replacement
-    //boost::regex_replace(input, matchEntity, replaceEntity);
     regex_replace_callback(input, matchEntity, replaceEntity);
 
-    // replacing by unicode: no lookup required actually, just print the corresponding unicode char if possible
-    // if not, look up in htmlEntities map (will not catch them all)
-    // warn in dox that entities in unicode notation will not be checked for validity
+    // unicode replacement
+    std::regex matchUnicode(R"(&#(x([A-Ea-e0-9]{1,5})|([0-9]{1,6}));)");
+    auto replaceUnicode = [](const std::vector<std::string>& matches) -> std::string {
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
+        // first alternative: decimal
+        char32_t c;
+        if(matches.size() < 3) {
+            return "";
+        }
+        if(matches.size() > 3 && !matches.at(3).empty()) {
+            c = (char32_t) std::stoul(matches.at(3));
+        }
+        // second alternative: hex
+        else if(!matches.at(2).empty()) {
+            c = (char32_t) std::stoul(matches.at(2), nullptr, 16);
+        }
+        else {
+            return "";
+        }
+        std::basic_stringstream<char32_t> out;
+        out << c;
+        return cv.to_bytes(out.str());
+    };
+    regex_replace_callback(input, matchUnicode, replaceUnicode);
 
     return input;
 }
