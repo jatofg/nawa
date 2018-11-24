@@ -1,5 +1,5 @@
 //
-// Created on 30/10/18.
+// Created on 30/10/18. -> Connection
 //
 
 #ifndef QSF_RESPONSE_H
@@ -19,6 +19,7 @@ namespace Qsf {
          * Create an empty Cookie.
          */
         Cookie() = default;
+        // TODO remove constructors to make aggregate init possible?
         /**
          * Create a cookie and directly set the content.
          * @param c Content of the cookie.
@@ -34,39 +35,35 @@ namespace Qsf {
         bool secure = false; /**< Set Secure attribute. */
         bool httpOnly = false; /**< Set HttpOnly attribute. */
         bool sameSite = false;  /**< Set SameSite attribute. */
-        // TODO something like makeCookie() in Response to actually make default options matter?
-        // TODO and, of course, create the setCookiePolicy() if it can somehow make sense
     };
     /**
      * Response objects to be passed back to QSF.
      */
-    class Response {
+    class Connection {
         std::string bodyString;
         std::map<std::string, std::string> headers;
         std::map<std::string, Cookie> cookies;
-        Qsf::Request& request;
         bool isFlushed = false;
         Cookie cookiePolicy;
         // set body
-        // operator << and >> overloads for stream handling (body)
+        // operator << and >> overloads for stream handling (response)
         // add/remove/set headers
         // handling of html special chars (in some other [static] class?)
         // cookie setting
-        // export of data to fcgi++ (must merge body into bodyString) => getRaw (?)
+        // export of data to fcgi++ (must merge response into bodyString) => getRaw (?)
         // constructor should set cookies (?)
         // automatic handling of session cookies
         void clearStream();
         void mergeStream();
     public:
-        std::stringstream body; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
-        // TODO create enum instead of define macros?
-        // TODO add cookie options to constructor?
+        const Qsf::Request& request;
+        std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
         // TODO deliver cookies in Request as Cookie struct? (possibly bad idea because of missing options)
         /**
          * Create a Response object.
          * @param request Reference to the request object (needed to import cookies and flush the response).
          */
-        explicit Response(Request& request);
+        explicit Connection(Request& request);
         /**
          * Set the HTTP response body (everything that comes after the headers). This will overwrite everything
          * that was set previously. You can use the Response object as an ostream instead.
@@ -93,7 +90,6 @@ namespace Qsf {
          * @param key Key of the HTTP header (case-insensitive).
          */
         void unsetHeader(std::string key);
-        // TODO cookie options: expiry, secure, httponly and possibly more (for specific cookies and setCookieOptions)
         /**
          * Set a new HTTP cookie or overwrite the cookie with the given key. Create a Cookie object first, setting at
          * least the content of the cookie. Please note that no sanitation or checking is currently done
@@ -133,8 +129,8 @@ namespace Qsf {
          * @param s Something that can be added to an output stream.
          * @return A reference to the Response object itself so you can add more using another "<<".
          */
-        Response& operator<<(std::string s);
-        Response& operator<<(std::ostream&(*f)(std::ostream&));
+        Connection& operator<<(std::string s);
+        Connection& operator<<(std::ostream&(*f)(std::ostream&));
         /**
          * Flush the Response object, i.e., send headers and body to the client and reset it.
          * Please note that you cannot set cookies and headers anymore after flushing.

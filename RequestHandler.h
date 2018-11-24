@@ -12,11 +12,11 @@
 
 namespace Qsf {
     class Request;
-    class Response;
+    class Connection;
 
     // Types of functions that need to be accessed from QSF applications
     typedef int init_t();
-    typedef int handleRequest_t(Qsf::Request& request, Qsf::Response& response);
+    typedef int handleRequest_t(Qsf::Connection& connection);
 
     class RequestHandler : public Fastcgipp::Request<char> {
         friend class Qsf::Request;
@@ -27,7 +27,7 @@ namespace Qsf {
         std::string rawPost;
     public:
         bool response() override;
-        void flush(Qsf::Response& response);
+        void flush(Qsf::Connection& connection);
         bool inProcessor() override;
         static void setConfig(size_t pm, uint rpa, void* appOpen);
         RequestHandler();

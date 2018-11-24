@@ -5,27 +5,27 @@
 #include <algorithm>
 #include <iomanip>
 #include <locale>
-#include "Response.h"
+#include "Connection.h"
 
-void Qsf::Response::setBody(std::string content) {
+void Qsf::Connection::setBody(std::string content) {
     bodyString = std::move(content);
     clearStream();
 }
 
-void Qsf::Response::setHeader(std::string key, std::string value) {
+void Qsf::Connection::setHeader(std::string key, std::string value) {
     // convert to lowercase
     // TODO check for correctness, maybe using regex (or waste of cpu time?)
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers[key] = std::move(value);
 }
 
-void Qsf::Response::unsetHeader(std::string key) {
+void Qsf::Connection::unsetHeader(std::string key) {
     // convert to lowercase
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers.erase(key);
 }
 
-std::string Qsf::Response::getRaw() {
+std::string Qsf::Connection::getRaw() {
     mergeStream();
     std::stringstream raw;
 
@@ -86,51 +86,51 @@ std::string Qsf::Response::getRaw() {
     return raw.str();
 }
 
-void Qsf::Response::mergeStream() {
-    bodyString += body.str();
+void Qsf::Connection::mergeStream() {
+    bodyString += response.str();
     clearStream();
 }
 
-void Qsf::Response::clearStream() {
-    body.str(std::string());
-    body.clear();
+void Qsf::Connection::clearStream() {
+    response.str(std::string());
+    response.clear();
 }
 
-Qsf::Response& Qsf::Response::operator<<(std::string s) {
-    body << s;
+Qsf::Connection& Qsf::Connection::operator<<(std::string s) {
+    response << s;
     return *this;
 }
 
-Qsf::Response& Qsf::Response::operator<<(std::ostream &(*f)(std::ostream &)) {
-    body << f;
+Qsf::Connection& Qsf::Connection::operator<<(std::ostream &(*f)(std::ostream &)) {
+    response << f;
     return *this;
 }
 
-Qsf::Response::Response(Request& request) : request(request) {
+Qsf::Connection::Connection(Request& request) : request(request) {
     headers["content-type"] = "text/html; charset=utf-8";
 }
 
-void Qsf::Response::setCookie(std::string key, Qsf::Cookie cookie) {
+void Qsf::Connection::setCookie(std::string key, Qsf::Cookie cookie) {
     cookies[key] = std::move(cookie);
 }
 
-void Qsf::Response::unsetCookie(std::string key) {
+void Qsf::Connection::unsetCookie(std::string key) {
     cookies.erase(key);
 }
 
-void Qsf::Response::flush() {
-    // access RequestHandler through Request::Env, which declares Response as a friend
+void Qsf::Connection::flush() {
+    // access RequestHandler through Request::Env, which declares Connection as a friend
     request.env.request.flush(*this);
     // now that headers and cookies have been sent to the client, make sure they are not included anymore
     isFlushed = true;
-    // also, empty the Response object, so that content will not be sent more than once
+    // also, empty the Connection object, so that content will not be sent more than once
     setBody("");
 }
 
-void Qsf::Response::setStatus(uint status) {
+void Qsf::Connection::setStatus(uint status) {
     headers["status"] = std::to_string(status);
 }
 
-void Qsf::Response::setCookiePolicy(Cookie policy) {
+void Qsf::Connection::setCookiePolicy(Cookie policy) {
     cookiePolicy = std::move(policy);
 }

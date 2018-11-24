@@ -84,9 +84,9 @@ namespace Qsf {
              */
             Fastcgipp::Http::Address getRemoteAddr() const;
 
-            // mark Response as a friend so it can access RequestHandler through Env
+            // mark Connection as a friend so it can access RequestHandler through Env
             // TODO find another solution as this looks a bit like a dirty hack?
-            friend Response;
+            friend Connection;
         };
         /**
          * Accessor for GET, POST, and COOKIE variables.
@@ -106,7 +106,7 @@ namespace Qsf {
 //                using iterator_category = std::input_iterator_tag;
 //            };
             GPC(RequestHandler& request, uint source);
-            virtual ~GPC() {}
+            virtual ~GPC() = default;
             /**
              * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
              * only one of them (usually the first definition) will be returned. For accessing all definitions,
@@ -150,7 +150,7 @@ namespace Qsf {
         class Post: public GPC {
         public:
             explicit Post(RequestHandler& request);
-            virtual ~Post() {}
+            ~Post() override = default;
             /**
              * Get the raw POST data (availability depends on the raw_access setting in the config).
              * @return Reference to a string containing the raw POST data if available, otherwise the string is empty.
@@ -169,12 +169,11 @@ namespace Qsf {
             std::vector<Request::File> getFileVector(std::string postVar) const;
         };
 
-        /* TODO cookie setting (fits better in Response, probably) */
         const Request::Env env; /**< The Env object you should use to access environment variables. */
         const Request::GPC get; /**< The GPC object you should use to access GET variables. */
         const Request::Post post; /**< The Post object you should use to access POST variables. */
         const Request::GPC cookie; /**< The GPC object you should use to access COOKIE variables. */
-        Request(RequestHandler& request);
+        explicit Request(RequestHandler& request);
     };
 }
 

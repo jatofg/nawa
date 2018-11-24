@@ -627,8 +627,6 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
         else {
             return "";
         }
-//        std::basic_stringstream<char32_t> out;
-//        out << c;
         std::u32string outs(1, c);
         return cv.to_bytes(outs);
     };

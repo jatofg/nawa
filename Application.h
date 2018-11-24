@@ -5,7 +5,7 @@
 #ifndef QSF_APPLICATION_H
 #define QSF_APPLICATION_H
 
-#include "Response.h"
+#include "Connection.h"
 
 namespace Qsf {
     /**
@@ -36,7 +36,7 @@ namespace Qsf {
          * @return A return value that may indicate success (0) or failure. As of now, this value has no effect at all.
          * In future, it might be possible to avoid flushing the response and let QSF print an error page instead.
          */
-        virtual int processRequest(Qsf::Request& request, Qsf::Response& response) = 0;
+        virtual int processRequest(Qsf::Connection& connection) = 0;
     };
 }
 

@@ -9,27 +9,27 @@
 #include <dlfcn.h>
 #include "RequestHandler.h"
 #include "Request.h"
-#include "Response.h"
+#include "Connection.h"
 
 static Qsf::handleRequest_t* appHandleRequest;
 
 bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
-    Qsf::Response response(request);
+    Qsf::Connection connection(request);
 
     // run application
     // TODO maybe do something with return value in future
-    appHandleRequest(request, response);
+    appHandleRequest(connection);
 
     // flush response
-    response.flush();
+    connection.flush();
 
     return true;
 }
 
 //bool Qsf::RequestHandler::response() {
 //    Qsf::Request request(*this);
-//    Qsf::Response response(request);
+//    Qsf::Connection response(request);
 //
 //    response.setCookie("TEST", Cookie("test"));
 //    Cookie policy;
@@ -56,8 +56,8 @@ bool Qsf::RequestHandler::response() {
 //    return true;
 //}
 
-void Qsf::RequestHandler::flush(Qsf::Response& response) {
-    auto raw = response.getRaw();
+void Qsf::RequestHandler::flush(Qsf::Connection& connection) {
+    auto raw = connection.getRaw();
     dump(raw.c_str(), raw.size());
 }
 
