@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include <fastcgi++/manager.hpp>
 #include <unistd.h>
 #include <sys/types.h>
@@ -6,24 +7,28 @@
 #include <grp.h>
 #include <dlfcn.h>
 #include "RequestHandler.h"
-#include "inih/INIReader.h"
+#include "Config.h"
+#include "SysException.h"
 
 int main() {
     // read config.ini
-    INIReader reader("config.ini");
-    if(reader.ParseError() < 0) {
+    Qsf::Config config;
+    try {
+        config.read("config.ini");
+    }
+    catch(Qsf::SysException& e) {
         std::cerr << "Fatal Error: Could not read or parse config.ini" << std::endl;
         return 1;
     }
 
     // privilege downgrade
     if(getuid() == 0) {
-        std::string username = reader.Get("privileges", "user", "-1");
-        std::string groupname = reader.Get("privileges", "group", "-1");
-        if(username == "-1" || groupname == "-1") {
+        if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
             std::cerr << "Fatal Error: Username or password not correctly set in config.ini" << std::endl;
             return 1;
         }
+        std::string username = config[{"privileges", "user"}];
+        std::string groupname = config[{"privileges", "group"}];
         passwd* user = getpwnam(username.c_str());
         group* group = getgrnam(groupname.c_str());
         if(user == nullptr || group == nullptr) {
@@ -42,7 +47,7 @@ int main() {
     }
 
     // load application init function
-    std::string appPath = reader.Get("application", "path", "");
+    std::string appPath = config[{"application", "path"}];
 
     if(appPath.empty()) {
         std::cerr << "Fatal Error: Application path not set in config file" << std::endl;
@@ -71,14 +76,32 @@ int main() {
 
     // set post config and pass application path to RequestHandler so it can load appHandleRequest
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
-    std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
-    uint rawPost = (rawPostStr == "never") ? 0 : ((rawPostStr == "nonstandard") ? 1 : 2);
-    Qsf::RequestHandler::setConfig(static_cast<size_t>(reader.GetInteger("post", "max_size", 0)) * 1024, rawPost, appOpen);
+    //std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
+    std::string rawPostStr = config[{"post", "raw_access"}];
+    uint rawPost = (rawPostStr == "never")
+            ? QSF_RAWPOST_NEVER : ((rawPostStr == "always") ? QSF_RAWPOST_ALWAYS : QSF_RAWPOST_NONSTANDARD);
+    size_t postMaxSize = 0;
+    try {
+        postMaxSize = config.isSet({"post", "max_size"})
+                      ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
+    }
+    catch(std::invalid_argument& e) {
+        std::cerr << "WARNING: Invalid value given for post/max_size given in the config file." << std::endl;
+    }
+    Qsf::RequestHandler::setConfig(postMaxSize, rawPost, appOpen);
 
     // concurrency
-    auto cReal = std::max(1.0, reader.GetReal("system", "threads", 1.0));
-    if(reader.Get("system", "concurrency", "fixed") == "hardware") {
-        cReal = std::max(1.0, std::thread::hardware_concurrency()*cReal);
+    double cReal = 1.0;
+    try {
+        cReal = config.isSet({"system", "concurrency"})
+                ? std::stod(config[{"system", "concurrency"}]) : 1.0;
+    }
+    catch(std::invalid_argument& e) {
+        std::cerr << "WARNING: Invalid value given for system/concurrency given in the config file." << std::endl;
+    }
+
+    if(config[{"system", "concurrency"}] == "hardware") {
+        cReal = std::max(1.0, std::thread::hardware_concurrency() * cReal);
     }
     auto cInt = static_cast<unsigned int>(cReal);
 
@@ -86,19 +109,22 @@ int main() {
     manager.setupSignals();
 
     // socket handling
-    std::string mode = reader.Get("fastcgi", "mode", "none");
+    std::string mode = config[{"fastcgi", "mode"}];
     if(mode == "tcp") {
-        if(!manager.listen(reader.Get("fastcgi", "listen", "127.0.0.1").c_str(),
-                reader.Get("fastcgi", "port", "8000").c_str())) {
+        auto fastcgiListen = config[{"fastcgi", "listen"}];
+        auto fastcgiPort = config[{"fastcgi", "port"}];
+        if(fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
+        if(fastcgiPort.empty()) fastcgiPort = "8000";
+        if(!manager.listen(fastcgiListen.c_str(), fastcgiPort.c_str())) {
             std::cerr << "Fatal Error: Could not create TCP socket" << std::endl;
             return 1;
         }
     }
     else if(mode == "unix") {
         uint32_t permissions = 0xffffffffUL;
-        std::string permStr = reader.Get("fastcgi", "permissions", "-1");
+        std::string permStr = config[{"fastcgi", "permissions"}];
         // convert the value from the config file
-        if(permStr != "-1") {
+        if(!permStr.empty()) {
             const char* psptr = permStr.c_str();
             char* endptr;
             long perm = strtol(psptr, &endptr, 8);
@@ -106,10 +132,17 @@ int main() {
                 permissions = (uint32_t) perm;
             }
         }
-        std::string ownerStr = reader.Get("fastcgi", "owner", "-1");
-        std::string groupStr = reader.Get("fastcgi", "group", "-1");
-        if(!manager.listen(reader.Get("fastcgi", "path", "/etc/qsf/sock.d/qsf.sock").c_str(), permissions,
-                (ownerStr == "-1") ? nullptr : ownerStr.c_str(), (groupStr == "-1") ? nullptr : groupStr.c_str() )) {
+
+        auto fastcgiSocketPath = config[{"fastcgi", "path"}];
+        if(fastcgiSocketPath.empty()) {
+            fastcgiSocketPath = "/etc/qsf/sock.d/qsf.sock";
+        }
+        auto fastcgiOwner = config[{"fastcgi", "owner"}];
+        auto fastcgiGroup = config[{"fastcgi", "group"}];
+
+        if(!manager.listen(fastcgiSocketPath.c_str(), permissions,
+                fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
+                fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
             std::cerr << "Fatal Error: Could not create UNIX socket" << std::endl;
             return 1;
         }
@@ -121,7 +154,6 @@ int main() {
 
     // before manager starts, init app
     appInit();
-    //dlclose(appOpen);
 
     manager.start();
     manager.join();

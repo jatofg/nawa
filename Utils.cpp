@@ -2,6 +2,7 @@
 // Created by tobias on 14/11/18.
 //
 
+#include <iomanip>
 #include "Utils.h"
 
 void
@@ -38,4 +39,13 @@ Qsf::regex_replace_callback(std::string &s, const std::regex &rgx, std::function
         }
     }
     s = out.str();
+}
+
+std::string Qsf::hex_dump(const std::string &in) {
+    std::stringstream rets;
+    rets << std::hex << std::setfill('0');
+    for(char c: in) {
+        rets << std::setw(2) << (int)(unsigned char)c;
+    }
+    return rets.str();
 }

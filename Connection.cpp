@@ -120,7 +120,7 @@ void Qsf::Connection::unsetCookie(std::string key) {
 
 void Qsf::Connection::flush() {
     // access RequestHandler through Request::Env, which declares Connection as a friend
-    request.env.request.flush(*this);
+    request.env.requestHandler.flush(*this);
     // now that headers and cookies have been sent to the client, make sure they are not included anymore
     isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once

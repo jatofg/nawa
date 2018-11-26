@@ -52,9 +52,9 @@ namespace Qsf {
          */
         class Env {
         protected:
-            RequestHandler& request;
+            RequestHandler& requestHandler;
         public:
-            explicit Env(RequestHandler& request) : request(request) {}
+            explicit Env(RequestHandler& request) : requestHandler(request) {}
             /**
              * Get an environment variable.
              * @param envVar Name of the environment variable.
@@ -93,7 +93,7 @@ namespace Qsf {
          */
         class GPC {
         protected:
-            RequestHandler& request;
+            RequestHandler& requestHandler;
             uint source;
             std::multimap<std::basic_string<char>, std::basic_string<char>> data;
         public:

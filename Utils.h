@@ -19,6 +19,12 @@ namespace Qsf {
      * the submatches at the following indexes (capturing group 1 at index 1, ...)
      */
     void regex_replace_callback(std::string& s, const std::regex& rgx, std::function<std::string(const std::vector<std::string>&)> fmt);
+    /**
+     * Apply hex encoding to every byte in a string of bytes.
+     * @param in Byte string that should be converted.
+     * @return String containing the hexadecimal representation of every byte (thus, twice as long as in).
+     */
+    std::string hex_dump(const std::string& in);
 }
 
 #endif //QSF_UTILS_H

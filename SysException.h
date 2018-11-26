@@ -11,13 +11,13 @@
 #include <sstream>
 
 namespace Qsf {
-    class Exception: public std::exception {
+    class SysException: public std::exception {
         const char* file;
         uint line;
         const char* message;
     public:
-        Exception(const char* file, uint line);
-        Exception(const char* file, uint line, const char* message);
+        SysException(const char* file, uint line);
+        SysException(const char* file, uint line, const char* message);
         virtual const char* what() const noexcept;
     };
 }
