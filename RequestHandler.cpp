@@ -15,7 +15,7 @@ static Qsf::handleRequest_t* appHandleRequest;
 
 bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
-    Qsf::Connection connection(request);
+    Qsf::Connection connection(request, config);
 
     // run application
     // TODO maybe do something with return value in future
@@ -26,35 +26,6 @@ bool Qsf::RequestHandler::response() {
 
     return true;
 }
-
-//bool Qsf::RequestHandler::response() {
-//    Qsf::Request request(*this);
-//    Qsf::Connection response(request);
-//
-//    response.setCookie("TEST", Cookie("test"));
-//    Cookie policy;
-//    policy.httpOnly = true;
-//    response.setCookiePolicy(policy);
-//
-//    response << "<!DOCTYPE html>\n"
-//                "<html><head><title>Test</title></head><body>"
-//                "<p>Hello World!</p>";
-//
-//    response.flush();
-//
-//    // wait a few secs, then print more
-//    //std::this_thread::sleep_for(std::chrono::seconds(3));
-//
-//    response << "<p>Hello World 2!</p>"
-//                "</body></html>";
-//
-//    response.flush();
-//
-//    //out << raw;
-//    //std::cout << raw << std::flush;
-//
-//    return true;
-//}
 
 void Qsf::RequestHandler::flush(Qsf::Connection& connection) {
     auto raw = connection.getRaw();
@@ -91,18 +62,24 @@ void Qsf::RequestHandler::flush(Qsf::Connection& connection) {
 
 size_t Qsf::RequestHandler::postMax = 0;
 uint Qsf::RequestHandler::rawPostAccess = 1;
+Qsf::Config Qsf::RequestHandler::config;
 
-void Qsf::RequestHandler::setConfig(size_t pm, uint rpa, void* appOpen) {
-    postMax = pm;
-    rawPostAccess = rpa;
+void Qsf::RequestHandler::setConfig(const Qsf::Config& cfg, void* appOpen) {
+    config = cfg;
+    postMax = 0;
+    try {
+        postMax = config.isSet({"post", "max_size"})
+                      ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
+    }
+    catch(std::invalid_argument& e) {
+        std::cerr << "WARNING: Invalid value given for post/max_size given in the config file." << std::endl;
+    }
+    // raw_access is translated to an integer according to the macros defined in RequestHandler.h
+    std::string rawPostStr = config[{"post", "raw_access"}];
+    rawPostAccess = (rawPostStr == "never")
+                   ? QSF_RAWPOST_NEVER : ((rawPostStr == "always") ? QSF_RAWPOST_ALWAYS : QSF_RAWPOST_NONSTANDARD);
 
     // load appHandleRequest function
-    //void* appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
-//    if(!appOpen) {
-//        std::cerr << "Fatal Error: Application file could not be loaded (RequestHandler): " << dlerror() << std::endl;
-//        exit(1);
-//    }
-//    dlerror();
     appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
     auto dlsymErr = dlerror();
     if(dlsymErr) {

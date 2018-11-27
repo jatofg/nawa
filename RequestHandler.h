@@ -9,6 +9,7 @@
 #define QSF_RAWPOST_ALWAYS 2
 
 #include <fastcgi++/request.hpp>
+#include "Config.h"
 
 namespace Qsf {
     class Request;
@@ -22,6 +23,7 @@ namespace Qsf {
         friend class Qsf::Request;
         static size_t postMax;
         static uint rawPostAccess;
+        static Qsf::Config config;
         //static handleRequest_t* appHandleRequest;
         std::string postContentType;
         std::string rawPost;
@@ -29,7 +31,8 @@ namespace Qsf {
         bool response() override;
         void flush(Qsf::Connection& connection);
         bool inProcessor() override;
-        static void setConfig(size_t pm, uint rpa, void* appOpen);
+//        static void setConfig(size_t pm, uint rpa, void* appOpen);
+        static void setConfig(const Qsf::Config& cfg, void* appOpen);
         RequestHandler();
     };
 }

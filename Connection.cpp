@@ -106,7 +106,7 @@ Qsf::Connection& Qsf::Connection::operator<<(std::ostream &(*f)(std::ostream &))
     return *this;
 }
 
-Qsf::Connection::Connection(Request& request) : request(request) {
+Qsf::Connection::Connection(Request& request, Config& config) : request(request), config(config) {
     headers["content-type"] = "text/html; charset=utf-8";
 }
 

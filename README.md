@@ -5,4 +5,4 @@ QSF
 
 - libfastcgi++
 - OpenSSL (libssl-dev for building)
-- libboost < 67 (for building)
+- libboost-dev < 67 (for building)

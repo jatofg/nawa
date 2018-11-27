@@ -19,7 +19,6 @@ namespace Qsf {
          * Create an empty Cookie.
          */
         Cookie() = default;
-        // TODO remove constructors to make aggregate init possible?
         /**
          * Create a cookie and directly set the content.
          * @param c Content of the cookie.
@@ -57,13 +56,14 @@ namespace Qsf {
         void mergeStream();
     public:
         const Qsf::Request& request;
+        const Qsf::Config& config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
         // TODO deliver cookies in Request as Cookie struct? (possibly bad idea because of missing options)
         /**
          * Create a Response object.
          * @param request Reference to the request object (needed to import cookies and flush the response).
          */
-        explicit Connection(Request& request);
+        Connection(Request& request, Config& config);
         /**
          * Set the HTTP response body (everything that comes after the headers). This will overwrite everything
          * that was set previously. You can use the Response object as an ostream instead.

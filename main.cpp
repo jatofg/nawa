@@ -47,6 +47,8 @@ int main() {
     }
 
     // load application init function
+    // TODO introduce new function, e.g. version(), in the app and check if compiled for correct QSF release
+    //      - can we make this automatic somehow, i.e., having sth in an included header file (Connection.h)
     std::string appPath = config[{"application", "path"}];
 
     if(appPath.empty()) {
@@ -74,27 +76,14 @@ int main() {
         return 1;
     }
 
-    // set post config and pass application path to RequestHandler so it can load appHandleRequest
-    // raw_access is translated to an integer according to the macros defined in RequestHandler.h
-    //std::string rawPostStr = reader.Get("post", "raw_access", "nonstandard");
-    std::string rawPostStr = config[{"post", "raw_access"}];
-    uint rawPost = (rawPostStr == "never")
-            ? QSF_RAWPOST_NEVER : ((rawPostStr == "always") ? QSF_RAWPOST_ALWAYS : QSF_RAWPOST_NONSTANDARD);
-    size_t postMaxSize = 0;
-    try {
-        postMaxSize = config.isSet({"post", "max_size"})
-                      ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
-    }
-    catch(std::invalid_argument& e) {
-        std::cerr << "WARNING: Invalid value given for post/max_size given in the config file." << std::endl;
-    }
-    Qsf::RequestHandler::setConfig(postMaxSize, rawPost, appOpen);
+    // pass config and application to RequestHandler so it can load appHandleRequest
+    Qsf::RequestHandler::setConfig(config, appOpen);
 
     // concurrency
     double cReal = 1.0;
     try {
-        cReal = config.isSet({"system", "concurrency"})
-                ? std::stod(config[{"system", "concurrency"}]) : 1.0;
+        cReal = config.isSet({"system", "threads"})
+                ? std::stod(config[{"system", "threads"}]) : 1.0;
     }
     catch(std::invalid_argument& e) {
         std::cerr << "WARNING: Invalid value given for system/concurrency given in the config file." << std::endl;

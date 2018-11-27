@@ -22,6 +22,12 @@ namespace Qsf {
          * @param iniFile ini file to parse, values will be added to the Config container.
          */
         explicit Config(std::string iniFile);
+        /**
+         * Assignment operator.
+         * @param other Object to copy from.
+         * @return This object.
+         */
+        Config& operator=(const Config& other);
         virtual ~Config() = default;
         /**
          * Read an ini file and add the values to the Config container. Throws a SysException on failure.
