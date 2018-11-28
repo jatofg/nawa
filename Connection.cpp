@@ -60,7 +60,7 @@ std::string Qsf::Connection::getRaw() {
                 std::locale::global(tmp);
             }
             // Max-Age option
-            uint maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
+            unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
             if(maxAge > 0) {
                 raw << "; Max-Age=" << maxAge;
             }

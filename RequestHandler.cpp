@@ -66,13 +66,13 @@ Qsf::Config Qsf::RequestHandler::config;
 
 void Qsf::RequestHandler::setConfig(const Qsf::Config& cfg, void* appOpen) {
     config = cfg;
-    postMax = 0;
     try {
         postMax = config.isSet({"post", "max_size"})
                       ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
     }
     catch(std::invalid_argument& e) {
         std::cerr << "WARNING: Invalid value given for post/max_size given in the config file." << std::endl;
+        postMax = 0;
     }
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
     std::string rawPostStr = config[{"post", "raw_access"}];

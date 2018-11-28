@@ -80,13 +80,14 @@ int main() {
     Qsf::RequestHandler::setConfig(config, appOpen);
 
     // concurrency
-    double cReal = 1.0;
+    double cReal;
     try {
         cReal = config.isSet({"system", "threads"})
                 ? std::stod(config[{"system", "threads"}]) : 1.0;
     }
     catch(std::invalid_argument& e) {
         std::cerr << "WARNING: Invalid value given for system/concurrency given in the config file." << std::endl;
+        cReal = 1.0;
     }
 
     if(config[{"system", "concurrency"}] == "hardware") {

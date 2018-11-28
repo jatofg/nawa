@@ -28,12 +28,12 @@ namespace Qsf {
         }
         std::string content; /**< Content of the cookie. */
         std::time_t expires = 0; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
-        uint maxAge = 0; /**< Set Max-Age attribute. */
+        unsigned long maxAge = 0; /**< Set Max-Age attribute. */
         std::string domain; /**< Set Domain attribute. */
         std::string path; /**< Set Path attribute. */
         bool secure = false; /**< Set Secure attribute. */
         bool httpOnly = false; /**< Set HttpOnly attribute. */
-        uint sameSite = 0;  /**< Set SameSite attribute. 1 for lax, >1 for strict. */
+        unsigned int sameSite = 0;  /**< Set SameSite attribute. 1 for lax, >1 for strict. */
     };
     /**
      * Response objects to be passed back to QSF.
@@ -109,9 +109,9 @@ namespace Qsf {
         /**
          * This method can be used to set default attributes for cookies. Setting a boolean attribute to true means
          * that the corresponding attribute will be sent for all cookies, regardless of the value specified in the
-         * Cookie object itself. Values of string attributes will be used as default values if the corresponding
-         * attributes are not customized in the Cookie object and ignored otherwise. The content attribute will be
-         * ignored.
+         * Cookie object itself. For sameSite, the policy will be overridden if sameSite > 0 in the Cookie object.
+         * Values of string attributes will be used as default values if the corresponding attributes are not
+         * customized in the Cookie object and ignored otherwise. The content attribute will be ignored.
          * @param policy Cookie object containing the default attributes.
          */
         void setCookiePolicy(Cookie policy);

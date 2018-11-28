@@ -36,24 +36,70 @@ std::string Qsf::Session::generateID() {
     return hex_dump(std::string((char*)sha1Hash, SHA_DIGEST_LENGTH));
 }
 
-void Qsf::Session::start() {
+void Qsf::Session::start(Cookie properties) {
     // get name of session cookie from config
     auto sessionCookieName = connection.config[{"session", "cookie_name"}];
     if(sessionCookieName.empty()) {
         // TODO change?
         sessionCookieName = "SESSION";
     }
+
+    // session duration
+    unsigned long sessionKeepalive = 1800;
+    if(properties.maxAge > 0) {
+        sessionKeepalive = properties.maxAge;
+    }
+    else {
+        auto sessionKStr = connection.config[{"session", "keepalive"}];
+        if(!sessionKStr.empty()) {
+            try {
+                sessionKeepalive = std::stoul(sessionKStr);
+            }
+            catch(std::invalid_argument& e) {
+                sessionKeepalive = 1800;
+            }
+        }
+    }
+
     // check whether client has submitted a session cookie
-    auto sessionCookie = connection.request.cookie[sessionCookieName];
-    if(!sessionCookie.empty()) {
+    auto sessionCookieStr = connection.request.cookie[sessionCookieName];
+    if(!sessionCookieStr.empty()) {
         // TODO check for validity
     }
     else {
-        sessionCookie = generateID();
+        sessionCookieStr = generateID();
         // TODO check for duplicate
     }
-    // set the response cookie
+    // set the response cookie and its properties according to the properties or
     // TODO special properties for session cookie -> extra private method for generating Cookie object?
-    connection.setCookie(sessionCookieName, Qsf::Cookie(sessionCookie));
+    std::string cookieExpiresStr;
+    if(properties.expires > 0 || connection.config[{"session", "cookie_expires"}] != "off") {
+        properties.expires = time(nullptr) + sessionKeepalive;
+        properties.maxAge = sessionKeepalive;
+    }
+    else {
+        // we need to reset the maxAge value to 0 if it should not be used for the cookie
+        properties.maxAge = 0;
+    }
+
+    if(!properties.secure && connection.config[{"session", "cookie_secure"}] != "off") {
+        properties.secure = true;
+    }
+    if(!properties.httpOnly && connection.config[{"session", "cookie_httponly"}] != "off") {
+        properties.httpOnly = true;
+    }
+    if(properties.sameSite == 0) {
+        auto sessionSameSite = connection.config[{"session", "cookie_samesite"}];
+        if(sessionSameSite == "lax") {
+            properties.sameSite = 1;
+        }
+        else if(sessionSameSite != "off") {
+            properties.sameSite = 2;
+        }
+    }
+
+    // set the content to the session ID and queue the cookie
+    properties.content = sessionCookieStr;
+    connection.setCookie(sessionCookieName, properties);
     // TODO load or create SessionData object and add to data (locking!)
 }
