@@ -35,3 +35,25 @@ std::string Qsf::Session::generateID() {
 
     return hex_dump(std::string((char*)sha1Hash, SHA_DIGEST_LENGTH));
 }
+
+void Qsf::Session::start() {
+    // get name of session cookie from config
+    auto sessionCookieName = connection.config[{"session", "cookie_name"}];
+    if(sessionCookieName.empty()) {
+        // TODO change?
+        sessionCookieName = "SESSION";
+    }
+    // check whether client has submitted a session cookie
+    auto sessionCookie = connection.request.cookie[sessionCookieName];
+    if(!sessionCookie.empty()) {
+        // TODO check for validity
+    }
+    else {
+        sessionCookie = generateID();
+        // TODO check for duplicate
+    }
+    // set the response cookie
+    // TODO special properties for session cookie -> extra private method for generating Cookie object?
+    connection.setCookie(sessionCookieName, Qsf::Cookie(sessionCookie));
+    // TODO load or create SessionData object and add to data (locking!)
+}

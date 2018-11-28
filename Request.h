@@ -113,7 +113,8 @@ namespace Qsf {
              * please use getVector(). Complexity is logarithmic, so if you want to access a value multiple times,
              * saving it as a variable is a good idea.
              * @param gpcVar Name of the variable.
-             * @return Value of the variable. Empty string if not set (or empty - use count() for checking whether the variable is set).
+             * @return Value of the variable. Empty string if not set
+             * (or empty - use count() for checking whether the variable is set).
              */
             std::string operator [](std::string gpcVar) const;
             /**

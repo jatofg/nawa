@@ -25,6 +25,18 @@ namespace Qsf {
      * @return String containing the hexadecimal representation of every byte (thus, twice as long as in).
      */
     std::string hex_dump(const std::string& in);
+    /**
+     * Convert every ASCII letter in the given string to lowercase.
+     * @param s String to convert.
+     * @return Lowercase string.
+     */
+    std::string to_lowercase(std::string s);
+    /**
+     * Convert every ASCII letter in the given string to uppercase.
+     * @param s String to convert.
+     * @return Uppercase string.
+     */
+    std::string to_uppercase(std::string s);
 }
 
 #endif //QSF_UTILS_H

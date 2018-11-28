@@ -31,7 +31,7 @@ namespace Qsf {
         explicit Session(Connection& response);
         virtual ~Session() = default;
         // will not work properly after flushing (as cookie cannot be set)
-        //void start();
+        void start();
         // TODO isEstablished function to check whether a session has been started
         // TODO garbage collection
         // TODO session ID generation and verification (is it expired, from correct IP, etc.)

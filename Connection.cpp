@@ -73,8 +73,12 @@ std::string Qsf::Connection::getRaw() {
                 raw << "; HttpOnly";
             }
             // SameSite option
-            if(e.second.sameSite || cookiePolicy.sameSite) {
-                raw << "; SameSite";
+            uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
+            if(sameSite == 1) {
+                raw << "; SameSite=lax";
+            }
+            else if(sameSite > 1) {
+                raw << "; SameSite=strict";
             }
             raw << "\r\n";
         }

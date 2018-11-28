@@ -33,7 +33,7 @@ namespace Qsf {
         std::string path; /**< Set Path attribute. */
         bool secure = false; /**< Set Secure attribute. */
         bool httpOnly = false; /**< Set HttpOnly attribute. */
-        bool sameSite = false;  /**< Set SameSite attribute. */
+        uint sameSite = 0;  /**< Set SameSite attribute. 1 for lax, >1 for strict. */
     };
     /**
      * Response objects to be passed back to QSF.
@@ -62,6 +62,7 @@ namespace Qsf {
         /**
          * Create a Response object.
          * @param request Reference to the request object (needed to import cookies and flush the response).
+         * @param config Reference to the Config object containing the QSF configuration.
          */
         Connection(Request& request, Config& config);
         /**

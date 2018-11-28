@@ -49,3 +49,13 @@ std::string Qsf::hex_dump(const std::string &in) {
     }
     return rets.str();
 }
+
+std::string Qsf::to_lowercase(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
+std::string Qsf::to_uppercase(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+    return s;
+}
