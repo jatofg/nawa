@@ -13,18 +13,18 @@
 namespace Qsf {
     struct SessionData {
         std::mutex dLock, eLock;
-        std::vector<Types::Compound> data;
+        std::unordered_map<std::string, Types::Compound> data;
         time_t expires;
         const std::string sourceIP;
+        SessionData() : expires(0) {}
+        explicit SessionData(const std::string& sIP) : expires(0), sourceIP(sIP) {}
     };
 
     class Session {
         // TODO get session expiry from config and apply it
         static std::mutex gLock;
-        static std::vector<std::shared_ptr<SessionData>> data;
-        static std::map<std::string, size_t> cookies;
+        static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
         Qsf::Connection& connection;
-        size_t currentIndex;
         std::shared_ptr<SessionData> currentData;
         std::string generateID();
     public:

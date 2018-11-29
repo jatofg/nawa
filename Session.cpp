@@ -7,6 +7,9 @@
 #include <random>
 #include <openssl/sha.h>
 
+std::mutex Qsf::Session::gLock;
+std::unordered_map<std::string, std::shared_ptr<Qsf::SessionData>> Qsf::Session::data;
+
 Qsf::Session::Session(Qsf::Connection &connection) : connection(connection) {
     // do not initialize session yet -> extra function
     // receive from connection.request or generate session key
@@ -37,6 +40,9 @@ std::string Qsf::Session::generateID() {
 }
 
 void Qsf::Session::start(Cookie properties) {
+
+    // TODO check everything really carefully for possible race conditions
+    
     // get name of session cookie from config
     auto sessionCookieName = connection.config[{"session", "cookie_name"}];
     if(sessionCookieName.empty()) {
@@ -64,14 +70,46 @@ void Qsf::Session::start(Cookie properties) {
     // check whether client has submitted a session cookie
     auto sessionCookieStr = connection.request.cookie[sessionCookieName];
     if(!sessionCookieStr.empty()) {
-        // TODO check for validity
+        // check for validity
+        // global data map may be accessed concurrently by different threads
+        std::lock_guard<std::mutex> lockGuard(gLock);
+        if(data.count(sessionCookieStr) == 1) {
+            // read validate_ip setting from config (needed a few lines later)
+            auto sessionValidateIP = connection.config[{"session", "validate_ip"}];
+            // session already expired?
+            if(data.at(sessionCookieStr)->expires <= time(nullptr)) {
+                // TODO more generic way to invalidate sessions, without the need of being accessed after expiry
+                // TODO invalidate session
+            }
+            // validate_ip enabled in QSF config and IP mismatch?
+            else if((sessionValidateIP == "strict" || sessionValidateIP == "lax")
+                    && data.at(sessionCookieStr)->sourceIP != connection.request.env["remoteAddress"]) {
+                if(sessionValidateIP == "strict") {
+                    // TODO invalidate session
+                }
+            }
+            // session is valid
+            else {
+                currentData = data.at(sessionCookieStr);
+                // reset expiry
+                std::lock_guard<std::mutex> currentLock(currentData->eLock);
+                currentData->expires = time(nullptr) + sessionKeepalive;
+            }
+        }
     }
-    else {
-        sessionCookieStr = generateID();
-        // TODO check for duplicate
+    // if currentData not yet set (sessionCookieStr empty or invalid) -> initiate new session
+    if(currentData.use_count() < 1) {
+        // generate new session ID string (and check for duplicate - should not really occur)
+        std::lock_guard<std::mutex> lockGuard(gLock);
+        do {
+            sessionCookieStr = generateID();
+        } while(data.count(sessionCookieStr) > 0);
+        currentData = std::make_shared<Qsf::SessionData>(connection.request.env["remoteAddr"]);
+        currentData->expires = time(nullptr) + sessionKeepalive;
+        data[sessionCookieStr] = currentData;
     }
-    // set the response cookie and its properties according to the properties or
-    // TODO special properties for session cookie -> extra private method for generating Cookie object?
+
+    // set the response cookie and its properties according to the Cookie parameter or the QSF config
     std::string cookieExpiresStr;
     if(properties.expires > 0 || connection.config[{"session", "cookie_expires"}] != "off") {
         properties.expires = time(nullptr) + sessionKeepalive;
