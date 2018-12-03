@@ -43,3 +43,10 @@ std::string Qsf::Config::operator[](std::pair<std::string, std::string> key) con
     }
 }
 
+void Qsf::Config::set(std::pair<std::string, std::string> key, std::string value) {
+    values[std::move(key)] = std::move(value);
+}
+
+void Qsf::Config::set(std::string section, std::string key, std::string value) {
+    set(std::pair<std::string, std::string> (std::move(section), std::move(key)), std::move(value));
+}

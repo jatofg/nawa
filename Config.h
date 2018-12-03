@@ -47,6 +47,19 @@ namespace Qsf {
          * an empty value and a non-existing one, use the isSet() function).
          */
         std::string operator[](std::pair<std::string, std::string> key) const;
+        /**
+         * Set a key to a new value or insert a new key with the given value.
+         * @param key Pair of section and key string identifying the Config value that is to be set.
+         * @param value The value to set.
+         */
+        void set(std::pair<std::string, std::string> key, std::string value);
+        /**
+         * Set a key to a new value or insert a new key with the given value.
+         * @param section The config section in which the key is located.
+         * @param key The key.
+         * @param value The value to set.
+         */
+        void set(std::string section, std::string key, std::string value);
     };
 }
 

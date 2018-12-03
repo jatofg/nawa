@@ -65,6 +65,8 @@ uint Qsf::RequestHandler::rawPostAccess = 1;
 Qsf::Config Qsf::RequestHandler::config;
 
 void Qsf::RequestHandler::setConfig(const Qsf::Config& cfg, void* appOpen) {
+    // TODO make config setting possible somehow
+    //  - idea: a method in Connection that copies Config object upon changing the first value
     config = cfg;
     try {
         postMax = config.isSet({"post", "max_size"})

@@ -58,6 +58,10 @@ namespace Qsf {
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
          */
         void start(Cookie properties = Cookie());
+        bool isSet(std::string key) const;
+        Types::Compound operator[](std::string key) const;
+        void set(std::string key, Types::Compound value);
+
         // TODO isEstablished function to check whether a session has been started
         // TODO garbage collection
         // TODO session ID generation and verification (is it expired, from correct IP, etc.)
