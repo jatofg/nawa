@@ -3,6 +3,8 @@
 //
 
 #include "SysException.h"
+#include <string>
+#include <sstream>
 
 const char *Qsf::SysException::what() const noexcept {
     std::stringstream ret;
@@ -10,9 +12,9 @@ const char *Qsf::SysException::what() const noexcept {
     return ret.str().c_str();
 }
 
-Qsf::SysException::SysException(const char *file, uint line) : file(file), line(line) {
+Qsf::SysException::SysException(const char *file, unsigned int line) : file(file), line(line) {
     message = "No message provided";
 }
 
-Qsf::SysException::SysException(const char *file, uint line, const char *message) : file(file), line(line), message(message) {
+Qsf::SysException::SysException(const char *file, unsigned int line, const char *message) : file(file), line(line), message(message) {
 }

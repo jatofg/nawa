@@ -4,6 +4,7 @@
 
 #include "Session.h"
 #include "Crypto.h"
+#include "UserException.h"
 #include <random>
 
 std::mutex Qsf::Session::gLock;
@@ -130,23 +131,57 @@ void Qsf::Session::start(Cookie properties) {
     // set the content to the session ID and queue the cookie
     properties.content = sessionCookieStr;
     connection.setCookie(sessionCookieName, properties);
-    // TODO load or create SessionData object and add to data (locking!)
+}
+
+bool Qsf::Session::established() const {
+    return (currentData.use_count() > 0);
 }
 
 bool Qsf::Session::isSet(std::string key) const {
-    std::lock_guard<std::mutex> lockGuard(currentData->dLock);
-    return (currentData->data.count(key) == 1);
+    if(established()) {
+        std::lock_guard<std::mutex> lockGuard(currentData->dLock);
+        return (currentData->data.count(key) == 1);
+    }
+    return false;
 }
 
 Qsf::Types::Compound Qsf::Session::operator[](std::string key) const {
-    std::lock_guard<std::mutex> lockGuard(currentData->dLock);
-    if(currentData->data.count(key) == 1) {
-        return currentData->data.at(key);
+    if(established()) {
+        std::lock_guard<std::mutex> lockGuard(currentData->dLock);
+        if(currentData->data.count(key) == 1) {
+            return currentData->data.at(key);
+        }
     }
     return std::string();
 }
 
 void Qsf::Session::set(std::string key, Qsf::Types::Compound value) {
+    if(!established()) {
+        throw UserException("Qsf::Session::set", 1, "Session not established.");
+    }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data[key] = value;
+}
+
+void Qsf::Session::invalidateSession(std::string id) {
+    std::lock_guard<std::mutex> lockGuard(gLock);
+    data.erase(id);
+}
+
+void Qsf::Session::collectGarbage() {
+    std::lock_guard<std::mutex> lockGuard(gLock);
+    // no increment in for statement as we want to remove elements
+    for(auto it = data.cbegin(); it != data.cend();) {
+        bool toDelete = false;
+        {
+            std::lock_guard<std::mutex> eGuard(it->second->eLock);
+            toDelete = (it->second->expires < time(nullptr));
+        }
+        if(toDelete) {
+            it = data.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
 }

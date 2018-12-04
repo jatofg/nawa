@@ -5,19 +5,16 @@
 #ifndef QSF_QSFEXCEPTION_H
 #define QSF_QSFEXCEPTION_H
 
-
 #include <bits/exception.h>
-#include <string>
-#include <sstream>
 
 namespace Qsf {
     class SysException: public std::exception {
         const char* file;
-        uint line;
+        unsigned int line;
         const char* message;
     public:
-        SysException(const char* file, uint line);
-        SysException(const char* file, uint line, const char* message);
+        SysException(const char* file, unsigned int line);
+        SysException(const char* file, unsigned int line, const char* message);
         virtual const char* what() const noexcept;
     };
 }

@@ -22,11 +22,34 @@ namespace Qsf {
 
     class Session {
         // TODO get session expiry from config and apply it
-        static std::mutex gLock;
+        static std::mutex gLock; /**< Lock for data. */
+        /**
+         * Map containing the session data for all sessions. The key is the session ID string.
+         */
         static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
-        Qsf::Connection& connection;
+        Qsf::Connection& connection; /**< Reference to the Connection object in order to access objects. */
+        /**
+         * Pointer to the session data struct for the current session, if established.
+         * Can be used to check whether a session is established by checking shared_ptr::use_count()
+         * (used by established()).
+         */
         std::shared_ptr<SessionData> currentData;
+        /**
+         * Generate a random, 40 chars session ID.
+         * @return The session ID.
+         */
         std::string generateID();
+        /**
+         * Invalidate the session with the given session ID by removing it from the data map (if it exists)
+         * As it is a shared_ptr, connections currently using this session should not be affected.
+         * @param id Session ID.
+         */
+        static void invalidateSession(std::string id);
+        /**
+         * Garbage collection by removing every expired session from the data map.
+         * Would be best if run async and in fixed intervals (or with 0.xx chance on certain session actions -> see php)
+         */
+        static void collectGarbage();
     public:
         explicit Session(Connection& response);
         virtual ~Session() = default;
@@ -58,16 +81,32 @@ namespace Qsf {
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
          */
         void start(Cookie properties = Cookie());
+        /**
+         * Check whether a session is currently active (has been started).
+         * @return True if session is established, false otherwise.
+         */
+        bool established() const;
+        /**
+         * Check whether there is a value set for key key.
+         * @param key Key to check.
+         * @return True if a value exists for this key, false otherwise. Always false if no session established.
+         */
         bool isSet(std::string key) const;
+        /**
+         * Get value at key key.
+         * @param key Key to get value for.
+         * @return Value at key. If no value exists for that key or no session established, an empty Compound is returned.
+         */
         Types::Compound operator[](std::string key) const;
+        /**
+         * Set key to value. Throws a UserException with error code 1 if no session is established.
+         * @param key Key to set.
+         * @param value Value to set the key to.
+         */
         void set(std::string key, Types::Compound value);
 
-        // TODO isEstablished function to check whether a session has been started
         // TODO garbage collection
         // TODO session ID generation and verification (is it expired, from correct IP, etc.)
-        // TODO option whether session ID should be bound to 1 IP
-        // TODO operator[] (read session data element)
-        // TODO write() function or sth like that (write session data element)
     };
 }
 
