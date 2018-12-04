@@ -21,7 +21,6 @@ namespace Qsf {
     };
 
     class Session {
-        // TODO get session expiry from config and apply it
         static std::mutex gLock; /**< Lock for data. */
         /**
          * Map containing the session data for all sessions. The key is the session ID string.
@@ -39,12 +38,6 @@ namespace Qsf {
          * @return The session ID.
          */
         std::string generateID();
-        /**
-         * Invalidate the session with the given session ID by removing it from the data map (if it exists)
-         * As it is a shared_ptr, connections currently using this session should not be affected.
-         * @param id Session ID.
-         */
-        static void invalidateSession(std::string id);
         /**
          * Garbage collection by removing every expired session from the data map.
          * Would be best if run async and in fixed intervals (or with 0.xx chance on certain session actions -> see php)
@@ -104,9 +97,6 @@ namespace Qsf {
          * @param value Value to set the key to.
          */
         void set(std::string key, Types::Compound value);
-
-        // TODO garbage collection
-        // TODO session ID generation and verification (is it expired, from correct IP, etc.)
     };
 }
 

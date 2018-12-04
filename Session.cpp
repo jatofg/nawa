@@ -70,14 +70,14 @@ void Qsf::Session::start(Cookie properties) {
             auto sessionValidateIP = connection.config[{"session", "validate_ip"}];
             // session already expired?
             if(data.at(sessionCookieStr)->expires <= time(nullptr)) {
-                // TODO more generic way to invalidate sessions, without the need of being accessed after expiry
-                // TODO invalidate session
+                data.erase(sessionCookieStr);
             }
             // validate_ip enabled in QSF config and IP mismatch?
             else if((sessionValidateIP == "strict" || sessionValidateIP == "lax")
                     && data.at(sessionCookieStr)->sourceIP != connection.request.env["remoteAddress"]) {
                 if(sessionValidateIP == "strict") {
-                    // TODO invalidate session
+                    // in strict mode, session has to be invalidated
+                    data.erase(sessionCookieStr);
                 }
             }
             // session is valid
@@ -131,6 +131,26 @@ void Qsf::Session::start(Cookie properties) {
     // set the content to the session ID and queue the cookie
     properties.content = sessionCookieStr;
     connection.setCookie(sessionCookieName, properties);
+
+    // run garbage collection in 1/x of invocations
+    unsigned long divisor;
+    try {
+        auto divisorStr = connection.config[{"session", "gc_divisor"}];
+        if(!divisorStr.empty()) {
+            divisor = std::stoul(divisorStr);
+        }
+        else {
+            divisor = 100;
+        }
+    }
+    catch(std::invalid_argument& e) {
+        divisor = 100;
+    }
+    std::random_device rd;
+    if(rd() % divisor == 0) {
+        // TODO make this async somehow
+        collectGarbage();
+    }
 }
 
 bool Qsf::Session::established() const {
@@ -161,11 +181,6 @@ void Qsf::Session::set(std::string key, Qsf::Types::Compound value) {
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data[key] = value;
-}
-
-void Qsf::Session::invalidateSession(std::string id) {
-    std::lock_guard<std::mutex> lockGuard(gLock);
-    data.erase(id);
 }
 
 void Qsf::Session::collectGarbage() {
