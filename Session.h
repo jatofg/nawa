@@ -97,6 +97,7 @@ namespace Qsf {
          * @param value Value to set the key to.
          */
         void set(std::string key, Types::Compound value);
+        // TODO voluntary session invalidation by user/app using public method
     };
 }
 

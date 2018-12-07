@@ -5,17 +5,30 @@
 #ifndef QSF_USEREXCEPTION_H
 #define QSF_USEREXCEPTION_H
 
-#include <bits/exception.h>
+#include <string>
+#include <sstream>
 
 namespace Qsf {
     class UserException: public std::exception {
-        const char* inFunction;
         int errorCode;
-        const char* message;
+        std::string message;
     public:
-        UserException(const char* inFunction, int errorCode, const char* message);
-        UserException(const char* inFunction, int errorCode);
-        virtual const char* what() const noexcept;
+        UserException(std::string inFunction, int errorCode, std::string _message) : errorCode(errorCode) {
+            std::stringstream mstream;
+            mstream << "QSF: UserException #" << errorCode << " in " << inFunction << ": " << _message;
+            message = mstream.str();
+        }
+        UserException(std::string inFunction, int errorCode) : errorCode(errorCode) {
+            std::stringstream mstream;
+            mstream << "QSF: UserException #" << errorCode << " in " << inFunction;
+            message = mstream.str();
+        }
+        virtual const int getErrorCode() const noexcept {
+            return errorCode;
+        }
+        virtual const char* what() const noexcept {
+            return message.c_str();
+        }
     };
 }
 
