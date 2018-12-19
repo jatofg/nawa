@@ -26,6 +26,7 @@ namespace Qsf {
             void* ptr; /**< Pointer to the piece of memory where the object is stored. */
             bool set; /**< Is an object currently stored in the Universal? */
             void (Universal::*deleter)(); /**< Pointer to destructor for the current object. */
+            void (Universal::*copier)(const Universal&); /**< Pointer to copy function for the current object. */
 
             // save a deleter function to properly call saved object destructor in Universal destructor
             void deleteNothing() {}
@@ -35,12 +36,28 @@ namespace Qsf {
                 T* tPtr = (T*) ptr;
                 delete tPtr;
             }
+
+            // copy function
+            void copyNothing(const Universal&) {}
+
+            template<typename T>
+            void copyValue(const Universal& from) {
+                *this = from.get<T>();
+            }
         public:
             /**
              * Create an empty, uninitialized Universal.
              */
             Universal() : typeIndex(typeid(void)), set(false), ptr(nullptr) {
                 deleter = &Universal::deleteNothing;
+                copier = &Universal::copyNothing;
+            }
+
+            // do not set set to true as operator= would call the deleter function then
+            Universal(const Universal& value) : typeIndex(value.typeIndex), set(false), ptr(nullptr) {
+                // members will be set by copier
+                copier = value.copier;
+                (this->*copier)(value);
             }
 
             /**
@@ -53,6 +70,14 @@ namespace Qsf {
                 T* tPtr = new T(std::move(value));
                 ptr = (void*) tPtr;
                 deleter = &Universal::deleteValue<T>;
+                copier = &Universal::copyValue<T>;
+            }
+
+            Universal& operator=(const Universal& value) {
+                // copier will deal with this
+                copier = value.copier;
+                (this->*copier)(value);
+                return *this;
             }
 
             /**
@@ -73,22 +98,21 @@ namespace Qsf {
                 T* tPtr = new T(std::move(value));
                 ptr = (void*) tPtr;
                 deleter = &Universal::deleteValue<T>;
+                copier = &Universal::copyValue<T>;
 
                 return *this;
             }
 
             // specialization: do not allow assignment of another Universal (casting must happen first)
-            Universal& operator=(Universal) = delete;
+            //Universal& operator=(Universal) = delete;
 
             // delete copy construction for safety and assignment of another Universal for obvious reasons
-            Universal(const Universal&) = delete;
-            Universal& operator=(const Universal&) = delete;
+
+            //Universal& operator=(const Universal&) = delete;
 
             ~Universal() {
                 (this->*deleter)();
             }
-
-            // getters
 
             /**
              * Get value of the Universal (copy of the stored object). If T differs from the type of the stored object,
@@ -110,8 +134,6 @@ namespace Qsf {
                 }
                 return *(T*)ptr;
             }
-
-            // allow explicit casting
 
             /**
              * Enable explicit casting. You can also get the object by casting to T instead of calling get<T>.

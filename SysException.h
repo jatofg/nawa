@@ -13,12 +13,12 @@ namespace Qsf {
     class SysException: public std::exception {
         std::string message;
     public:
-        SysException(std::string file, unsigned int line) {
+        SysException(const std::string& file, unsigned int line) {
             std::stringstream ret;
             ret << "QSF: SysException in " << file << " at line " << line;
             message = ret.str();
         }
-        SysException(std::string file, unsigned int line, std::string _message) {
+        SysException(const std::string& file, unsigned int line, const std::string& _message) {
             std::stringstream ret;
             ret << "QSF: SysException in " << file << " at line " << line << ": " << _message;
             message = ret.str();

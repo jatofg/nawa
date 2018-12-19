@@ -6,6 +6,8 @@
 #include "Utils.h"
 #include <openssl/sha.h>
 #include <openssl/md5.h>
+#include "libbcrypt/bcrypt.h"
+#include "UserException.h"
 
 std::string Qsf::Crypto::sha1(const std::string &input, bool hex) {
     auto sha1Base = (const unsigned char*) input.c_str();
@@ -77,4 +79,46 @@ std::string Qsf::Crypto::md5(const std::string &input, bool hex) {
         return hex_dump(ret);
     }
     return ret;
+}
+
+std::string Qsf::Crypto::passwordHash(const std::string &password, int cost) {
+    if(password.empty()) {
+        throw UserException("Qsf::Cryto::passwordHash", 1, "Trying to hash empty password");
+    }
+    if(cost <= 0) {
+        throw UserException("Qsf::Crypto::passwordHash", 3, "Cost factor invalid.");
+    }
+
+    char salt[BCRYPT_HASHSIZE];
+    char hash[BCRYPT_HASHSIZE];
+
+    // use the functions provided by libbcrypt to generate a salt and a hash
+    // they will return negative integers in case of a failure, 0 on success
+    if(bcrypt_gensalt(cost, salt) != 0 || bcrypt_hashpw(password.c_str(), salt, hash) != 0) {
+        throw UserException("Qsf::Crypto::passwordHash", 2, "Could not hash this password (unknown bcrypt failure).");
+    }
+
+    return std::string(hash, 60);
+}
+
+bool Qsf::Crypto::passwordVerify(const std::string &password, const std::string &hash) {
+    if(hash.empty()) {
+        throw UserException("Qsf::Crypto::passwordVerify", 1, "Cannot verify an empty hash");
+    }
+    if(password.empty()) {
+        return false;
+    }
+
+    // return value of bcrypt_checkpw is -1 on failure, 0 on match, and >0 if not matching
+    int ret = bcrypt_checkpw(password.c_str(), hash.c_str());
+
+
+    if(ret < 0) {
+        throw UserException("Qsf::Crypto::passwordVerify", 2, "Could not check this password (unknown bcrypt failure");
+    }
+    else if(ret == 0) {
+        return true;
+    }
+
+    return false;
 }

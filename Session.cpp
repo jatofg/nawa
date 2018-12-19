@@ -165,22 +165,22 @@ bool Qsf::Session::isSet(std::string key) const {
     return false;
 }
 
-Qsf::Types::Compound Qsf::Session::operator[](std::string key) const {
+Qsf::Types::Universal Qsf::Session::operator[](std::string key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         if(currentData->data.count(key) == 1) {
             return currentData->data.at(key);
         }
     }
-    return std::string();
+    return Types::Universal();
 }
 
-void Qsf::Session::set(std::string key, Qsf::Types::Compound value) {
+void Qsf::Session::set(std::string key, const Qsf::Types::Universal& value) {
     if(!established()) {
         throw UserException("Qsf::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
-    currentData->data[key] = value;
+    currentData->data[std::move(key)] = value;
 }
 
 void Qsf::Session::collectGarbage() {

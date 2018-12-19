@@ -13,12 +13,12 @@ namespace Qsf {
         int errorCode;
         std::string message;
     public:
-        UserException(std::string inFunction, int errorCode, std::string _message) : errorCode(errorCode) {
+        UserException(const std::string& inFunction, int errorCode, const std::string& _message) : errorCode(errorCode) {
             std::stringstream mstream;
             mstream << "QSF: UserException #" << errorCode << " in " << inFunction << ": " << _message;
             message = mstream.str();
         }
-        UserException(std::string inFunction, int errorCode) : errorCode(errorCode) {
+        UserException(const std::string& inFunction, int errorCode) : errorCode(errorCode) {
             std::stringstream mstream;
             mstream << "QSF: UserException #" << errorCode << " in " << inFunction;
             message = mstream.str();

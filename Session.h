@@ -6,14 +6,14 @@
 #define QSF_SESSION_H
 
 #include "Connection.h"
-#include "Types/Compound.h"
+#include "Types/Universal.h"
 #include <vector>
 #include <mutex>
 
 namespace Qsf {
     struct SessionData {
         std::mutex dLock, eLock;
-        std::unordered_map<std::string, Types::Compound> data;
+        std::unordered_map<std::string, Types::Universal> data;
         time_t expires;
         const std::string sourceIP;
         SessionData() : expires(0) {}
@@ -90,13 +90,13 @@ namespace Qsf {
          * @param key Key to get value for.
          * @return Value at key. If no value exists for that key or no session established, an empty Compound is returned.
          */
-        Types::Compound operator[](std::string key) const;
+        Types::Universal operator[](std::string key) const;
         /**
          * Set key to value. Throws a UserException with error code 1 if no session is established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */
-        void set(std::string key, Types::Compound value);
+        void set(std::string key, const Types::Universal& value);
         // TODO voluntary session invalidation by user/app using public method
     };
 }
