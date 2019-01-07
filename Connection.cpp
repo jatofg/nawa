@@ -112,6 +112,11 @@ Qsf::Connection& Qsf::Connection::operator<<(std::ostream &(*f)(std::ostream &))
 
 Qsf::Connection::Connection(Request& request, Config& config) : request(request), config(config), session(*this) {
     headers["content-type"] = "text/html; charset=utf-8";
+    // autostart of session must happen here (as config is not yet accessible in Session constructor)
+    // check if autostart is enabled in config and if yes, directly call ::start
+    if(config[{"session", "autostart"}] == "on") {
+        session.start();
+    }
 }
 
 void Qsf::Connection::setCookie(std::string key, Qsf::Cookie cookie) {

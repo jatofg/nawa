@@ -12,11 +12,8 @@ std::mutex Qsf::Session::gLock;
 std::unordered_map<std::string, std::shared_ptr<Qsf::SessionData>> Qsf::Session::data;
 
 Qsf::Session::Session(Qsf::Connection &connection) : connection(connection) {
-    // check if autostart is enabled in config and if yes, directly call ::start
-    // TODO session autostart - the following will cause a SIGFPE
-//    if(connection.config[{"session", "autostart"}] == "on") {
-//        start();
-//    }
+    // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
+    // thus, it will be triggered by the Connection constructor
 }
 
 std::string Qsf::Session::generateID() {
@@ -36,6 +33,9 @@ std::string Qsf::Session::generateID() {
 void Qsf::Session::start(Cookie properties) {
 
     // TODO check everything really carefully for possible race conditions
+
+    // if session already started, do not start it again
+    if(established()) return;
 
     // get name of session cookie from config
     auto sessionCookieName = connection.config[{"session", "cookie_name"}];
