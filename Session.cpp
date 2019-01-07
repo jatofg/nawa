@@ -3,6 +3,7 @@
 //
 
 #include "Session.h"
+#include "Connection.h"
 #include "Crypto.h"
 #include "UserException.h"
 #include <random>
@@ -12,9 +13,10 @@ std::unordered_map<std::string, std::shared_ptr<Qsf::SessionData>> Qsf::Session:
 
 Qsf::Session::Session(Qsf::Connection &connection) : connection(connection) {
     // check if autostart is enabled in config and if yes, directly call ::start
-    if(connection.config[{"session", "autostart"}] == "on") {
-        start();
-    }
+    // TODO session autostart - the following will cause a SIGFPE
+//    if(connection.config[{"session", "autostart"}] == "on") {
+//        start();
+//    }
 }
 
 std::string Qsf::Session::generateID() {

@@ -8,33 +8,11 @@
 #include <string>
 #include <map>
 #include <sstream>
+#include "Cookie.h"
 #include "Request.h"
+#include "Session.h"
 
 namespace Qsf {
-    /**
-     * Structure for creating Cookie objects. Content can be set using the default constructor.
-     */
-    struct Cookie {
-        /**
-         * Create an empty Cookie.
-         */
-        Cookie() = default;
-        /**
-         * Create a cookie and directly set the content.
-         * @param c Content of the cookie.
-         */
-        explicit Cookie(std::string c) {
-            content = std::move(c);
-        }
-        std::string content; /**< Content of the cookie. */
-        std::time_t expires = 0; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
-        unsigned long maxAge = 0; /**< Set Max-Age attribute. */
-        std::string domain; /**< Set Domain attribute. */
-        std::string path; /**< Set Path attribute. */
-        bool secure = false; /**< Set Secure attribute. */
-        bool httpOnly = false; /**< Set HttpOnly attribute. */
-        unsigned int sameSite = 0;  /**< Set SameSite attribute. 1 for lax, >1 for strict. */
-    };
     /**
      * Response objects to be passed back to QSF.
      */
@@ -56,6 +34,7 @@ namespace Qsf {
         void mergeStream();
     public:
         const Qsf::Request& request; /**< Access the Request object representing the current request. */
+        Qsf::Session session;
         /**
          * Access the QSF configuration. This is a copy of the Config object that contains the values of the config file
          * which was read at the startup of QSF. You can use the ::set method to change values at runtime, however,

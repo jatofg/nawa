@@ -5,12 +5,15 @@
 #ifndef QSF_SESSION_H
 #define QSF_SESSION_H
 
-#include "Connection.h"
+#include "Cookie.h"
 #include "Types/Universal.h"
 #include <vector>
 #include <mutex>
+#include <unordered_map>
 
 namespace Qsf {
+    class Connection;
+
     struct SessionData {
         std::mutex dLock, eLock;
         std::unordered_map<std::string, Types::Universal> data;
@@ -44,7 +47,7 @@ namespace Qsf {
          */
         static void collectGarbage();
     public:
-        explicit Session(Connection& response);
+        explicit Session(Connection& connection);
         virtual ~Session() = default;
         /**
          * Start the session (load existing session basing on a cookie sent by the client or create a new one).
@@ -73,7 +76,7 @@ namespace Qsf {
          * - httpOnly: send the HttpOnly attribute with the cookie.
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
          */
-        void start(Cookie properties = Cookie());
+        void start(Qsf::Cookie properties = Cookie());
         /**
          * Check whether a session is currently active (has been started).
          * @return True if session is established, false otherwise.
