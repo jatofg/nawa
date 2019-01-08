@@ -6,11 +6,38 @@
 #include <pwd.h>
 #include <grp.h>
 #include <dlfcn.h>
+#include <csignal>
 #include "RequestHandler.h"
 #include "Config.h"
 #include "SysException.h"
 
+namespace {
+    // this will make the manager instance and loaded app accessible for signal handlers
+    std::unique_ptr<Fastcgipp::Manager<Qsf::RequestHandler>> managerPtr;
+    void* appOpen = nullptr;
+}
+
+void shutdown(int signum) {
+    std::cerr << "QSF: Terminating on signal " << signum << std::endl;
+    // terminate worker threads
+    if(managerPtr) {
+        // should unblock managerPtr->join() and execute the rest of the program
+        managerPtr->stop();
+    }
+    else {
+        if(appOpen != nullptr) {
+            // app has been already opened, close it
+            dlclose(appOpen);
+        }
+        exit(0);
+    }
+}
+
 int main() {
+    // set up signal handlers
+    signal(SIGINT, shutdown);
+    signal(SIGTERM, shutdown);
+
     // read config.ini
     Qsf::Config config;
     try {
@@ -55,7 +82,7 @@ int main() {
         std::cerr << "Fatal Error: Application path not set in config file" << std::endl;
         return 1;
     }
-    void* appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
+    appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if(!appOpen) {
         std::cerr << "Fatal Error: Application file could not be loaded (main): " << dlerror() << std::endl;
         return 1;
@@ -95,8 +122,9 @@ int main() {
     }
     auto cInt = static_cast<unsigned int>(cReal);
 
-    Fastcgipp::Manager<Qsf::RequestHandler> manager(cInt);
-    manager.setupSignals();
+    //Fastcgipp::Manager<Qsf::RequestHandler> manager(cInt);
+    managerPtr = std::make_unique<Fastcgipp::Manager<Qsf::RequestHandler>>(cInt);
+    managerPtr->setupSignals();
 
     // socket handling
     std::string mode = config[{"fastcgi", "mode"}];
@@ -105,7 +133,7 @@ int main() {
         auto fastcgiPort = config[{"fastcgi", "port"}];
         if(fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
         if(fastcgiPort.empty()) fastcgiPort = "8000";
-        if(!manager.listen(fastcgiListen.c_str(), fastcgiPort.c_str())) {
+        if(!managerPtr->listen(fastcgiListen.c_str(), fastcgiPort.c_str())) {
             std::cerr << "Fatal Error: Could not create TCP socket" << std::endl;
             return 1;
         }
@@ -130,7 +158,7 @@ int main() {
         auto fastcgiOwner = config[{"fastcgi", "owner"}];
         auto fastcgiGroup = config[{"fastcgi", "group"}];
 
-        if(!manager.listen(fastcgiSocketPath.c_str(), permissions,
+        if(!managerPtr->listen(fastcgiSocketPath.c_str(), permissions,
                 fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
                 fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
             std::cerr << "Fatal Error: Could not create UNIX socket" << std::endl;
@@ -145,8 +173,8 @@ int main() {
     // before manager starts, init app
     appInit();
 
-    manager.start();
-    manager.join();
+    managerPtr->start();
+    managerPtr->join();
 
     dlclose(appOpen);
     return 0;
