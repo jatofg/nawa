@@ -18,17 +18,17 @@ namespace Qsf {
          * (1) Type safety. While Universal can store an arbitrary type, accessing it requires explicitly stating it
          * as a template parameter. Type checking is done at runtime, an exception will be thrown when trying to
          * cast to the wrong type.
-         * (2) Deleted copy constructor. Copying requires getting the object and inserting it into a new Universal.
+         * (2) Safe copying. Copying the object will also copy the attached object on the heap.
          * (3) Safe destruction. Memory will be freed when the destructor is called.
          */
         class Universal {
-            std::type_index typeIndex; /**< Save type for comparison. */
+            std::type_index typeIndex; /**< Store type for comparison. */
             void* ptr; /**< Pointer to the piece of memory where the object is stored. */
             bool set; /**< Is an object currently stored in the Universal? */
             void (Universal::*deleter)(); /**< Pointer to destructor for the current object. */
             void (Universal::*copier)(const Universal&); /**< Pointer to copy function for the current object. */
 
-            // save a deleter function to properly call saved object destructor in Universal destructor
+            // save a deleter function to properly call stored object destructor in Universal destructor
             void deleteNothing() {}
 
             template<typename T>
@@ -102,13 +102,6 @@ namespace Qsf {
 
                 return *this;
             }
-
-            // specialization: do not allow assignment of another Universal (casting must happen first)
-            //Universal& operator=(Universal) = delete;
-
-            // delete copy construction for safety and assignment of another Universal for obvious reasons
-
-            //Universal& operator=(const Universal&) = delete;
 
             ~Universal() {
                 (this->*deleter)();

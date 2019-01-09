@@ -18,13 +18,20 @@ namespace Qsf {
         std::ostream* out;
         std::ofstream logFile;
         std::mutex outLock;
+        std::string hostname;
+        __pid_t pid = 0;
     public:
         Log();
+        explicit Log(std::ostream* os);
+        explicit Log(std::string filename);
+        // TODO implement copying if required
+        Log(const Log&) = delete;
+        Log& operator=(const Log&) = delete;
         virtual ~Log();
         void setStream(std::ostream* os);
         void setOutfile(std::string filename);
         void write(std::string msg);
-        Log& operator<<(std::string s);
+        void operator()(std::string s);
     };
 }
 

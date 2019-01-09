@@ -10,15 +10,19 @@
 #include "RequestHandler.h"
 #include "Config.h"
 #include "SysException.h"
+#include "Log.h"
 
 namespace {
     // this will make the manager instance and loaded app accessible for signal handlers
     std::unique_ptr<Fastcgipp::Manager<Qsf::RequestHandler>> managerPtr;
     void* appOpen = nullptr;
+    // use this for logging
+    // TODO enable logging to log file through config
+    Qsf::Log LOG;
 }
 
 void shutdown(int signum) {
-    std::cerr << "QSF: Terminating on signal " << signum << std::endl;
+    LOG("Terminating on signal " + std::to_string(signum));
     // terminate worker threads
     if(managerPtr) {
         // should unblock managerPtr->join() and execute the rest of the program
@@ -44,14 +48,14 @@ int main() {
         config.read("config.ini");
     }
     catch(Qsf::SysException& e) {
-        std::cerr << "Fatal Error: Could not read or parse config.ini" << std::endl;
+        LOG("Fatal Error: Could not read or parse config.ini");
         return 1;
     }
 
     // privilege downgrade
     if(getuid() == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
-            std::cerr << "Fatal Error: Username or password not correctly set in config.ini" << std::endl;
+            LOG("Fatal Error: Username or password not correctly set in config.ini");
             return 1;
         }
         std::string username = config[{"privileges", "user"}];
@@ -59,18 +63,18 @@ int main() {
         passwd* user = getpwnam(username.c_str());
         group* group = getgrnam(groupname.c_str());
         if(user == nullptr || group == nullptr) {
-            std::cerr << "Fatal Error: Username or groupname invalid" << std::endl;
+            LOG("Fatal Error: Username or groupname invalid");
             return 1;
         }
         if(user->pw_uid == 0 || group->gr_gid == 0) {
-            std::cerr << "WARNING: QSF will be running as user or group root. Security risk!" << std::endl;
+            LOG("WARNING: QSF will be running as user or group root. Security risk!");
         }
         if(setgid(group->gr_gid) != 0 || setuid(user->pw_uid) != 0) {
-            std::cerr << "Fatal Error: Could not set privileges" << std::endl;
+            LOG("Fatal Error: Could not set privileges");
             return 1;
         }
     } else {
-        std::cerr << "WARNING: Not starting as root, cannot set privileges" << std::endl;
+        LOG("WARNING: Not starting as root, cannot set privileges");
     }
 
     // load application init function
@@ -79,12 +83,12 @@ int main() {
     std::string appPath = config[{"application", "path"}];
 
     if(appPath.empty()) {
-        std::cerr << "Fatal Error: Application path not set in config file" << std::endl;
+        LOG("Fatal Error: Application path not set in config file");
         return 1;
     }
     appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if(!appOpen) {
-        std::cerr << "Fatal Error: Application file could not be loaded (main): " << dlerror() << std::endl;
+        LOG(std::string("Fatal Error: Application file could not be loaded (main): ") + dlerror());
         return 1;
     }
     // reset dl errors
@@ -93,13 +97,13 @@ int main() {
     auto appInit = (Qsf::init_t*) dlsym(appOpen, "init");
     auto dlsymErr = dlerror();
     if(dlsymErr) {
-        std::cerr << "Fatal Error: Could not load init function from application: " << dlsymErr << std::endl;
+        LOG(std::string("Fatal Error: Could not load init function from application: ") + dlsymErr);
         return 1;
     }
     auto appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
     dlsymErr = dlerror();
     if(dlsymErr) {
-        std::cerr << "Fatal Error: Could not load handleRequest function from application: " << dlsymErr << std::endl;
+        LOG(std::string("Fatal Error: Could not load handleRequest function from application: ") + dlsymErr);
         return 1;
     }
 
@@ -113,7 +117,7 @@ int main() {
                 ? std::stod(config[{"system", "threads"}]) : 1.0;
     }
     catch(std::invalid_argument& e) {
-        std::cerr << "WARNING: Invalid value given for system/concurrency given in the config file." << std::endl;
+        LOG("WARNING: Invalid value given for system/concurrency given in the config file.");
         cReal = 1.0;
     }
 
@@ -134,7 +138,7 @@ int main() {
         if(fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
         if(fastcgiPort.empty()) fastcgiPort = "8000";
         if(!managerPtr->listen(fastcgiListen.c_str(), fastcgiPort.c_str())) {
-            std::cerr << "Fatal Error: Could not create TCP socket" << std::endl;
+            LOG("Fatal Error: Could not create TCP socket");
             return 1;
         }
     }
@@ -161,12 +165,12 @@ int main() {
         if(!managerPtr->listen(fastcgiSocketPath.c_str(), permissions,
                 fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
                 fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
-            std::cerr << "Fatal Error: Could not create UNIX socket" << std::endl;
+            LOG("Fatal Error: Could not create UNIX socket");
             return 1;
         }
     }
     else {
-        std::cerr << "Fatal Error: Unknown FastCGI socket mode in config.ini" << std::endl;
+        LOG("Fatal Error: Unknown FastCGI socket mode in config.ini");
         return 1;
     }
 

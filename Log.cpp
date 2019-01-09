@@ -9,6 +9,20 @@
 
 Qsf::Log::Log() {
     out = &std::cerr;
+    // get hostname
+    char chostname[HOST_NAME_MAX+1];
+    gethostname(chostname, HOST_NAME_MAX+1);
+    hostname = chostname;
+    // get pid
+    pid = getpid();
+}
+
+Qsf::Log::Log(std::ostream *os) : Log() {
+    out = os;
+}
+
+Qsf::Log::Log(std::string filename) : Log() {
+    setOutfile(std::move(filename));
 }
 
 Qsf::Log::~Log() {
@@ -31,12 +45,11 @@ void Qsf::Log::setOutfile(std::string filename) {
 
 void Qsf::Log::write(std::string msg) {
     auto now = std::time(nullptr);
-    std::string hostname = getenv("HOSTNAME");
+
     *out << std::put_time(std::localtime(&now), "%b %d %H:%M:%S ") << hostname << ' ' << program_invocation_short_name
-         << '[' << getpid() << "]: [QSF] " << msg << std::endl;
+         << '[' << pid << "]: [QSF] " << msg << std::endl;
 }
 
-Qsf::Log &Qsf::Log::operator<<(std::string s) {
+void Qsf::Log::operator()(std::string s) {
     write(std::move(s));
-    return *this;
 }
