@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <locale>
+#include <regex>
 #include "Connection.h"
 
 void Qsf::Connection::setBody(std::string content) {
@@ -37,7 +38,6 @@ std::string Qsf::Connection::getRaw() {
         }
         // include cookies
         for(auto const &e: cookies) {
-            // TODO checking and especially escaping?
             raw << "Set-Cookie: " << e.first << "=" << e.second.content;
             // Domain option
             const std::string& domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
@@ -120,6 +120,12 @@ Qsf::Connection::Connection(Request& request, Config& config) : request(request)
 }
 
 void Qsf::Connection::setCookie(std::string key, Qsf::Cookie cookie) {
+    // check key and value using regex, according to ietf rfc 6265
+    std::regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
+    std::regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
+    if(!std::regex_match(key, matchKey) || !std::regex_match(cookie.content, matchContent)) {
+        throw UserException("Qsf::Connection::setCookie", 1, "Invalid characters in key or value");
+    }
     cookies[key] = std::move(cookie);
 }
 

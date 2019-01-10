@@ -50,6 +50,6 @@ void Qsf::Log::write(std::string msg) {
          << '[' << pid << "]: [QSF] " << msg << std::endl;
 }
 
-void Qsf::Log::operator()(std::string s) {
-    write(std::move(s));
+void Qsf::Log::operator()(std::string msg) {
+    write(std::move(msg));
 }

@@ -10,8 +10,12 @@
 #include "RequestHandler.h"
 #include "Request.h"
 #include "Connection.h"
+#include "Log.h"
 
-static Qsf::handleRequest_t* appHandleRequest;
+namespace {
+    Qsf::handleRequest_t* appHandleRequest;
+    Qsf::Log LOG;
+}
 
 bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
@@ -65,15 +69,13 @@ uint Qsf::RequestHandler::rawPostAccess = 1;
 Qsf::Config Qsf::RequestHandler::config;
 
 void Qsf::RequestHandler::setConfig(const Qsf::Config& cfg, void* appOpen) {
-    // TODO make config setting possible somehow
-    //  - idea: a method in Connection that copies Config object upon changing the first value
     config = cfg;
     try {
         postMax = config.isSet({"post", "max_size"})
                       ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
     }
     catch(std::invalid_argument& e) {
-        std::cerr << "WARNING: Invalid value given for post/max_size given in the config file." << std::endl;
+        LOG("WARNING: Invalid value given for post/max_size given in the config file.");
         postMax = 0;
     }
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
@@ -85,7 +87,7 @@ void Qsf::RequestHandler::setConfig(const Qsf::Config& cfg, void* appOpen) {
     appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
     auto dlsymErr = dlerror();
     if(dlsymErr) {
-        std::cerr << "Fatal Error: Could not load handleRequest function from application: " << dlsymErr << std::endl;
+        LOG(std::string("Fatal Error: Could not load handleRequest function from application: ") + dlsymErr);
         exit(1);
     }
 }

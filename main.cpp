@@ -78,8 +78,6 @@ int main() {
     }
 
     // load application init function
-    // TODO introduce new function, e.g. version(), in the app and check if compiled for correct QSF release
-    //      - can we make this automatic somehow, i.e., having sth in an included header file (Connection.h)
     std::string appPath = config[{"application", "path"}];
 
     if(appPath.empty()) {

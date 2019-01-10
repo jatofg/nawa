@@ -42,7 +42,6 @@ namespace Qsf {
          */
         Qsf::Config config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
-        // TODO deliver cookies in Request as Cookie struct? (possibly bad idea because of missing options)
         /**
          * Create a Response object.
          * @param request Reference to the request object (needed to import cookies and flush the response).
@@ -63,7 +62,8 @@ namespace Qsf {
         /**
          * Set an HTTP header or overwrite an existing one with the same key (keys are case-insensitive and will be
          * converted to lowercase). Please note that the content-type header will be automatically set to
-         * "text/html; charset=utf-8", but can be overwritten, of course.
+         * "text/html; charset=utf-8", but can be overwritten, of course. There will be no checking or validation,
+         * please make sure that the content of the header is valid (value valid for key, no newlines, ...)
          * @param key Key of the HTTP header (case-insensitive).
          * @param value Value of the HTTP header.
          */
@@ -77,12 +77,11 @@ namespace Qsf {
         void unsetHeader(std::string key);
         /**
          * Set a new HTTP cookie or overwrite the cookie with the given key. Create a Cookie object first, setting at
-         * least the content of the cookie. Please note that no sanitation or checking is currently done
-         * (even though this may change in future), so make sure not to accept cookie keys or content from users
-         * without proper sanitation! (In practice, only ASCII characters should be used in cookies, and '=' must
-         * not be used in the key).
-         * @param key Key of the cookie.
+         * least the content of the cookie. This function may throw a UserException with error code 1 if the key or
+         * cookie content contain illicit characters.
+         * @param key Key of the cookie. Valid characters in the key (as regex): [A-Za-z0-9!#$%&'*+\-.^_`|~]
          * @param cookie Cookie object containing the value and options of the cookie.
+         * Valid characters in the cookie content (as regex): [A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]
          */
         void setCookie(std::string key, Cookie cookie);
         /**
@@ -126,6 +125,7 @@ namespace Qsf {
     };
 }
 
-// TODO add stream modifiers if needed
+// TODO add stream modifiers if needed (or remove the stream modifiers altogether and advise to use .body)
+//  - it is actually impossible to implement everything, e.g. integers, floats, ... -> better let the stream handle this
 
 #endif //QSF_RESPONSE_H
