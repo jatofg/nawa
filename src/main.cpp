@@ -21,6 +21,7 @@ namespace {
     Qsf::Log LOG;
 }
 
+// signal handler for SIGINT and SIGTERM
 void shutdown(int signum) {
     LOG("Terminating on signal " + std::to_string(signum));
     // terminate worker threads
@@ -92,8 +93,19 @@ int main() {
     // reset dl errors
     dlerror();
     // load symbols and check for errors
-    auto appInit = (Qsf::init_t*) dlsym(appOpen, "init");
+    // first load qsf_version_major (defined in Application.h, included in Connection.h)
+    // the version the app has been compiled for should match the version of this qsfrunner
+    auto appQsfVersion = (int*) dlsym(appOpen, "qsf_version_major");
     auto dlsymErr = dlerror();
+    if(dlsymErr) {
+        LOG(std::string("Fatal Error: Could not read QSF version from application: ") + dlsymErr);
+        return 1;
+    }
+    if(*appQsfVersion != 0) {
+        LOG("Fatal Error: App has been compiled against another version of QSF.");
+    }
+    auto appInit = (Qsf::init_t*) dlsym(appOpen, "init");
+    dlsymErr = dlerror();
     if(dlsymErr) {
         LOG(std::string("Fatal Error: Could not load init function from application: ") + dlsymErr);
         return 1;

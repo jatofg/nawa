@@ -1,0 +1,15 @@
+//
+// Created by tobias on 08/11/18.
+//
+
+// File for application config
+
+#ifndef QSF_APPLICATION_H
+#define QSF_APPLICATION_H
+#define QSF_VERSION_MAJOR @QSF_VERSION_MAJOR@
+#define QSF_VERSION_MINOR @QSF_VERSION_MINOR@
+
+extern "C" const int qsf_version_major = QSF_VERSION_MAJOR;
+extern "C" const int qsf_version_minor = QSF_VERSION_MINOR;
+
+#endif //QSF_APPLICATION_H
