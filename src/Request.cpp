@@ -3,8 +3,8 @@
 //
 
 #include <fstream>
-#include "Request.h"
-#include "SysException.h"
+#include "qsf/Request.h"
+#include "qsf/SysException.h"
 
 std::string Qsf::Request::Env::operator[](std::string envVar) const {
     std::string ret;

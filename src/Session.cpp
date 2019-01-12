@@ -2,10 +2,10 @@
 // Created by tobias on 23/11/18.
 //
 
-#include "Session.h"
-#include "Connection.h"
-#include "Crypto.h"
-#include "UserException.h"
+#include "qsf/Session.h"
+#include "qsf/Connection.h"
+#include "qsf/Crypto.h"
+#include "qsf/UserException.h"
 #include <random>
 
 std::mutex Qsf::Session::gLock;

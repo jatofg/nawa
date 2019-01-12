@@ -2,9 +2,9 @@
 // Created by tobias on 26/11/18.
 //
 
-#include "Config.h"
-#include "inih/ini.h"
-#include "SysException.h"
+#include "qsf/Config.h"
+#include "../libs/inih/ini.h"
+#include "qsf/SysException.h"
 
 Qsf::Config::Config(std::string iniFile) {
     read(std::move(iniFile));

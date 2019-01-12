@@ -9,8 +9,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <iomanip>
-#include "Encoding.h"
-#include "Utils.h"
+#include "qsf/Encoding.h"
+#include "qsf/Utils.h"
 
 namespace {
     //std::unordered_map<char16_t, std::u16string> htmlEntities;

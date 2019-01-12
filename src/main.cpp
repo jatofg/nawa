@@ -7,10 +7,10 @@
 #include <grp.h>
 #include <dlfcn.h>
 #include <csignal>
-#include "RequestHandler.h"
-#include "Config.h"
-#include "SysException.h"
-#include "Log.h"
+#include "qsf/RequestHandler.h"
+#include "qsf/Config.h"
+#include "qsf/SysException.h"
+#include "qsf/Log.h"
 
 namespace {
     // this will make the manager instance and loaded app accessible for signal handlers

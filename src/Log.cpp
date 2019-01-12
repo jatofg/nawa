@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <unistd.h>
 #include <climits>
-#include "Log.h"
+#include "qsf/Log.h"
 
 Qsf::Log::Log() {
     out = &std::cerr;

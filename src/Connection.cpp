@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <locale>
 #include <regex>
-#include "Connection.h"
+#include "qsf/Connection.h"
 
 void Qsf::Connection::setBody(std::string content) {
     bodyString = std::move(content);

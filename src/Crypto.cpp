@@ -2,12 +2,12 @@
 // Created by tobias on 03/12/18.
 //
 
-#include "Crypto.h"
-#include "Utils.h"
+#include "qsf/Crypto.h"
+#include "qsf/Utils.h"
 #include <openssl/sha.h>
 #include <openssl/md5.h>
-#include "libbcrypt/bcrypt.h"
-#include "UserException.h"
+#include "../libs/libbcrypt/bcrypt.h"
+#include "qsf/UserException.h"
 
 std::string Qsf::Crypto::sha1(const std::string &input, bool hex) {
     auto sha1Base = (const unsigned char*) input.c_str();
