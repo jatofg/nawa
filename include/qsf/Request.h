@@ -97,14 +97,6 @@ namespace Qsf {
             uint source;
             std::multimap<std::basic_string<char>, std::basic_string<char>> data;
         public:
-//            class iterator {
-//            public:
-//                using value_type = std::string;
-//                using reference = std::string&;
-//                using pointer = std::string*;
-//                using difference_type = std::ptrdiff_t;
-//                using iterator_category = std::input_iterator_tag;
-//            };
             GPC(RequestHandler& request, uint source);
             virtual ~GPC() = default;
             /**

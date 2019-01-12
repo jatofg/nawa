@@ -44,9 +44,16 @@ add_executable(qsf
 
         libs/inih/ini.c
         libs/inih/ini.h)
-
 target_link_libraries(qsf -ldl -lfastcgipp -lcrypto ${CMAKE_BINARY_DIR}/libbcrypt.a)
 target_include_directories(qsf PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+add_library(qsftest SHARED
+        tests/app.h
+        tests/qsftest.cpp)
+target_include_directories(qsftest PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
