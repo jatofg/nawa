@@ -36,6 +36,8 @@ namespace Qsf {
          * (used by established()).
          */
         std::shared_ptr<SessionData> currentData;
+        std::string currentID; /**< The current session ID. */
+        std::string cookieName; /**< Name of the session cookie, as determined by start(). */
         /**
          * Generate a random, 40 chars session ID.
          * @return The session ID.
@@ -101,6 +103,13 @@ namespace Qsf {
          */
         void set(std::string key, const Types::Universal& value);
         // TODO voluntary session invalidation by user/app using public method
+        /**
+         * Terminate and delete the currently existing session along with its data and dequeue the session cookie.
+         * This function will do nothing if no session is currently active. After invalidating the current session,
+         * you may start a new one, as long as the response has not already been flushed (as in this case, the cookie
+         * header has already been sent).
+         */
+        void invalidate();
     };
 }
 

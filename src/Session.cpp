@@ -7,6 +7,8 @@
 #include "qsf/Crypto.h"
 #include "qsf/UserException.h"
 #include <random>
+#include <qsf/Session.h>
+
 
 std::mutex Qsf::Session::gLock;
 std::unordered_map<std::string, std::shared_ptr<Qsf::SessionData>> Qsf::Session::data;
@@ -38,10 +40,10 @@ void Qsf::Session::start(Cookie properties) {
     if(established()) return;
 
     // get name of session cookie from config
-    auto sessionCookieName = connection.config[{"session", "cookie_name"}];
-    if(sessionCookieName.empty()) {
+    cookieName = connection.config[{"session", "cookie_name"}];
+    if(cookieName.empty()) {
         // TODO change?
-        sessionCookieName = "SESSION";
+        cookieName = "SESSION";
     }
 
     // session duration
@@ -62,7 +64,7 @@ void Qsf::Session::start(Cookie properties) {
     }
 
     // check whether client has submitted a session cookie
-    auto sessionCookieStr = connection.request.cookie[sessionCookieName];
+    auto sessionCookieStr = connection.request.cookie[cookieName];
     if(!sessionCookieStr.empty()) {
         // check for validity
         // global data map may be accessed concurrently by different threads
@@ -130,9 +132,12 @@ void Qsf::Session::start(Cookie properties) {
         }
     }
 
+    // save the ID so we can invalidate the session
+    currentID = sessionCookieStr;
+
     // set the content to the session ID and queue the cookie
     properties.content = sessionCookieStr;
-    connection.setCookie(sessionCookieName, properties);
+    connection.setCookie(cookieName, properties);
 
     // run garbage collection in 1/x of invocations
     unsigned long divisor;
@@ -201,4 +206,21 @@ void Qsf::Session::collectGarbage() {
             ++it;
         }
     }
+}
+
+void Qsf::Session::invalidate() {
+
+    // do nothing if no session has been established
+    if(!established()) return;
+
+    // reset currentData pointer, this will also make established() return false
+    currentData.reset();
+
+    // erase this session from the data map
+    std::lock_guard<std::mutex> lockGuard(gLock);
+    data.erase(currentID);
+
+    // unset the session cookie, so that a new session can be started
+    connection.unsetCookie(cookieName);
+
 }

@@ -6,7 +6,7 @@
 #define QSF_RESPONSE_H
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <sstream>
 #include "Cookie.h"
 #include "Request.h"
@@ -18,8 +18,8 @@ namespace Qsf {
      */
     class Connection {
         std::string bodyString;
-        std::map<std::string, std::string> headers;
-        std::map<std::string, Cookie> cookies;
+        std::unordered_map<std::string, std::string> headers;
+        std::unordered_map<std::string, Cookie> cookies;
         bool isFlushed = false;
         Cookie cookiePolicy;
         // set body
@@ -85,7 +85,8 @@ namespace Qsf {
          */
         void setCookie(std::string key, Cookie cookie);
         /**
-         * Unset an HTTP cookie that was previously set using setCookie().
+         * Unset an HTTP cookie that was previously set using setCookie(). Will just do nothing if no cookie with the
+         * given key exists.
          * @param key Key of the cookie.
          */
         void unsetCookie(std::string key);

@@ -81,12 +81,15 @@ int handleRequest(Connection &connection) {
     connection << "<!DOCTYPE html>\n"
                   "<html><head><title>Test</title></head><body>"
                   "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
-                                                                                            "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>";
-
-    // better alternative: connection.session.isSet("test"), but this should work, too
-    if(connection.session["test"].isSet()) {
-//    if(connection.session.isSet("test")) {
+                  "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>";
+    
+    // alternative: connection.session["test"].isSet()
+    if(connection.session.isSet("test")) {
         connection << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";
+        connection.session.invalidate();
+        connection.session.start();
+        connection.session.set("test", Types::Universal(std::string("noch viel mehr blub")));
+        
     }
     else {
         connection.session.set("test", Types::Universal(std::string("bla bla blub")));

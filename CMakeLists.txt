@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.7)
 project(qsf)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -7,7 +7,12 @@ set(CMAKE_CXX_STANDARD 14)
 set(QSF_VERSION_MAJOR 0)
 set(QSF_VERSION_MINOR 1)
 
-#configure the file that we need for version checking
+# only unix-based OS are supported
+if(NOT UNIX)
+    message(FATAL_ERROR "Unsupported operating system")
+endif()
+
+# configure the file that we need for version checking
 configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
         ${PROJECT_BINARY_DIR}/include/qsf/Application.h)
 
@@ -60,3 +65,9 @@ target_include_directories(qsftest PUBLIC
 
 set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
+
+# install targets
+include(GNUInstallDirs)
+install(TARGETS qsf DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/qsf" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/qsf/Application.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qsf)
