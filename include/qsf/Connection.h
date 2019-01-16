@@ -22,14 +22,6 @@ namespace Qsf {
         std::unordered_map<std::string, Cookie> cookies;
         bool isFlushed = false;
         Cookie cookiePolicy;
-        // set body
-        // operator << and >> overloads for stream handling (response)
-        // add/remove/set headers
-        // handling of html special chars (in some other [static] class?)
-        // cookie setting
-        // export of data to fcgi++ (must merge response into bodyString) => getRaw (?)
-        // constructor should set cookies (?)
-        // automatic handling of session cookies
         void clearStream();
         void mergeStream();
     public:
@@ -43,7 +35,7 @@ namespace Qsf {
         Qsf::Config config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
         /**
-         * Create a Response object.
+         * Create a Connection object.
          * @param request Reference to the request object (needed to import cookies and flush the response).
          * @param config Reference to the Config object containing the QSF configuration.
          */
@@ -105,24 +97,12 @@ namespace Qsf {
          */
         std::string getRaw();
         /**
-         * You can add strings and a few other things to the body like this:\n
-         * response << "Some HTML content";\n
-         * Please note, however, that Response is not a full-featured ostream. In case of problems, please
-         * address the stream directly:\n
-         * response.body << "Some HTML content";\n
-         * This feature might be removed at any time from v0.
-         * @param s Something that can be added to an output stream.
-         * @return A reference to the Response object itself so you can add more using another "<<".
-         */
-        Connection& operator<<(std::string s);
-        Connection& operator<<(std::ostream&(*f)(std::ostream&));
-        /**
          * Flush the Response object, i.e., send headers and body to the client and reset it.
          * Please note that you cannot set cookies and headers anymore after flushing.
          * Attempts to do so will be silently ignored.\n
          * NOTE: Flushing might not work as expected with Apache 2.4 and mod_proxy_fcgi
          */
-        void flush();
+        void flushResponse();
     };
 }
 

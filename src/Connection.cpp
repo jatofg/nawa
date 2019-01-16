@@ -100,16 +100,6 @@ void Qsf::Connection::clearStream() {
     response.clear();
 }
 
-Qsf::Connection& Qsf::Connection::operator<<(std::string s) {
-    response << s;
-    return *this;
-}
-
-Qsf::Connection& Qsf::Connection::operator<<(std::ostream &(*f)(std::ostream &)) {
-    response << f;
-    return *this;
-}
-
 Qsf::Connection::Connection(Request& request, Config& config) : request(request), config(config), session(*this) {
     headers["content-type"] = "text/html; charset=utf-8";
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
@@ -133,7 +123,7 @@ void Qsf::Connection::unsetCookie(std::string key) {
     cookies.erase(key);
 }
 
-void Qsf::Connection::flush() {
+void Qsf::Connection::flushResponse() {
     // access RequestHandler through Request::Env, which declares Connection as a friend
     request.env.requestHandler.flush(*this);
     // now that headers and cookies have been sent to the client, make sure they are not included anymore

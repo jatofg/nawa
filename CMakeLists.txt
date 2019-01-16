@@ -66,8 +66,14 @@ target_include_directories(qsftest PUBLIC
 set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
-# install targets
+# install targets, components should be checked again w.r.t. packaging
 include(GNUInstallDirs)
-install(TARGETS qsf DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/qsf" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/qsf/Application.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qsf)
+install(TARGETS qsf
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT Runtime)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/qsf"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT Development)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/qsf/Application.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qsf
+        COMPONENT Development)

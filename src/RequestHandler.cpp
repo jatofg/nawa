@@ -26,7 +26,7 @@ bool Qsf::RequestHandler::response() {
     appHandleRequest(connection);
 
     // flush response
-    connection.flush();
+    connection.flushResponse();
 
     return true;
 }

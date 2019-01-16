@@ -11,6 +11,7 @@
 #include "qsf/Config.h"
 #include "qsf/SysException.h"
 #include "qsf/Log.h"
+#include "qsf/Application.h"
 
 namespace {
     // this will make the manager instance and loaded app accessible for signal handlers
@@ -36,6 +37,17 @@ void shutdown(int signum) {
         }
         exit(0);
     }
+}
+
+// load a symbol from the app .so file
+void* loadAppSymbol(const char* symbolName, const std::string& error) {
+    void* symbol = dlsym(appOpen, symbolName);
+    auto dlsymError = dlerror();
+    if(dlsymError) {
+        LOG(error + dlsymError);
+        exit(1);
+    }
+    return symbol;
 }
 
 int main() {
@@ -95,27 +107,14 @@ int main() {
     // load symbols and check for errors
     // first load qsf_version_major (defined in Application.h, included in Connection.h)
     // the version the app has been compiled for should match the version of this qsfrunner
-    auto appQsfVersion = (int*) dlsym(appOpen, "qsf_version_major");
-    auto dlsymErr = dlerror();
-    if(dlsymErr) {
-        LOG(std::string("Fatal Error: Could not read QSF version from application: ") + dlsymErr);
-        return 1;
-    }
-    if(*appQsfVersion != 0) {
+    std::string appVersionError = "Fatal Error: Could not read QSF version from application: ";
+    auto appQsfVersionMajor = (int*) loadAppSymbol("qsf_version_major", appVersionError);
+    auto appQsfVersionMinor = (int*) loadAppSymbol("qsf_version_minor", appVersionError);
+    //auto appQsfVersion = (int*) dlsym(appOpen, "qsf_version_major");
+    if(*appQsfVersionMajor != qsf_version_major || *appQsfVersionMinor != qsf_version_minor) {
         LOG("Fatal Error: App has been compiled against another version of QSF.");
     }
-    auto appInit = (Qsf::init_t*) dlsym(appOpen, "init");
-    dlsymErr = dlerror();
-    if(dlsymErr) {
-        LOG(std::string("Fatal Error: Could not load init function from application: ") + dlsymErr);
-        return 1;
-    }
-    auto appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
-    dlsymErr = dlerror();
-    if(dlsymErr) {
-        LOG(std::string("Fatal Error: Could not load handleRequest function from application: ") + dlsymErr);
-        return 1;
-    }
+    auto appInit = (Qsf::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
 
     // pass config and application to RequestHandler so it can load appHandleRequest
     Qsf::RequestHandler::setConfig(config, appOpen);

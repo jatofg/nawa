@@ -78,14 +78,14 @@ int handleRequest(Connection &connection) {
     std::string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
     std::string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
 
-    connection << "<!DOCTYPE html>\n"
+    connection.response << "<!DOCTYPE html>\n"
                   "<html><head><title>Test</title></head><body>"
                   "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
                   "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>";
     
     // alternative: connection.session["test"].isSet()
     if(connection.session.isSet("test")) {
-        connection << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";
+        connection.response << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";
         connection.session.invalidate();
         connection.session.start();
         connection.session.set("test", Types::Universal(std::string("noch viel mehr blub")));
@@ -93,26 +93,26 @@ int handleRequest(Connection &connection) {
     }
     else {
         connection.session.set("test", Types::Universal(std::string("bla bla blub")));
-        connection << "<p>There was no session yet, but now there should be one!" << "</p>";
+        connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 
     std::string encodedDecoded = Encoding::htmlDecode(encoded);
     if(decoded == encodedDecoded) {
-        connection << "<p>yay!</p>";
+        connection.response << "<p>yay!</p>";
     }
     else {
-        connection << "<p>" << Encoding::htmlEncode(encodedDecoded) <<"</p>";
+        connection.response << "<p>" << Encoding::htmlEncode(encodedDecoded) <<"</p>";
     }
 
-    connection.flush();
+    connection.flushResponse();
 
     // wait a few secs, then print more
     //std::this_thread::sleep_for(std::chrono::seconds(3));
 
-    connection << "<p>Hello World 2!</p>"
+    connection.response << "<p>Hello World 2!</p>"
                   "</body></html>";
 
-//    connection.flush();
+//    connection.flushResponse();
 
     return 0;
 }
