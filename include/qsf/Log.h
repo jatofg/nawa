@@ -1,6 +1,25 @@
-//
-// Created by tobias on 08/01/19.
-//
+/**
+ * \file Log.h
+ * \brief Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream
+ */
+
+/*
+ * Copyright (C) 2019 Jan Flaig.
+ *
+ * This file is part of QSF.
+ *
+ * QSF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * QSF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef QSF_LOG_H
 #define QSF_LOG_H
@@ -49,8 +68,8 @@ namespace Qsf {
         void setStream(std::ostream* os);
         // TODO does std::ofstream file opening really throw exceptions or is there sth that has to be changed?
         /**
-         * Change the output to append to the specified log file. This will open the specified file using the standard
-         * std::ofstream method and may therefore throw exceptions in case the file cannot be opened.
+         * Change the output to append to the specified log file. Will throw a UserException with error code 1 if
+         * the requested file cannot be opened for writing.
          * @param filename Path to the log file.
          */
         void setOutfile(std::string filename);

@@ -1,6 +1,25 @@
-//
-// Created on 30/09/18. All rights reserved.
-//
+/**
+ * \file Request.h
+ * \brief Class which represents request objects.
+ */
+
+/*
+ * Copyright (C) 2019 Jan Flaig.
+ *
+ * This file is part of QSF.
+ *
+ * QSF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * QSF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef QSF_QSFREQUEST_H
 #define QSF_QSFREQUEST_H

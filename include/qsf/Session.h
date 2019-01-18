@@ -1,6 +1,25 @@
-//
-// Created by tobias on 23/11/18.
-//
+/**
+ * \file Session.h
+ * \brief Class for managing sessions and getting and setting connection-independent session data.
+ */
+
+/*
+ * Copyright (C) 2019 Jan Flaig.
+ *
+ * This file is part of QSF.
+ *
+ * QSF is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * QSF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef QSF_SESSION_H
 #define QSF_SESSION_H
@@ -14,19 +33,33 @@
 namespace Qsf {
     class Connection;
 
+    /**
+     * SessionData objects contain all data of one session.
+     */
     struct SessionData {
-        std::mutex dLock, eLock;
-        std::unordered_map<std::string, Types::Universal> data;
-        time_t expires;
-        const std::string sourceIP;
+        std::mutex dLock; /**< Lock for data. */
+        std::mutex eLock; /**< Lock for expires.  */
+        std::unordered_map<std::string, Types::Universal> data; /**< Map containing all values of this session. */
+        time_t expires; /**< Time when this session expires. */
+        const std::string sourceIP; /**< IP address of the session initiator, for optional IP checking. */
+        /**
+         * Construct an empty SessionData object without a source IP.
+         */
         SessionData() : expires(0) {}
+        /**
+         * Construct an empty SessionData object with a source IP.
+         * @param sIP IP address of the session initiator.
+         */
         explicit SessionData(const std::string& sIP) : expires(0), sourceIP(sIP) {}
     };
 
+    /**
+     * Class for managing sessions and getting and setting connection-independent session data.
+     */
     class Session {
         static std::mutex gLock; /**< Lock for data. */
         /**
-         * Map containing the session data for all sessions. The key is the session ID string.
+         * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
          */
         static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
         Qsf::Connection& connection; /**< Reference to the Connection object in order to access objects. */
@@ -49,6 +82,10 @@ namespace Qsf {
          */
         static void collectGarbage();
     public:
+        /**
+         * Construct a new Session object. This will just store the Connection reference in the object.
+         * @param connection Reference to the current Connection (for getting and setting cookies).
+         */
         explicit Session(Connection& connection);
         virtual ~Session() = default;
         /**
@@ -102,7 +139,6 @@ namespace Qsf {
          * @param value Value to set the key to.
          */
         void set(std::string key, const Types::Universal& value);
-        // TODO voluntary session invalidation by user/app using public method
         /**
          * Terminate and delete the currently existing session along with its data and dequeue the session cookie.
          * This function will do nothing if no session is currently active. After invalidating the current session,
