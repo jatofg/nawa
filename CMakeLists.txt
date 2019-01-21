@@ -33,6 +33,7 @@ add_executable(qsf
         include/qsf/UserException.h
         include/qsf/Cookie.h
         include/qsf/Log.h
+        include/qsf/AccessFilters.h
         include/qsf/Types/Universal.h
 
         src/main.cpp
@@ -47,7 +48,7 @@ add_executable(qsf
         src/Log.cpp
 
         libs/inih/ini.c
-        libs/inih/ini.h)
+        libs/inih/ini.h include/qsf/AppInit.h)
 target_link_libraries(qsf -ldl -lfastcgipp -lcrypto ${CMAKE_BINARY_DIR}/libbcrypt.a)
 target_include_directories(qsf PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>

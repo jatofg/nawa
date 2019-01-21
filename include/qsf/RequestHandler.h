@@ -29,13 +29,14 @@
 
 #include <fastcgi++/request.hpp>
 #include "Config.h"
+#include "AppInit.h"
 
 namespace Qsf {
     class Request;
     class Connection;
 
     // Types of functions that need to be accessed from QSF applications
-    typedef int init_t(); /**< Type for the init() function of QSF apps. */
+    typedef int init_t(Qsf::AppInit& appInit); /**< Type for the init() function of QSF apps. */
     typedef int handleRequest_t(Qsf::Connection& connection); /**< Type for the handleRequest(Connection) function of QSF apps. */
 
     /**
@@ -44,16 +45,6 @@ namespace Qsf {
     class RequestHandler : public Fastcgipp::Request<char> {
         // declare Request friend so it can access private members inherited from Fastcgipp::Request
         friend class Qsf::Request;
-        static size_t postMax; /**< Maximum post size, in bytes, read from the config by setConfig(...). */
-        /**
-         * Integer value referring to the raw post access level, as described by the QSF_RAWPOST_* macros.
-         */
-        static uint rawPostAccess;
-        /**
-         * The config read from the config file will be stored here statically. The Config object will be copied
-         * upon each request into a non-static member of Connection, so it can be modified at runtime.
-         */
-        static Qsf::Config config;
         std::string postContentType; /**< Content type submitted by the browser in the request, set by inProcessor() */
         std::string rawPost; /**< Raw POST request, set by inProcessor() if requested. */
     public:
@@ -78,6 +69,11 @@ namespace Qsf {
          * @param appOpen dlopen handle which will be used to load the app handleRequest(...) function.
          */
         static void setConfig(const Qsf::Config& cfg, void* appOpen);
+        /**
+         * Take over the AppInit struct filled by the init() function of the app.
+         * @param _appInit AppInit struct as filled by the app.
+         */
+        static void setAppInit(const Qsf::AppInit& _appInit);
         /**
          * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
          */

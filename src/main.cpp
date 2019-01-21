@@ -74,6 +74,7 @@ void* loadAppSymbol(const char* symbolName, const std::string& error) {
 }
 
 int main() {
+
     // set up signal handlers
     signal(SIGINT, shutdown);
     signal(SIGTERM, shutdown);
@@ -115,7 +116,6 @@ int main() {
 
     // load application init function
     std::string appPath = config[{"application", "path"}];
-
     if(appPath.empty()) {
         LOG("Fatal Error: Application path not set in config file");
         return 1;
@@ -133,7 +133,6 @@ int main() {
     std::string appVersionError = "Fatal Error: Could not read QSF version from application: ";
     auto appQsfVersionMajor = (int*) loadAppSymbol("qsf_version_major", appVersionError);
     auto appQsfVersionMinor = (int*) loadAppSymbol("qsf_version_minor", appVersionError);
-    //auto appQsfVersion = (int*) dlsym(appOpen, "qsf_version_major");
     if(*appQsfVersionMajor != qsf_version_major || *appQsfVersionMinor != qsf_version_minor) {
         LOG("Fatal Error: App has been compiled against another version of QSF.");
     }
@@ -152,13 +151,12 @@ int main() {
         LOG("WARNING: Invalid value given for system/concurrency given in the config file.");
         cReal = 1.0;
     }
-
     if(config[{"system", "concurrency"}] == "hardware") {
         cReal = std::max(1.0, std::thread::hardware_concurrency() * cReal);
     }
     auto cInt = static_cast<unsigned int>(cReal);
 
-    //Fastcgipp::Manager<Qsf::RequestHandler> manager(cInt);
+    // set up fastcgi manager
     managerPtr = std::make_unique<Fastcgipp::Manager<Qsf::RequestHandler>>(cInt);
     managerPtr->setupSignals();
 
@@ -207,7 +205,10 @@ int main() {
     }
 
     // before manager starts, init app
-    appInit();
+    // TODO receive filters from init somehow
+    //  - mention that filters can only be set in init bc of multithreading
+    Qsf::AppInit appInit1;
+    appInit(appInit1);
 
     managerPtr->start();
     managerPtr->join();

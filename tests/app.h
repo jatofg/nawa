@@ -25,9 +25,8 @@
 #define QSF_APP_H
 
 #include "qsf/Application.h"
-#include "qsf/Connection.h"
 
-extern "C" int init();
+extern "C" int init(Qsf::AppInit& appInit);
 extern "C" int handleRequest(Qsf::Connection& connection);
 
 #endif //QSF_APP_H

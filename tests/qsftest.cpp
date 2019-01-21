@@ -31,7 +31,7 @@
 
 using namespace Qsf;
 
-int init() {
+int init(Qsf::AppInit& appInit) {
 //    std::cout << "It works!" << std::endl;
 //
 //    std::string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
@@ -83,6 +83,8 @@ int init() {
 //    std::cout << "Another one: " << Crypto::passwordHash(md5test, 10) << std::endl;
 //    std::cout << "Is 'Hello world!' correct? " << (Crypto::passwordVerify("Hello world!", hwHash) ? "yes" : "no") << std::endl;
 //    std::cout << "Is '" << md5test << "' correct? "  << (Crypto::passwordVerify("Hello wórld!", hwHash) ? "yes" : "no") << std::endl;
+
+    appInit.accessFilters.filtersEnabled = true;
 
     return 0;
 }

@@ -26,6 +26,8 @@
 #include <chrono>
 #include <thread>
 #include <dlfcn.h>
+#include <qsf/RequestHandler.h>
+
 #include "qsf/RequestHandler.h"
 #include "qsf/Request.h"
 #include "qsf/Connection.h"
@@ -34,12 +36,14 @@
 namespace {
     Qsf::handleRequest_t* appHandleRequest;
     Qsf::Log LOG;
+    size_t postMax = 0; /* Maximum post size, in bytes, read from the config by setConfig(...). */
+    // Integer value referring to the raw post access level, as described by the QSF_RAWPOST_* macros.
+    unsigned int rawPostAccess = 1;
+    // The config read from the config file will be stored here statically. The Config object will be copied
+    // upon each request into a non-static member of Connection, so it can be modified at runtime.
+    Qsf::Config config; /* The config as loaded by main. */
+    Qsf::AppInit appInit; /* The initialization struct as returned by the app init() function. */
 }
-
-// initialize static private members, so that the linker does not complain
-size_t Qsf::RequestHandler::postMax = 0;
-uint Qsf::RequestHandler::rawPostAccess = 1;
-Qsf::Config Qsf::RequestHandler::config;
 
 bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
@@ -47,6 +51,7 @@ bool Qsf::RequestHandler::response() {
 
     // run application
     // TODO maybe do something with return value in future
+    // TODO apply filters before
     appHandleRequest(connection);
 
     // flush response
@@ -98,4 +103,8 @@ bool Qsf::RequestHandler::inProcessor() {
     auto postBuffer = environment().postBuffer();
     rawPost = std::string(postBuffer.data(), postBuffer.size());
     return false;
+}
+
+void Qsf::RequestHandler::setAppInit(const Qsf::AppInit &_appInit) {
+    appInit = _appInit;
 }
