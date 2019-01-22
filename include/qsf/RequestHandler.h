@@ -78,6 +78,14 @@ namespace Qsf {
          * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
          */
         RequestHandler();
+        /**
+         * Apply the filters set by the app (through AppInit), if filtering is enabled.
+         * @param connection Reference to the connection object to read the request from and write the response to,
+         * if the request has to be filtered.
+         * @return True if the request has been filtered and a response has already been set by this function
+         * (and the app should not be invoked on this request). False if the app should handle this request.
+         */
+        bool applyFilters(Qsf::Connection& connection);
     };
 }
 

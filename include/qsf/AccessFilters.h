@@ -55,7 +55,7 @@ namespace Qsf {
          * For REGEX filtering: A std::regex matching the paths to be filtered (in the form "/dir1/dir2/file.ext").
          * Please note that this filtering is very resource-intensive and should only be used if the other filters
          * are not an option and the filtering goal cannot be achieved by combining another kind of filter with some
-         * other application logic (that does not use regex).
+         * other application logic (that does not use regex). std::regex_match will be used for matching.
          */
         std::regex regexFilter;
         /**
@@ -73,7 +73,19 @@ namespace Qsf {
         /**
          * The HTTP status that will be sent to the client if the request is blocked.
          */
-        int status = 403;
+        unsigned int status = 403;
+    };
+
+    /**
+     * Defines a filter that will request HTTP Basic Authentication if matching.
+     */
+    struct AuthFilter: public AccessFilter {
+        /**
+         * The authentication function. It will be called with the provided user name as first parameter and the
+         * provided user password as the second parameter. Access will be granted if the authentication function
+         * returns true.
+         */
+        std::function<bool(std::string, std::string)> authFunction;
     };
 
     /**
@@ -93,29 +105,19 @@ namespace Qsf {
          * - PATH: The request path will be added to the base path (e.g., the file mentioned above would be looked up
          * in basepath."/dir1/dir2/file.ext".
          */
-        enum BasePathExtension {FILENAME, PATH} basePathExtension = PATH;
+        enum BasePathExtension {BY_FILENAME, BY_PATH} basePathExtension = BY_PATH;
     };
 
     /**
-     * Defines a filter that will request HTTP Basic Authentication if matching.
-     */
-    struct AuthFilter: public AccessFilter {
-        /**
-         * The authentication function. It will be called with the provided user name as first parameter and the
-         * provided user password as the second parameter. Access will be granted if the authentication function
-         * returns true.
-         */
-        std::function<bool(std::string, std::string)> authFunction;
-    };
-
-    /**
-     * Structure in which all filters that should be applied by the RequestHandler can be included.
+     * Structure in which all filters that should be applied by the RequestHandler can be included. The filters will
+     * be processed from the first element in a vector to the last element, block filters first, then auth filters,
+     * then forward filters. If one filter leads to a block/forward/denied access, all following filters will be ignored.
      */
     struct AccessFilters {
         bool filtersEnabled = false; /**< Is the filter module enabled? If false, no filters will be applied. */
         std::vector<BlockFilter> blockFilters; /**< List of BlockFilter objects to be applied. */
-        std::vector<ForwardFilter> forwardFilters; /**< List of ForwardFilter objects to be applied. */
         std::vector<AuthFilter> authFilters; /**< List of AuthFilter objects to be applied. */
+        std::vector<ForwardFilter> forwardFilters; /**< List of ForwardFilter objects to be applied. */
     };
 }
 

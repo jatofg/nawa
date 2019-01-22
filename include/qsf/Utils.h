@@ -56,6 +56,14 @@ namespace Qsf {
      * @return Uppercase string.
      */
     std::string to_uppercase(std::string s);
+    /**
+     * Generate a very basic HTML error page for a given HTTP status.
+     * @param httpStatus The HTTP status. Currently supported: 400, 401, 403, 404, 405, 406, 408, 409, 410, 415, 418,
+     * 429, 451, 500, 501, 503.
+     * @return An HTML document containing a simple error page. If the given status code is unknown, it will be
+     * titled "Unknown error".
+     */
+    std::string generate_error_page(unsigned int httpStatus);
 }
 
 #endif //QSF_UTILS_H

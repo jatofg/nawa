@@ -27,6 +27,7 @@
 #include <thread>
 #include <dlfcn.h>
 #include <qsf/RequestHandler.h>
+#include <qsf/Utils.h>
 
 #include "qsf/RequestHandler.h"
 #include "qsf/Request.h"
@@ -43,6 +44,35 @@ namespace {
     // upon each request into a non-static member of Connection, so it can be modified at runtime.
     Qsf::Config config; /* The config as loaded by main. */
     Qsf::AppInit appInit; /* The initialization struct as returned by the app init() function. */
+
+    // check extension in request path and compare it
+    bool extensionMatches(const std::vector<std::string> &path, const std::string& extension) {
+        auto const &filename = path.back();
+        return filename.substr(filename.find_last_of('.') + 1) == extension;
+    }
+
+    // check if the given request path is a member of the second one (for path filtering)
+    bool pathMatches(const std::vector<std::string> &path1, const std::vector<std::string> &path2) {
+        // the second path is the one given by the filter: all elements of the second path must be in the first
+        if(path2.size() < path1.size())
+            return false;
+        for(unsigned long i = 0; i < path2.size(); ++i) {
+            if(path2.at(i) != path1.at(i))
+                return false;
+        }
+        return true;
+    }
+
+    // check whether the req. path (as a string "/dir1/dir2/file.ext") is matched by the regex
+    bool regexMatches(const std::vector<std::string> &path, const std::regex &regex) {
+        // merge path to string
+        std::stringstream pathStr;
+        for(auto const &e: path) {
+            pathStr << '/' << e;
+        }
+        return std::regex_match(pathStr.str(), regex);
+    }
+
 }
 
 bool Qsf::RequestHandler::response() {
@@ -107,4 +137,99 @@ bool Qsf::RequestHandler::inProcessor() {
 
 void Qsf::RequestHandler::setAppInit(const Qsf::AppInit &_appInit) {
     appInit = _appInit;
+}
+
+bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
+
+    // if filters are disabled, do not even check
+    if(!appInit.accessFilters.filtersEnabled) return false;
+
+    auto requestPath = connection.request.env.getPathInfo();
+
+    // check block filters
+    for(auto const &flt: appInit.accessFilters.blockFilters) {
+        switch(flt.filterType) {
+            case Qsf::AccessFilter::EXTENSION:
+                if(extensionMatches(requestPath, flt.extensionFilter)) {
+                    connection.setStatus(flt.status);
+                    if(!flt.response.empty()) {
+                        connection.setBody(flt.response);
+                    }
+                    else {
+                        connection.setBody(Qsf::generate_error_page(flt.status));
+                    }
+                    return true;
+                }
+                break;
+            case Qsf::AccessFilter::PATH:
+                if(pathMatches(requestPath, flt.pathFilter)) {
+                    connection.setStatus(flt.status);
+                    if(!flt.response.empty()) {
+                        connection.setBody(flt.response);
+                    }
+                    else {
+                        connection.setBody(Qsf::generate_error_page(flt.status));
+                    }
+                    return true;
+                }
+                break;
+            case Qsf::AccessFilter::REGEX:
+                if(regexMatches(requestPath, flt.regexFilter)) {
+                    connection.setStatus(flt.status);
+                    if(!flt.response.empty()) {
+                        connection.setBody(flt.response);
+                    }
+                    else {
+                        connection.setBody(Qsf::generate_error_page(flt.status));
+                    }
+                    return true;
+                }
+                break;
+        }
+
+        // check auth filters
+        for(auto const &flt: appInit.accessFilters.authFilters) {
+            switch(flt.filterType) {
+                case Qsf::AccessFilter::EXTENSION:
+                    if(extensionMatches(requestPath, flt.extensionFilter)) {
+                        // request auth, then return true if auth succeeds, otherwise send error document
+                    }
+                    break;
+                case Qsf::AccessFilter::PATH:
+                    if(pathMatches(requestPath, flt.pathFilter)) {
+                        // ...
+                    }
+                    break;
+                case Qsf::AccessFilter::REGEX:
+                    if(regexMatches(requestPath, flt.regexFilter)) {
+                        // ...
+                    }
+                    break;
+            }
+        }
+
+        // check forward filters
+        for(auto const &flt: appInit.accessFilters.forwardFilters) {
+            switch(flt.filterType) {
+                case Qsf::AccessFilter::EXTENSION:
+                    if(extensionMatches(requestPath, flt.extensionFilter)) {
+                        // look up path (with correct basePathExtension), return document with correct content-type
+                        // if found, otherwise return 404 error page (flt.response or generate_error_page(404))
+                        // check if cached in the browser (ifModifiedSince) and set a modified header!
+                    }
+                    break;
+                case Qsf::AccessFilter::PATH:
+                    if(pathMatches(requestPath, flt.pathFilter)) {
+                        // ...
+                    }
+                    break;
+                case Qsf::AccessFilter::REGEX:
+                    if(regexMatches(requestPath, flt.regexFilter)) {
+                        // ...
+                    }
+                    break;
+            }
+        }
+    }
+
 }
