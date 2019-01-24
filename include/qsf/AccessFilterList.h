@@ -31,31 +31,37 @@
 
 namespace Qsf {
 
+    // TODO auth filters requesting the credentials on every request do not make sense
+    //  --> possibly http auth should better be implemented somewhere else?
+    //  (however, forwarded requests cannot be authenticated then)
+
     /**
-     * Defines a filter on the request path.
+     * Defines a filter on the request path. Path filtering will be done first, then extension filtering, then regex
+     * filtering. In order to match, all enabled conditions must match (AND connector, use multiple filters for OR).
+     * Filters which are left empty will "match everything". A filter with no conditions will match everything.
      */
     struct AccessFilter {
         /**
-         * Type of the filter:
-         * - EXTENSION: match all files with a certain file extension
-         * - PATH: match everything under a certain request path (directory)
-         * - REGEX: matches the request path with a given regex
-         */
-        enum FilterType {EXTENSION, PATH, REGEX} filterType = EXTENSION;
-        /**
-         * For EXTENSION filtering: the file extension (the part behind the last '.')
-         */
-        std::string extensionFilter;
-        /**
-         * For PATH filtering: A vector containing all directory names under the web root
-         * (e.g., ["dir1", "dir2"] for /dir1/dir2/).
+         * For path filtering: A vector containing all directory names under the web root
+         * (e.g., ["dir1", "dir2"] for /dir1/dir2/). If empty, path filtering will not be applied.
          */
         std::vector<std::string> pathFilter;
         /**
-         * For REGEX filtering: A std::regex matching the paths to be filtered (in the form "/dir1/dir2/file.ext").
-         * Please note that this filtering is very resource-intensive and should only be used if the other filters
-         * are not an option and the filtering goal cannot be achieved by combining another kind of filter with some
-         * other application logic (that does not use regex). std::regex_match will be used for matching.
+         * For extension filtering: the file extension (the part behind the last '.'). If empty, extension filtering
+         * will not be applied.
+         */
+        std::string extensionFilter;
+        /**
+         * Regex filtering will be applied iff this value is set to true.\n
+         * Please note that this filtering is very resource-intensive. Use it only if you cannot achieve your goal by
+         * using (possibly a combination of) the other filters. It makes sense to define a path and/or extension filter
+         * additionally, so that the regex is only checked if the path and/or extension preconditions are met.
+         */
+        bool regexFilterEnabled = false;
+        /**
+         * For regex filtering: A std::regex matching the paths to be filtered (in the form "/dir1/dir2/file.ext").
+         * std::regex_match will be used for matching. If regexFilterEnabled is set to false, this value will be
+         * ignored. If regexFilterEnabled is set to true and the regex is not assigned, nothing will be matched.
          */
         std::regex regexFilter;
         /**
@@ -77,7 +83,8 @@ namespace Qsf {
     };
 
     /**
-     * Defines a filter that will request HTTP Basic Authentication if matching.
+     * Defines a filter that will request HTTP Basic Authentication if matching. This filter type is not implemented
+     * yet and possibly it also won't be implemented in future.
      */
     struct AuthFilter: public AccessFilter {
         /**
@@ -86,6 +93,12 @@ namespace Qsf {
          * returns true.
          */
         std::function<bool(std::string, std::string)> authFunction;
+        /**
+         * Use sessions to remember the authenticated user. This will create a session variable "_qsf_staticAuth_user".
+         * You can use it in your application to find out which user has authenticated and delete it to log the user out.
+         * If disabled, the user will have to authenticate on every single request.
+         */
+        bool useSessions = true;
     };
 
     /**
@@ -113,7 +126,7 @@ namespace Qsf {
      * be processed from the first element in a vector to the last element, block filters first, then auth filters,
      * then forward filters. If one filter leads to a block/forward/denied access, all following filters will be ignored.
      */
-    struct AccessFilters {
+    struct AccessFilterList {
         bool filtersEnabled = false; /**< Is the filter module enabled? If false, no filters will be applied. */
         std::vector<BlockFilter> blockFilters; /**< List of BlockFilter objects to be applied. */
         std::vector<AuthFilter> authFilters; /**< List of AuthFilter objects to be applied. */

@@ -25,10 +25,78 @@
 #include <iomanip>
 #include <locale>
 #include <regex>
+#include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <qsf/Utils.h>
+
 #include "qsf/Connection.h"
 
 void Qsf::Connection::setBody(std::string content) {
     bodyString = std::move(content);
+    clearStream();
+}
+
+void
+Qsf::Connection::sendFile(std::string path, std::string contentType, bool forceDownload, std::string downloadFilename) {
+    // TODO guess file type (based on extension)
+    // TODO set the other headers, see comment in header
+
+    // open file as binary
+    std::ifstream f(path, std::ifstream::binary);
+
+    // throw exception if file cannot be opened
+    if(!f) {
+        throw Qsf::UserException("Qsf::Connection::sendFile", 1, "Cannot open file for reading");
+    }
+
+    // set content-type header
+    if(!contentType.empty()) {
+        setHeader("content-type", contentType);
+    }
+    else {
+        // use the function from utils.h to guess the content type
+        setHeader("content-type", Qsf::content_type_by_extension(Qsf::get_file_extension(path)));
+    }
+
+    // set the content-disposition header
+    if(forceDownload) {
+        if(!downloadFilename.empty()) {
+            std::stringstream hval;
+            hval << "attachment; filename=\"" << downloadFilename << '"';
+            setHeader("content-disposition", hval.str());
+        }
+        else {
+            setHeader("content-disposition", "attachment");
+        }
+    }
+    else if(!downloadFilename.empty()) {
+        std::stringstream hval;
+        hval << "inline; filename=\"" << downloadFilename << '"';
+        setHeader("content-disposition", hval.str());
+    }
+
+    // set the content-length header
+    // get file size
+    f.seekg(0, std::ios::end);
+    long fs = f.tellg();
+    f.seekg(0);
+    setHeader("content-length", std::to_string(fs));
+
+    // set the last-modified header (if possible)
+    struct stat fileStat;
+    if(stat(path.c_str(), &fileStat) == 0) {
+        std::stringstream hval;
+        hval << std::put_time(gmtime(&fileStat.st_mtim.tv_sec), "%a, %d %b %Y %H:%M:%S GMT");
+        setHeader("last-modified", hval.str());
+    }
+
+    // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
+    bodyString.resize(static_cast<unsigned long>(fs) + 1, '\0');
+    bodyString[fs] = '\0';
+    f.read(&bodyString[0], fs);
+
+    // also clear the stream so that it doesn't mess with our file
     clearStream();
 }
 

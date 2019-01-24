@@ -66,6 +66,21 @@ namespace Qsf {
          */
         void setBody(std::string content);
         /**
+         * Send a file from disk to the client. This will automatically set the content-type, content-length, and
+         * last-modified headers and replace the existing HTTP response body (if any) with the contents of the file.
+         * You are responsible to check request headers (such as accepts and if-modified-since). If the file cannot
+         * be read, a UserException with error code 1 will be thrown.
+         * @param path Path to the file, including the file name of course (better use absolute paths).
+         * @param contentType The content-type string (such as image/png). If left empty, QSF will try to guess the
+         * content type itself (this will only work for a few common file types), and use "application/octet-stream"
+         * if that fails. Content type guessing is done solely based on the file extension.
+         * @param forceDownload Ask the browser to download the file by sending "content-disposition: attachment".
+         * @param downloadFilename Preferred filename for saving the file on the disk of the client. If this parameter
+         * is set, and forceDownload is set to false, a "content-disposition: inline" header will be sent.
+         * ('; filename="picture.jpg"')
+         */
+        void sendFile(std::string path, std::string contentType = "", bool forceDownload = false, std::string downloadFilename = "");
+        /**
          * Set the HTTP status code. It will be passed to the web server without checking for validity.
          * @param status The HTTP status code to pass to the web server.
          */

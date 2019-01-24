@@ -45,32 +45,43 @@ namespace {
     Qsf::Config config; /* The config as loaded by main. */
     Qsf::AppInit appInit; /* The initialization struct as returned by the app init() function. */
 
-    // check extension in request path and compare it
-    bool extensionMatches(const std::vector<std::string> &path, const std::string& extension) {
-        auto const &filename = path.back();
-        return filename.substr(filename.find_last_of('.') + 1) == extension;
-    }
+    /**
+     * Check the conditions of an AccessFilter.
+     * @param requestPath The request path of the current request.
+     * @param flt The access filter that will be checked.
+     * @return True if the filter matches, false otherwise.
+     */
+    bool filterMatches(const std::vector<std::string> &requestPath, const Qsf::AccessFilter &flt) {
+        if(!flt.pathFilter.empty()) {
+            // path condition is set but does not match -> the whole filter does not match
+            // all elements of the filter path must be in the request path
+            if(requestPath.size() < flt.pathFilter.size())
+                return false;
+            for(unsigned long i = 0; i < flt.pathFilter.size(); ++i) {
+                if(flt.pathFilter.at(i) != requestPath.at(i))
+                    return false;
+            }
+            // path condition matches -> continue to the next filter
+        }
 
-    // check if the given request path is a member of the second one (for path filtering)
-    bool pathMatches(const std::vector<std::string> &path1, const std::vector<std::string> &path2) {
-        // the second path is the one given by the filter: all elements of the second path must be in the first
-        if(path2.size() < path1.size())
-            return false;
-        for(unsigned long i = 0; i < path2.size(); ++i) {
-            if(path2.at(i) != path1.at(i))
+        if(!flt.extensionFilter.empty()) {
+            auto const &filename = requestPath.back();
+            if(Qsf::get_file_extension(filename) != flt.extensionFilter)
                 return false;
         }
-        return true;
-    }
 
-    // check whether the req. path (as a string "/dir1/dir2/file.ext") is matched by the regex
-    bool regexMatches(const std::vector<std::string> &path, const std::regex &regex) {
-        // merge path to string
-        std::stringstream pathStr;
-        for(auto const &e: path) {
-            pathStr << '/' << e;
+        if(!flt.regexFilterEnabled) {
+            // merge request path to string
+            std::stringstream pathStr;
+            for(auto const &e: requestPath) {
+                pathStr << '/' << e;
+            }
+            if(!std::regex_match(pathStr.str(), flt.regexFilter))
+                return false;
         }
-        return std::regex_match(pathStr.str(), regex);
+
+        // all conditions match or no condition has been set -> the filter matches
+        return true;
     }
 
 }
@@ -148,88 +159,45 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
 
     // check block filters
     for(auto const &flt: appInit.accessFilters.blockFilters) {
-        switch(flt.filterType) {
-            case Qsf::AccessFilter::EXTENSION:
-                if(extensionMatches(requestPath, flt.extensionFilter)) {
-                    connection.setStatus(flt.status);
-                    if(!flt.response.empty()) {
-                        connection.setBody(flt.response);
-                    }
-                    else {
-                        connection.setBody(Qsf::generate_error_page(flt.status));
-                    }
-                    return true;
-                }
-                break;
-            case Qsf::AccessFilter::PATH:
-                if(pathMatches(requestPath, flt.pathFilter)) {
-                    connection.setStatus(flt.status);
-                    if(!flt.response.empty()) {
-                        connection.setBody(flt.response);
-                    }
-                    else {
-                        connection.setBody(Qsf::generate_error_page(flt.status));
-                    }
-                    return true;
-                }
-                break;
-            case Qsf::AccessFilter::REGEX:
-                if(regexMatches(requestPath, flt.regexFilter)) {
-                    connection.setStatus(flt.status);
-                    if(!flt.response.empty()) {
-                        connection.setBody(flt.response);
-                    }
-                    else {
-                        connection.setBody(Qsf::generate_error_page(flt.status));
-                    }
-                    return true;
-                }
-                break;
+        // if the filter does not apply, go to the next
+        if(!filterMatches(requestPath, flt)) {
+            continue;
         }
 
-        // check auth filters
-        for(auto const &flt: appInit.accessFilters.authFilters) {
-            switch(flt.filterType) {
-                case Qsf::AccessFilter::EXTENSION:
-                    if(extensionMatches(requestPath, flt.extensionFilter)) {
-                        // request auth, then return true if auth succeeds, otherwise send error document
-                    }
-                    break;
-                case Qsf::AccessFilter::PATH:
-                    if(pathMatches(requestPath, flt.pathFilter)) {
-                        // ...
-                    }
-                    break;
-                case Qsf::AccessFilter::REGEX:
-                    if(regexMatches(requestPath, flt.regexFilter)) {
-                        // ...
-                    }
-                    break;
-            }
+        // filter matches -> apply block
+        connection.setStatus(flt.status);
+        if(!flt.response.empty()) {
+            connection.setBody(flt.response);
         }
-
-        // check forward filters
-        for(auto const &flt: appInit.accessFilters.forwardFilters) {
-            switch(flt.filterType) {
-                case Qsf::AccessFilter::EXTENSION:
-                    if(extensionMatches(requestPath, flt.extensionFilter)) {
-                        // look up path (with correct basePathExtension), return document with correct content-type
-                        // if found, otherwise return 404 error page (flt.response or generate_error_page(404))
-                        // check if cached in the browser (ifModifiedSince) and set a modified header!
-                    }
-                    break;
-                case Qsf::AccessFilter::PATH:
-                    if(pathMatches(requestPath, flt.pathFilter)) {
-                        // ...
-                    }
-                    break;
-                case Qsf::AccessFilter::REGEX:
-                    if(regexMatches(requestPath, flt.regexFilter)) {
-                        // ...
-                    }
-                    break;
-            }
+        else {
+            connection.setBody(Qsf::generate_error_page(flt.status));
         }
+        // the request has been blocked, so no more filters have to be applied
+        // returning true means: the request has been filtered
+        return true;
     }
+
+    // TODO check auth filters (or remove them completely)
+
+    // check forward filters
+    for(auto const &flt: appInit.accessFilters.forwardFilters) {
+        if(!filterMatches(requestPath, flt)) {
+            continue;
+        }
+        // TODO use sendFile from Connection
+        //  - do not forget checking if-modified-since (not modified response)
+
+        // check if-modified-since header
+        // if i-m-s header available, check the last modification time of the file and compare (phew...)
+        // if not modified, send not-modified response (with corresponding http status code)
+        // otherwise, use connection.sendFile to send the file
+        // catch UserException from sendFile, for 404 case, and send 404 with flt.response or generate_error_page(404)
+
+        return true;
+    }
+
+    // if no filters were triggered (and therefore returned true), return false so that the request can be handled by
+    // the app
+    return false;
 
 }

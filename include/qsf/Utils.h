@@ -64,6 +64,20 @@ namespace Qsf {
      * titled "Unknown error".
      */
     std::string generate_error_page(unsigned int httpStatus);
+    /**
+     * Get the extension (that is, everything after the last '.') out of a filename. Swallows out_of_range exceptions.
+     * @param filename The filename.
+     * @return String containing the extension, or an empty string if no extension has been found.
+     */
+    std::string get_file_extension(const std::string& filename);
+    /**
+     * Get the MIME content type string for a particular file extension. This function checks the extension against a
+     * limited, incomplete set of file types (case-insensitive). If no match is found, "application/octet-stream"
+     * will be returned.
+     * @param extension The file extension (without '.').
+     * @return A MIME content type string.
+     */
+    std::string content_type_by_extension(std::string extension);
 }
 
 #endif //QSF_UTILS_H

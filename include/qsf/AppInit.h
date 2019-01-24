@@ -5,11 +5,11 @@
 #ifndef QSF_APPINIT_H
 #define QSF_APPINIT_H
 
-#include "AccessFilters.h"
+#include "AccessFilterList.h"
 
 namespace Qsf {
     struct AppInit {
-        AccessFilters accessFilters;
+        AccessFilterList accessFilters;
     };
 }
 

@@ -33,7 +33,7 @@ add_executable(qsf
         include/qsf/UserException.h
         include/qsf/Cookie.h
         include/qsf/Log.h
-        include/qsf/AccessFilters.h
+        include/qsf/AccessFilterList.h
         include/qsf/Types/Universal.h
 
         src/main.cpp
