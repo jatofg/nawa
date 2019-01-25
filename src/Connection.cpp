@@ -38,7 +38,8 @@ void Qsf::Connection::setBody(std::string content) {
 }
 
 void
-Qsf::Connection::sendFile(std::string path, std::string contentType, bool forceDownload, std::string downloadFilename) {
+Qsf::Connection::sendFile(std::string path, std::string contentType, bool forceDownload, std::string downloadFilename,
+        bool checkIfModifiedSince) {
     // TODO guess file type (based on extension)
     // TODO set the other headers, see comment in header
 
@@ -48,6 +49,24 @@ Qsf::Connection::sendFile(std::string path, std::string contentType, bool forceD
     // throw exception if file cannot be opened
     if(!f) {
         throw Qsf::UserException("Qsf::Connection::sendFile", 1, "Cannot open file for reading");
+    }
+
+    // get time of last modification
+    struct stat fileStat;
+    time_t lastModified = 0;
+    if(stat(path.c_str(), &fileStat) == 0) {
+        lastModified = fileStat.st_mtim.tv_sec;
+    }
+
+    // check if-modified if requested
+    // TODO make ifModifiedSince available without converting it back and forth (universal? or not before v2?)
+    // TODO check if Date header is properly sent
+    // TODO implement other cache control headers, such as pragma, expires, ...
+    // TODO list of status codes in setStatus so the proper message will be sent in addition to the status code
+    if(checkIfModifiedSince && std::stoul(request.env["ifModifiedSince"]) >= lastModified) {
+        setStatus(304);
+        setBody(std::string());
+        return;
     }
 
     // set content-type header
@@ -84,11 +103,8 @@ Qsf::Connection::sendFile(std::string path, std::string contentType, bool forceD
     setHeader("content-length", std::to_string(fs));
 
     // set the last-modified header (if possible)
-    struct stat fileStat;
-    if(stat(path.c_str(), &fileStat) == 0) {
-        std::stringstream hval;
-        hval << std::put_time(gmtime(&fileStat.st_mtim.tv_sec), "%a, %d %b %Y %H:%M:%S GMT");
-        setHeader("last-modified", hval.str());
+    if(lastModified > 0) {
+        setHeader("last-modified", Qsf::make_http_time(lastModified));
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
@@ -143,7 +159,7 @@ std::string Qsf::Connection::getRaw() {
                 // (in case the app modified the locale)
                 std::locale tmp;
                 std::locale::global(std::locale::classic());
-                raw << "; Expires=" << std::put_time(gmtime(&expiry), "%a, %d %b %Y %H:%M:%S GMT");
+                raw << "; Expires=" << Qsf::make_http_time(expiry);
                 std::locale::global(tmp);
             }
             // Max-Age option

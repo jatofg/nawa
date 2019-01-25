@@ -22,6 +22,7 @@
  */
 
 #include <fstream>
+#include <qsf/Utils.h>
 #include "qsf/Request.h"
 #include "qsf/SysException.h"
 
@@ -88,8 +89,11 @@ std::vector<std::string> Qsf::Request::Env::getAcceptLanguages() const {
     return requestHandler.environment().acceptLanguages;
 }
 
-std::vector<std::string> Qsf::Request::Env::getPathInfo() const {
-    return requestHandler.environment().pathInfo;
+std::vector<std::string> Qsf::Request::Env::getRequestPath() const {
+    // TODO is this function really necessary? get RP via operator[] when switched to Universal?
+    // TODO what does environment().pathInfo do?
+    //return requestHandler.environment().pathInfo;
+    return Qsf::split_path(requestHandler.environment().requestUri);
 }
 
 Fastcgipp::Http::Address Qsf::Request::Env::getServerAddr() const {

@@ -242,3 +242,42 @@ std::string Qsf::content_type_by_extension(std::string extension) {
     }
     return "application/octet-stream";
 }
+
+std::string Qsf::make_http_time(time_t time) {
+    std::stringstream httpTime;
+    httpTime << std::put_time(gmtime(&time), "%a, %d %b %Y %H:%M:%S GMT");
+    return httpTime.str();
+}
+
+time_t Qsf::read_http_time(std::string httpTime) {
+    std::istringstream timeStream(httpTime);
+    tm timeStruct;
+    timeStream >> std::get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
+    return mktime(&timeStruct);
+}
+
+std::vector<std::string> Qsf::split_string(std::string str, char delimiter, bool ignoreEmpty) {
+    std::vector<std::string> ret;
+    for(size_t pos = 0; pos < str.length();) {
+        pos = str.find_first_of(delimiter);
+        auto token = str.substr(0, pos);
+        if(!ignoreEmpty || !token.empty()) {
+            ret.push_back(str.substr(0, pos));
+        }
+        str = str.substr(pos + 1);
+    }
+    return ret;
+}
+
+std::string Qsf::merge_path(const std::vector<std::string> &path) {
+    std::stringstream stringPath;
+    for(auto const &e: path) {
+        stringPath << '/' << e;
+    }
+    return stringPath.str();
+}
+
+std::vector<std::string> Qsf::split_path(const std::string &pathString) {
+    auto ret = split_string(pathString, '/', true);
+    return ret;
+}

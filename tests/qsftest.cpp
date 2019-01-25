@@ -28,6 +28,7 @@
 #include "qsf/Session.h"
 #include "qsf/Types/Universal.h"
 #include "qsf/Crypto.h"
+#include "qsf/Utils.h"
 
 using namespace Qsf;
 
@@ -84,7 +85,14 @@ int init(Qsf::AppInit& appInit) {
 //    std::cout << "Is 'Hello world!' correct? " << (Crypto::passwordVerify("Hello world!", hwHash) ? "yes" : "no") << std::endl;
 //    std::cout << "Is '" << md5test << "' correct? "  << (Crypto::passwordVerify("Hello wórld!", hwHash) ? "yes" : "no") << std::endl;
 
+    // apply a forward filter
+    // TODO fix filter problem: forwardFilters seems to be empty?
     appInit.accessFilters.filtersEnabled = true;
+    ForwardFilter forwardFilter;
+    forwardFilter.pathFilter = {"test", "images"};
+    forwardFilter.extensionFilter = "png";
+    forwardFilter.basePath = "/home/tobias/files";
+    appInit.accessFilters.forwardFilters.push_back(forwardFilter);
 
     return 0;
 }
@@ -105,8 +113,10 @@ int handleRequest(Connection &connection) {
     connection.response << "<!DOCTYPE html>\n"
                   "<html><head><title>Test</title></head><body>"
                   "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
-                  "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>";
-    
+                  "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
+                  //"<p>Request Path: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
+                  "<p>Request URI: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
+
     // alternative: connection.session["test"].isSet()
     if(connection.session.isSet("test")) {
         connection.response << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";

@@ -78,6 +78,38 @@ namespace Qsf {
      * @return A MIME content type string.
      */
     std::string content_type_by_extension(std::string extension);
+    /**
+     * Convert a time_t value (UNIX timestamp) to a HTTP header compatible time string.
+     * @param time UNIX timestamp as a time_t value.
+     * @return Time string in the format "<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT".
+     */
+    std::string make_http_time(time_t time);
+    /**
+     * Create a time_t value (UNIX timestamp) from a HTTP header time string.
+     * @param httpTime Time string in the format: "<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT".
+     * @return UNIX timestamp value (time_t).
+     */
+    time_t read_http_time(std::string httpTime);
+    /**
+     * Split a string using a character as a delimiter.
+     * @param str String to split.
+     * @param delimiter Delimiter.
+     * @param ignoreEmpty Ignore empty tokens, i.e., do not add them to the vector.
+     * @return Vector containing the elements.
+     */
+    std::vector<std::string> split_string(std::string str, char delimiter, bool ignoreEmpty = false);
+    /**
+     * Convert a vector representation of a path ({"dir1", "dir2"}) to a string representation ("/dir1/dir2").
+     * @param path Vector representation of a path.
+     * @return String representation of the given path.
+     */
+    std::string merge_path(const std::vector<std::string> &path);
+    /**
+     * Convert a string representation of a path ("/dir1/dir2") to a vector representation ({"dir1", "dir2"}).
+     * @param pathString Sting representation of the path.
+     * @return Vector representation of the given path.
+     */
+    std::vector<std::string> split_path(const std::string &pathString);
 }
 
 #endif //QSF_UTILS_H

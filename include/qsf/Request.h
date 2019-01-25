@@ -86,10 +86,10 @@ namespace Qsf {
              */
             std::vector<std::string> getAcceptLanguages() const;
             /**
-             * Request path.
+             * Request path. Use ["requestUri"] to access it as a string.
              * @return Vector of strings containing the elements of the path.
              */
-            std::vector<std::string> getPathInfo() const;
+            std::vector<std::string> getRequestPath() const;
             /**
              * Get the server address as a libfastcgipp Address object. Use ["serverAddress"] to access it as a string.
              * @return The Address object.

@@ -90,10 +90,11 @@ bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
     Qsf::Connection connection(request, config);
 
-    // run application
+    // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
-    // TODO apply filters before
-    appHandleRequest(connection);
+    if(!applyFilters(connection)) {
+        appHandleRequest(connection);
+    }
 
     // flush response
     connection.flushResponse();
@@ -155,7 +156,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
     // if filters are disabled, do not even check
     if(!appInit.accessFilters.filtersEnabled) return false;
 
-    auto requestPath = connection.request.env.getPathInfo();
+    auto requestPath = connection.request.env.getRequestPath();
 
     // check block filters
     for(auto const &flt: appInit.accessFilters.blockFilters) {
@@ -184,14 +185,32 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
         if(!filterMatches(requestPath, flt)) {
             continue;
         }
-        // TODO use sendFile from Connection
-        //  - do not forget checking if-modified-since (not modified response)
 
-        // check if-modified-since header
-        // if i-m-s header available, check the last modification time of the file and compare (phew...)
-        // if not modified, send not-modified response (with corresponding http status code)
-        // otherwise, use connection.sendFile to send the file
-        // catch UserException from sendFile, for 404 case, and send 404 with flt.response or generate_error_page(404)
+        std::stringstream filePath;
+        filePath << flt.basePath;
+        if(flt.basePathExtension == Qsf::ForwardFilter::BY_PATH) {
+            for(auto const &e: requestPath) {
+                filePath << '/' << e;
+            }
+        }
+        else {
+            filePath << '/' << requestPath.back();
+        }
+
+        // send file if it exists, catch the "file does not exist" UserException and send 404 document if not
+        try {
+            connection.sendFile(filePath.str(), "", false, "", true);
+        }
+        catch(Qsf::UserException&) {
+            // file does not exist, send 404
+            connection.setStatus(404);
+            if(!flt.response.empty()) {
+                connection.setBody(flt.response);
+            }
+            else {
+                connection.setBody(Qsf::generate_error_page(404));
+            }
+        }
 
         return true;
     }

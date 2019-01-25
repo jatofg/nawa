@@ -77,9 +77,12 @@ namespace Qsf {
          * @param forceDownload Ask the browser to download the file by sending "content-disposition: attachment".
          * @param downloadFilename Preferred filename for saving the file on the disk of the client. If this parameter
          * is set, and forceDownload is set to false, a "content-disposition: inline" header will be sent.
-         * ('; filename="picture.jpg"')
+         * @param checkIfModifiedSince Check the if-modified-since header, if sent by the client, and compare it to
+         * the modification date of the file. Prepare a not-modified response and clear the body if the file has not
+         * been modified. Using this parameter only makes sense if the client requested exactly this file, of course.
          */
-        void sendFile(std::string path, std::string contentType = "", bool forceDownload = false, std::string downloadFilename = "");
+        void sendFile(std::string path, std::string contentType = "", bool forceDownload = false,
+                std::string downloadFilename = "", bool checkIfModifiedSince = false);
         /**
          * Set the HTTP status code. It will be passed to the web server without checking for validity.
          * @param status The HTTP status code to pass to the web server.

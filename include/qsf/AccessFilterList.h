@@ -118,7 +118,7 @@ namespace Qsf {
          * - PATH: The request path will be added to the base path (e.g., the file mentioned above would be looked up
          * in basepath."/dir1/dir2/file.ext".
          */
-        enum BasePathExtension {BY_FILENAME, BY_PATH} basePathExtension = BY_PATH;
+        enum BasePathExtension {BY_FILENAME, BY_PATH} basePathExtension = BY_FILENAME;
     };
 
     /**
