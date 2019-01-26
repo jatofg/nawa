@@ -28,8 +28,10 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <iomanip>
+
 #include "qsf/Encoding.h"
 #include "qsf/Utils.h"
+#include "../libs/base64/base64.h"
 
 namespace {
     //std::unordered_map<char16_t, std::u16string> htmlEntities;
@@ -654,7 +656,7 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
     return input;
 }
 
-std::string Qsf::Encoding::urlEncode(std::string input) {
+std::string Qsf::Encoding::urlEncode(const std::string& input) {
     if(urlUnreserved.empty()) initializeUrlUnreserved();
     std::stringstream out;
 
@@ -686,4 +688,17 @@ std::string Qsf::Encoding::urlDecode(std::string input) {
     regex_replace_callback(input, matchCode, replaceCode);
 
     return input;
+}
+
+bool Qsf::Encoding::isBase64(const std::string &input) {
+    std::regex rgx(R"([A-Za-z0-9\+/]+={0,2})");
+    return (input.length() % 4 == 0) && std::regex_match(input, rgx);
+}
+
+std::string Qsf::Encoding::base64Encode(const std::string &input) {
+    return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length());
+}
+
+std::string Qsf::Encoding::base64Decode(const std::string &input) {
+    return base64_decode(input);
 }

@@ -55,13 +55,32 @@ namespace Qsf {
          * @param input String with characters that need to be escaped for use in a URL.
          * @return String with escaped characters.
          */
-        std::string urlEncode(std::string input);
+        std::string urlEncode(const std::string &input);
         /**
          * Decode a percent-encoded string (byte-wise, in URLs always utf-8).
          * @param input Percent-encoded string.
          * @return Decoded string.
          */
         std::string urlDecode(std::string input);
+        /**
+         * Check if a string contains valid base64.
+         * @param input Input string.
+         * @return True if the string contains only valid base64, false otherwise.
+         */
+        bool isBase64(const std::string &input);
+        /**
+         * Encode a string (of bytes) as base64.
+         * @param input Input string.
+         * @return Base64-encoded input string.
+         */
+        std::string base64Encode(const std::string &input);
+        /**
+         * Decode a base64-encoded string (of bytes). If the input string does not contain valid base64, the return
+         * string may be undefined garbage. You may use isBase64 to check it with a regex first, if the result matters.
+         * @param input Base64 representation of a string.
+         * @return The decoded string.
+         */
+        std::string base64Decode(const std::string &input);
     }
 }
 

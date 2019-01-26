@@ -103,6 +103,8 @@ int init(Qsf::AppInit& appInit) {
     blockFilter.status = 404;
     appInit.accessFilters.blockFilters.push_back(blockFilter);
 
+    // TODO test auth filters, also with an empty auth function
+
     return 0;
 }
 

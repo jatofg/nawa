@@ -44,7 +44,7 @@ namespace Qsf {
         /**
          * Negate the filter, i.e., the filter will match if none of the conditions apply (instead of all). This is
          * particularly useful, for example, for defining a BlockFilter with a set of allowed URLs and send a 404
-         * error page for everything else.
+         * error page for everything else, or to apply authentication to everything except for a path.
          */
         bool invert = false;
         /**
@@ -89,18 +89,28 @@ namespace Qsf {
     };
 
     /**
-     * Defines a filter that will request HTTP Basic Authentication if matching. This filter type is not implemented
-     * yet and possibly it also won't be implemented in future.
+     * Defines a filter that will request HTTP Basic Authentication if matching. After successful authentication,
+     * forward filters will still be checked, and if no forward filter matches, the request can be processed by the app
+     * normally. If authentication fails, a 403 page with the defined response or a standard error page will be sent.
      */
     struct AuthFilter: public AccessFilter {
         /**
          * The authentication function. It will be called with the provided user name as first parameter and the
          * provided user password as the second parameter. Access will be granted if the authentication function
-         * returns true.
+         * returns true. If the function is not set, authorization will always be denied.
          */
         std::function<bool(std::string, std::string)> authFunction;
         /**
-         * Use sessions to remember the authenticated user. This will create a session variable "_qsf_staticAuth_user".
+         * A short description of the required authentication that may be shown by the browser ("realm") (optional).
+         * This value should only contain alphanumeric characters and must not contain double quotes or newlines.
+         * It will not be checked for validity by QSF, instead, authentication may fail and the server might even become
+         * unaccessible in case of non-compliance. If this value comes from a user, make sure to check it thoroughly
+         * (by the way, it shouldn't).
+         */
+        std::string authName;
+        /**
+         * Use sessions to remember the authenticated user. This will create a std::string session variable
+         * "_qsf_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
          * You can use it in your application to find out which user has authenticated and delete it to log the user out.
          * If disabled, the user will have to authenticate on every single request.
          */

@@ -28,6 +28,7 @@
 #include <dlfcn.h>
 #include <qsf/RequestHandler.h>
 #include <qsf/Utils.h>
+#include <qsf/Encoding.h>
 
 #include "qsf/RequestHandler.h"
 #include "qsf/Request.h"
@@ -179,7 +180,84 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
         return true;
     }
 
-    // TODO check auth filters (or remove them completely)
+    // the ID is used to identify the exact filter for session cookie creation
+    int authFilterID = -1;
+    for(auto const &flt: appInit.accessFilters.authFilters) {
+        ++authFilterID;
+
+        bool matches = filterMatches(requestPath, flt);
+        if((!matches && !flt.invert) || (matches && flt.invert)) {
+            continue;
+        }
+
+        bool isAuthenticated = false;
+        std::string sessionCookieName;
+
+        // check session variable for this filter, if session usage is on
+        if(flt.useSessions) {
+            connection.session.start();
+            sessionCookieName = "_qsf_authfilter" + std::to_string(authFilterID);
+            if(connection.session.isSet(sessionCookieName)) {
+                isAuthenticated = true;
+            }
+        }
+
+        // if this did not work, request authentication or invoke auth function if credentials have already been sent
+        if(!isAuthenticated) {
+            // case 1: no authorization header sent by client -> send a 401 without body
+            if(connection.request.env["authorization"].empty()) {
+                connection.setStatus(401);
+                std::stringstream hval;
+                hval << "Basic";
+                if(!flt.authName.empty()) {
+                    hval << " realm=\"" << flt.authName << '"';
+                }
+                connection.setHeader("www-authenticate", hval.str());
+
+                // that's it, the response must be sent to the client directly so it can authenticate
+                return true;
+            }
+            // case 2: credentials already sent
+            else {
+                // split the authorization string, only the last part should contain base64
+                auto authResponse = Qsf::split_string(connection.request.env["authorization"], ' ', true);
+                // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
+                if(authResponse.size() == 2 || authResponse.at(0) == "Basic") {
+                    auto credentials = Qsf::split_string(Qsf::Encoding::base64Decode(authResponse.at(1)), ':', true);
+                    // credentials must also have 2 elements, a username and a password,
+                    // and the auth function must be callable
+                    if(credentials.size() == 2 && flt.authFunction) {
+                        // now we can actually check the credentials with our function (if it is set)
+                        if(flt.authFunction(credentials.at(0), credentials.at(1))) {
+                            isAuthenticated = true;
+                            // now, if sessions are used, set the session variable to the username
+                            if(flt.useSessions) {
+                                connection.session.set(sessionCookieName, Types::Universal(credentials.at(0)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // now, if the user is still not authenticated, send a 403 Forbidden
+        if(!isAuthenticated) {
+            connection.setStatus(403);
+            if(!flt.response.empty()) {
+                connection.setBody(flt.response);
+            }
+            else {
+                connection.setBody(Qsf::generate_error_page(403));
+            }
+
+            // request blocked
+            return true;
+        }
+
+        // if the user is authenticated, we can continue to process forward filters
+        break;
+
+    }
 
     // check forward filters
     for(auto const &flt: appInit.accessFilters.forwardFilters) {
@@ -215,6 +293,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
             }
         }
 
+        // return true as the request has been filtered
         return true;
     }
 
