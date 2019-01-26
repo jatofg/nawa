@@ -42,6 +42,12 @@ namespace Qsf {
      */
     struct AccessFilter {
         /**
+         * Negate the filter, i.e., the filter will match if none of the conditions apply (instead of all). This is
+         * particularly useful, for example, for defining a BlockFilter with a set of allowed URLs and send a 404
+         * error page for everything else.
+         */
+        bool invert = false;
+        /**
          * For path filtering: A vector containing all directory names under the web root
          * (e.g., ["dir1", "dir2"] for /dir1/dir2/). If empty, path filtering will not be applied.
          */
@@ -125,6 +131,7 @@ namespace Qsf {
      * Structure in which all filters that should be applied by the RequestHandler can be included. The filters will
      * be processed from the first element in a vector to the last element, block filters first, then auth filters,
      * then forward filters. If one filter leads to a block/forward/denied access, all following filters will be ignored.
+     * Filters can only be applied statically on app initialization as part of the AppInit struct (for thread-safety).
      */
     struct AccessFilterList {
         bool filtersEnabled = false; /**< Is the filter module enabled? If false, no filters will be applied. */

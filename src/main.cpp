@@ -205,10 +205,9 @@ int main() {
     }
 
     // before manager starts, init app
-    // TODO receive filters from init somehow
-    //  - mention that filters can only be set in init bc of multithreading
     Qsf::AppInit appInit1;
     appInit(appInit1);
+    Qsf::RequestHandler::setAppInit(appInit1);
 
     managerPtr->start();
     managerPtr->join();

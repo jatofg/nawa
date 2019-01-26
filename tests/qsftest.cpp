@@ -85,14 +85,23 @@ int init(Qsf::AppInit& appInit) {
 //    std::cout << "Is 'Hello world!' correct? " << (Crypto::passwordVerify("Hello world!", hwHash) ? "yes" : "no") << std::endl;
 //    std::cout << "Is '" << md5test << "' correct? "  << (Crypto::passwordVerify("Hello wórld!", hwHash) ? "yes" : "no") << std::endl;
 
-    // apply a forward filter
-    // TODO fix filter problem: forwardFilters seems to be empty?
+    // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
+
+    // apply a forward filter for images
     ForwardFilter forwardFilter;
     forwardFilter.pathFilter = {"test", "images"};
     forwardFilter.extensionFilter = "png";
-    forwardFilter.basePath = "/home/tobias/files";
+    forwardFilter.basePath = "/home/tobias/Pictures";
     appInit.accessFilters.forwardFilters.push_back(forwardFilter);
+
+    // apply a block filter for everything that is not in /test or /test/images (and some more restrictions)
+    BlockFilter blockFilter;
+    blockFilter.invert = true;
+    blockFilter.regexFilterEnabled = true;
+    blockFilter.regexFilter.assign(R"(/test(/images)?(/[A-Za-z0-9]*\.?[A-Za-z]{2,4})?)");
+    blockFilter.status = 404;
+    appInit.accessFilters.blockFilters.push_back(blockFilter);
 
     return 0;
 }

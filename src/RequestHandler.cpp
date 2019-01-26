@@ -70,7 +70,7 @@ namespace {
                 return false;
         }
 
-        if(!flt.regexFilterEnabled) {
+        if(flt.regexFilterEnabled) {
             // merge request path to string
             std::stringstream pathStr;
             for(auto const &e: requestPath) {
@@ -160,8 +160,9 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
 
     // check block filters
     for(auto const &flt: appInit.accessFilters.blockFilters) {
-        // if the filter does not apply, go to the next
-        if(!filterMatches(requestPath, flt)) {
+        // if the filter does not apply (or does in case of an inverted filter), go to the next
+        bool matches = filterMatches(requestPath, flt);
+        if((!matches && !flt.invert) || (matches && flt.invert)) {
             continue;
         }
 
@@ -182,7 +183,8 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
 
     // check forward filters
     for(auto const &flt: appInit.accessFilters.forwardFilters) {
-        if(!filterMatches(requestPath, flt)) {
+        bool matches = filterMatches(requestPath, flt);
+        if((!matches && !flt.invert) || (matches && flt.invert)) {
             continue;
         }
 
@@ -198,8 +200,9 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
         }
 
         // send file if it exists, catch the "file does not exist" UserException and send 404 document if not
+        auto filePathStr = filePath.str();
         try {
-            connection.sendFile(filePath.str(), "", false, "", true);
+            connection.sendFile(filePathStr, "", false, "", true);
         }
         catch(Qsf::UserException&) {
             // file does not exist, send 404
