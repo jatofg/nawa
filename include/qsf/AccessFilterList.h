@@ -91,7 +91,15 @@ namespace Qsf {
     /**
      * Defines a filter that will request HTTP Basic Authentication if matching. After successful authentication,
      * forward filters will still be checked, and if no forward filter matches, the request can be processed by the app
-     * normally. If authentication fails, a 403 page with the defined response or a standard error page will be sent.
+     * normally. If authentication fails, a 403 page with the defined response or a standard error page will be sent.\n
+     * Please note that this will not work out of the box with Apache2 and mod_proxy_fcgi, as Apache does not forward
+     * the WWW-Authenticate header to the application. You can fix this by setting "CGIPassAuth On" for all request
+     * URIs that need this feature in the Apache2 vhost config, e.g.:
+     * \code{.unparsed}
+     * <LocationMatch "^/test">
+     *     CGIPassAuth On
+     * </LocationMatch>
+     * \endcode
      */
     struct AuthFilter: public AccessFilter {
         /**
@@ -111,10 +119,12 @@ namespace Qsf {
         /**
          * Use sessions to remember the authenticated user. This will create a std::string session variable
          * "_qsf_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
-         * You can use it in your application to find out which user has authenticated and delete it to log the user out.
-         * If disabled, the user will have to authenticate on every single request.
+         * You can use it in your application to find out which user has authenticated and delete it to log the user
+         * out. This is usually not necessary (but might be more effective or extend the scope of the authorization,
+         * and lets you access the user name), as browsers will usually send the authentication string on every single
+         * request.
          */
-        bool useSessions = true;
+        bool useSessions = false;
     };
 
     /**

@@ -258,13 +258,18 @@ time_t Qsf::read_http_time(std::string httpTime) {
 
 std::vector<std::string> Qsf::split_string(std::string str, char delimiter, bool ignoreEmpty) {
     std::vector<std::string> ret;
-    for(size_t pos = 0; pos < str.length();) {
+    for(size_t pos = 0; !str.empty();) {
         pos = str.find_first_of(delimiter);
         auto token = str.substr(0, pos);
         if(!ignoreEmpty || !token.empty()) {
             ret.push_back(str.substr(0, pos));
         }
-        str = str.substr(pos + 1);
+        if(pos < str.length()) {
+            str = str.substr(pos + 1);
+        }
+        else {
+            break;
+        }
     }
     return ret;
 }

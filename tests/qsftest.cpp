@@ -85,6 +85,13 @@ int init(Qsf::AppInit& appInit) {
 //    std::cout << "Is 'Hello world!' correct? " << (Crypto::passwordVerify("Hello world!", hwHash) ? "yes" : "no") << std::endl;
 //    std::cout << "Is '" << md5test << "' correct? "  << (Crypto::passwordVerify("Hello wórld!", hwHash) ? "yes" : "no") << std::endl;
 
+    // test base64
+    std::string base64test = "Hello World";
+    auto b64encoded = Encoding::base64Encode(base64test);
+    std::cout << "Some base64: " << b64encoded << std::endl;
+    std::cout << "Decoded: " << Encoding::base64Decode(b64encoded) << std::endl;
+    std::cout << "Is it even valid? " << (Encoding::isBase64(b64encoded) ? "yes" : "no") << std::endl;
+
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
 
@@ -99,9 +106,18 @@ int init(Qsf::AppInit& appInit) {
     BlockFilter blockFilter;
     blockFilter.invert = true;
     blockFilter.regexFilterEnabled = true;
-    blockFilter.regexFilter.assign(R"(/test(/images)?(/[A-Za-z0-9]*\.?[A-Za-z]{2,4})?)");
+    blockFilter.regexFilter.assign(R"(/test(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
     blockFilter.status = 404;
     appInit.accessFilters.blockFilters.push_back(blockFilter);
+
+    // authenticate access to the images directory
+    AuthFilter authFilter;
+    authFilter.pathFilter = {"test", "images"};
+    authFilter.authName = "Not for everyone!";
+    authFilter.authFunction = [](std::string user, std::string password) -> bool {
+        return (user == "test" && password == "supersecure");
+    };
+    appInit.accessFilters.authFilters.push_back(authFilter);
 
     // TODO test auth filters, also with an empty auth function
 
@@ -126,7 +142,9 @@ int handleRequest(Connection &connection) {
                   "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
                   "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
                   //"<p>Request Path: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
-                  "<p>Request URI: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
+                  //"<p>Request URI: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
+                  "<p>Request URI: (" << connection.request.env.getRequestPath().size() << " elements): "
+                  << connection.request.env["requestUri"] << "</p>";
 
     // alternative: connection.session["test"].isSet()
     if(connection.session.isSet("test")) {
