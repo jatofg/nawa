@@ -84,10 +84,11 @@ namespace Qsf {
         void sendFile(std::string path, std::string contentType = "", bool forceDownload = false,
                 std::string downloadFilename = "", bool checkIfModifiedSince = false);
         /**
-         * Set the HTTP status code. It will be passed to the web server without checking for validity.
+         * Set the HTTP status code. It will be passed to the web server without checking for validity. For known
+         * status codes, the textual description will be appended.
          * @param status The HTTP status code to pass to the web server.
          */
-        void setStatus(uint status);
+        void setStatus(unsigned int status);
         /**
          * Set an HTTP header or overwrite an existing one with the same key (keys are case-insensitive and will be
          * converted to lowercase). Please note that the content-type header will be automatically set to
