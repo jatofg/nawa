@@ -25,7 +25,6 @@
 #define QSF_LOG_H
 
 #include <iostream>
-#include <mutex>
 #include <fstream>
 
 namespace Qsf {

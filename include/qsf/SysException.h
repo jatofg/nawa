@@ -26,7 +26,6 @@
 
 #include <string>
 #include <sstream>
-#include <bits/exception.h>
 
 namespace Qsf {
 
