@@ -139,8 +139,8 @@ int main() {
     auto appInit = (Qsf::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
 
     // pass config and application to RequestHandler so it can load appHandleRequest
-    // (config will be saved later, here it will only be used to load the RequestHandler)
-    // (request handler already loaded here so that errors can be detected before setting up the socket)
+    // (config will be saved later, here it will only be used to load the appHandleRequest)
+    // (app function already loaded here so that errors can be detected before setting up the socket)
     Qsf::RequestHandler::setAppRequestHandler(config, appOpen);
 
     // concurrency
@@ -168,8 +168,10 @@ int main() {
         auto fastcgiListen = config[{"fastcgi", "listen"}];
         auto fastcgiPort = config[{"fastcgi", "port"}];
         if(fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
+        const char* fastcgiListenC = fastcgiListen.c_str();
+        if(fastcgiListen == "all") fastcgiListenC = nullptr;
         if(fastcgiPort.empty()) fastcgiPort = "8000";
-        if(!managerPtr->listen(fastcgiListen.c_str(), fastcgiPort.c_str())) {
+        if(!managerPtr->listen(fastcgiListenC, fastcgiPort.c_str())) {
             LOG("Fatal Error: Could not create TCP socket");
             return 1;
         }
