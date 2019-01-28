@@ -73,7 +73,7 @@ void* loadAppSymbol(const char* symbolName, const std::string& error) {
     return symbol;
 }
 
-int main() {
+int main(int argc, char** argv) {
 
     // set up signal handlers
     signal(SIGINT, shutdown);
@@ -82,10 +82,17 @@ int main() {
     // read config.ini
     Qsf::Config config;
     try {
-        config.read("config.ini");
+        // QSF will take the path to the config as an argument
+        // if no argument was given, look for a config.ini in the current path
+        if(argc > 1) {
+            config.read(argv[1]);
+        }
+        else {
+            config.read("config.ini");
+        }
     }
     catch(Qsf::SysException& e) {
-        LOG("Fatal Error: Could not read or parse config.ini");
+        LOG("Fatal Error: Could not read or parse the configuration file");
         return 1;
     }
 
