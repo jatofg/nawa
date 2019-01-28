@@ -68,12 +68,12 @@ namespace Qsf {
          * @param cfg Reference to the Config object representing the QSF config file(s).
          * @param appOpen dlopen handle which will be used to load the app handleRequest(...) function.
          */
-        static void setConfig(const Qsf::Config& cfg, void* appOpen);
+        static void setAppRequestHandler(const Qsf::Config &cfg, void *appOpen);
         /**
          * Take over the AppInit struct filled by the init() function of the app.
          * @param _appInit AppInit struct as filled by the app.
          */
-        static void setAppInit(const Qsf::AppInit& _appInit);
+        static void setConfig(const Qsf::AppInit &_appInit);
         /**
          * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
          */

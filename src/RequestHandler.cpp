@@ -38,12 +38,11 @@
 namespace {
     Qsf::handleRequest_t* appHandleRequest;
     Qsf::Log LOG;
-    size_t postMax = 0; /* Maximum post size, in bytes, read from the config by setConfig(...). */
+    size_t postMax = 0; /* Maximum post size, in bytes, read from the config by setAppRequestHandler(...). */
     // Integer value referring to the raw post access level, as described by the QSF_RAWPOST_* macros.
     unsigned int rawPostAccess = 1;
     // The config read from the config file will be stored here statically. The Config object will be copied
     // upon each request into a non-static member of Connection, so it can be modified at runtime.
-    Qsf::Config config; /* The config as loaded by main. */
     Qsf::AppInit appInit; /* The initialization struct as returned by the app init() function. */
 
     /**
@@ -89,7 +88,7 @@ namespace {
 
 bool Qsf::RequestHandler::response() {
     Qsf::Request request(*this);
-    Qsf::Connection connection(request, config);
+    Qsf::Connection connection(request, appInit.config);
 
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
@@ -108,18 +107,17 @@ void Qsf::RequestHandler::flush(Qsf::Connection& connection) {
     dump(raw.c_str(), raw.size());
 }
 
-void Qsf::RequestHandler::setConfig(const Qsf::Config& cfg, void* appOpen) {
-    config = cfg;
+void Qsf::RequestHandler::setAppRequestHandler(const Qsf::Config &cfg, void *appOpen) {
     try {
-        postMax = config.isSet({"post", "max_size"})
-                      ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
+        postMax = cfg.isSet({"post", "max_size"})
+                      ? static_cast<size_t>(std::stoul(cfg[{"post", "max_size"}])) * 1024 : 0;
     }
     catch(std::invalid_argument& e) {
         LOG("WARNING: Invalid value given for post/max_size given in the config file.");
         postMax = 0;
     }
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
-    std::string rawPostStr = config[{"post", "raw_access"}];
+    std::string rawPostStr = cfg[{"post", "raw_access"}];
     rawPostAccess = (rawPostStr == "never")
                    ? QSF_RAWPOST_NEVER : ((rawPostStr == "always") ? QSF_RAWPOST_ALWAYS : QSF_RAWPOST_NONSTANDARD);
 
@@ -148,7 +146,7 @@ bool Qsf::RequestHandler::inProcessor() {
     return false;
 }
 
-void Qsf::RequestHandler::setAppInit(const Qsf::AppInit &_appInit) {
+void Qsf::RequestHandler::setConfig(const Qsf::AppInit &_appInit) {
     appInit = _appInit;
 }
 

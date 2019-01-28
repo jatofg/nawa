@@ -9,6 +9,13 @@
 
 namespace Qsf {
     struct AppInit {
+        /**
+         * You can use this to modify the default configuration for every request during initialization.
+         */
+        Config config;
+        /**
+         * List of static access filters that can be evaluated before forwarding a request to your app.
+         */
         AccessFilterList accessFilters;
     };
 }

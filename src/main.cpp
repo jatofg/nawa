@@ -139,7 +139,9 @@ int main() {
     auto appInit = (Qsf::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
 
     // pass config and application to RequestHandler so it can load appHandleRequest
-    Qsf::RequestHandler::setConfig(config, appOpen);
+    // (config will be saved later, here it will only be used to load the RequestHandler)
+    // (request handler already loaded here so that errors can be detected before setting up the socket)
+    Qsf::RequestHandler::setAppRequestHandler(config, appOpen);
 
     // concurrency
     double cReal;
@@ -206,8 +208,9 @@ int main() {
 
     // before manager starts, init app
     Qsf::AppInit appInit1;
+    appInit1.config = config;
     appInit(appInit1);
-    Qsf::RequestHandler::setAppInit(appInit1);
+    Qsf::RequestHandler::setConfig(appInit1);
 
     managerPtr->start();
     managerPtr->join();
