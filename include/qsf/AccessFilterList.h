@@ -1,5 +1,5 @@
 /**
- * \file AccessRules.h
+ * \file AccessFilterList.h
  * \brief Options to check the path and invoke certain actions before forwarding the request to the app.
  */
 

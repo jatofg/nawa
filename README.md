@@ -27,14 +27,32 @@ without having to care about session management yourself
 easier are included (e.g., SHA-1/2 hasing, password hashing, hex 
 encoding, base64 encoding/decoding, date/time format conversions, 
 default page generation, content type guessing, string splitting)
+- Set up request filters to forward files and block or authenticate 
+requests.
+- Request handling may take place using multiple threads exploit  
+multi-core CPUs.
 
 More features will come. For the full documentation, have a look at:
 [TBA]
 
 ## Example
 
+A QSF app consists of:
+
+- A simple config file with properties concerning the behavior of the 
+application, and
+- A shared object file containing the application itself.
+
 For a simple QSF app:
 [TBA]
+
+The path to the object file is included in the config file, and QSF 
+will take care of setting everything up and starting the app. You 
+can run it like this:
+
+`$ qsfrunner config.ini`
+
+Of course, it is also possible to start it as a systemd service.
 
 ## Building
 
