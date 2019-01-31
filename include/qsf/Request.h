@@ -29,7 +29,7 @@
 
 #include <string>
 #include <fastcgi++/request.hpp>
-#include "RequestHandler.h"
+#include <qsf/RequestHandler.h>
 
 namespace Qsf {
     /**

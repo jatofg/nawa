@@ -24,11 +24,11 @@
 #ifndef QSF_SESSION_H
 #define QSF_SESSION_H
 
-#include "Cookie.h"
-#include "Types/Universal.h"
 #include <vector>
 #include <mutex>
 #include <unordered_map>
+#include <qsf/Cookie.h>
+#include <qsf/Types/Universal.h>
 
 namespace Qsf {
     class Connection;

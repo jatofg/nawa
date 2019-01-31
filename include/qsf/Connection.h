@@ -27,9 +27,9 @@
 #include <string>
 #include <unordered_map>
 #include <sstream>
-#include "Cookie.h"
-#include "Request.h"
-#include "Session.h"
+#include <qsf/Cookie.h>
+#include <qsf/Request.h>
+#include <qsf/Session.h>
 
 namespace Qsf {
     /**

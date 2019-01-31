@@ -29,11 +29,9 @@
 #include <qsf/RequestHandler.h>
 #include <qsf/Utils.h>
 #include <qsf/Encoding.h>
-
-#include "qsf/RequestHandler.h"
-#include "qsf/Request.h"
-#include "qsf/Connection.h"
-#include "qsf/Log.h"
+#include <qsf/Request.h>
+#include <qsf/Connection.h>
+#include <qsf/Log.h>
 
 namespace {
     Qsf::handleRequest_t* appHandleRequest;

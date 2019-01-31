@@ -21,13 +21,11 @@
  * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "qsf/Session.h"
-#include "qsf/Connection.h"
-#include "qsf/Crypto.h"
-#include "qsf/UserException.h"
 #include <random>
 #include <qsf/Session.h>
-
+#include <qsf/Connection.h>
+#include <qsf/Crypto.h>
+#include <qsf/UserException.h>
 
 std::mutex Qsf::Session::gLock;
 std::unordered_map<std::string, std::shared_ptr<Qsf::SessionData>> Qsf::Session::data;

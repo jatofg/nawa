@@ -27,8 +27,8 @@
 #define QSF_VERSION_MAJOR @QSF_VERSION_MAJOR@
 #define QSF_VERSION_MINOR @QSF_VERSION_MINOR@
 
-#include "qsf/Connection.h"
-#include "qsf/AppInit.h"
+#include <qsf/Connection.h>
+#include <qsf/AppInit.h>
 
 extern "C" const int qsf_version_major = QSF_VERSION_MAJOR;
 extern "C" const int qsf_version_minor = QSF_VERSION_MINOR;

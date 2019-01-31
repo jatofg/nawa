@@ -21,12 +21,12 @@
  * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "qsf/Crypto.h"
-#include "qsf/Utils.h"
+#include <qsf/Crypto.h>
+#include <qsf/Utils.h>
+#include <qsf/UserException.h>
 #include <openssl/sha.h>
 #include <openssl/md5.h>
 #include "../libs/libbcrypt/bcrypt.h"
-#include "qsf/UserException.h"
 
 std::string Qsf::Crypto::sha1(const std::string &input, bool hex) {
     auto sha1Base = (const unsigned char*) input.c_str();

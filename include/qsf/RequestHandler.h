@@ -28,8 +28,8 @@
 #define QSF_RAWPOST_ALWAYS 2
 
 #include <fastcgi++/request.hpp>
-#include "Config.h"
-#include "AppInit.h"
+#include <qsf/Config.h>
+#include <qsf/AppInit.h>
 
 namespace Qsf {
     class Request;

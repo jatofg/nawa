@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <climits>
 #include <qsf/UserException.h>
-#include "qsf/Log.h"
+#include <qsf/Log.h>
 
 Qsf::Log::Log() {
     out = &std::cerr;

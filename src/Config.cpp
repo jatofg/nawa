@@ -21,9 +21,9 @@
  * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "qsf/Config.h"
+#include <qsf/Config.h>
+#include <qsf/SysException.h>
 #include "../libs/inih/ini.h"
-#include "qsf/SysException.h"
 
 Qsf::Config::Config(std::string iniFile) {
     read(std::move(iniFile));

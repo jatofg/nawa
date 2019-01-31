@@ -29,8 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <qsf/Utils.h>
-
-#include "qsf/Connection.h"
+#include <qsf/Connection.h>
 
 namespace {
     const std::unordered_map<unsigned int, std::string> httpStatusCodes = {

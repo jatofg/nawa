@@ -22,10 +22,8 @@
  */
 
 #include <iomanip>
-#include <qsf/Utils.h>
 #include <unordered_map>
-
-#include "qsf/Utils.h"
+#include <qsf/Utils.h>
 
 namespace {
     std::unordered_map<std::string, std::string> contentTypeMap = {
