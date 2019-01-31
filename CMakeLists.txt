@@ -76,6 +76,9 @@ include(GNUInstallDirs)
 install(TARGETS qsf
         DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT Runtime)
+install(FILES "${PROJECT_SOURCE_DIR}/config.ini"
+        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/qsf
+        COMPONENT Runtime)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/qsf"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT Development)
