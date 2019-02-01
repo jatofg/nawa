@@ -96,11 +96,11 @@ std::vector<std::string> Qsf::Request::Env::getRequestPath() const {
     return Qsf::split_path(requestHandler.environment().requestUri);
 }
 
-Fastcgipp::Http::Address Qsf::Request::Env::getServerAddr() const {
+Fastcgipp::Address Qsf::Request::Env::getServerAddr() const {
     return requestHandler.environment().serverAddress;
 }
 
-Fastcgipp::Http::Address Qsf::Request::Env::getRemoteAddr() const {
+Fastcgipp::Address Qsf::Request::Env::getRemoteAddr() const {
     return requestHandler.environment().remoteAddress;
 }
 

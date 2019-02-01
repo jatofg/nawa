@@ -95,13 +95,13 @@ namespace Qsf {
              * @return The Address object.
              * @deprecated
              */
-            Fastcgipp::Http::Address getServerAddr() const;
+            Fastcgipp::Address getServerAddr() const;
             /**
              * Get the remote address as a libfastcgipp Address object. Use ["remoteAddress"] to access it as a string.
              * @return  The Address object.
              * @deprecated
              */
-            Fastcgipp::Http::Address getRemoteAddr() const;
+            Fastcgipp::Address getRemoteAddr() const;
 
             // mark Connection as a friend so it can access RequestHandler through Env
             // TODO find another solution as this looks a bit like a dirty hack?
