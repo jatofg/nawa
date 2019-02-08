@@ -96,7 +96,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // privilege downgrade
+    // prepare privilege downgrade and check for errors (downgrade will happen after socket setup)
+    passwd* privUser;
+    group* privGroup;
     if(getuid() == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
             LOG("Fatal Error: Username or password not correctly set in config.ini");
@@ -104,18 +106,14 @@ int main(int argc, char** argv) {
         }
         std::string username = config[{"privileges", "user"}];
         std::string groupname = config[{"privileges", "group"}];
-        passwd* user = getpwnam(username.c_str());
-        group* group = getgrnam(groupname.c_str());
-        if(user == nullptr || group == nullptr) {
+        privUser = getpwnam(username.c_str());
+        privGroup = getgrnam(groupname.c_str());
+        if(privUser == nullptr || privGroup == nullptr) {
             LOG("Fatal Error: Username or groupname invalid");
             return 1;
         }
-        if(user->pw_uid == 0 || group->gr_gid == 0) {
+        if(privUser->pw_uid == 0 || privGroup->gr_gid == 0) {
             LOG("WARNING: QSF will be running as user or group root. Security risk!");
-        }
-        if(setgid(group->gr_gid) != 0 || setuid(user->pw_uid) != 0) {
-            LOG("Fatal Error: Could not set privileges");
-            return 1;
         }
     } else {
         LOG("WARNING: Not starting as root, cannot set privileges");
@@ -213,6 +211,14 @@ int main(int argc, char** argv) {
     else {
         LOG("Fatal Error: Unknown FastCGI socket mode in config.ini");
         return 1;
+    }
+
+    // do privilege downgrade
+    if(getuid() == 0) {
+        if(setgid(privGroup->gr_gid) != 0 || setuid(privUser->pw_uid) != 0) {
+            LOG("Fatal Error: Could not set privileges");
+            return 1;
+        }
     }
 
     // before manager starts, init app
