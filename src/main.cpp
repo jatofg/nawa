@@ -45,13 +45,21 @@ namespace {
     Qsf::Log LOG;
 }
 
-// signal handler for SIGINT and SIGTERM
+// signal handler for SIGINT, SIGTERM, and SIGUSR1
 void shutdown(int signum) {
     LOG("Terminating on signal " + std::to_string(signum));
     // terminate worker threads
     if(managerPtr) {
         // should unblock managerPtr->join() and execute the rest of the program
         managerPtr->stop();
+        // if this does not work, try harder
+        sleep(10);
+        if(managerPtr && signum != SIGUSR1) {
+            LOG("Enforcing termination now, ignoring pending requests.");
+            managerPtr->terminate();
+            sleep(2);
+            exit(0);
+        }
     }
     else {
         if(appOpen != nullptr) {
@@ -78,6 +86,7 @@ int main(int argc, char** argv) {
     // set up signal handlers
     signal(SIGINT, shutdown);
     signal(SIGTERM, shutdown);
+    signal(SIGUSR1, shutdown);
 
     // read config.ini
     Qsf::Config config;
@@ -97,9 +106,10 @@ int main(int argc, char** argv) {
     }
 
     // prepare privilege downgrade and check for errors (downgrade will happen after socket setup)
+    auto privUid = getuid();
     passwd* privUser;
     group* privGroup;
-    if(getuid() == 0) {
+    if(privUid == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
             LOG("Fatal Error: Username or password not correctly set in config.ini");
             return 1;
@@ -165,7 +175,7 @@ int main(int argc, char** argv) {
 
     // set up fastcgi manager
     managerPtr = std::make_unique<Fastcgipp::Manager<Qsf::RequestHandler>>(cInt);
-    managerPtr->setupSignals();
+    //managerPtr->setupSignals();
 
     // socket handling
     std::string mode = config[{"fastcgi", "mode"}];
@@ -214,7 +224,7 @@ int main(int argc, char** argv) {
     }
 
     // do privilege downgrade
-    if(getuid() == 0) {
+    if(privUid == 0) {
         if(setgid(privGroup->gr_gid) != 0 || setuid(privUser->pw_uid) != 0) {
             LOG("Fatal Error: Could not set privileges");
             return 1;
@@ -231,5 +241,5 @@ int main(int argc, char** argv) {
     managerPtr->join();
 
     dlclose(appOpen);
-    return 0;
+    exit(0);
 }
