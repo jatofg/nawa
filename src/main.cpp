@@ -53,12 +53,10 @@ void shutdown(int signum) {
         // should unblock managerPtr->join() and execute the rest of the program
         managerPtr->stop();
         // if this does not work, try harder
-        sleep(10);
+        sleep(30);
         if(managerPtr && signum != SIGUSR1) {
             LOG("Enforcing termination now, ignoring pending requests.");
             managerPtr->terminate();
-            sleep(2);
-            exit(0);
         }
     }
     else {
