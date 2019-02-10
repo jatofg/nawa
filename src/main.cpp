@@ -51,9 +51,11 @@ void shutdown(int signum) {
     // terminate worker threads
     if(managerPtr) {
         // should unblock managerPtr->join() and execute the rest of the program
+        // (in fact it doesn't, but at least new connections should not be accepted anymore)
+        // TODO find the bug or reason for this behavior in libfastcgi++
         managerPtr->stop();
-        // if this does not work, try harder
-        sleep(30);
+        // this normally doesn't work, so try harder
+        sleep(10);
         if(managerPtr && signum != SIGUSR1) {
             LOG("Enforcing termination now, ignoring pending requests.");
             managerPtr->terminate();
@@ -230,13 +232,18 @@ int main(int argc, char** argv) {
     }
 
     // before manager starts, init app
-    Qsf::AppInit appInit1;
-    appInit1.config = config;
-    appInit(appInit1);
-    Qsf::RequestHandler::setConfig(appInit1);
+    {
+        Qsf::AppInit appInit1;
+        appInit1.config = config;
+        appInit(appInit1);
+        Qsf::RequestHandler::setConfig(appInit1);
+    }
 
     managerPtr->start();
     managerPtr->join();
+
+    // explicitly destroy AppInit to avoid a segfault
+    Qsf::RequestHandler::destroyAppInit();
 
     dlclose(appOpen);
     exit(0);

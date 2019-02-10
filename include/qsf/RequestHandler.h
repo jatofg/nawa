@@ -75,6 +75,10 @@ namespace Qsf {
          */
         static void setConfig(const Qsf::AppInit &_appInit);
         /**
+         * Reset the pointer to the AppInit to avoid a segfault on termination.
+         */
+        static void destroyAppInit();
+        /**
          * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
          */
         RequestHandler();

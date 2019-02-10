@@ -32,6 +32,7 @@
 #include <qsf/Request.h>
 #include <qsf/Connection.h>
 #include <qsf/Log.h>
+#include <qsf/SysException.h>
 
 namespace {
     Qsf::handleRequest_t* appHandleRequest;
@@ -39,9 +40,11 @@ namespace {
     size_t postMax = 0; /* Maximum post size, in bytes, read from the config by setAppRequestHandler(...). */
     // Integer value referring to the raw post access level, as described by the QSF_RAWPOST_* macros.
     unsigned int rawPostAccess = 1;
-    // The config read from the config file will be stored here statically. The Config object will be copied
-    // upon each request into a non-static member of Connection, so it can be modified at runtime.
-    Qsf::AppInit appInit; /* The initialization struct as returned by the app init() function. */
+    // The config read from the config file (and possibly modified by the app's init() function) will be stored in
+    // the AppInit. The Config object will be copied upon each request into a non-static member of Connection,
+    // so it can be modified at runtime.
+    // unique_ptr necessary so we can explicitly destruct it and avoid a segmentation fault on termination
+    std::unique_ptr<Qsf::AppInit> appInitPtr; /* The initialization struct as returned by the app init() function. */
 
     /**
      * Check the conditions of an AccessFilter.
@@ -85,8 +88,13 @@ namespace {
 }
 
 bool Qsf::RequestHandler::response() {
+    // check AppInitPtr for safety
+    if(!appInitPtr) {
+        throw Qsf::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
+    }
+
     Qsf::Request request(*this);
-    Qsf::Connection connection(request, appInit.config);
+    Qsf::Connection connection(request, appInitPtr->config);
 
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
@@ -145,18 +153,26 @@ bool Qsf::RequestHandler::inProcessor() {
 }
 
 void Qsf::RequestHandler::setConfig(const Qsf::AppInit &_appInit) {
-    appInit = _appInit;
+    appInitPtr = std::make_unique<Qsf::AppInit>(_appInit);
+}
+
+void Qsf::RequestHandler::destroyAppInit() {
+    appInitPtr.reset(nullptr);
 }
 
 bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
+    // check AppInitPtr for safety
+    if(!appInitPtr) {
+        throw Qsf::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
+    }
 
     // if filters are disabled, do not even check
-    if(!appInit.accessFilters.filtersEnabled) return false;
+    if(!appInitPtr->accessFilters.filtersEnabled) return false;
 
     auto requestPath = connection.request.env.getRequestPath();
 
     // check block filters
-    for(auto const &flt: appInit.accessFilters.blockFilters) {
+    for(auto const &flt: appInitPtr->accessFilters.blockFilters) {
         // if the filter does not apply (or does in case of an inverted filter), go to the next
         bool matches = filterMatches(requestPath, flt);
         if((!matches && !flt.invert) || (matches && flt.invert)) {
@@ -178,7 +194,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
 
     // the ID is used to identify the exact filter for session cookie creation
     int authFilterID = -1;
-    for(auto const &flt: appInit.accessFilters.authFilters) {
+    for(auto const &flt: appInitPtr->accessFilters.authFilters) {
         ++authFilterID;
 
         bool matches = filterMatches(requestPath, flt);
@@ -256,7 +272,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
     }
 
     // check forward filters
-    for(auto const &flt: appInit.accessFilters.forwardFilters) {
+    for(auto const &flt: appInitPtr->accessFilters.forwardFilters) {
         bool matches = filterMatches(requestPath, flt);
         if((!matches && !flt.invert) || (matches && flt.invert)) {
             continue;
