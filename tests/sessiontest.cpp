@@ -18,6 +18,8 @@ int handleRequest(Connection& connection) {
     std::random_device rd;
     unsigned int cm[1000];
 
+    connection.session.start();
+
     // set session variables
     for(int i = 0; i < 1000; ++i) {
         // fill with a random uint from urandom
@@ -38,12 +40,12 @@ int handleRequest(Connection& connection) {
         int val = desc ? 1000-i : i;
         connection.session.set("sessioncount" + std::to_string(i), val);
     }
-    
+
     // get sessiontest variables and compare - this should actually fail now and then in a multithreading env
     // so matchcount does not necessarily have to be 1000
     int matchcount = 0;
     for(int i = 0; i < 1000; ++i) {
-        if(connection.session["sessiontest" + std::to_string(i)].get<int>() == cm[i]) {
+        if(connection.session["sessiontest" + std::to_string(i)].get<unsigned int>() == cm[i]) {
             ++matchcount;
         }
     }
