@@ -68,6 +68,14 @@ target_include_directories(qsftest PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
+add_library(sessiontest SHARED
+        tests/app.h
+        tests/sessiontest.cpp)
+target_include_directories(sessiontest PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
 set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 

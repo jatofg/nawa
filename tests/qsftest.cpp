@@ -151,11 +151,11 @@ int handleRequest(Connection &connection) {
         connection.response << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";
         connection.session.invalidate();
         connection.session.start();
-        connection.session.set("test", Types::Universal(std::string("noch viel mehr blub")));
+        connection.session.set("test", std::string("noch viel mehr blub"));
         
     }
     else {
-        connection.session.set("test", Types::Universal(std::string("bla bla blub")));
+        connection.session.set("test", "bla bla blub");
         connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 

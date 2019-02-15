@@ -134,11 +134,39 @@ namespace Qsf {
          */
         Types::Universal operator[](std::string key) const;
         /**
-         * Set key to value. Throws a UserException with error code 1 if no session is established.
+         * Set key to a Universal value. Throws a UserException with error code 1 if no session has been established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */
         void set(std::string key, const Types::Universal& value);
+        /**
+         * Set key to a string value. This function exists for convenience and makes sure that you do not save a
+         * const char* (c-style string) into a session (a terrible idea, as such a pointer would not be available
+         * anymore on the next request and therefore cause a segmentation fault). For std::string values, the next
+         * specialization (arbitrary type) will be used. The c-style string will be wrapped into a std::string, which
+         * will be wrapped into a Types::Universal value. As this function internally calls
+         * set(std::string, Types::Universal), a UserException with error code 1 will be thrown if no session has been
+         * established.
+         * @param key Key to set.
+         * @param value C-string that will be used as the value (will be stored as a std::string!).
+         */
+        void set(std::string key, const char* value) {
+            set(std::move(key), Types::Universal(std::string(value)));
+        }
+        /**
+         * Set key to a variable of an arbitrary type. This function exists just for convenience and will create a
+         * new Universal from the value type and call set(std::string, Types::Universal), and will therefore throw a
+         * UserException with error code 1 if no session has been established. As you need to explicitly state the 
+         * type when receiving the value later on, explicitly constructing the desired type might make your code 
+         * more readable and less error-prone (if the value is directly constructed and not given as a variable).
+         * @tparam T Type of the value. Can usually be deducted automatically by the compiler.
+         * @param key Key to set.
+         * @param value Value to set the key to.
+         */
+        template<typename T>
+        void set(std::string key, const T& value) {
+            set(std::move(key), Types::Universal(value));
+        }
         /**
          * Terminate and delete the currently existing session along with its data and dequeue the session cookie.
          * This function will do nothing if no session is currently active. After invalidating the current session,
