@@ -156,8 +156,9 @@ void Qsf::RequestHandler::setConfig(const Qsf::AppInit &_appInit) {
     appInitPtr = std::make_unique<Qsf::AppInit>(_appInit);
 }
 
-void Qsf::RequestHandler::destroyAppInit() {
+void Qsf::RequestHandler::destroyEverything() {
     appInitPtr.reset(nullptr);
+    Qsf::Session::destroy();
 }
 
 bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {

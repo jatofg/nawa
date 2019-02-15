@@ -81,6 +81,13 @@ namespace Qsf {
          * Would be best if run async and in fixed intervals (or with 0.xx chance on certain session actions -> see php)
          */
         static void collectGarbage();
+        /**
+         * Reset the data map to delete all session data. This function is not thread-safe and should be used only
+         * on QSF termination.
+         */
+        static void destroy();
+        // RequestHandler should be able to call destroy()
+        friend class RequestHandler;
     public:
         /**
          * Construct a new Session object. This will just store the Connection reference in the object.
@@ -156,8 +163,8 @@ namespace Qsf {
         /**
          * Set key to a variable of an arbitrary type. This function exists just for convenience and will create a
          * new Universal from the value type and call set(std::string, Types::Universal), and will therefore throw a
-         * UserException with error code 1 if no session has been established. As you need to explicitly state the 
-         * type when receiving the value later on, explicitly constructing the desired type might make your code 
+         * UserException with error code 1 if no session has been established. As you need to explicitly state the
+         * type when receiving the value later on, explicitly constructing the desired type might make your code
          * more readable and less error-prone (if the value is directly constructed and not given as a variable).
          * @tparam T Type of the value. Can usually be deducted automatically by the compiler.
          * @param key Key to set.

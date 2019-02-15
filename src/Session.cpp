@@ -225,6 +225,10 @@ void Qsf::Session::collectGarbage() {
     }
 }
 
+void Qsf::Session::destroy() {
+    data.clear();
+}
+
 void Qsf::Session::invalidate() {
 
     // do nothing if no session has been established

@@ -242,8 +242,8 @@ int main(int argc, char** argv) {
     managerPtr->start();
     managerPtr->join();
 
-    // explicitly destroy AppInit to avoid a segfault
-    Qsf::RequestHandler::destroyAppInit();
+    // explicitly destroy AppInit and clear session data to avoid a segfault
+    Qsf::RequestHandler::destroyEverything();
 
     dlclose(appOpen);
     exit(0);
