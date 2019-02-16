@@ -207,6 +207,14 @@ void Qsf::Session::set(std::string key, const Qsf::Types::Universal& value) {
     currentData->data[std::move(key)] = value;
 }
 
+void Qsf::Session::unset(const std::string& key) {
+    if(!established()) {
+        throw UserException("Qsf::Session::set", 1, "Session not established.");
+    }
+    std::lock_guard<std::mutex> lockGuard(currentData->dLock);
+    currentData->data.erase(key);
+}
+
 void Qsf::Session::collectGarbage() {
     std::lock_guard<std::mutex> lockGuard(gLock);
     // no increment in for statement as we want to remove elements

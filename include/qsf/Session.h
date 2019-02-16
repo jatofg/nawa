@@ -99,25 +99,29 @@ namespace Qsf {
          * Start the session (load existing session basing on a cookie sent by the client or create a new one).
          * This will send a session cookie to the client. The properties/attributes of the session cookie are determined
          * by, with decreasing precedence,\n
-         * (1) the Cookie object that may be passed as an optional parameter to this function and will be used as a
-         * template for the cookie. See the param description on how to use it.\n
-         * (2) the configuration in the QSF configuration file,\n
-         * (3) and, of course, by the cookie policy that can be set via Connection::setCookiePolicy.\n
+         *
+         * 1. the Cookie object that may be passed as an optional parameter to this function and will be used as a
+         *    template for the cookie. See the param description on how to use it.
+         * 2. the configuration in the QSF configuration file,
+         * 3. and, of course, by the cookie policy that can be set via Connection::setCookiePolicy.
+         *
          * The duration (keep-alive) of the session is defined in the QSF config file, but can be overridden by setting
-         * the attribute maxAge of the parameter object, see below.\n
-         * IMPORTANT! This function will NOT work correctly after flushing the response (as setting a session cookie
+         * the attribute maxAge of the parameter object, see below.
+         *
+         * **IMPORTANT!** This function will NOT work correctly after flushing the response (as setting a session cookie
          * is impossible then). It is recommended to call start() directly in the beginning of your program.
+         *
          * @param properties Template for the cookie sent to the client. You can use it to influence the behavior of
-         * Session and to make sure the cookie is properly secured. The attributes will be used as follows:\n
-         * - content: will be ignored (and replaced by the session ID)\n
+         * Session and to make sure the cookie is properly secured. The attributes will be used as follows:
+         * - content: will be ignored (and replaced by the session ID)
          * - expires: set this to > 0 (e.g., to 1), if the Expires and Max-Age attributes should be set for the cookie.
-         * The value will be replaced by the proper expiry time. If 0, attribute inclusion can still be forced by the
-         * QSF configuration or Connection::setCookiePolicy. Please note that if using setCookiePolicy, the attributes
-         * will be added after Session has set the cookie and the contents will thus be determined by the policy, not
-         * by the session. This may lead to unwanted behavior, so please make sure that you set this attribute to > 0
-         * here if you are using setCookiePolicy.\n
+         *   The value will be replaced by the proper expiry time. If 0, attribute inclusion can still be forced by the
+         *   QSF configuration or Connection::setCookiePolicy. Please note that if using setCookiePolicy, the attributes
+         *   will be added after Session has set the cookie and the contents will thus be determined by the policy, not
+         *   by the session. This may lead to unwanted behavior, so please make sure that you set this attribute to > 0
+         *   here if you are using setCookiePolicy.
          * - maxAge: will be used as the session duration (inactive keep-alive, server-side!) if > 0. If expires == 0
-         * (and is also not overridden by the QSF config), this attribute will be reset to 0 before setting the cookie.
+         *   (and is also not overridden by the QSF config), this attribute will be reset to 0 before setting the cookie.
          * - secure: send the Secure attribute with the cookie.
          * - httpOnly: send the HttpOnly attribute with the cookie.
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
@@ -129,15 +133,21 @@ namespace Qsf {
          */
         bool established() const;
         /**
-         * Check whether there is a value set for key key.
+         * Check whether there exists a stored Universal for the given key. Please note that the behavior of this
+         * function might differ from `[key].isSet()` - while this function will also return true if the key has been
+         * set to an empty Universal, the latter one only returns true if the Universal contains an object.
          * @param key Key to check.
          * @return True if a value exists for this key, false otherwise. Always false if no session established.
          */
         bool isSet(std::string key) const;
         /**
-         * Get value at key key.
+         * Get the value at the given key (as a Types::Universal object). To actually receive the stored object, use
+         * the `.get<T>()` function of the Universal (e.g., `conn.session["test"].get<std::string>()`). You will have to
+         * explicitly state the type of the stored object as a template argument in order to receive it
+         * (as C++ is statically typed).
          * @param key Key to get value for.
-         * @return Value at key. If no value exists for that key or no session established, an empty Compound is returned.
+         * @return Value at key. If no value exists for that key or no session established, an empty Universal will be
+         * returned.
          */
         Types::Universal operator[](std::string key) const;
         /**
@@ -174,6 +184,12 @@ namespace Qsf {
         void set(std::string key, const T& value) {
             set(std::move(key), Types::Universal(value));
         }
+        /**
+         * Remove the session variable with the given key. Throws a UserException with error code 1 if no session has
+         * been established.
+         * @param key Key to remove.
+         */
+        void unset(const std::string& key);
         /**
          * Terminate and delete the currently existing session along with its data and dequeue the session cookie.
          * This function will do nothing if no session is currently active. After invalidating the current session,
