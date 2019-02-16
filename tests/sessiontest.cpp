@@ -15,6 +15,7 @@ int init(AppInit& appInit) {
 
 int handleRequest(Connection& connection) {
     // run this a lot of times in parallel (flood requests) to test multi-threading
+    // for example with curl: $ curl -b SESSION=... http://t1.local/test?it=[1-100]
     std::random_device rd;
     unsigned int cm[1000];
 
