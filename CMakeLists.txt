@@ -35,6 +35,8 @@ add_executable(qsf
         include/qsf/Log.h
         include/qsf/AccessFilterList.h
         include/qsf/AppInit.h
+        include/qsf/SmtpMailer.h
+        include/qsf/Types/Email.h
         include/qsf/Types/Universal.h
 
         src/main.cpp
@@ -47,6 +49,7 @@ add_executable(qsf
         src/Config.cpp
         src/Crypto.cpp
         src/Log.cpp
+        src/SmtpMailer.cpp
 
         libs/inih/ini.h
         libs/inih/ini.c
@@ -54,7 +57,7 @@ add_executable(qsf
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
-target_link_libraries(qsf -ldl -lfastcgipp -lcrypto ${CMAKE_BINARY_DIR}/libbcrypt.a)
+target_link_libraries(qsf -ldl -lfastcgipp -lcrypto -lcurl ${CMAKE_BINARY_DIR}/libbcrypt.a)
 target_include_directories(qsf PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>

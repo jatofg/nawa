@@ -63,9 +63,10 @@ Before building, make sure that you have the dependencies installed:
 - libfastcgi++ (pull from eddic/fastcgipp)
 - libssl-dev (should be available in your distro)
 - libboost-dev < 67
+- libcurl4-openssl-dev
 
 For actually running applications with qsfrunner, only libfastcgi++ 
-is required. OpenSSL should be present on your system anyway.
+is required. OpenSSL and libcurl4 should be present on your system anyway.
 
 To build qsfrunner, pull the source code, open a terminal, and 
 switch to the qsf directory.
