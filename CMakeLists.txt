@@ -36,7 +36,7 @@ add_executable(qsf
         include/qsf/AccessFilterList.h
         include/qsf/AppInit.h
         include/qsf/SmtpMailer.h
-        include/qsf/Types/Email.h
+        include/qsf/Types/MimeEmail.h
         include/qsf/Types/Universal.h
 
         src/main.cpp

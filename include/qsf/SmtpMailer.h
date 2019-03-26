@@ -7,7 +7,7 @@
 #define QSF_SMTPMAILER_H
 
 #include <string>
-#include <qsf/Types/Email.h>
+#include <qsf/Types/MimeEmail.h>
 
 namespace Qsf {
     class SmtpMailer {
@@ -39,16 +39,16 @@ namespace Qsf {
         void setServer(std::string _serverUrl, unsigned int _serverPort = 25, TlsMode _tlsMode = NONE,
                 bool _verifyTlsCert = true);
         void setAuth(std::string _authUsername, std::string _authPassword);
-        void connect();
-        void disconnect();
         // TODO send emails async?
         // TODO send multiple mails in one SMTP connection?
         // TODO attachments, MIME in general, ...
         // TODO signing and encryption?
-        void send(Types::Email email, Types::EmailAddress to = Types::EmailAddress(),
+        void enqueue(Types::MimeEmail email, Types::EmailAddress to = Types::EmailAddress(),
                 Types::EmailAddress from = Types::EmailAddress());
-        void bulkSend(Types::Email email, std::vector<Types::EmailAddress> recipients,
+        void bulkEnqueue(Types::MimeEmail email, std::vector<Types::EmailAddress> recipients,
                 std::unordered_map<std::string, std::string> replacementRules = std::unordered_map<std::string, std::string>());
+        void clearQueue();
+        void processQueue();
     };
 }
 

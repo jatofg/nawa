@@ -80,18 +80,65 @@ namespace Qsf {
         };
 
         /**
-         * Structure representing an email (just headers and payload, excluding the envelope).
+         * Structure representing a basic email (just headers and payload, excluding the envelope).
          */
-        struct Email {
-            // From, To, Cc, Subject, Date, ...
+        struct SimpleEmail {
             /**
-             * Map to save the mail headers in (case-sensitive).
+             * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
+             * automatically by the mail function if not specified in this map. Other fields that should be considered
+             * are: To, Subject, Cc, Content-Type (will be set automatically if MIME is used).
              */
             std::unordered_map<std::string, std::string> headers;
             /**
-             * The content of the email.
+             * The text part of the email.
              */
-            std::string payload;
+            std::string text;
+        };
+
+        /**
+         * Structure representing an MIME email (headers and MIME parts, excluding the envelope).
+         */
+        struct MimeEmail {
+            /**
+             * Structure representing a MIME part of a MIME email.
+             */
+            struct MimePart {
+                /**
+                 * The Content-Type of this part.
+                 */
+                std::string contentType;
+                /**
+                 * The Content-Disposition part-header (e.g., "inline", or "attachment; filename=test.zip").
+                 */
+                std::string contentDisposition;
+                /**
+                 * Specify how the data string will be interpreted. PAYLOAD (default) means that the data string
+                 * contains the payload of this MIME part (encoding will be applied by the mail handling function).
+                 * FILENAME means that the data string contains a path to a file which should be read, encoded,
+                 * and attached by the mail handling function.
+                 */
+                enum DataType {
+                    FILENAME,
+                    PAYLOAD
+                } dataType = PAYLOAD;
+                /**
+                 * The data string, containing either the payload of the MIME part or the path to a file containing it,
+                 * according to the dataType property.
+                 */
+                std::string data;
+            };
+            // From, To, Cc, Subject, Date, ...
+            /**
+             * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
+             * automatically by the mail function if not specified in this map. Other fields that should be considered
+             * are: To, Subject, Cc, Content-Type (will be set automatically if MIME is used).
+             */
+            std::unordered_map<std::string, std::string> headers;
+            /**
+             * Vector containing all MIME parts that should be included in this email. It should contain at least one
+             * text (or HTML) part.
+             */
+            std::vector<MimePart> mimeParts;
             // TODO MIME, attachments, ...
             // smtp server etc. -> get from config? set here manually?
             // establish smtp persistent connection and allow to send multiple mails via this instance?
