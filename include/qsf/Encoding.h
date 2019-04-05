@@ -81,6 +81,8 @@ namespace Qsf {
          * @return The decoded string.
          */
         std::string base64Decode(const std::string &input);
+        std::string quotedPrintableEncode(const std::string &input, bool replaceCrlf = false);
+        std::string quotedPrintableDecode(std::string input);
     }
 }
 

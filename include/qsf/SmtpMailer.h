@@ -7,7 +7,7 @@
 #define QSF_SMTPMAILER_H
 
 #include <string>
-#include <qsf/Types/MimeEmail.h>
+#include <qsf/Types/Email.h>
 
 namespace Qsf {
     class SmtpMailer {

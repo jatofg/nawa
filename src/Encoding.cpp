@@ -689,3 +689,45 @@ std::string Qsf::Encoding::base64Encode(const std::string &input) {
 std::string Qsf::Encoding::base64Decode(const std::string &input) {
     return base64_decode(input);
 }
+
+std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, bool replaceCrlf) {
+    std::stringstream ret;
+    int lineCount = 0;
+    for(const char c: input) {
+        // TODO do not replace =09 (tabulator)? spaces at the end of a line (shoud be encoded =20)?
+        if(c >= 32 && c <= 126 && c != 61) {
+            if(lineCount >= 75) {
+                ret << "=\r\n";
+                lineCount = 0;
+            }
+            ret << c;
+            ++lineCount;
+        }
+        else if(!replaceCrlf && (c == 10 || c == 13)) {
+            ret << c;
+            lineCount = 0;
+        }
+        else {
+            if(lineCount >= 73) {
+                ret << "=\r\n";
+                lineCount = 0;
+            }
+            ret << "=" << Qsf::to_uppercase(Qsf::hex_dump(std::string(1, c)));
+            lineCount += 3;
+        }
+    }
+    return ret.str();
+}
+
+std::string Qsf::Encoding::quotedPrintableDecode(std::string input) {
+    std::regex matchCode(R"(=[0-9A-F]{2})");
+
+    // replacement function
+    auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
+        return std::string(1, (char) std::stoul(matches.at(0), nullptr, 16));
+    };
+
+    regex_replace_callback(input, matchCode, replaceCode);
+
+    return input;
+}

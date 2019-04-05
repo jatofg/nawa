@@ -26,7 +26,8 @@
 
 #include <string>
 #include <unordered_map>
-#include <regex>
+#include <vector>
+#include <memory>
 
 namespace Qsf {
     namespace Types {
@@ -73,49 +74,81 @@ namespace Qsf {
              * send a confirmation email to it.
              * @return True if the email address could be valid, false if it is definitely not valid.
              */
-            bool isValid() {
-                std::regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", std::regex::icase);
-                return std::regex_match(address, emCheck);
-            }
+            bool isValid();
         };
 
         /**
-         * Structure representing a basic email (just headers and payload, excluding the envelope).
+         * Pure virtual base structure for emails. To create an email, use the SimpleEmail or MimeEmail class.
          */
-        struct SimpleEmail {
+        struct Email {
             /**
              * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
              * automatically by the mail function if not specified in this map. Other fields that should be considered
-             * are: To, Subject, Cc, Content-Type (will be set automatically if MIME is used).
+             * are: To, Subject, Cc, Content-Type (will be set automatically if MIME is used). This map is designed to
+             * be accessed by the mail function in order to complete it, if necessary. The toRaw() method might as well
+             * include other headers.
+             *
+             * The email function is not obliged to (and should not) do any escaping in the headers. The application
+             * creating the email is responsible for ensuring their validity.
              */
             std::unordered_map<std::string, std::string> headers;
+
+            // TODO offer encoded-word in headers like subject to make it easier
+
+            /**
+             * This method shall generate the raw source of the email (including headers).
+             * @return Raw source of the email.
+             */
+            virtual std::string toRaw() = 0;
+        };
+
+        /**
+         * Structure representing a basic email (just headers and payload, excluding the envelope). Please remember to
+         * also set the headers in the headers map of the base class Email.
+         */
+        struct SimpleEmail: public Email {
             /**
              * The text part of the email.
              */
             std::string text;
+            /**
+             * Get the raw source of the email.
+             * @return Raw source of the email.
+             */
+            std::string toRaw() override;
         };
 
         /**
-         * Structure representing an MIME email (headers and MIME parts, excluding the envelope).
+         * Structure representing a MIME email (headers and MIME parts, excluding the envelope).
          */
-        struct MimeEmail {
+        struct MimeEmail: public Email {
             /**
              * Structure representing a MIME part of a MIME email.
              */
             struct MimePart {
                 /**
-                 * The Content-Type of this part.
+                 * The Content-Type of this part (e.g., "text/plain; charset=utf-8").
                  */
                 std::string contentType;
                 /**
-                 * The Content-Disposition part-header (e.g., "inline", or "attachment; filename=test.zip").
+                 * The Content-Disposition part-header (e.g., "inline", or "attachment; filename=test.zip"). Optional,
+                 * if this value is empty, the header will not be set.
                  */
                 std::string contentDisposition;
                 /**
+                 * The encoding to apply to the MIME part. Choose BASE64 for file attachments, and QUOTED_PRINTABLE
+                 * for HTML, etc. Use NONE if and only if you made sure that the part contains only valid characters.
+                 */
+                enum ApplyEncoding {
+                    BASE64,
+                    QUOTED_PRINTABLE,
+                    NONE
+                } applyEncoding = QUOTED_PRINTABLE;
+                /**
                  * Specify how the data string will be interpreted. PAYLOAD (default) means that the data string
-                 * contains the payload of this MIME part (encoding will be applied by the mail handling function).
+                 * contains the payload of this MIME part.
                  * FILENAME means that the data string contains a path to a file which should be read, encoded,
-                 * and attached by the mail handling function.
+                 * and attached.
                  */
                 enum DataType {
                     FILENAME,
@@ -127,6 +160,57 @@ namespace Qsf {
                  */
                 std::string data;
             };
+
+            struct MimePartList;
+
+            /**
+             * As a MIME part of an email can be nested, this struct allows you to either create a MIME part
+             * containing data, or a list of MIME parts - in the latter case, a MIME part containing another list of
+             * MIME parts will be created.
+             */
+            struct MimePartOrList {
+                /**
+                 * Make sure default constructor exists.
+                 */
+                MimePartOrList() = default;
+                /**
+                 * Copy constructor, as this struct contains smart pointers.
+                 * @param other Object to copy.
+                 */
+                MimePartOrList(const MimePartOrList& other) {
+                    if(other.mimePart) {
+                        mimePart = std::make_unique<MimePart>();
+                        *mimePart = *(other.mimePart);
+                    }
+                    else if(other.mimePartList) {
+                        mimePartList = std::make_unique<MimePartList>();
+                        *mimePartList = *(other.mimePartList);
+                    }
+                }
+                /**
+                 * Create a MIME part containing data. If this pointer contains a MimePart object, the second pointer
+                 * (for another MimePartList object) will be ignored (and not copied together with the object).
+                 */
+                std::unique_ptr<MimePart> mimePart;
+                /**
+                 * Create a MIME part containing another MIME container with (possibly) multiple MIME parts.
+                 */
+                std::unique_ptr<MimePartList> mimePartList;
+            };
+
+            struct MimePartList {
+                enum MultipartType {
+                    MIXED,
+                    DIGEST,
+                    ALTERNATIVE,
+                    RELATED,
+                    REPORT,
+                    SIGNED,
+                    ENCRYPTED
+                } multipartType = MIXED;
+                std::vector<MimePartOrList> mimeParts;
+            };
+
             // From, To, Cc, Subject, Date, ...
             /**
              * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
@@ -138,11 +222,12 @@ namespace Qsf {
              * Vector containing all MIME parts that should be included in this email. It should contain at least one
              * text (or HTML) part.
              */
-            std::vector<MimePart> mimeParts;
-            // TODO MIME, attachments, ...
-            // smtp server etc. -> get from config? set here manually?
-            // establish smtp persistent connection and allow to send multiple mails via this instance?
-            //      (unlikely this would work with libcurl, but maybe an idea for the future)
+            std::vector<MimePartList> mimeParts;
+            /**
+             * Get the raw source of the email.
+             * @return Raw source of the email.
+             */
+            std::string toRaw() override;
         };
     }
 
