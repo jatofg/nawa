@@ -110,6 +110,20 @@ namespace Qsf {
      * @return Vector representation of the given path.
      */
     std::vector<std::string> split_path(const std::string &pathString);
+    /**
+     * Convert line endings in a string between LF (Unix) and CRLF (Windows/Email).
+     * @param in Input string with CRLF or LF line endings
+     * @param ending The new line ending (e.g., "\\n" or "\\r\\n")
+     * @return String with converted line endings.
+     */
+    std::string convert_line_endings(const std::string& in, const std::string& ending);
+    /**
+     * Simple function to read a whole file into a string. Will a UserException with error code 1 if the file does not 
+     * exist.
+     * @param path Path and filename.
+     * @return String containing the whole file.
+     */
+    std::string get_file_contents(const std::string& path);
 }
 
 #endif //QSF_UTILS_H

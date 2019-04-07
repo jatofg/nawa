@@ -677,27 +677,33 @@ std::string Qsf::Encoding::urlDecode(std::string input) {
     return input;
 }
 
-bool Qsf::Encoding::isBase64(const std::string &input) {
-    std::regex rgx(R"([A-Za-z0-9\+/]+={0,2})");
+bool Qsf::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
+    std::regex rgx;
+    if(allowWhitespaces) {
+        rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
+    }
+    else {
+        rgx.assign(R"([A-Za-z0-9\+/]+={0,2})");
+    }
     return (input.length() % 4 == 0) && std::regex_match(input, rgx);
 }
 
-std::string Qsf::Encoding::base64Encode(const std::string &input) {
-    return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length());
+std::string Qsf::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
+    return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length(), breakAfter, breakSequence);
 }
 
 std::string Qsf::Encoding::base64Decode(const std::string &input) {
     return base64_decode(input);
 }
 
-std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, bool replaceCrlf) {
+std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding, bool replaceCrlf) {
     std::stringstream ret;
     int lineCount = 0;
     for(const char c: input) {
         // TODO do not replace =09 (tabulator)? spaces at the end of a line (shoud be encoded =20)?
         if(c >= 32 && c <= 126 && c != 61) {
             if(lineCount >= 75) {
-                ret << "=\r\n";
+                ret << "=" << lineEnding;
                 lineCount = 0;
             }
             ret << c;
@@ -709,7 +715,7 @@ std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, bool 
         }
         else {
             if(lineCount >= 73) {
-                ret << "=\r\n";
+                ret << "=" << lineEnding;
                 lineCount = 0;
             }
             ret << "=" << Qsf::to_uppercase(Qsf::hex_dump(std::string(1, c)));

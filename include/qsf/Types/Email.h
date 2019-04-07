@@ -145,18 +145,11 @@ namespace Qsf {
                     NONE
                 } applyEncoding = QUOTED_PRINTABLE;
                 /**
-                 * Specify how the data string will be interpreted. PAYLOAD (default) means that the data string
-                 * contains the payload of this MIME part.
-                 * FILENAME means that the data string contains a path to a file which should be read, encoded,
-                 * and attached.
+                 * Additional headers for this MIME part (such as Content-ID) can be added here.
                  */
-                enum DataType {
-                    FILENAME,
-                    PAYLOAD
-                } dataType = PAYLOAD;
+                std::unordered_map<std::string, std::string> partHeaders;
                 /**
-                 * The data string, containing either the payload of the MIME part or the path to a file containing it,
-                 * according to the dataType property.
+                 * The data string, containing the body of the MIME part.
                  */
                 std::string data;
             };
@@ -177,16 +170,13 @@ namespace Qsf {
                  * Copy constructor, as this struct contains smart pointers.
                  * @param other Object to copy.
                  */
-                MimePartOrList(const MimePartOrList& other) {
-                    if(other.mimePart) {
-                        mimePart = std::make_unique<MimePart>();
-                        *mimePart = *(other.mimePart);
-                    }
-                    else if(other.mimePartList) {
-                        mimePartList = std::make_unique<MimePartList>();
-                        *mimePartList = *(other.mimePartList);
-                    }
-                }
+                MimePartOrList(const MimePartOrList& other);
+                /**
+                 * Assignment operator, as this struct contains smart pointers.
+                 * @param other Object to copy from.
+                 * @return This object.
+                 */
+                MimePartOrList& operator=(const MimePartOrList& other);
                 /**
                  * Create a MIME part containing data. If this pointer contains a MimePart object, the second pointer
                  * (for another MimePartList object) will be ignored (and not copied together with the object).
@@ -198,7 +188,14 @@ namespace Qsf {
                 std::unique_ptr<MimePartList> mimePartList;
             };
 
+            /**
+             * A list containing MIME parts, which can also be lists of MIME parts themselves (nested).
+             */
             struct MimePartList {
+                /**
+                 * The type of this MIME container (content-type, e.g., `multipart/mixed` for independent parts, or
+                 * `multipart/alternative` for alternatives like plain text and HTML). See Wikipedia/MIME for details.
+                 */
                 enum MultipartType {
                     MIXED,
                     DIGEST,
@@ -208,10 +205,13 @@ namespace Qsf {
                     SIGNED,
                     ENCRYPTED
                 } multipartType = MIXED;
+                /**
+                 * The list of MIME parts. The MimePartOrList type allows nesting, it can contain either a "final"
+                 * MIME part with payload, or another nested list of MIME parts.
+                 */
                 std::vector<MimePartOrList> mimeParts;
             };
 
-            // From, To, Cc, Subject, Date, ...
             /**
              * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
              * automatically by the mail function if not specified in this map. Other fields that should be considered
@@ -219,15 +219,17 @@ namespace Qsf {
              */
             std::unordered_map<std::string, std::string> headers;
             /**
-             * Vector containing all MIME parts that should be included in this email. It should contain at least one
+             * List containing all MIME parts that should be included in this email. It should contain at least one
              * text (or HTML) part.
              */
-            std::vector<MimePartList> mimeParts;
+            MimePartList mimeParts;
             /**
              * Get the raw source of the email.
              * @return Raw source of the email.
              */
             std::string toRaw() override;
+            // TODO add extra functions, e.g., for adding an attachment or easily creating alternative text and html
+            //   parts (attachments read from a file, can use util function get_file_contents)
         };
     }
 

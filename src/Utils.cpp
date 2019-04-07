@@ -24,6 +24,8 @@
 #include <iomanip>
 #include <unordered_map>
 #include <qsf/Utils.h>
+#include <fstream>
+#include <qsf/UserException.h>
 
 namespace {
     std::unordered_map<std::string, std::string> contentTypeMap = {
@@ -282,5 +284,35 @@ std::string Qsf::merge_path(const std::vector<std::string> &path) {
 
 std::vector<std::string> Qsf::split_path(const std::string &pathString) {
     auto ret = split_string(pathString, '/', true);
+    return ret;
+}
+
+std::string Qsf::convert_line_endings(const std::string &in, const std::string &ending) {
+    std::stringstream ret;
+    for(const auto &c: in) {
+        if(c == '\n') ret << ending;
+        else if(c != '\r') ret << c;
+    }
+    return ret.str();
+}
+
+std::string Qsf::get_file_contents(const std::string &path) {
+    // open file as binary
+    std::ifstream f(path, std::ifstream::binary);
+
+    // throw exception if file cannot be opened
+    if(!f) {
+        throw Qsf::UserException("Qsf::Utils::file_get_contents", 1, "Cannot open file for reading");
+    }
+
+    // get file size
+    f.seekg(0, std::ios::end);
+    long fs = f.tellg();
+    f.seekg(0);
+
+    // load to string
+    std::string ret(static_cast<unsigned long>(fs) + 1, '\0');
+    f.read(&ret[0], fs);
+    
     return ret;
 }

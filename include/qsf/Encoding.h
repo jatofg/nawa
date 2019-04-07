@@ -65,23 +65,41 @@ namespace Qsf {
         /**
          * Check if a string contains valid base64.
          * @param input Input string.
+         * @param allowWhitespaces If true, the whitespace characters '\\r', '\\n', '\\t', and ' ' will be allowed.
          * @return True if the string contains only valid base64, false otherwise.
          */
-        bool isBase64(const std::string &input);
+        bool isBase64(const std::string &input, bool allowWhitespaces = true);
         /**
          * Encode a string (of bytes) as base64.
          * @param input Input string.
-         * @return Base64-encoded input string.
+         * @param breakAfter Maximum line length. The breakSequence will be inserted after the given number of base64
+         * characters. If breakAfter is 0 (default), no line breaks will be inserted by this function.
+         * @param breakSequence The characters to use as a line break. (e.g., "\\n" or "\\r\\n").
+         * @return Base64-encoded string.
          */
-        std::string base64Encode(const std::string &input);
+        std::string base64Encode(const std::string &input, size_t breakAfter = 0, const std::string &breakSequence = "");
         /**
-         * Decode a base64-encoded string (of bytes). If the input string does not contain valid base64, the return
-         * string may be undefined garbage. You may use isBase64 to check it with a regex first, if the result matters.
+         * Decode a base64-encoded string (of bytes). If the input string does not (only) contain valid base64, the
+         * return string may be undefined garbage. Exception: The characters '\\r', '\\n', '\\t', and ' ' (whitespaces)
+         * will be ignored. You may use isBase64 to check it with a regex first, if the result matters.
          * @param input Base64 representation of a string.
          * @return The decoded string.
          */
         std::string base64Decode(const std::string &input);
-        std::string quotedPrintableEncode(const std::string &input, bool replaceCrlf = false);
+        /**
+         * Encode a string using quoted-printable encoding (especially useful for emails).
+         * @param input String to be encoded.
+         * @param lineEnding Character(s) to end the line. Default is "\\r\\n", as this is the default for emails.
+         * @param replaceCrlf Whether to encode the '\\r' and '\\n' characters in the string. Defaults to false.
+         * @return The encoded string.
+         */
+        std::string quotedPrintableEncode(const std::string &input, const std::string &lineEnding = "\r\n",
+                bool replaceCrlf = false);
+        /**
+         * Decode a quoted-printable encoded string.
+         * @param input Encoded string.
+         * @return Decoded string.
+         */
         std::string quotedPrintableDecode(std::string input);
     }
 }
