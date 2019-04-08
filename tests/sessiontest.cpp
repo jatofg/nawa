@@ -6,7 +6,6 @@
 #include "app.h"
 
 using namespace Qsf;
-using namespace Qsf::Types;
 
 int init(AppInit& appInit) {
 

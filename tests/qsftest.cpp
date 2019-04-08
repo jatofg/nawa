@@ -26,7 +26,7 @@
 #include <iostream>
 #include "qsf/Encoding.h"
 #include "qsf/Session.h"
-#include "qsf/Types/Universal.h"
+#include "qsf/Universal.h"
 #include "qsf/Crypto.h"
 #include "qsf/Utils.h"
 
@@ -58,8 +58,8 @@ int init(Qsf::AppInit& appInit) {
 //
 //    std::cout << urlEncoded << std::endl;
 //
-//    Types::Universal u1(std::string("test"));
-//    Types::Universal u2;
+//    Universal u1(std::string("test"));
+//    Universal u2;
 //    u2 = 5;
 //
 //    std::cout << "u1 = " << u1.get<std::string>() << std::endl;
@@ -70,7 +70,7 @@ int init(Qsf::AppInit& appInit) {
 //
 //    u2 = u1;
 //    u1.unset();
-//    Types::Universal u3 = u2;
+//    Universal u3 = u2;
 //    u2 = std::string("test2xyz");
 //
 //    std::cout << "u2 = " << u2.get<std::string>() << std::endl;

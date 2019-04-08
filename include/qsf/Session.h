@@ -28,7 +28,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <qsf/Cookie.h>
-#include <qsf/Types/Universal.h>
+#include <qsf/Universal.h>
 
 namespace Qsf {
     class Connection;
@@ -39,7 +39,7 @@ namespace Qsf {
     struct SessionData {
         std::mutex dLock; /**< Lock for data. */
         std::mutex eLock; /**< Lock for expires.  */
-        std::unordered_map<std::string, Types::Universal> data; /**< Map containing all values of this session. */
+        std::unordered_map<std::string, Universal> data; /**< Map containing all values of this session. */
         time_t expires; /**< Time when this session expires. */
         const std::string sourceIP; /**< IP address of the session initiator, for optional IP checking. */
         /**
@@ -141,7 +141,7 @@ namespace Qsf {
          */
         bool isSet(std::string key) const;
         /**
-         * Get the value at the given key (as a Types::Universal object). To actually receive the stored object, use
+         * Get the value at the given key (as a Universal object). To actually receive the stored object, use
          * the `.get<T>()` function of the Universal (e.g., `conn.session["test"].get<std::string>()`). You will have to
          * explicitly state the type of the stored object as a template argument in order to receive it
          * (as C++ is statically typed).
@@ -149,30 +149,30 @@ namespace Qsf {
          * @return Value at key. If no value exists for that key or no session established, an empty Universal will be
          * returned.
          */
-        Types::Universal operator[](std::string key) const;
+        Universal operator[](std::string key) const;
         /**
          * Set key to a Universal value. Throws a UserException with error code 1 if no session has been established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */
-        void set(std::string key, const Types::Universal& value);
+        void set(std::string key, const Universal& value);
         /**
          * Set key to a string value. This function exists for convenience and makes sure that you do not save a
          * const char* (c-style string) into a session (a terrible idea, as such a pointer would not be available
          * anymore on the next request and therefore cause a segmentation fault). For std::string values, the next
          * specialization (arbitrary type) will be used. The c-style string will be wrapped into a std::string, which
-         * will be wrapped into a Types::Universal value. As this function internally calls
-         * set(std::string, Types::Universal), a UserException with error code 1 will be thrown if no session has been
+         * will be wrapped into a Universal value. As this function internally calls
+         * set(std::string, Universal), a UserException with error code 1 will be thrown if no session has been
          * established.
          * @param key Key to set.
          * @param value C-string that will be used as the value (will be stored as a std::string!).
          */
         void set(std::string key, const char* value) {
-            set(std::move(key), Types::Universal(std::string(value)));
+            set(std::move(key), Universal(std::string(value)));
         }
         /**
          * Set key to a variable of an arbitrary type. This function exists just for convenience and will create a
-         * new Universal from the value type and call set(std::string, Types::Universal), and will therefore throw a
+         * new Universal from the value type and call set(std::string, Universal), and will therefore throw a
          * UserException with error code 1 if no session has been established. As you need to explicitly state the
          * type when receiving the value later on, explicitly constructing the desired type might make your code
          * more readable and less error-prone (if the value is directly constructed and not given as a variable).
@@ -182,7 +182,7 @@ namespace Qsf {
          */
         template<typename T>
         void set(std::string key, const T& value) {
-            set(std::move(key), Types::Universal(value));
+            set(std::move(key), Universal(value));
         }
         /**
          * Remove the session variable with the given key. Throws a UserException with error code 1 if no session has
