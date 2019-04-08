@@ -7,7 +7,7 @@
 #define QSF_SMTPMAILER_H
 
 #include <string>
-#include <qsf/Types/Email.h>
+#include <qsf/Email.h>
 
 namespace Qsf {
     class SmtpMailer {
@@ -43,9 +43,8 @@ namespace Qsf {
         // TODO send multiple mails in one SMTP connection?
         // TODO attachments, MIME in general, ...
         // TODO signing and encryption?
-        void enqueue(Types::MimeEmail email, Types::EmailAddress to = Types::EmailAddress(),
-                Types::EmailAddress from = Types::EmailAddress());
-        void bulkEnqueue(Types::MimeEmail email, std::vector<Types::EmailAddress> recipients,
+        void enqueue(Email& email, EmailAddress to = EmailAddress(), EmailAddress from = EmailAddress());
+        void bulkEnqueue(Email& email, std::vector<EmailAddress> recipients,
                 std::unordered_map<std::string, std::string> replacementRules = std::unordered_map<std::string, std::string>());
         void clearQueue();
         void processQueue();

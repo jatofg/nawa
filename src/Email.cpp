@@ -3,7 +3,7 @@
  * \brief Implementation of methods in email-related structs in the Qsf::Types namespace.
  */
 
-#include <qsf/Types/Email.h>
+#include <qsf/Email.h>
 #include <qsf/Crypto.h>
 #include <sstream>
 #include <regex>
@@ -28,21 +28,21 @@ namespace {
         return ret.str();
     }
 
-    std::string multipartTypeToString(const Qsf::Types::MimeEmail::MimePartList::MultipartType &multipartType) {
+    std::string multipartTypeToString(const Qsf::MimeEmail::MimePartList::MultipartType &multipartType) {
         switch(multipartType) {
-            case Qsf::Types::MimeEmail::MimePartList::MIXED:
+            case Qsf::MimeEmail::MimePartList::MIXED:
                 return "mixed";
-            case Qsf::Types::MimeEmail::MimePartList::DIGEST:
+            case Qsf::MimeEmail::MimePartList::DIGEST:
                 return "digest";
-            case Qsf::Types::MimeEmail::MimePartList::ALTERNATIVE:
+            case Qsf::MimeEmail::MimePartList::ALTERNATIVE:
                 return "alternative";
-            case Qsf::Types::MimeEmail::MimePartList::RELATED:
+            case Qsf::MimeEmail::MimePartList::RELATED:
                 return "related";
-            case Qsf::Types::MimeEmail::MimePartList::REPORT:
+            case Qsf::MimeEmail::MimePartList::REPORT:
                 return "report";
-            case Qsf::Types::MimeEmail::MimePartList::SIGNED:
+            case Qsf::MimeEmail::MimePartList::SIGNED:
                 return "signed";
-            case Qsf::Types::MimeEmail::MimePartList::ENCRYPTED:
+            case Qsf::MimeEmail::MimePartList::ENCRYPTED:
                 return "encrypted";
         }
         return "";
@@ -53,7 +53,7 @@ namespace {
      * @param mimePartList The MimePartList object representing the MIME parts to be converted.
      * @return Tuple containing the boundary string (for inclusion in the header) and the MIME parts as a string.
      */
-    std::string mergeMimePartList(const Qsf::Types::MimeEmail::MimePartList &mimePartList, const std::string& boundary) {
+    std::string mergeMimePartList(const Qsf::MimeEmail::MimePartList &mimePartList, const std::string& boundary) {
         std::stringstream ret;
 
         // iterate through the list
@@ -71,15 +71,15 @@ namespace {
                 }
 
                 switch(part.mimePart->applyEncoding) {
-                    case Qsf::Types::MimeEmail::MimePart::BASE64:
+                    case Qsf::MimeEmail::MimePart::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
                         ret << Qsf::Encoding::base64Encode(mimePart.data, 76, "\r\n");
                         break;
-                    case Qsf::Types::MimeEmail::MimePart::QUOTED_PRINTABLE:
+                    case Qsf::MimeEmail::MimePart::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
                         ret << Qsf::Encoding::quotedPrintableEncode(mimePart.data);
                         break;
-                    case Qsf::Types::MimeEmail::MimePart::NONE:
+                    case Qsf::MimeEmail::MimePart::NONE:
                         ret << "\r\n" << mimePart.data;
                         break;
                 }
@@ -101,12 +101,12 @@ namespace {
     }
 }
 
-bool Qsf::Types::EmailAddress::isValid() {
+bool Qsf::EmailAddress::isValid() {
     std::regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", std::regex::icase);
     return std::regex_match(address, emCheck);
 }
 
-std::string Qsf::Types::SimpleEmail::toRaw() {
+std::string Qsf::SimpleEmail::getRaw() {
     std::stringstream ret;
     for(auto const &e: headers) {
         ret << e.first << ": " << e.second << "\r\n";
@@ -115,12 +115,19 @@ std::string Qsf::Types::SimpleEmail::toRaw() {
     return ret.str();
 }
 
-Qsf::Types::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::Types::MimeEmail::MimePartOrList &other) {
+Qsf::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::MimeEmail::MimePartOrList &other) {
     operator=(other);
 }
 
-Qsf::Types::MimeEmail::MimePartOrList &
-Qsf::Types::MimeEmail::MimePartOrList::operator=(const Qsf::Types::MimeEmail::MimePartOrList &other) {
+Qsf::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::MimeEmail::MimePart &_mimePart) {
+    operator=(_mimePart);
+}
+
+Qsf::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::MimeEmail::MimePartList &_mimePartList) {
+    operator=(_mimePartList);
+}
+
+Qsf::MimeEmail::MimePartOrList &Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePartOrList &other) {
     if(&other == this) {
         return *this;
     }
@@ -145,16 +152,39 @@ Qsf::Types::MimeEmail::MimePartOrList::operator=(const Qsf::Types::MimeEmail::Mi
     return *this;
 }
 
-std::string Qsf::Types::MimeEmail::toRaw() {
+Qsf::MimeEmail::MimePartOrList &Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePart &_mimePart) {
+    if(!mimePart) {
+        mimePart = std::make_unique<MimePart>();
+    }
+    if(mimePartList) {
+        mimePartList.reset(nullptr);
+    }
+    *mimePart = _mimePart;
+    return *this;
+}
+
+Qsf::MimeEmail::MimePartOrList &
+Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePartList &_mimePartList) {
+    if(!mimePartList) {
+        mimePartList = std::make_unique<MimePartList>();
+    }
+    if(mimePart) {
+        mimePart.reset(nullptr);
+    }
+    *mimePartList = _mimePartList;
+    return *this;
+}
+
+std::string Qsf::MimeEmail::getRaw() {
     std::stringstream ret;
     headers["MIME-Version"] = "1.0";
     std::string boundary = genBoundary();
-    headers["Content-Type"] = "multipart/" + multipartTypeToString(mimeParts.multipartType) + "; boundary=\"" + boundary + "\"";
+    headers["Content-Type"] = "multipart/" + multipartTypeToString(mimePartList.multipartType) + "; boundary=\"" + boundary + "\"";
     for(auto const &e: headers) {
         ret << e.first << ": " << e.second << "\r\n";
     }
     ret << "\r\n" << "This is a multi-part message in MIME format" << "\r\n\r\n";
-    ret << mergeMimePartList(mimeParts, boundary);
+    ret << mergeMimePartList(mimePartList, boundary);
 
     return ret.str();
 }
