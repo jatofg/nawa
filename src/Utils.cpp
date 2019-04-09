@@ -316,3 +316,13 @@ std::string Qsf::get_file_contents(const std::string &path) {
     
     return ret;
 }
+
+std::string Qsf::string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns) {
+    for(const auto &pattern: patterns) {
+        for(size_t pos = input.find(pattern.first); pos != std::string::npos;) {
+            input.replace(pos, pattern.first.length(), pattern.second);
+            pos = input.find(pattern.first, pos + pattern.second.length());
+        }
+    }
+    return input;
+}

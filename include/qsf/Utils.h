@@ -26,6 +26,7 @@
 
 #include <string>
 #include <regex>
+#include <unordered_map>
 
 namespace Qsf {
     /**
@@ -124,6 +125,13 @@ namespace Qsf {
      * @return String containing the whole file.
      */
     std::string get_file_contents(const std::string& path);
+    /**
+     * Replace all occurrences of pattern keys by the corresponding pattern values in the input string.
+     * @param input String in which the patterns shall be replaced.
+     * @param patterns Map of key strings (to be replaced in the input string) and value strings (the replacements).
+     * @return String with replacements applied.
+     */
+    std::string string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns);
 }
 
 #endif //QSF_UTILS_H

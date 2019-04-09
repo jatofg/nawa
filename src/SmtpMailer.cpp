@@ -25,3 +25,16 @@ void Qsf::SmtpMailer::setAuth(std::string _authUsername, std::string _authPasswo
     authUsername = std::move(_authUsername);
     authPassword = std::move(_authPassword);
 }
+
+void Qsf::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, EmailAddress from) {
+    queue.push_back(QueueElem{.email=email,.from=std::make_shared<EmailAddress>(from),.to=std::move(to)});
+}
+
+void Qsf::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
+                                  EmailAddress from, ReplacementRules replacementRules) {
+
+}
+
+void Qsf::SmtpMailer::clearQueue() {
+
+}

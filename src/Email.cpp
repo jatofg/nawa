@@ -11,6 +11,7 @@
 #include <qsf/UserException.h>
 #include <fstream>
 #include <qsf/Encoding.h>
+#include <qsf/Utils.h>
 
 namespace {
     /**
@@ -53,7 +54,8 @@ namespace {
      * @param mimePartList The MimePartList object representing the MIME parts to be converted.
      * @return Tuple containing the boundary string (for inclusion in the header) and the MIME parts as a string.
      */
-    std::string mergeMimePartList(const Qsf::MimeEmail::MimePartList &mimePartList, const std::string& boundary) {
+    std::string mergeMimePartList(const Qsf::MimeEmail::MimePartList &mimePartList, const std::string& boundary,
+            const Qsf::ReplacementRules& replacementRules) {
         std::stringstream ret;
 
         // iterate through the list
@@ -70,17 +72,25 @@ namespace {
                     ret << e.first << ": " << e.second << "\r\n";
                 }
 
-                switch(part.mimePart->applyEncoding) {
+                // apply the replacement rules (only if necessary) and the selected encoding afterwards
+                switch(mimePart.applyEncoding) {
                     case Qsf::MimeEmail::MimePart::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
-                        ret << Qsf::Encoding::base64Encode(mimePart.data, 76, "\r\n");
+                        ret << Qsf::Encoding::base64Encode(
+                                (mimePart.allowReplacements && !replacementRules.empty())
+                                ? Qsf::string_replace(mimePart.data, replacementRules) : mimePart.data,
+                                76, "\r\n");
                         break;
                     case Qsf::MimeEmail::MimePart::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-                        ret << Qsf::Encoding::quotedPrintableEncode(mimePart.data);
+                        ret << Qsf::Encoding::quotedPrintableEncode(
+                                (mimePart.allowReplacements && !replacementRules.empty())
+                                ? Qsf::string_replace(mimePart.data, replacementRules) : mimePart.data
+                                );
                         break;
                     case Qsf::MimeEmail::MimePart::NONE:
-                        ret << "\r\n" << mimePart.data;
+                        ret << "\r\n" << ((mimePart.allowReplacements && !replacementRules.empty())
+                        ? Qsf::string_replace(mimePart.data, replacementRules) : mimePart.data);
                         break;
                 }
 
@@ -92,7 +102,7 @@ namespace {
                 ret << "Content-Type: multipart/" << multipartTypeToString(part.mimePartList->multipartType);
                 std::string partBoundary = genBoundary();
                 ret << "; boundary=\"" << partBoundary << "\"\r\n\r\n";
-                ret << mergeMimePartList(*part.mimePartList, partBoundary) << "\r\n\r\n";
+                ret << mergeMimePartList(*part.mimePartList, partBoundary, replacementRules) << "\r\n\r\n";
             }
         }
 
@@ -106,12 +116,12 @@ bool Qsf::EmailAddress::isValid() {
     return std::regex_match(address, emCheck);
 }
 
-std::string Qsf::SimpleEmail::getRaw() {
+std::string Qsf::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
     for(auto const &e: headers) {
         ret << e.first << ": " << e.second << "\r\n";
     }
-    ret << "\r\n" << text;
+    ret << "\r\n" << (replacementRules.empty() ? text : string_replace(text, replacementRules));
     return ret.str();
 }
 
@@ -175,16 +185,17 @@ Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePartList &_m
     return *this;
 }
 
-std::string Qsf::MimeEmail::getRaw() {
+std::string Qsf::MimeEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
-    headers["MIME-Version"] = "1.0";
-    std::string boundary = genBoundary();
-    headers["Content-Type"] = "multipart/" + multipartTypeToString(mimePartList.multipartType) + "; boundary=\"" + boundary + "\"";
     for(auto const &e: headers) {
+        if(e.first == "MIME-Version" || e.first == "Content-Type") continue;
         ret << e.first << ": " << e.second << "\r\n";
     }
-    ret << "\r\n" << "This is a multi-part message in MIME format" << "\r\n\r\n";
-    ret << mergeMimePartList(mimePartList, boundary);
+    std::string boundary = genBoundary();
+    ret << "MIME-Version: 1.0\r\nContent-Type: multipart/" << multipartTypeToString(mimePartList.multipartType);
+    ret << "; boundary=\"" << boundary;
+    ret << "\"\r\n\r\nThis is a multi-part message in MIME format\r\n\r\n";
+    ret << mergeMimePartList(mimePartList, boundary, replacementRules);
 
     return ret.str();
 }

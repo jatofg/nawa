@@ -32,9 +32,15 @@
 namespace Qsf {
 
     /**
-        * Structure containing the name and email address of a recipient or sender. It contains functions for validation
-        * and getting a representation in a standard format that can be used for curl.
-        */
+     * Replacement rules for emails are just a string -> string map. All occurrences of the key string should be
+     * replaced by the value string.
+     */
+    typedef std::unordered_map<std::string, std::string> ReplacementRules;
+
+    /**
+     * Structure containing the name and email address of a recipient or sender. It contains functions for validation
+     * and getting a representation in a standard format that can be used for curl.
+     */
     struct EmailAddress {
         std::string name; /**< The name of the sender or recipient. */
         std::string address; /**< The email address itself. */
@@ -97,9 +103,10 @@ namespace Qsf {
 
         /**
          * This method shall generate the raw source of the email (including headers).
+         * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        virtual std::string getRaw() = 0;
+        virtual std::string getRaw(const ReplacementRules &replacementRules) const = 0;
     };
 
     /**
@@ -113,9 +120,10 @@ namespace Qsf {
         std::string text;
         /**
          * Get the raw source of the email.
+         * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        std::string getRaw() override;
+        std::string getRaw(const ReplacementRules &replacementRules) const override;
     };
 
     /**
@@ -148,6 +156,11 @@ namespace Qsf {
              * Additional headers for this MIME part (such as Content-ID) can be added here.
              */
             std::unordered_map<std::string, std::string> partHeaders;
+            /**
+             * Whether to allow replacements using ReplacementRules in the data of this MIME part. The replacements
+             * will be applied before the encoding.
+             */
+            bool allowReplacements = false;
             /**
              * The data string, containing the body of the MIME part.
              */
@@ -239,21 +252,16 @@ namespace Qsf {
         };
 
         /**
-         * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
-         * automatically by the mail function if not specified in this map. Other fields that should be considered
-         * are: To, Subject, Cc, Content-Type (will be set automatically if MIME is used).
-         */
-        std::unordered_map<std::string, std::string> headers;
-        /**
          * List containing all MIME parts that should be included in this email. It should contain at least one
          * text (or HTML) part.
          */
         MimePartList mimePartList;
         /**
          * Get the raw source of the email.
+         * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        std::string getRaw() override;
+        std::string getRaw(const ReplacementRules &replacementRules) const override;
         // TODO add extra functions, e.g., for adding an attachment or easily creating alternative text and html
         //   parts (attachments read from a file, can use util function get_file_contents)
     };

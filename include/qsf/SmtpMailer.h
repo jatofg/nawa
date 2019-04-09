@@ -11,6 +11,13 @@
 
 namespace Qsf {
     class SmtpMailer {
+        struct QueueElem {
+            std::shared_ptr<const Email> email;
+            std::shared_ptr<const EmailAddress> from;
+            EmailAddress to;
+            ReplacementRules replacementRules;
+        };
+
         std::string serverUrl;
         unsigned int serverPort;
         enum TlsMode {
@@ -23,6 +30,7 @@ namespace Qsf {
         std::string authUsername;
         std::string authPassword;
         bool connected = false;
+        std::vector<QueueElem> queue;
     public:
         /**
          * Construct an SmtpMailer object and optionally set the connection and authentication properties. Constructing
@@ -43,9 +51,9 @@ namespace Qsf {
         // TODO send multiple mails in one SMTP connection?
         // TODO attachments, MIME in general, ...
         // TODO signing and encryption?
-        void enqueue(Email& email, EmailAddress to = EmailAddress(), EmailAddress from = EmailAddress());
-        void bulkEnqueue(Email& email, std::vector<EmailAddress> recipients,
-                std::unordered_map<std::string, std::string> replacementRules = std::unordered_map<std::string, std::string>());
+        void enqueue(std::shared_ptr<Email> email, EmailAddress to = EmailAddress(), EmailAddress from = EmailAddress());
+        void bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
+                EmailAddress from, ReplacementRules replacementRules = ReplacementRules());
         void clearQueue();
         void processQueue();
     };

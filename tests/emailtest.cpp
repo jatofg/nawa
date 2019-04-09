@@ -13,7 +13,12 @@ int init(AppInit& appInit) {
 }
 
 int handleRequest(Connection& connection) {
-    connection.setHeader("content-type", "text/plain");
+    connection.setHeader("content-type", "text/plain; charset=utf-8");
+    
+    // The replacement rules to apply
+    ReplacementRules replacementRules;
+    replacementRules.insert({"Test", "T€st"});
+    replacementRules.insert({"email", "émail"});
 
     // part 1: simple email
     connection.response << "+++++ TEST 1: SimpleEmail +++++\r\n\r\n";
@@ -22,20 +27,21 @@ int handleRequest(Connection& connection) {
     email1.headers["From"] = "test@example.com";
     email1.headers["Subject"] = "Test mail";
     email1.text = "Test email 'm€ssage' =@#$%^&*()===";
-    connection.response << email1.getRaw() << "\r\n\r\n";
+    connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
 
     // part 2: MIME email
     connection.response << "+++++ TEST 2: MimeEmail +++++\r\n\r\n";
 
     MimeEmail email2;
     email2.headers["From"] = "test@example.com";
-    email2.headers["Subject"] = "Test mail";
+    email2.headers["Subject"] = "Test email";
 
     // text part
     MimeEmail::MimePart textPart;
     textPart.applyEncoding = MimeEmail::MimePart::QUOTED_PRINTABLE;
     textPart.contentType = "text/plain; charset=utf-8";
     textPart.contentDisposition = "inline";
+    textPart.allowReplacements = true;
     textPart.data = "Test email 'm€ssage' =@#$%^&*()=== asjdflkasjdfoiwej sdflkawjefijwefijsldjf dsnvndvjnwkjenggfweg";
 
     // html part
@@ -43,7 +49,7 @@ int handleRequest(Connection& connection) {
     htmlPart.applyEncoding = MimeEmail::MimePart::QUOTED_PRINTABLE;
     htmlPart.contentType = "text/html";
     htmlPart.contentDisposition = "inline";
-    htmlPart.data = "<html><head><title>Bla</title></head>\n<body><p>T&auml;st</p></body></html>";
+    htmlPart.data = "<html><head><title>Bla</title></head>\n<body><p>Test T&auml;st email</p></body></html>";
 
     // attachment
     MimeEmail::MimePart attachmentPart;
@@ -64,5 +70,5 @@ int handleRequest(Connection& connection) {
     email2.mimePartList.mimeParts.emplace_back(attachmentPart);
 
     // print the result
-    connection.response << email2.getRaw();
+    connection.response << email2.getRaw(replacementRules);
 }
