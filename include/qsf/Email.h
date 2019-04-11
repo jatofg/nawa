@@ -70,7 +70,8 @@ namespace Qsf {
          * @param includeName Include the name in the representation.
          * @return String representation.
          */
-        std::string get(bool includeName = true) {
+        std::string get(bool includeName = true) const {
+            // TODO implement correctly!
             return std::string();
         }
         /**
@@ -80,7 +81,7 @@ namespace Qsf {
          * send a confirmation email to it.
          * @return True if the email address could be valid, false if it is definitely not valid.
          */
-        bool isValid();
+        bool isValid() const;
     };
 
     /**

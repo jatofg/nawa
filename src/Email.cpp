@@ -111,7 +111,7 @@ namespace {
     }
 }
 
-bool Qsf::EmailAddress::isValid() {
+bool Qsf::EmailAddress::isValid() const {
     std::regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", std::regex::icase);
     return std::regex_match(address, emCheck);
 }

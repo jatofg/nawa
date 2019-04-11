@@ -33,7 +33,7 @@ namespace Qsf {
         struct QueueElem {
             std::shared_ptr<const Email> email;
             std::shared_ptr<const EmailAddress> from;
-            EmailAddress to;
+            std::vector<EmailAddress> recipients;
             std::unique_ptr<ReplacementRules> replacementRules;
         };
 
@@ -49,11 +49,12 @@ namespace Qsf {
         /**
          * Construct an SmtpMailer object and optionally set the connection and authentication properties. Constructing
          * the object will not establish a connection to the SMTP server yet.
-         * @param _serverDomain Domain name or IP address of the SMTP server to use.
+         * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
          * @param _serverPort Port of the SMTP server.
          * @param _tlsMode How TLS should be used, see TlsMode struct.
          * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
-         * (recommended).
+         * (highly recommended).
          * @param _authUsername Username for authentication.
          * @param _authPassword Password for authentication.
          */
@@ -61,11 +62,12 @@ namespace Qsf {
                 bool _verifyTlsCert = true, std::string _authUsername = "", std::string _authPassword = "");
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
-         * @param _serverDomain Domain name or IP address of the SMTP server to use.
+         * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
          * @param _serverPort Port of the SMTP server.
          * @param _tlsMode How TLS should be used, see TlsMode struct.
          * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
-         * (recommended).
+         * (highly recommended).
          */
         void setServer(std::string _serverDomain, unsigned int _serverPort = 25, TlsMode _tlsMode = NONE,
                 bool _verifyTlsCert = true);
@@ -91,12 +93,10 @@ namespace Qsf {
          * @param to The recipient of the email (envelope). Please note that this will not modify the headers of your
          * email (as shown in the email app of the recipient), those have to be set inside of the Email object. This is
          * the address the mail will be actually sent to.
-         * @param from The sender of the email (envelope). This address definitely has to be set, and it should be an
-         * email address that the SMTP server "owns", i.e., has the permission to send emails from this address (the
-         * spam filter of the recipient normally uses this address to classify the email). Even though this must not
-         * be confused with the "From" header that will be shown in the email client of the recipient, this function
-         * will check for the existence of the "From" header in the Email object (which is obligatory according to the
-         * standards) and set it to this address if it doesn't exist. This function will take a shared_ptr, too, as the
+         * @param from The sender of the email (envelope, also known as the return-path). It should be an email address
+         * that the SMTP server "owns", i.e., has the permission to send emails from this address (the spam filter of
+         * the recipient normally uses this address to classify the email). This address should be set in all cases,
+         * except for those noted in RFC 5321, section 4.5.5. This function will take a shared_ptr, too, as the
          * sender of mass emails is usually always the same, so you can reuse the same object for all recipients.
          * @param replacementRules An optional set of replacement rules. It is a map with a string as key (the text
          * to be replaced) and another string as value (the text to replace it with). This set is saved and evaluated
@@ -106,26 +106,28 @@ namespace Qsf {
         void enqueue(std::shared_ptr<Email> email, EmailAddress to,
                 std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
         /**
-         * This function will enqueue an email for a whole list of recipients at once. The only advantage of using this
-         * function is that the Email object will only be checked once against the existence of the "Date" and "From"
-         * header. It offers a convenient way to enqueue a mass mail if no personalization is required (otherwise, you
+         * This function will enqueue an email for a list of recipients. This improves efficiency, but it doesn't
+         * allow the application of replacement rules for each recipient individually. Replacement rules can still be
+         * used, but the replacements will be the same for all recipients (if you need personalization, you
          * should call enqueue() for each recipient and pass individual rule sets; the email object can be the same
          * nevertheless, thanks to the shared_ptr).
          * @param email The Email object (for comments, look at the docs for enqueue()).
          * @param recipients The list of recipients as EmailAddress objects (envelope, see enqueue() docs).
          * @param from The sender of the email (envelope, see enqueue() docs).
+         * @param replacementRules An optional set of replacement rules (see enqueue() docs). They will be applied
+         * to the email once and do not offer personalization to individual recipients.
          */
-        void bulkEnqueue(std::shared_ptr<Email> email, const std::vector<EmailAddress> &recipients,
-                         const std::shared_ptr<EmailAddress> &from);
+        void bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
+                std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
         /**
          * Clear the email queue.
          */
         void clearQueue();
         /**
          * Process the queue, i.e., establish an SMTP connection and send all emails in the queue. This function will
-         * not modify the queue.
+         * not modify the queue. In case of errors, a UserException with error code 1 will be thrown.
          */
-        void processQueue();
+        void processQueue() const;
     };
 }
 
