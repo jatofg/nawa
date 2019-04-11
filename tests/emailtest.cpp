@@ -4,6 +4,8 @@
 
 #include <qsf/Email.h>
 #include <qsf/Utils.h>
+#include <ctime>
+#include <iomanip>
 #include "app.h"
 
 using namespace Qsf;
@@ -14,6 +16,12 @@ int init(AppInit& appInit) {
 
 int handleRequest(Connection& connection) {
     connection.setHeader("content-type", "text/plain; charset=utf-8");
+
+    connection.response << "SMTP time: ";
+    time_t currentTime = time(nullptr);
+    tm ltime;
+    localtime_r(&currentTime, &ltime);
+    connection.response << std::put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
     
     // The replacement rules to apply
     ReplacementRules replacementRules;

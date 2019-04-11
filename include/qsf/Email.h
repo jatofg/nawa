@@ -109,6 +109,7 @@ namespace Qsf {
         virtual std::string getRaw(const ReplacementRules &replacementRules) const = 0;
     };
 
+    // TODO encoding for SimpleEmail
     /**
      * Structure representing a basic email (just headers and payload, excluding the envelope). Please remember to
      * also set the headers in the headers map of the base class Email.

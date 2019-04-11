@@ -91,6 +91,64 @@ namespace {
             {"3gp", "video/3gpp"}, {"3g2", "video/3gpp2"},
             {"7z", "application/x-7z-compressed"}
     };
+
+    /**
+     * Check whether current locale is "C" and, if it is not, reset it to "C". This function might not be thread-safe,
+     * but ideally, it should never have to update the locale. The app should not update the locale itself.
+     */
+//    inline void resetLocale() {
+//        if(std::locale() != std::locale::classic()) {
+//            std::locale::global(std::locale::classic());
+//        }
+//    }
+
+    /**
+     * Get the day of week as a string. This function is used instead of the %a specifier, as it is locale-independent,
+     * and checking and setting the locale is not the best idea (not thread-safe).
+     * @param dow Day of week, range [0-6], where 0 is Sun and 6 is Sat.
+     * @return Abbreviated weekday string representation.
+     */
+    inline std::string getDayOfWeek(int dow) {
+        std::string ret;
+        switch(dow) {
+            case 0: ret = "Sun"; break;
+            case 1: ret = "Mon"; break;
+            case 2: ret = "Tue"; break;
+            case 3: ret = "Wed"; break;
+            case 4: ret = "Thu"; break;
+            case 5: ret = "Fri"; break;
+            case 6: ret = "Sat"; break;
+            default: break;
+        }
+        return ret;
+    }
+
+    /**
+     * Get the abbreviated month representation as a string, used instead of the %b specifier for the same reasons as
+     * above.
+     * @param mon Months since January (range [0-11]).
+     * @return String representation.
+     */
+    inline std::string getMonth(int mon) {
+        std::string ret;
+        switch(mon) {
+            case 0: ret = "Jan"; break;
+            case 1: ret = "Feb"; break;
+            case 2: ret = "Mar"; break;
+            case 3: ret = "Apr"; break;
+            case 4: ret = "May"; break;
+            case 5: ret = "Jun"; break;
+            case 6: ret = "Jul"; break;
+            case 7: ret = "Aug"; break;
+            case 8: ret = "Sep"; break;
+            case 9: ret = "Oct"; break;
+            case 10: ret = "Nov"; break;
+            case 11: ret = "Dec"; break;
+            default: break;
+        }
+        return ret;
+    }
+
 }
 
 void
@@ -243,16 +301,41 @@ std::string Qsf::content_type_by_extension(std::string extension) {
     return "application/octet-stream";
 }
 
-std::string Qsf::make_http_time(time_t time) {
+std::string Qsf::make_http_time(time_t time1) {
     std::stringstream httpTime;
-    httpTime << std::put_time(gmtime(&time), "%a, %d %b %Y %H:%M:%S GMT");
+    tm gmt;
+    gmtime_r(&time1, &gmt);
+    httpTime << getDayOfWeek(gmt.tm_wday) << std::put_time(&gmt, ", %d ") << getMonth(gmt.tm_mon);
+    httpTime << std::put_time(&gmt, " %Y %H:%M:%S GMT");
+
     return httpTime.str();
 }
 
-time_t Qsf::read_http_time(std::string httpTime) {
+time_t Qsf::read_http_time(const std::string &httpTime) {
     std::istringstream timeStream(httpTime);
     tm timeStruct;
     timeStream >> std::get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
+
+    // timegm will interpret the tm as UTC and convert it to a time_t
+    return timegm(&timeStruct);
+}
+
+std::string Qsf::make_smtp_time(time_t time1) {
+    std::stringstream smtpTime;
+    tm ltime;
+    localtime_r(&time1, &ltime);
+    smtpTime << getDayOfWeek(ltime.tm_wday) << std::put_time(&ltime, ", %e ") << getMonth(ltime.tm_mon);
+    smtpTime << std::put_time(&ltime, " %Y %H:%M:%S %z");
+
+    return smtpTime.str();
+}
+
+time_t Qsf::read_smtp_time(const std::string &smtpTime) {
+    std::istringstream timeStream(smtpTime);
+    tm timeStruct;
+    timeStream >> std::get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
+
+    // mktime will interpret the tm as local time and convert it to a time_t
     return mktime(&timeStruct);
 }
 

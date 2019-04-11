@@ -59,8 +59,8 @@ void Qsf::Connection::setBody(std::string content) {
 }
 
 void
-Qsf::Connection::sendFile(std::string path, std::string contentType, bool forceDownload, std::string downloadFilename,
-        bool checkIfModifiedSince) {
+Qsf::Connection::sendFile(const std::string &path, const std::string &contentType, bool forceDownload,
+                          const std::string &downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
     std::ifstream f(path, std::ifstream::binary);
@@ -172,12 +172,7 @@ std::string Qsf::Connection::getRaw() {
             // Expires option
             time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
             if(expiry > 0) {
-                // reset locale to C for correct Expires string and reset it afterwards
-                // (in case the app modified the locale)
-                std::locale tmp;
-                std::locale::global(std::locale::classic());
                 raw << "; Expires=" << Qsf::make_http_time(expiry);
-                std::locale::global(tmp);
             }
             // Max-Age option
             unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
@@ -229,7 +224,7 @@ Qsf::Connection::Connection(Request& request, Config& config) : request(request)
     }
 }
 
-void Qsf::Connection::setCookie(std::string key, Qsf::Cookie cookie) {
+void Qsf::Connection::setCookie(const std::string &key, Qsf::Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
     std::regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     std::regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
@@ -239,7 +234,7 @@ void Qsf::Connection::setCookie(std::string key, Qsf::Cookie cookie) {
     cookies[key] = std::move(cookie);
 }
 
-void Qsf::Connection::unsetCookie(std::string key) {
+void Qsf::Connection::unsetCookie(const std::string &key) {
     cookies.erase(key);
 }
 

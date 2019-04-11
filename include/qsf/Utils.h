@@ -80,17 +80,37 @@ namespace Qsf {
      */
     std::string content_type_by_extension(std::string extension);
     /**
-     * Convert a time_t value (UNIX timestamp) to a HTTP header compatible time string.
+     * Convert a time_t value (UNIX timestamp) to a HTTP header compatible date/time string.
      * @param time UNIX timestamp as a time_t value.
-     * @return Time string in the format "<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT".
+     * @return Time string in the format
+     * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
      */
     std::string make_http_time(time_t time);
     /**
-     * Create a time_t value (UNIX timestamp) from a HTTP header time string.
-     * @param httpTime Time string in the format: "<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT".
+     * Create a time_t value (UNIX timestamp) from a HTTP header date/time string. This function will only work if the
+     * locale is set to "C" (classic locale). If your app updates the locale, make sure to reset it before calling this
+     * function. Locale changes might not be thread-safe, so you'd better use a mutex.
+     * @param httpTime Time string in the format:
+     * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
      * @return UNIX timestamp value (time_t).
      */
-    time_t read_http_time(std::string httpTime);
+    time_t read_http_time(const std::string &httpTime);
+    /**
+     * Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string.
+     * @param time UNIX timestamp as a time_t value.
+     * @return Time string in the format
+     * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> +<tzoffset(4)>".
+     */
+    std::string make_smtp_time(time_t time);
+    /**
+     * Create a time_t value (UNIX timestamp) from a SMTP header date/time string. This function will only work if the
+     * locale is set to "C" (classic locale). If your app updates the locale, make sure to reset it before calling this
+     * function. Locale changes might not be thread-safe, so you'd better use a mutex.
+     * @param httpTime Time string in the format:
+     * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> +<tzoffset(4)>".
+     * @return UNIX timestamp value (time_t).
+     */
+    time_t read_smtp_time(const std::string &smtpTime);
     /**
      * Split a string using a character as a delimiter.
      * @param str String to split.

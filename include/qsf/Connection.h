@@ -81,8 +81,8 @@ namespace Qsf {
          * the modification date of the file. Prepare a not-modified response and clear the body if the file has not
          * been modified. Using this parameter only makes sense if the client requested exactly this file, of course.
          */
-        void sendFile(std::string path, std::string contentType = "", bool forceDownload = false,
-                std::string downloadFilename = "", bool checkIfModifiedSince = false);
+        void sendFile(const std::string &path, const std::string &contentType = "", bool forceDownload = false,
+                      const std::string &downloadFilename = "", bool checkIfModifiedSince = false);
         /**
          * Set the HTTP status code. It will be passed to the web server without checking for validity. For known
          * status codes, the textual description will be appended.
@@ -113,13 +113,13 @@ namespace Qsf {
          * @param cookie Cookie object containing the value and options of the cookie.
          * Valid characters in the cookie content (as regex): [A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]
          */
-        void setCookie(std::string key, Cookie cookie);
+        void setCookie(const std::string &key, Cookie cookie);
         /**
          * Unset an HTTP cookie that was previously set using setCookie(). Will just do nothing if no cookie with the
          * given key exists.
          * @param key Key of the cookie.
          */
-        void unsetCookie(std::string key);
+        void unsetCookie(const std::string &key);
         /**
          * This method can be used to set default attributes for cookies. Setting a boolean attribute to true means
          * that the corresponding attribute will be sent for all cookies, regardless of the value specified in the
