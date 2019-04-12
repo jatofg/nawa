@@ -7,16 +7,34 @@
 #include <qsf/Utils.h>
 #include <curl/curl.h>
 #include <qsf/UserException.h>
+#include <random>
+#include <qsf/Crypto.h>
 
 namespace {
     /**
-     * Check for the existence of the obligatory "Date" header in the email, and set it if non-existent.
+     * Check for the existence of the obligatory "Date" and "From" headers in the email, and set them if non-existent.
+     * Also adds a "Message-ID" header if necessary and possible.
      * @param email Email to check and modify.
      * @param from EmailAddress object to set the From header from, if necessary.
      */
     void addMissingHeaders(std::shared_ptr<Qsf::Email> &email, const std::shared_ptr<Qsf::EmailAddress> &from) {
         if(!email->headers.count("Date")) {
             email->headers["Date"] = Qsf::make_smtp_time(time(nullptr));
+        }
+        if(!email->headers.count("From") && !from->address.empty()) {
+            email->headers["From"] = from->get();
+        }
+        unsigned long atPos;
+        if(!email->headers.count("Message-ID") && !from->address.empty()
+                && (atPos = from->address.find_last_of('@')) != std::string::npos) {
+            std::stringstream mid;
+            std::stringstream base;
+            std::random_device rd;
+            timespec mtime;
+            clock_gettime(CLOCK_REALTIME, &mtime);
+            base << mtime.tv_sec << mtime.tv_nsec << from->address << rd();
+            mid << '<' << Qsf::Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos+1) << '>';
+            email->headers["Message-ID"] = mid.str();
         }
     }
 }
@@ -102,6 +120,10 @@ void Qsf::SmtpMailer::processQueue() const {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         }
 
+//        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+        FILE* devNull = fopen("/dev/null", "wb");
+        curl_easy_setopt(curl, CURLOPT_STDERR, devNull);
+
         // iterate queue
         for(const auto &mail: queue) {
 
@@ -118,13 +140,16 @@ void Qsf::SmtpMailer::processQueue() const {
             // specify how to read the mail data
             std::string payload = mail.email->getRaw(*mail.replacementRules);
             // fmemopen will create a FILE* to read from the string (curl expects that, unfortunately)
-            curl_easy_setopt(curl, CURLOPT_READDATA, fmemopen((void*)payload.c_str(), payload.length(), "r"));
+            FILE* payloadFile = fmemopen((void*)payload.c_str(), payload.length(), "r");
+            curl_easy_setopt(curl, CURLOPT_READDATA, (void*)payloadFile);
+            curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
             // perform sending
             res = curl_easy_perform(curl);
 
             // free memory
             curl_slist_free_all(recipients);
+            fclose(payloadFile);
 
             // check for errors, throw exception if one happens
             if(res != CURLE_OK) {
@@ -136,6 +161,7 @@ void Qsf::SmtpMailer::processQueue() const {
         }
 
         curl_easy_cleanup(curl);
+        fclose(devNull);
 
     }
 

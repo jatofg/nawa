@@ -70,10 +70,7 @@ namespace Qsf {
          * @param includeName Include the name in the representation.
          * @return String representation.
          */
-        std::string get(bool includeName = true) const {
-            // TODO implement correctly!
-            return std::string();
-        }
+        std::string get(bool includeName = true) const;
         /**
          * Perform a very basic, regex-based validity check on the saved email address. This will only check that it
          * contains an \@ symbol and only valid characters before and after it, so if this function returns true,
@@ -91,7 +88,7 @@ namespace Qsf {
         /**
          * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
          * automatically by the mail function if not specified in this map. Other fields that should be considered
-         * are: To, Subject, Cc, Content-Type (will be set automatically if MIME is used). This map is designed to
+         * are: To, Subject, Cc, Content-Type (will be set automatically by MimeEmail). This map is designed to
          * be accessed by the mail function in order to complete it, if necessary. The toRaw() method might as well
          * include other headers.
          *

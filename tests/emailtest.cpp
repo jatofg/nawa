@@ -6,6 +6,7 @@
 #include <qsf/Utils.h>
 #include <ctime>
 #include <iomanip>
+#include <qsf/SmtpMailer.h>
 #include "app.h"
 
 using namespace Qsf;
@@ -28,11 +29,15 @@ int handleRequest(Connection& connection) {
     replacementRules.insert({"Test", "T€st"});
     replacementRules.insert({"email", "émail"});
 
+    EmailAddress from("QSF Test", "qsftest@tobias-flaig.de");
+    EmailAddress to("Tobias Flaig", "me@tobias-flaig.de");
+
     // part 1: simple email
     connection.response << "+++++ TEST 1: SimpleEmail +++++\r\n\r\n";
 
     SimpleEmail email1;
-    email1.headers["From"] = "test@example.com";
+    email1.headers["From"] = from.get();
+    email1.headers["To"] = to.get();
     email1.headers["Subject"] = "Test mail";
     email1.text = "Test email 'm€ssage' =@#$%^&*()===";
     connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
@@ -41,22 +46,23 @@ int handleRequest(Connection& connection) {
     connection.response << "+++++ TEST 2: MimeEmail +++++\r\n\r\n";
 
     MimeEmail email2;
-    email2.headers["From"] = "test@example.com";
-    email2.headers["Subject"] = "Test email";
+    email2.headers["From"] = from.get();
+    email2.headers["To"] = to.get();
+    email2.headers["Subject"] = "Test email 2";
 
     // text part
     MimeEmail::MimePart textPart;
     textPart.applyEncoding = MimeEmail::MimePart::QUOTED_PRINTABLE;
     textPart.contentType = "text/plain; charset=utf-8";
     textPart.contentDisposition = "inline";
-    textPart.allowReplacements = true;
     textPart.data = "Test email 'm€ssage' =@#$%^&*()=== asjdflkasjdfoiwej sdflkawjefijwefijsldjf dsnvndvjnwkjenggfweg";
 
     // html part
     MimeEmail::MimePart htmlPart;
     htmlPart.applyEncoding = MimeEmail::MimePart::QUOTED_PRINTABLE;
-    htmlPart.contentType = "text/html";
+    htmlPart.contentType = "text/html; charset=utf-8";
     htmlPart.contentDisposition = "inline";
+    htmlPart.allowReplacements = true;
     htmlPart.data = "<html><head><title>Bla</title></head>\n<body><p>Test T&auml;st email</p></body></html>";
 
     // attachment
@@ -79,4 +85,24 @@ int handleRequest(Connection& connection) {
 
     // print the result
     connection.response << email2.getRaw(replacementRules);
+
+    // if GET sendit=yes, then send it via SMTP localhost
+    if(connection.request.get["sendit"] == "yes") {
+
+        connection.response << "\r\n";
+
+        // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
+        SmtpMailer smtp("s4.quicktools.org", 587, SmtpMailer::REQUIRE_STARTTLS, true, "qsftest@tobias-flaig.de", "875EMKJK4xLc5ur");
+        smtp.enqueue(std::make_shared<MimeEmail>(email2), to, std::make_shared<EmailAddress>(from), replacementRules);
+
+        try {
+            smtp.processQueue();
+            connection.response << "Mail sent successfully!";
+        }
+        catch(const UserException &e) {
+            connection.response << "Error sending mail: " << e.what();
+        }
+
+    }
+
 }

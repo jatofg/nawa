@@ -78,8 +78,6 @@ namespace Qsf {
          */
         void setAuth(std::string _authUsername, std::string _authPassword);
         // TODO send emails async?
-        // TODO send multiple mails in one SMTP connection?
-        // TODO attachments, MIME in general, ...
         // TODO signing and encryption?
         /**
          * Add an email to the sending queue. The email will be sent upon calling processQueue().
@@ -89,7 +87,7 @@ namespace Qsf {
          * pointer will be copied, but the Email object has to be kept in memory only once. To personalize the emails,
          * you can instead use the replacement rules - one rule set can be saved for each recipient. Please note that
          * this function might modify your Email object (it will set the obligatory "Date" and "From" headers, if they
-         * are not there yet).
+         * are not there yet, as well as the "Message-ID" header, if possible).
          * @param to The recipient of the email (envelope). Please note that this will not modify the headers of your
          * email (as shown in the email app of the recipient), those have to be set inside of the Email object. This is
          * the address the mail will be actually sent to.
@@ -98,6 +96,8 @@ namespace Qsf {
          * the recipient normally uses this address to classify the email). This address should be set in all cases,
          * except for those noted in RFC 5321, section 4.5.5. This function will take a shared_ptr, too, as the
          * sender of mass emails is usually always the same, so you can reuse the same object for all recipients.
+         * While this address may be different from the one in the "From" header of the email (which is required),
+         * this function will set the "From" header from this address in case it doesn't exist in the email yet.
          * @param replacementRules An optional set of replacement rules. It is a map with a string as key (the text
          * to be replaced) and another string as value (the text to replace it with). This set is saved and evaluated
          * for each recipient individually, so this is a relatively memory-efficient way to personalize emails. If
