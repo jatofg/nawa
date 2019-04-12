@@ -117,6 +117,13 @@ namespace Qsf {
          * The text part of the email.
          */
         std::string text;
+
+        /**
+         * Whether to apply quoted-printable encoding to the content of the email (recommended). This will also take
+         * care of the line lengths and set the header Content-Transfer-Encoding.
+         */
+        bool quotedPrintableEncode = true;
+
         /**
          * Get the raw source of the email.
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.

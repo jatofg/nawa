@@ -73,13 +73,14 @@ switch to the qsf directory.
 
 First, create a directory for the build files:
 
-`$ mkdir build`
+`$ mkdir build`<br>
+`$ cd build`
 
 Then, build QSF:
 
 `$ cmake --build ..`
 
-And last, install it to the target directories so that the app 
+And last, install it to the target directories so that the apps 
 can find it:
 
 `$ sudo make install`

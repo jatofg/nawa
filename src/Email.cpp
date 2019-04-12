@@ -127,10 +127,23 @@ bool Qsf::EmailAddress::isValid() const {
 
 std::string Qsf::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
+
     for(auto const &e: headers) {
+        if(quotedPrintableEncode && e.first == "Content-Transfer-Encoding")
+            continue;
         ret << e.first << ": " << e.second << "\r\n";
     }
-    ret << "\r\n" << (replacementRules.empty() ? text : string_replace(text, replacementRules));
+
+    if(quotedPrintableEncode) {
+        ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        ret << Encoding::quotedPrintableEncode(
+                replacementRules.empty() ? text : string_replace(text, replacementRules)
+                );
+    }
+    else {
+        ret << "\r\n" << (replacementRules.empty() ? text : string_replace(text, replacementRules));
+    }
+
     return ret.str();
 }
 
