@@ -106,7 +106,7 @@ namespace Qsf {
      * Create a time_t value (UNIX timestamp) from a SMTP header date/time string. This function will only work if the
      * locale is set to "C" (classic locale). If your app updates the locale, make sure to reset it before calling this
      * function. Locale changes might not be thread-safe, so you'd better use a mutex.
-     * @param httpTime Time string in the format:
+     * @param smtpTime Time string in the format:
      * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> +<tzoffset(4)>".
      * @return UNIX timestamp value (time_t).
      */

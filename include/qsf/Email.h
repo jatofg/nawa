@@ -107,7 +107,6 @@ namespace Qsf {
         virtual std::string getRaw(const ReplacementRules &replacementRules) const = 0;
     };
 
-    // TODO encoding for SimpleEmail
     /**
      * Structure representing a basic email (just headers and payload, excluding the envelope). Please remember to
      * also set the headers in the headers map of the base class Email.
@@ -187,12 +186,12 @@ namespace Qsf {
             MimePartOrList() = default;
             /**
              * Construct a MimePartOrList from a MimePart (also implicitly).
-             * @param mimePart The MimePart object this MimePartOrList should refer to.
+             * @param _mimePart The MimePart object this MimePartOrList should refer to.
              */
             MimePartOrList(const MimePart& _mimePart);
             /**
              * Construct a MimePartOrList from a MimePartList (also implicitly).
-             * @param mimePartList The MimePartList object this MimePartOrList should refer to.
+             * @param _mimePartList The MimePartList object this MimePartOrList should refer to.
              */
             MimePartOrList(const MimePartList& _mimePartList);
             /**
@@ -208,13 +207,13 @@ namespace Qsf {
             MimePartOrList& operator=(const MimePartOrList& other);
             /**
              * Assign a MimePart object to this MimePartOrList.
-             * @param mimePart Object to assign.
+             * @param _mimePart Object to assign.
              * @return This object.
              */
             MimePartOrList& operator=(const MimePart& _mimePart);
             /**
              * Assign a MimePartList object to this MimePartOrList.
-             * @param mimePartList Object to assign.
+             * @param _mimePartList Object to assign.
              * @return This object.
              */
             MimePartOrList& operator=(const MimePartList& _mimePartList);

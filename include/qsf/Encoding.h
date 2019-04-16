@@ -91,16 +91,25 @@ namespace Qsf {
          * @param input String to be encoded.
          * @param lineEnding Character(s) to end the line. Default is "\\r\\n", as this is the default for emails.
          * @param replaceCrlf Whether to encode the '\\r' and '\\n' characters in the string. Defaults to false.
+         * @param qEncoding Use the similar Q-encoding instead of quoted-printable. Line breaks will not be used, no
+         * limit on line length will be applied.
          * @return The encoded string.
          */
         std::string quotedPrintableEncode(const std::string &input, const std::string &lineEnding = "\r\n",
-                bool replaceCrlf = false);
+                bool replaceCrlf = false, bool qEncoding = false);
         /**
          * Decode a quoted-printable encoded string.
          * @param input Encoded string.
          * @return Decoded string.
          */
         std::string quotedPrintableDecode(std::string input);
+        /**
+         * Convert a UTF8-encoded string to the encoded-word syntax for email headers.
+         * @param input The input string to encode.
+         * @param base64 Whether to use base64-encoding instead of Q-encoding (defaults to false).
+         * @return Encoded string.
+         */
+        std::string makeEncodedWord(const std::string &input, bool base64 = false);
     }
 }
 

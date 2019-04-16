@@ -696,13 +696,14 @@ std::string Qsf::Encoding::base64Decode(const std::string &input) {
     return base64_decode(input);
 }
 
-std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding, bool replaceCrlf) {
+std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
+        bool replaceCrlf, bool qEncoding) {
     std::stringstream ret;
     int lineCount = 0;
     for(const char c: input) {
         // TODO do not replace =09 (tabulator)? spaces at the end of a line (shoud be encoded =20)?
-        if(c >= 32 && c <= 126 && c != 61) {
-            if(lineCount >= 75) {
+        if (c >= 32 && c <= 126 && c != 61 && !(qEncoding && (c == 32 || c == 63 || c == 95))) {
+            if(!qEncoding && lineCount >= 75) {
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
@@ -713,8 +714,13 @@ std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const
             ret << c;
             lineCount = 0;
         }
+        else if(qEncoding && c == 32) {
+            // space character represented by '_' in Q-encoding
+            ret << '_';
+            ++lineCount;
+        }
         else {
-            if(lineCount >= 73) {
+            if(!qEncoding && lineCount >= 73) {
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
@@ -736,4 +742,17 @@ std::string Qsf::Encoding::quotedPrintableDecode(std::string input) {
     regex_replace_callback(input, matchCode, replaceCode);
 
     return input;
+}
+
+std::string Qsf::Encoding::makeEncodedWord(const std::string &input, bool base64) {
+    std::stringstream ret;
+    ret << "=?utf-8?";
+    if(base64) {
+        ret << "?B?" << base64Encode(input);
+    }
+    else {
+        ret << "?Q?" << quotedPrintableEncode(input, "", true, true);
+    }
+    ret << "?=";
+    return ret.str();
 }
