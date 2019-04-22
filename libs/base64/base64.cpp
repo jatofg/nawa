@@ -116,9 +116,9 @@ std::string base64_decode(std::string const& encoded_string) {
     unsigned char char_array_4[4], char_array_3[3];
     std::stringstream ret;
 
-    while (in_len-- && (is_base64(encoded_string_u[in_]) || is_whitespace(encoded_string_u[in_]))) {
+    for(in_ = 0; in_ < in_len && (is_base64(encoded_string_u[in_]) || is_whitespace(encoded_string_u[in_])); ++in_) {
         if(is_whitespace(encoded_string_u[in_])) continue;
-        char_array_4[i++] = encoded_string_u[in_]; in_++;
+        char_array_4[i++] = encoded_string_u[in_];
         if (i ==4) {
             for (i = 0; i <4; i++)
                 char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));

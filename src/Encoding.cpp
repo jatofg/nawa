@@ -529,10 +529,12 @@ namespace {
                 htmlDecodeTable.insert(std::make_pair(e.second, std::make_pair(e.first, U'\0')));
             }
             else if(htmlLookaheads.count(e.first) == 1) {
-                char32_t secondChar = htmlLookaheads.at(e.first).first;
-                htmlDecodeTable.insert(std::make_pair(e.second, std::make_pair(e.first, secondChar)));
+                auto const &lookahead = htmlLookaheads.at(e.first);
+                char32_t secondChar = lookahead.first;
+                htmlDecodeTable.insert(std::make_pair(lookahead.second, std::make_pair(e.first, secondChar)));
             }
         }
+        // fjlig makes no sense at all as it just replaces fj => add it here only and remove it from the encode tables
     }
 
 }
@@ -584,6 +586,10 @@ std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
             else {
                 uoutputs << c;
             }
+        }
+        // if lookahead is not \0, the last char has been (falsely) identified as lookahead
+        if(lookahead != '\0') {
+            uoutputs << lookahead;
         }
         input = cv.to_bytes(uoutputs.str());
     }
@@ -685,7 +691,7 @@ bool Qsf::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
     else {
         rgx.assign(R"([A-Za-z0-9\+/]+={0,2})");
     }
-    return (input.length() % 4 == 0) && std::regex_match(input, rgx);
+    return std::regex_match(input, rgx);
 }
 
 std::string Qsf::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
@@ -732,11 +738,12 @@ std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const
 }
 
 std::string Qsf::Encoding::quotedPrintableDecode(std::string input) {
-    std::regex matchCode(R"(=[0-9A-F]{2})");
+    std::regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function
     auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
-        return std::string(1, (char) std::stoul(matches.at(0), nullptr, 16));
+        return (matches.at(1) == "\r\n" || matches.at(1) == "\n")
+            ? std::string() : std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
     };
 
     regex_replace_callback(input, matchCode, replaceCode);

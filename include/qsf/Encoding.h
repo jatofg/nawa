@@ -63,10 +63,10 @@ namespace Qsf {
          */
         std::string urlDecode(std::string input);
         /**
-         * Check if a string contains valid base64.
+         * Check if a string contains only valid base64 characters and could be valid base64.
          * @param input Input string.
          * @param allowWhitespaces If true, the whitespace characters '\\r', '\\n', '\\t', and ' ' will be allowed.
-         * @return True if the string contains only valid base64, false otherwise.
+         * @return True if the string contains only valid base64 characters, false otherwise.
          */
         bool isBase64(const std::string &input, bool allowWhitespaces = true);
         /**

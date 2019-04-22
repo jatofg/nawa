@@ -24,6 +24,7 @@
 #include "app.h"
 
 #include <iostream>
+#include <random>
 #include "qsf/Encoding.h"
 #include "qsf/Session.h"
 #include "qsf/Universal.h"
@@ -32,65 +33,102 @@
 
 using namespace Qsf;
 
-int init(Qsf::AppInit& appInit) {
-//    std::cout << "It works!" << std::endl;
-//
-//    std::string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
-//    std::string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
-//
-//    std::string encodedDecoded = Encoding::htmlDecode(encoded);
-//    if(decoded == encodedDecoded) {
-//        std::cout << "yay!" << std::endl;
-//    }
-//    else {
-//        std::cout <<  Encoding::htmlEncode(encodedDecoded) << std::endl;
-//    }
-//
-//    std::string forUrl = "bla bla bla!??xyzäßédsfsdf ";
-//    auto urlEncoded = Encoding::urlEncode(forUrl);
-//    std::string reDecoded = Encoding::urlDecode(urlEncoded);
-//    if(forUrl == reDecoded) {
-//        std::cout << "yay2!" << std::endl;
-//    }
-//    else {
-//        std::cout <<  Encoding::htmlEncode(reDecoded) << std::endl;
-//    }
-//
-//    std::cout << urlEncoded << std::endl;
-//
-//    Universal u1(std::string("test"));
-//    Universal u2;
-//    u2 = 5;
-//
-//    std::cout << "u1 = " << u1.get<std::string>() << std::endl;
-//
-//    std::cout << "u2 = " << u2.get<int>() << std::endl;
-//
-//    u2.unset();
-//
-//    u2 = u1;
-//    u1.unset();
-//    Universal u3 = u2;
-//    u2 = std::string("test2xyz");
-//
-//    std::cout << "u2 = " << u2.get<std::string>() << std::endl;
-//    std::cout << "u3 = " << u3.get<std::string>() << std::endl;
-//    //std::cout << "u1 = " << u1.get<std::string>() << std::endl;
-//
-//    std::string md5test = "Hello wórld!";
-//    std::cout << "MD5 of " << md5test << " is: " << Crypto::md5(md5test, true) << std::endl;
-//    std::string hwHash = Crypto::passwordHash(md5test);
-//    std::cout << "Its hash is: " << hwHash << std::endl;
-//    std::cout << "Another one: " << Crypto::passwordHash(md5test, 10) << std::endl;
-//    std::cout << "Is 'Hello world!' correct? " << (Crypto::passwordVerify("Hello world!", hwHash) ? "yes" : "no") << std::endl;
-//    std::cout << "Is '" << md5test << "' correct? "  << (Crypto::passwordVerify("Hello wórld!", hwHash) ? "yes" : "no") << std::endl;
+std::string genRandomUnicode(size_t len, unsigned int rseed) {
+    const char cl[][50] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
+                            "s", "t", "u", "v", "w", "x", "y", "z", " ", "\t", "<", ">", "\"", "=", "ä", "ö", "ü", "ß",
+                            "é", "ó", "ú", "𝔸", "@", "#", "$", "€", "?", "!", "/", "\\", "-", "~"};
+    std::stringstream ret;
+    std::default_random_engine dre(rseed);
+    std::uniform_int_distribution<size_t> distribution(0, 49);
+    for(size_t i = len; i > 0; --i) {
+        ret << cl[distribution(dre)];
+    }
+    return ret.str();
+}
 
-    // test base64
-    std::string base64test = "Hello World";
-    auto b64encoded = Encoding::base64Encode(base64test);
-    std::cout << "Some base64: " << b64encoded << std::endl;
-    std::cout << "Decoded: " << Encoding::base64Decode(b64encoded) << std::endl;
-    std::cout << "Is it even valid? " << (Encoding::isBase64(b64encoded) ? "yes" : "no") << std::endl;
+int init(Qsf::AppInit& appInit) {
+
+    // GROUP 1: Qsf::Encoding
+
+    std::string decoded;
+    for(unsigned int rseed = 0; rseed < 100; ++rseed) {
+
+        std::cout << "TESTING NOW WITH SEED " << rseed << std::endl;
+        decoded = genRandomUnicode(1000, rseed);
+
+        // TEST 1.1: HTML encoding
+        std::string htmlDecoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
+        std::string htmlEncoded = Encoding::htmlEncode(htmlDecoded, true);
+        std::string htmlEncoded2 = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
+        assert(htmlEncoded.length() > htmlDecoded.length());
+        assert(Encoding::htmlDecode(htmlEncoded) == htmlDecoded);
+        assert(htmlDecoded == Encoding::htmlDecode(htmlEncoded2));
+        std::string htmlEncodedRand = Encoding::htmlEncode(decoded, true);
+        std::string htmlEncodedRand2 = Encoding::htmlEncode(decoded, false);
+        std::cout << decoded << std::endl << htmlEncodedRand << std::endl << Encoding::htmlDecode(htmlEncodedRand) << std::endl;
+        assert(Encoding::htmlDecode(htmlEncodedRand) == decoded);
+        assert(Encoding::htmlDecode(htmlEncodedRand2) == decoded);
+        std::cout << "TEST 1.1 passed" << std::endl;
+
+        // TEST 1.2: URL encoding
+        std::string urlDecoded = "bla bla bla!??xyzäßédsfsdf ";
+        auto urlEncoded = Encoding::urlEncode(urlDecoded);
+        auto urlEncodedRand = Encoding::urlEncode(decoded);
+        assert(Encoding::urlDecode(urlEncoded) == urlDecoded);
+        assert(Encoding::urlDecode(urlEncodedRand) == decoded);
+        std::cout << "TEST 1.2 passed" << std::endl;
+
+        // TEST 1.3: BASE64
+        auto base64Encoded = Encoding::base64Encode(decoded, 80, "\r\n");
+        //std::cout << decoded << std::endl << base64Encoded << std::endl << Encoding::base64Decode(base64Encoded) << std::endl;
+        assert(Encoding::isBase64(base64Encoded, true));
+        assert(Encoding::base64Decode(base64Encoded) == decoded);
+        std::cout << "TEST 1.3 passed" << std::endl;
+
+        // TEST 1.4: quoted-printable
+        auto qpEncoded = Encoding::quotedPrintableEncode(decoded);
+        //std::cout << decoded << std::endl << qpEncoded << std::endl << Encoding::quotedPrintableDecode(qpEncoded) << std::endl;
+        assert(Encoding::quotedPrintableDecode(qpEncoded) == decoded);
+        std::cout << "TEST 1.4 passed" << std::endl;
+
+        // GROUP 2: Qsf::Crypto
+
+        // TEST 2.1: password hashing
+//        auto hashedPw = Crypto::passwordHash(decoded);
+//        assert(Crypto::passwordVerify(decoded, hashedPw));
+//        std::cout << "TEST 2.1 passed" << std::endl;
+
+    }
+
+    // GROUP 3 (utils)
+
+    // TEST 3.1: Time conversions
+    time_t currentTime = time(nullptr);
+    assert(read_http_time(make_http_time(currentTime)) == currentTime);
+    assert(read_smtp_time(make_smtp_time(currentTime)) == currentTime);
+    std::cout << "TEST 3.1 passed" << std::endl;
+
+    // GROUP 4: Qsf::Universal
+
+    // TEST 4.1: Universal test
+    Universal u1(decoded);
+    Universal u2;
+    u2 = 5;
+    assert(u2.get<int>() == 5);
+    u2 = u1;
+    u1.unset();
+    Universal u3 = u2;
+    u2 = std::string("test2xyz");
+    assert(u3.get<std::string>() == decoded);
+    try {
+        auto test = u2.get<int>();
+        std::cerr << "TEST 4.1 failed: could get an int from a string Universal" << std::endl;
+        exit(1);
+    }
+    catch(const UserException&) {}
+    std::cout << "TEST 4.1 passed" << std::endl;
+
+    exit(0);
 
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
@@ -119,15 +157,13 @@ int init(Qsf::AppInit& appInit) {
     };
     appInit.accessFilters.authFilters.push_back(authFilter);
 
-    // TODO test auth filters, also with an empty auth function
-
     return 0;
 }
 
 int handleRequest(Connection &connection) {
 
     // start a session
-    //connection.session.start();
+    connection.session.start();
 
     connection.setCookie("TEST", Cookie("test"));
     Cookie policy;
@@ -141,8 +177,6 @@ int handleRequest(Connection &connection) {
                   "<html><head><title>Test</title></head><body>"
                   "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
                   "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
-                  //"<p>Request Path: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
-                  //"<p>Request URI: " << merge_path(connection.request.env.getRequestPath()) << "</p>";
                   "<p>Request URI: (" << connection.request.env.getRequestPath().size() << " elements): "
                   << connection.request.env["requestUri"] << "</p>";
 
@@ -151,11 +185,11 @@ int handleRequest(Connection &connection) {
         connection.response << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";
         connection.session.invalidate();
         connection.session.start();
-        connection.session.set("test", std::string("noch viel mehr blub"));
+        connection.session.set("test", std::string("and even more blah"));
         
     }
     else {
-        connection.session.set("test", "bla bla blub");
+        connection.session.set("test", "blah blah blah");
         connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 
@@ -169,13 +203,8 @@ int handleRequest(Connection &connection) {
 
     connection.flushResponse();
 
-    // wait a few secs, then print more
-    //std::this_thread::sleep_for(std::chrono::seconds(3));
-
     connection.response << "<p>Hello World 2!</p>"
                   "</body></html>";
-
-//    connection.flushResponse();
 
     return 0;
 }
