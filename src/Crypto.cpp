@@ -100,44 +100,22 @@ std::string Qsf::Crypto::md5(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Qsf::Crypto::passwordHash(const std::string &password, int cost) {
-    if(password.empty()) {
-        throw UserException("Qsf::Cryto::passwordHash", 1, "Trying to hash empty password");
-    }
-    if(cost <= 0) {
-        throw UserException("Qsf::Crypto::passwordHash", 3, "Cost factor invalid.");
-    }
-
-    char salt[BCRYPT_HASHSIZE];
-    char hash[BCRYPT_HASHSIZE];
-
-    // use the functions provided by libbcrypt to generate a salt and a hash
-    // they will return negative integers in case of a failure, 0 on success
-    if(bcrypt_gensalt(cost, salt) != 0 || bcrypt_hashpw(password.c_str(), salt, hash) != 0) {
-        throw UserException("Qsf::Crypto::passwordHash", 2, "Could not hash this password (unknown bcrypt failure).");
-    }
-
-    return std::string(hash, 60);
+std::string Qsf::Crypto::passwordHash(const std::string &password, const Engines::HashingEngine &hashingEngine) {
+    // use the provided HashingEngine for generation
+    return hashingEngine.generateHash(password);
 }
 
-bool Qsf::Crypto::passwordVerify(const std::string &password, const std::string &hash) {
+bool Qsf::Crypto::passwordVerify(const std::string &password, const std::string &hash,
+        const Engines::HashTypeTable &hashTypeTable) {
     if(hash.empty()) {
         throw UserException("Qsf::Crypto::passwordVerify", 1, "Cannot verify an empty hash");
     }
-    if(password.empty()) {
-        return false;
+
+    auto verifyer = hashTypeTable.getEngine(hash);
+    if(verifyer.use_count() == 0) {
+        throw UserException("Qsf::Crypto::passwordVerify", 2,
+                "Could not determine a HashingEngine that is able to verify the given hash");
     }
 
-    // return value of bcrypt_checkpw is -1 on failure, 0 on match, and >0 if not matching
-    int ret = bcrypt_checkpw(password.c_str(), hash.c_str());
-
-
-    if(ret < 0) {
-        throw UserException("Qsf::Crypto::passwordVerify", 2, "Could not check this password (unknown bcrypt failure");
-    }
-    else if(ret == 0) {
-        return true;
-    }
-
-    return false;
+    return verifyer->verifyHash(password, hash);
 }

@@ -51,10 +51,10 @@ int init(Qsf::AppInit& appInit) {
     // GROUP 1: Qsf::Encoding
 
     std::string decoded;
-    for(unsigned int rseed = 0; rseed < 100; ++rseed) {
+    for(unsigned int rseed = 0; rseed < 2; ++rseed) {
 
         std::cout << "TESTING NOW WITH SEED " << rseed << std::endl;
-        decoded = genRandomUnicode(1000, rseed);
+        decoded = genRandomUnicode(100, rseed);
 
         // TEST 1.1: HTML encoding
         std::string htmlDecoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
@@ -65,7 +65,7 @@ int init(Qsf::AppInit& appInit) {
         assert(htmlDecoded == Encoding::htmlDecode(htmlEncoded2));
         std::string htmlEncodedRand = Encoding::htmlEncode(decoded, true);
         std::string htmlEncodedRand2 = Encoding::htmlEncode(decoded, false);
-        std::cout << decoded << std::endl << htmlEncodedRand << std::endl << Encoding::htmlDecode(htmlEncodedRand) << std::endl;
+        //std::cout << decoded << std::endl << htmlEncodedRand << std::endl << Encoding::htmlDecode(htmlEncodedRand) << std::endl;
         assert(Encoding::htmlDecode(htmlEncodedRand) == decoded);
         assert(Encoding::htmlDecode(htmlEncodedRand2) == decoded);
         std::cout << "TEST 1.1 passed" << std::endl;
@@ -94,9 +94,12 @@ int init(Qsf::AppInit& appInit) {
         // GROUP 2: Qsf::Crypto
 
         // TEST 2.1: password hashing
-//        auto hashedPw = Crypto::passwordHash(decoded);
-//        assert(Crypto::passwordVerify(decoded, hashedPw));
-//        std::cout << "TEST 2.1 passed" << std::endl;
+        auto hashedPw = Crypto::passwordHash(decoded, Engines::BcryptHashingEngine(8));
+        auto startTime = std::chrono::steady_clock::now();
+        assert(Crypto::passwordVerify(decoded, hashedPw));
+        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime);
+        std::cout << decoded << std::endl << hashedPw << std::endl;
+        std::cout << "TEST 2.1 passed, took " << elapsed.count() << " µs" << std::endl;
 
     }
 

@@ -25,6 +25,10 @@
 #define QSF_CRYPTO_H
 
 #include <string>
+#include <qsf/Engines/HashingEngine.h>
+#include <qsf/Engines/BcryptHashingEngine.h>
+#include <qsf/Engines/HashTypeTable.h>
+#include <qsf/Engines/DefaultHashTypeTable.h>
 
 namespace Qsf {
     namespace Crypto {
@@ -77,29 +81,34 @@ namespace Qsf {
          */
         std::string md5(const std::string &input, bool hex = true);
         /**
-         * Create a (hopefully) secure password hash using the bcrypt hash algorithm. \n
+         * Create a (hopefully) secure password hash using a hash algorithm (bcrypt by default). \n
          * This function returns one-way hashes with pseudo-random salts. Use passwordVerify to validate a password.\n
-         * May throw a UserException on failure. Error codes: 1 (empty input password), 2 (unknown bcrypt failure),
-         * 3 (invalid cost factor).\n
+         * May throw a UserException on failure, the error codes are defined by the underlying hashing engine, but
+         * should not be lower than 10.
          * Argon2 hashing might be added later, probably in a separate function.
          * @param password The password to hash.
-         * @param cost The cost factor determines how much effort is needed in order to generate the salt.
-         * A higher cost factor increases security of the hash, but it will also slow down the hash generation.\n
-         * Clearly, the cost factor must be >0.
-         * @return Hash of the password (60 characters).
+         * @param hashingEngine The hashing engine (containing the hashing algorithm) to use. This will (currently)
+         * default to bcrypt. You can pass an object to a hashing engine if you want to use another algorithm or in case
+         * you wish to customize hashing properties (such as using your own salt or changing the work factor).
+         * @return Hash of the password (in case of bcrypt: 60 characters).
          */
-        std::string passwordHash(const std::string& password, int cost = 12);
+        std::string passwordHash(const std::string& password,
+                const Engines::HashingEngine &hashingEngine = Engines::BcryptHashingEngine());
         /**
-         * Validate a password hashed using passwordHash with the same algorithm (currently always bcrypt).
-         * This function (more precisely, the underlying libbcrypt function) is designed in a way that timing attacks
-         * should not be possible, given that the compiler did no bad optimizations. Only in case the input password is
-         * empty, this function will immediately return false.\n
-         * May throw a UserException on failure. Error codes: 1 (empty input hash), 2 (unknown bcrypt failure).
+         * Validate a password with a matching hashing engine (determined by a HashTypeTable). The underlying function
+         * of the hashing engine should be designed in a way that prevents timing attacks (given that the compiler did
+         * no bad optimizations).\n
+         * May throw a UserException on failure. Error codes: 1 (empty input hash), 2 (no hashing engine able to
+         * verify the given hash could be determined by the HashTypeTable).
          * @param password Password (user input) to be verified.
          * @param hash Hash (e.g., from a database) to verify the user password against.
+         * @param hashTypeTable Object providing a function that is able to determine a hashing engine that can verify
+         * the given hash. The default HashTypeTable shipped with QSF recognizes all hashing engines that also ship
+         * with QSF.
          * @return True if the password matches, false otherwise.
          */
-        bool passwordVerify(const std::string& password, const std::string& hash);
+        bool passwordVerify(const std::string& password, const std::string& hash,
+                const Engines::HashTypeTable &hashTypeTable = Engines::DefaultHashTypeTable());
     };
 }
 

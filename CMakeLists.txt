@@ -38,6 +38,10 @@ add_executable(qsf
         include/qsf/SmtpMailer.h
         include/qsf/Email.h
         include/qsf/Universal.h
+        include/qsf/Engines/HashingEngine.h
+        include/qsf/Engines/BcryptHashingEngine.h
+        include/qsf/Engines/HashTypeTable.h
+        include/qsf/Engines/DefaultHashTypeTable.h
 
         src/main.cpp
         src/Request.cpp
@@ -51,6 +55,8 @@ add_executable(qsf
         src/Log.cpp
         src/Email.cpp
         src/SmtpMailer.cpp
+        src/Engines/BcryptHashingEngine.cpp
+        src/Engines/DefaultHashTypeTable.cpp
 
         libs/inih/ini.h
         libs/inih/ini.c

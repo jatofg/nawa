@@ -163,7 +163,7 @@ namespace {
              {U'\u20AC',U"&euro;"},{U'\u0021',U"&excl;"},{U'\u2203',U"&exist;"},{U'\u0424',U"&Fcy;"},
              {U'\u0444',U"&fcy;"},{U'\u2640',U"&female;"},{U'\uFB03',U"&ffilig;"},{U'\uFB00',U"&fflig;"},
              {U'\uFB04',U"&ffllig;"},{U'\U0001d509',U"&Ffr;"},{U'\U0001d523',U"&ffr;"},{U'\uFB01',U"&filig;"},
-             {U'\u25FC',U"&FilledSmallSquare;"},{U'\u0066',U""},{U'\u266D',U"&flat;"},{U'\uFB02',U"&fllig;"},
+             {U'\u25FC',U"&FilledSmallSquare;"},/*{U'\u0066',U""},*/{U'\u266D',U"&flat;"},{U'\uFB02',U"&fllig;"},
              {U'\u25B1',U"&fltns;"},{U'\u0192',U"&fnof;"},{U'\U0001d53d',U"&Fopf;"},{U'\U0001d557',U"&fopf;"},
              {U'\u2200',U"&forall;"},{U'\u22D4',U"&fork;"},{U'\u2AD9',U"&forkv;"},{U'\u2131',U"&Fouriertrf;"},
              {U'\u2A0D',U"&fpartint;"},{U'\u00BD',U"&frac12;"},{U'\u2153',U"&frac13;"},
@@ -455,7 +455,7 @@ namespace {
              {U'\u2261',std::make_pair(U'\u20E5', U"&bnequiv;")},
              {U'\u2229',std::make_pair(U'\uFE00', U"&caps;")},
              {U'\u222A',std::make_pair(U'\uFE00', U"&cups;")},
-             {U'\u0066',std::make_pair(U'\u006A', U"&fjlig;")},
+             //{U'\u0066',std::make_pair(U'\u006A', U"&fjlig;")},
              {U'\u22DB',std::make_pair(U'\uFE00', U"&gesl;")},
              {U'\u2269',std::make_pair(U'\uFE00', U"&gvertneqq;")},
              {U'\u2AAD',std::make_pair(U'\uFE00', U"&lates;")},
@@ -534,7 +534,9 @@ namespace {
                 htmlDecodeTable.insert(std::make_pair(lookahead.second, std::make_pair(e.first, secondChar)));
             }
         }
-        // fjlig makes no sense at all as it just replaces fj => add it here only and remove it from the encode tables
+        // &fjlig; is a strange entity that represents just the characters fj
+        // for that reason, it is not included (or commented out) in the entity tables
+        htmlDecodeTable.insert(std::make_pair(U"&fjlig;", std::make_pair(U'\u0066', U'\u006A')));
     }
 
 }
