@@ -27,7 +27,7 @@
 #include <typeinfo>
 #include <typeindex>
 #include <memory>
-#include "UserException.h"
+#include <qsf/UserException.h>
 
 namespace Qsf {
     /**
