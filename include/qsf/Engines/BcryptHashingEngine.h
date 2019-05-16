@@ -34,12 +34,16 @@ namespace Qsf {
             /**
              * Generate a hash of the input string with the given salt or, if empty, with a random one based on the
              * work factor.
+             *
+             * This function might throw an exception with error code 10 (salt generation failed), or 11 (hash
+             * generation failed).
              * @param input The input string to hash.
              * @return A bcrypt hash (60 characters) in the standard format, including WF and salt ("$2a$...").
              */
             std::string generateHash(std::string input) const override;
             /**
              * Check if the given bcrypt hash in standard format (e.g., "$2a$..."), is a hash of the input string.
+             * This function is designed in a way that it should not be vulnerable to timing attacks.
              * @param input The input string.
              * @param hash The hash to verify.
              * @return True if it matches, false otherwise.

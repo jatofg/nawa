@@ -66,7 +66,7 @@ add_executable(qsf
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
-target_link_libraries(qsf -ldl -lfastcgipp -lcrypto -lcurl ${CMAKE_BINARY_DIR}/libbcrypt.a)
+target_link_libraries(qsf -ldl -lfastcgipp -lcrypto -lcurl -largon2 ${CMAKE_BINARY_DIR}/libbcrypt.a)
 target_include_directories(qsf PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
