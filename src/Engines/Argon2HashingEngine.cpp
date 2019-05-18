@@ -4,6 +4,8 @@
 #include <argon2.h>
 #include <qsf/UserException.h>
 #include <random>
+#include <regex>
+#include <qsf/Encoding.h>
 
 Qsf::Engines::Argon2HashingEngine::Argon2HashingEngine(Qsf::Engines::Argon2HashingEngine::Algorithm algorithm,
                                                        uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,
@@ -77,27 +79,58 @@ std::string Qsf::Engines::Argon2HashingEngine::generateHash(std::string input) c
 
 bool Qsf::Engines::Argon2HashingEngine::verifyHash(std::string input, std::string hash) const {
 
-    // check existence and validity of the salt
-    if(salt.empty() || salt.length() < ARGON2_MIN_SALT_LENGTH) {
+    // split the hash and create a new object with the properties of the hash
+    std::regex rgx(R"(\$argon2(i|d|id)\$(v=([0-9]+))?\$m=([0-9]+),t=([0-9]+),p=([0-9]+)\$([A-Za-z0-9+\/]+={0,2})\$([A-Za-z0-9+\/]+={0,2}))");
+    std::smatch matches;
+    std::regex_match(hash, matches, rgx);
+    Algorithm algorithm1;
+    uint32_t version1;
+    uint32_t memoryCost1;
+    uint32_t timeCost1;
+    uint32_t parallelism1;
+    std::string salt1;
+    std::string hash1;
+    if(matches.size() == 9) {
+        if(matches[1] == "d") algorithm1 = ARGON2D;
+        else if(matches[1] == "id") algorithm1 = ARGON2ID;
+        else algorithm1 = ARGON2I;
+        try {
+            version1 = std::stoul(matches[3]);
+            memoryCost1 = std::stoul(matches[4]);
+            timeCost1 = std::stoul(matches[5]);
+            parallelism1 = std::stoul(matches[6]);
+            salt1 = Encoding::base64Decode(matches[7]);
+            hash1 = Encoding::base64Decode(matches[8]);
+        }
+        catch(...) {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+    if(version1 != 19) {
         return false;
     }
 
+    auto engine1 = Argon2HashingEngine(algorithm1, timeCost1, memoryCost1, parallelism1, salt1, hash1.length());
     std::string inputHash;
     try {
-        inputHash = generateHash(input);
+        inputHash = engine1.generateHash(input);
+        inputHash = Encoding::base64Decode(inputHash.substr(inputHash.find_last_of('$')+1));
     }
     catch(const UserException&) {
         return false;
     }
 
-    if(inputHash.length() != hash.length())
+    if(hash1.length() != inputHash.length())
         return false;
 
-    auto u1 = (const unsigned char*) inputHash.c_str();
-    auto u2 = (const unsigned char*) hash.c_str();
+    auto u1 = (const unsigned char*) hash1.c_str();
+    auto u2 = (const unsigned char*) inputHash.c_str();
 
     int ret = 0;
-    for (int i = 0; i < hash.length(); ++i)
+    for (int i = 0; i < hash1.length(); ++i)
         ret |= (u1[i] ^ u2[i]);
 
     return ret == 0;

@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <random>
+#include <qsf/Engines/Argon2HashingEngine.h>
 #include "qsf/Encoding.h"
 #include "qsf/Session.h"
 #include "qsf/Universal.h"
@@ -51,7 +52,7 @@ int init(Qsf::AppInit& appInit) {
     // GROUP 1: Qsf::Encoding
 
     std::string decoded;
-    for(unsigned int rseed = 0; rseed < 2; ++rseed) {
+    for(unsigned int rseed = 0; rseed < 10; ++rseed) {
 
         std::cout << "TESTING NOW WITH SEED " << rseed << std::endl;
         decoded = genRandomUnicode(100, rseed);
@@ -93,14 +94,27 @@ int init(Qsf::AppInit& appInit) {
 
         // GROUP 2: Qsf::Crypto
 
-        // TEST 2.1: password hashing
+        // TEST 2.1: password hashing using bcrypt
         auto hashedPw = Crypto::passwordHash(decoded, Engines::BcryptHashingEngine(8));
         auto startTime = std::chrono::steady_clock::now();
         assert(Crypto::passwordVerify(decoded, hashedPw));
         auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime);
-        std::cout << decoded << std::endl << hashedPw << std::endl;
+        //std::cout << decoded << std::endl << hashedPw << std::endl;
         std::cout << "TEST 2.1 passed, took " << elapsed.count() << " µs" << std::endl;
 
+        // TEST 2.2: password hashing using argon2
+        hashedPw = Crypto::passwordHash(decoded, Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2ID, 2, 1 << 16, 2, "", 40));
+        auto hashedPw_i = Crypto::passwordHash(decoded, Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2I));
+        auto hashedPw_d = Crypto::passwordHash(decoded, Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2D));
+        startTime = std::chrono::steady_clock::now();
+        std::cout << decoded << std::endl << hashedPw << std::endl;
+        std::cout << hashedPw_i << std::endl << hashedPw_d << std::endl;
+        //auto he = Engines::Argon2HashingEngine();
+        assert(Crypto::passwordVerify(decoded, hashedPw));
+        assert(Crypto::passwordVerify(decoded, hashedPw_i));
+        assert(Crypto::passwordVerify(decoded, hashedPw_d));
+        elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime);
+        std::cout << "TEST 2.2 passed, took " << elapsed.count() << " µs" << std::endl;
     }
 
     // GROUP 3 (utils)

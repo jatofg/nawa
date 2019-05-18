@@ -11,11 +11,17 @@ namespace Qsf {
     namespace Engines {
 
         class Argon2HashingEngine: public HashingEngine {
+        public:
+            /**
+             * The Argon2 flavor to use.
+             */
             enum Algorithm {
                 ARGON2I,
                 ARGON2D,
                 ARGON2ID
-            } algorithm; /**< The Argon2 flavor to use. */
+            };
+        private:
+            Algorithm algorithm; /**< The Argon2 flavor to use. */
             uint32_t timeCost; /**< Number of iterations. */
             uint32_t memoryCost; /**< Memory usage in kiB. */
             uint32_t parallelism; /**< Number of threads used. */
@@ -44,9 +50,10 @@ namespace Qsf {
              */
             std::string generateHash(std::string input) const override;
             /**
-             * Verify the given Argon2 hash, hashed with the specified properties. This requires the environment to be
-             * set up according to the properties of the hash, and the salt has to be set as well.
-             * This function is designed in a way that it should not be vulnerable to timing attacks.
+             * Verify if the given Argon2 hash, given in encoded format ("$argon2..."), has been generated using the
+             * input string. This function will create a new engine object according to the properties of the encoded
+             * string internally.
+             * It is designed in a way that it should not be vulnerable to timing attacks.
              * @param input The input string.
              * @param hash The hash to verify.
              * @return True if it matches, false otherwise.
