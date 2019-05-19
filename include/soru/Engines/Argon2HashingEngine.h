@@ -1,11 +1,25 @@
-//
-// Created by tobias on 30/04/19.
-//
+/*
+ * Copyright (C) 2019 Jan Flaig.
+ *
+ * This file is part of soru.
+ *
+ * soru is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * soru is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-#ifndef QSF_ARGON2HASHINGENGINE_H
-#define QSF_ARGON2HASHINGENGINE_H
+#ifndef SORU_ARGON2HASHINGENGINE_H
+#define SORU_ARGON2HASHINGENGINE_H
 
-#include <qsf/Engines/HashingEngine.h>
+#include <soru/Engines/HashingEngine.h>
 
 namespace soru {
     namespace Engines {
@@ -64,4 +78,4 @@ namespace soru {
     }
 }
 
-#endif //QSF_ARGON2HASHINGENGINE_H
+#endif //SORU_ARGON2HASHINGENGINE_H

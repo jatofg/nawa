@@ -1,11 +1,29 @@
-#include <qsf/Engines/Argon2HashingEngine.h>
+/*
+ * Copyright (C) 2019 Jan Flaig.
+ *
+ * This file is part of soru.
+ *
+ * soru is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * soru is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include <soru/Engines/Argon2HashingEngine.h>
 #include <cstring>
 #include <cstdlib>
 #include <argon2.h>
-#include <qsf/UserException.h>
+#include <soru/UserException.h>
 #include <random>
 #include <regex>
-#include <qsf/Encoding.h>
+#include <soru/Encoding.h>
 
 soru::Engines::Argon2HashingEngine::Argon2HashingEngine(soru::Engines::Argon2HashingEngine::Algorithm algorithm,
                                                        uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,

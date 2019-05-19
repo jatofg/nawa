@@ -6,25 +6,25 @@
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
- * This file is part of QSF.
+ * This file is part of soru.
  *
- * QSF is free software: you can redistribute it and/or modify
+ * soru is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * QSF is distributed in the hope that it will be useful,
+ * soru is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <fstream>
-#include <qsf/Utils.h>
-#include <qsf/Request.h>
-#include <qsf/SysException.h>
+#include <soru/Utils.h>
+#include <soru/Request.h>
+#include <soru/SysException.h>
 
 std::string soru::Request::Env::operator[](std::string envVar) const {
     std::string ret;
@@ -107,13 +107,13 @@ Fastcgipp::Address soru::Request::Env::getRemoteAddr() const {
 soru::Request::GPC::GPC(RequestHandler &request, uint source)
         : requestHandler(request), source(source) {
     switch (source) {
-        case QSF_REQ_COOKIE:
+        case SORU_REQ_COOKIE:
             data = request.environment().cookies;
             break;
-        case QSF_REQ_POST:
+        case SORU_REQ_POST:
             data = request.environment().posts;
             break;
-        case QSF_REQ_GET:
+        case SORU_REQ_GET:
             data = request.environment().gets;
             break;
         default:
@@ -153,9 +153,9 @@ std::multimap<std::string, std::string>::const_iterator soru::Request::GPC::end(
 }
 
 soru::Request::Request(RequestHandler &request)
-        : env(request), get(request, QSF_REQ_GET), post(request), cookie(request, QSF_REQ_COOKIE) {}
+        : env(request), get(request, SORU_REQ_GET), post(request), cookie(request, SORU_REQ_COOKIE) {}
 
-soru::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {}
+soru::Request::Post::Post(RequestHandler &request) : GPC(request, SORU_REQ_POST) {}
 
 std::string& soru::Request::Post::getRaw() const {
     return requestHandler.rawPost;

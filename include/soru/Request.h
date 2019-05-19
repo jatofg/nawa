@@ -6,30 +6,30 @@
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
- * This file is part of QSF.
+ * This file is part of soru.
  *
- * QSF is free software: you can redistribute it and/or modify
+ * soru is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * QSF is distributed in the hope that it will be useful,
+ * soru is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef QSF_QSFREQUEST_H
-#define QSF_QSFREQUEST_H
-#define QSF_REQ_GET 1
-#define QSF_REQ_POST 2
-#define QSF_REQ_COOKIE 3
+#ifndef SORU_SORUREQUEST_H
+#define SORU_SORUREQUEST_H
+#define SORU_REQ_GET 1
+#define SORU_REQ_POST 2
+#define SORU_REQ_COOKIE 3
 
 #include <string>
 #include <fastcgi++/request.hpp>
-#include <qsf/RequestHandler.h>
+#include <soru/RequestHandler.h>
 
 namespace soru {
     /**
@@ -192,4 +192,4 @@ namespace soru {
 
 
 
-#endif //QSF_QSFREQUEST_H
+#endif //SORU_SORUREQUEST_H

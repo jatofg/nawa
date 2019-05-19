@@ -6,30 +6,30 @@
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
- * This file is part of QSF.
+ * This file is part of soru.
  *
- * QSF is free software: you can redistribute it and/or modify
+ * soru is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * QSF is distributed in the hope that it will be useful,
+ * soru is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef QSF_RESPONSE_H
-#define QSF_RESPONSE_H
+#ifndef SORU_RESPONSE_H
+#define SORU_RESPONSE_H
 
 #include <string>
 #include <unordered_map>
 #include <sstream>
-#include <qsf/Cookie.h>
-#include <qsf/Request.h>
-#include <qsf/Session.h>
+#include <soru/Cookie.h>
+#include <soru/Request.h>
+#include <soru/Session.h>
 
 namespace soru {
     /**
@@ -147,4 +147,4 @@ namespace soru {
 // TODO add stream modifiers if needed (or remove the stream modifiers altogether and advise to use .body)
 //  - it is actually impossible to implement everything, e.g. integers, floats, ... -> better let the stream handle this
 
-#endif //QSF_RESPONSE_H
+#endif //SORU_RESPONSE_H

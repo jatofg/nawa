@@ -30,11 +30,11 @@
 #include <grp.h>
 #include <dlfcn.h>
 #include <csignal>
-#include <qsf/RequestHandler.h>
-#include <qsf/Config.h>
-#include <qsf/SysException.h>
-#include <qsf/Log.h>
-#include <qsf/Application.h>
+#include <soru/RequestHandler.h>
+#include <soru/Config.h>
+#include <soru/SysException.h>
+#include <soru/Log.h>
+#include <soru/Application.h>
 
 namespace {
     // this will make the manager instance and loaded app accessible for signal handlers

@@ -1,34 +1,34 @@
 /**
  * \file Application.h
  * \brief This file will be configured by CMake and contains the necessary properties to ensure that a loaded app
- * has been compiled against the same QSF version as the qsfrunner loading it (or, at least, one with a compatible ABI).
+ * has been compiled against the same soru version as the sorun executable loading it (or, at least, one with a compatible ABI).
  */
 
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
- * This file is part of QSF.
+ * This file is part of soru.
  *
- * QSF is free software: you can redistribute it and/or modify
+ * soru is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * QSF is distributed in the hope that it will be useful,
+ * soru is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef QSF_APPLICATION_H
-#define QSF_APPLICATION_H
+#ifndef SORU_APPLICATION_H
+#define SORU_APPLICATION_H
 #define SORU_VERSION_MAJOR @SORU_VERSION_MAJOR@
 #define SORU_VERSION_MINOR @SORU_VERSION_MINOR@
 
-#include <qsf/Connection.h>
-#include <qsf/AppInit.h>
+#include <soru/Connection.h>
+#include <soru/AppInit.h>
 
 extern "C" const int soru_version_major = SORU_VERSION_MAJOR;
 extern "C" const int soru_version_minor = SORU_VERSION_MINOR;

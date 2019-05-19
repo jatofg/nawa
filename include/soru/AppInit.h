@@ -1,8 +1,3 @@
-/**
- * \file app.h
- * \brief A very basic header for a QSF application.
- */
-
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
@@ -21,12 +16,22 @@
  * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_APP_H
-#define SORU_APP_H
+#ifndef SORU_APPINIT_H
+#define SORU_APPINIT_H
 
-#include <soru/Application.h>
+#include <soru/AccessFilterList.h>
 
-extern "C" int init(soru::AppInit& appInit);
-extern "C" int handleRequest(soru::Connection& connection);
+namespace soru {
+    struct AppInit {
+        /**
+         * You can use this to modify the default configuration for every request during initialization.
+         */
+        Config config;
+        /**
+         * List of static access filters that can be evaluated before forwarding a request to your app.
+         */
+        AccessFilterList accessFilters;
+    };
+}
 
-#endif //QSF_APP_H
+#endif //SORU_APPINIT_H

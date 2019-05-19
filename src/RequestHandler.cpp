@@ -6,19 +6,19 @@
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
- * This file is part of QSF.
+ * This file is part of soru.
  *
- * QSF is free software: you can redistribute it and/or modify
+ * soru is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * QSF is distributed in the hope that it will be useful,
+ * soru is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <unistd.h>
@@ -26,13 +26,13 @@
 #include <chrono>
 #include <thread>
 #include <dlfcn.h>
-#include <qsf/RequestHandler.h>
-#include <qsf/Utils.h>
-#include <qsf/Encoding.h>
-#include <qsf/Request.h>
-#include <qsf/Connection.h>
-#include <qsf/Log.h>
-#include <qsf/SysException.h>
+#include <soru/RequestHandler.h>
+#include <soru/Utils.h>
+#include <soru/Encoding.h>
+#include <soru/Request.h>
+#include <soru/Connection.h>
+#include <soru/Log.h>
+#include <soru/SysException.h>
 
 namespace {
     soru::handleRequest_t* appHandleRequest;
@@ -125,7 +125,7 @@ void soru::RequestHandler::setAppRequestHandler(const soru::Config &cfg, void *a
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
     std::string rawPostStr = cfg[{"post", "raw_access"}];
     rawPostAccess = (rawPostStr == "never")
-                   ? QSF_RAWPOST_NEVER : ((rawPostStr == "always") ? QSF_RAWPOST_ALWAYS : QSF_RAWPOST_NONSTANDARD);
+                   ? SORU_RAWPOST_NEVER : ((rawPostStr == "always") ? SORU_RAWPOST_ALWAYS : SORU_RAWPOST_NONSTANDARD);
 
     // load appHandleRequest function
     appHandleRequest = (soru::handleRequest_t*) dlsym(appOpen, "handleRequest");
@@ -140,10 +140,10 @@ soru::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
 
 bool soru::RequestHandler::inProcessor() {
     postContentType = environment().contentType;
-    if(rawPostAccess == QSF_RAWPOST_NEVER) {
+    if(rawPostAccess == SORU_RAWPOST_NEVER) {
         return false;
     }
-    else if (rawPostAccess == QSF_RAWPOST_NONSTANDARD &&
+    else if (rawPostAccess == SORU_RAWPOST_NONSTANDARD &&
             (postContentType == "multipart/form-data" || postContentType == "application/x-www-form-urlencoded")) {
         return false;
     }
