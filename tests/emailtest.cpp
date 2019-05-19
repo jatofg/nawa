@@ -9,7 +9,7 @@
 #include <qsf/SmtpMailer.h>
 #include "app.h"
 
-using namespace Qsf;
+using namespace soru;
 
 int init(AppInit& appInit) {
     return 0;

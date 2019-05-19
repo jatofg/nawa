@@ -9,7 +9,7 @@
 #include <string>
 #include <qsf/Email.h>
 
-namespace Qsf {
+namespace soru {
     class SmtpMailer {
     public:
         /**

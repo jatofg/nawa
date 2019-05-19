@@ -17,9 +17,9 @@ namespace {
      * @param email Email to check and modify.
      * @param from EmailAddress object to set the From header from, if necessary.
      */
-    void addMissingHeaders(std::shared_ptr<Qsf::Email> &email, const std::shared_ptr<Qsf::EmailAddress> &from) {
+    void addMissingHeaders(std::shared_ptr<soru::Email> &email, const std::shared_ptr<soru::EmailAddress> &from) {
         if(!email->headers.count("Date")) {
-            email->headers["Date"] = Qsf::make_smtp_time(time(nullptr));
+            email->headers["Date"] = soru::make_smtp_time(time(nullptr));
         }
         if(!email->headers.count("From") && !from->address.empty()) {
             email->headers["From"] = from->get();
@@ -33,13 +33,13 @@ namespace {
             timespec mtime;
             clock_gettime(CLOCK_REALTIME, &mtime);
             base << mtime.tv_sec << mtime.tv_nsec << from->address << rd();
-            mid << '<' << Qsf::Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos+1) << '>';
+            mid << '<' << soru::Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos+1) << '>';
             email->headers["Message-ID"] = mid.str();
         }
     }
 }
 
-Qsf::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort, Qsf::SmtpMailer::TlsMode _tlsMode,
+soru::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort, soru::SmtpMailer::TlsMode _tlsMode,
                             bool _verifyTlsCert, std::string _authUsername, std::string _authPassword)
         : serverPort(_serverPort), tlsMode(_tlsMode), verifyTlsCert(_verifyTlsCert) {
     serverDomain = std::move(_serverDomain);
@@ -47,7 +47,7 @@ Qsf::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort,
     authPassword = std::move(_authPassword);
 }
 
-void Qsf::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverPort, Qsf::SmtpMailer::TlsMode _tlsMode,
+void soru::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverPort, soru::SmtpMailer::TlsMode _tlsMode,
                                 bool _verifyTlsCert) {
     serverDomain = std::move(_serverDomain);
     serverPort = _serverPort;
@@ -55,18 +55,18 @@ void Qsf::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverP
     verifyTlsCert = _verifyTlsCert;
 }
 
-void Qsf::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassword) {
+void soru::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassword) {
     authUsername = std::move(_authUsername);
     authPassword = std::move(_authPassword);
 }
 
-void Qsf::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
+void soru::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
         ReplacementRules replacementRules) {
     bulkEnqueue(std::move(email), std::vector<EmailAddress>({std::move(to)}), std::move(from),
             std::move(replacementRules));
 }
 
-void Qsf::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
+void soru::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
                                   std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules) {
     addMissingHeaders(email, from);
     std::unique_ptr<ReplacementRules> rulesPtr;
@@ -77,11 +77,11 @@ void Qsf::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<Emai
                               .replacementRules=std::move(rulesPtr)});
 }
 
-void Qsf::SmtpMailer::clearQueue() {
+void soru::SmtpMailer::clearQueue() {
     queue.clear();
 }
 
-void Qsf::SmtpMailer::processQueue() const {
+void soru::SmtpMailer::processQueue() const {
     CURL *curl;
     CURLcode res = CURLE_OK;
 
@@ -154,7 +154,7 @@ void Qsf::SmtpMailer::processQueue() const {
             // check for errors, throw exception if one happens
             if(res != CURLE_OK) {
                 curl_easy_cleanup(curl);
-                throw UserException("Qsf::SmtpMailer::processQueue()", 1,
+                throw UserException("soru::SmtpMailer::processQueue()", 1,
                         std::string("CURL error: ") + curl_easy_strerror(res));
             }
 

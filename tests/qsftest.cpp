@@ -32,7 +32,7 @@
 #include "qsf/Crypto.h"
 #include "qsf/Utils.h"
 
-using namespace Qsf;
+using namespace soru;
 
 std::string genRandomUnicode(size_t len, unsigned int rseed) {
     const char cl[][50] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
@@ -47,9 +47,9 @@ std::string genRandomUnicode(size_t len, unsigned int rseed) {
     return ret.str();
 }
 
-int init(Qsf::AppInit& appInit) {
+int init(soru::AppInit& appInit) {
 
-    // GROUP 1: Qsf::Encoding
+    // GROUP 1: soru::Encoding
 
     std::string decoded;
     for(unsigned int rseed = 0; rseed < 10; ++rseed) {
@@ -92,7 +92,7 @@ int init(Qsf::AppInit& appInit) {
         assert(Encoding::quotedPrintableDecode(qpEncoded) == decoded);
         std::cout << "TEST 1.4 passed" << std::endl;
 
-        // GROUP 2: Qsf::Crypto
+        // GROUP 2: soru::Crypto
 
         // TEST 2.1: password hashing using bcrypt
         auto hashedPw = Crypto::passwordHash(decoded, Engines::BcryptHashingEngine(8));
@@ -125,7 +125,7 @@ int init(Qsf::AppInit& appInit) {
     assert(read_smtp_time(make_smtp_time(currentTime)) == currentTime);
     std::cout << "TEST 3.1 passed" << std::endl;
 
-    // GROUP 4: Qsf::Universal
+    // GROUP 4: soru::Universal
 
     // TEST 4.1: Universal test
     Universal u1(decoded);

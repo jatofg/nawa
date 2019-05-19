@@ -27,7 +27,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace Qsf {
+namespace soru {
     // TODO also 'improve' logging (change it to the correct format) in fastcgi++
     /**
      * Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream

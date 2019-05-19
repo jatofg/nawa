@@ -26,7 +26,7 @@
 
 #include "qsf/Application.h"
 
-extern "C" int init(Qsf::AppInit& appInit);
-extern "C" int handleRequest(Qsf::Connection& connection);
+extern "C" int init(soru::AppInit& appInit);
+extern "C" int handleRequest(soru::Connection& connection);
 
 #endif //QSF_APP_H

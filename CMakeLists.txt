@@ -4,8 +4,8 @@ project(qsf VERSION 0.1)
 set(CMAKE_CXX_STANDARD 14)
 
 # version
-set(QSF_VERSION_MAJOR 0)
-set(QSF_VERSION_MINOR 1)
+set(SORU_VERSION_MAJOR 0)
+set(SORU_VERSION_MINOR 1)
 
 # only unix-based OS are supported
 if(NOT UNIX)

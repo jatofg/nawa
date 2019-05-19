@@ -27,7 +27,7 @@
 #include <string>
 #include <ctime>
 
-namespace Qsf {
+namespace soru {
     /**
      * Structure for creating Cookie objects. Content can be set by using a constructor.
      */

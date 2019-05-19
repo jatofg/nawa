@@ -8,7 +8,7 @@
 #include <memory>
 #include <qsf/Engines/HashingEngine.h>
 
-namespace Qsf {
+namespace soru {
     namespace Engines {
 
         /**

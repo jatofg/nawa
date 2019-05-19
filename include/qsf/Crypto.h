@@ -30,7 +30,7 @@
 #include <qsf/Engines/HashTypeTable.h>
 #include <qsf/Engines/DefaultHashTypeTable.h>
 
-namespace Qsf {
+namespace soru {
     namespace Crypto {
         /**
          * Get SHA-1 hash of a string.

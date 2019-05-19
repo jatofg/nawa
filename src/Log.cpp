@@ -27,7 +27,7 @@
 #include <qsf/UserException.h>
 #include <qsf/Log.h>
 
-Qsf::Log::Log() {
+soru::Log::Log() {
     out = &std::cerr;
     // get hostname
     char chostname[HOST_NAME_MAX+1];
@@ -37,42 +37,42 @@ Qsf::Log::Log() {
     pid = getpid();
 }
 
-Qsf::Log::Log(std::ostream *os) : Log() {
+soru::Log::Log(std::ostream *os) : Log() {
     out = os;
 }
 
-Qsf::Log::Log(std::string filename) : Log() {
+soru::Log::Log(std::string filename) : Log() {
     setOutfile(std::move(filename));
 }
 
-Qsf::Log::~Log() {
+soru::Log::~Log() {
     if(logFile.is_open()) {
         logFile.close();
     }
 }
 
-void Qsf::Log::setStream(std::ostream *os) {
+void soru::Log::setStream(std::ostream *os) {
     out = os;
 }
 
-void Qsf::Log::setOutfile(std::string filename) {
+void soru::Log::setOutfile(std::string filename) {
     if(logFile.is_open()) {
         logFile.close();
     }
     logFile.open(filename, std::ofstream::out | std::ofstream::app);
     if(!logFile) {
-        throw UserException("Qsf::Log::setOutfile", 1, "Failed to open requested file for writing.");
+        throw UserException("soru::Log::setOutfile", 1, "Failed to open requested file for writing.");
     }
     out = &logFile;
 }
 
-void Qsf::Log::write(std::string msg) {
+void soru::Log::write(std::string msg) {
     auto now = std::time(nullptr);
 
     *out << std::put_time(std::localtime(&now), "%b %d %H:%M:%S ") << hostname << ' ' << program_invocation_short_name
          << '[' << pid << "]: [QSF] " << msg << std::endl;
 }
 
-void Qsf::Log::operator()(std::string msg) {
+void soru::Log::operator()(std::string msg) {
     write(std::move(msg));
 }

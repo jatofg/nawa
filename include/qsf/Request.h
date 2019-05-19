@@ -31,7 +31,7 @@
 #include <fastcgi++/request.hpp>
 #include <qsf/RequestHandler.h>
 
-namespace Qsf {
+namespace soru {
     /**
      * Represents request objects.
      */

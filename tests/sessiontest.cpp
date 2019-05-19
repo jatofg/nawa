@@ -5,7 +5,7 @@
 #include <random>
 #include "app.h"
 
-using namespace Qsf;
+using namespace soru;
 
 int init(AppInit& appInit) {
 

@@ -26,7 +26,7 @@
 
 #include <string>
 
-namespace Qsf {
+namespace soru {
     /**
      * Namespace containing functions for text encoding and decoding
      */

@@ -27,7 +27,7 @@
 #include <string>
 #include <sstream>
 
-namespace Qsf {
+namespace soru {
 
     /**
      * Exception class to provide debugging output for severe errors in QSF itself.

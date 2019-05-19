@@ -1,24 +1,24 @@
 /**
  * \file main.cpp
- * \brief Application main file for qsfrunner
+ * \brief Application main file for sorun
  */
 
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
- * This file is part of QSF.
+ * This file is part of soru.
  *
- * QSF is free software: you can redistribute it and/or modify
+ * soru is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * QSF is distributed in the hope that it will be useful,
+ * soru is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with QSF.  If not, see <https://www.gnu.org/licenses/>.
+ * along with soru.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <iostream>
@@ -38,11 +38,11 @@
 
 namespace {
     // this will make the manager instance and loaded app accessible for signal handlers
-    std::unique_ptr<Fastcgipp::Manager<Qsf::RequestHandler>> managerPtr;
+    std::unique_ptr<Fastcgipp::Manager<soru::RequestHandler>> managerPtr;
     void* appOpen = nullptr;
     // use this for logging
     // TODO enable logging to log file through config
-    Qsf::Log LOG;
+    soru::Log LOG;
 }
 
 // signal handler for SIGINT, SIGTERM, and SIGUSR1
@@ -89,9 +89,9 @@ int main(int argc, char** argv) {
     signal(SIGUSR1, shutdown);
 
     // read config.ini
-    Qsf::Config config;
+    soru::Config config;
     try {
-        // QSF will take the path to the config as an argument
+        // sorun will take the path to the config as an argument
         // if no argument was given, look for a config.ini in the current path
         if(argc > 1) {
             config.read(argv[1]);
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
             config.read("config.ini");
         }
     }
-    catch(Qsf::SysException& e) {
+    catch(soru::SysException& e) {
         LOG("Fatal Error: Could not read or parse the configuration file");
         return 1;
     }
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         if(privUser->pw_uid == 0 || privGroup->gr_gid == 0) {
-            LOG("WARNING: QSF will be running as user or group root. Security risk!");
+            LOG("WARNING: sorun will be running as user or group root. Security risk!");
         }
     } else {
         LOG("WARNING: Not starting as root, cannot set privileges");
@@ -143,20 +143,20 @@ int main(int argc, char** argv) {
     // reset dl errors
     dlerror();
     // load symbols and check for errors
-    // first load qsf_version_major (defined in Application.h, included in Connection.h)
-    // the version the app has been compiled for should match the version of this qsfrunner
-    std::string appVersionError = "Fatal Error: Could not read QSF version from application: ";
-    auto appQsfVersionMajor = (int*) loadAppSymbol("qsf_version_major", appVersionError);
-    auto appQsfVersionMinor = (int*) loadAppSymbol("qsf_version_minor", appVersionError);
-    if(*appQsfVersionMajor != qsf_version_major || *appQsfVersionMinor != qsf_version_minor) {
-        LOG("Fatal Error: App has been compiled against another version of QSF.");
+    // first load soru_version_major (defined in Application.h, included in Connection.h)
+    // the version the app has been compiled for should match the version of this sorun
+    std::string appVersionError = "Fatal Error: Could not read soru version from application: ";
+    auto appSoruVersionMajor = (int*) loadAppSymbol("soru_version_major", appVersionError);
+    auto appSoruVersionMinor = (int*) loadAppSymbol("soru_version_minor", appVersionError);
+    if(*appSoruVersionMajor != soru_version_major || *appSoruVersionMinor != soru_version_minor) {
+        LOG("Fatal Error: App has been compiled against another version of soru.");
     }
-    auto appInit = (Qsf::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
+    auto appInit = (soru::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
 
     // pass config and application to RequestHandler so it can load appHandleRequest
     // (config will be saved later, here it will only be used to load the appHandleRequest)
     // (app function already loaded here so that errors can be detected before setting up the socket)
-    Qsf::RequestHandler::setAppRequestHandler(config, appOpen);
+    soru::RequestHandler::setAppRequestHandler(config, appOpen);
 
     // concurrency
     double cReal;
@@ -174,7 +174,7 @@ int main(int argc, char** argv) {
     auto cInt = static_cast<unsigned int>(cReal);
 
     // set up fastcgi manager
-    managerPtr = std::make_unique<Fastcgipp::Manager<Qsf::RequestHandler>>(cInt);
+    managerPtr = std::make_unique<Fastcgipp::Manager<soru::RequestHandler>>(cInt);
     //managerPtr->setupSignals();
 
     // socket handling
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
 
         auto fastcgiSocketPath = config[{"fastcgi", "path"}];
         if(fastcgiSocketPath.empty()) {
-            fastcgiSocketPath = "/etc/qsf/sock.d/qsf.sock";
+            fastcgiSocketPath = "/etc/sorun/sock.d/sorun.sock";
         }
         auto fastcgiOwner = config[{"fastcgi", "owner"}];
         auto fastcgiGroup = config[{"fastcgi", "group"}];
@@ -233,17 +233,17 @@ int main(int argc, char** argv) {
 
     // before manager starts, init app
     {
-        Qsf::AppInit appInit1;
+        soru::AppInit appInit1;
         appInit1.config = config;
         appInit(appInit1);
-        Qsf::RequestHandler::setConfig(appInit1);
+        soru::RequestHandler::setConfig(appInit1);
     }
 
     managerPtr->start();
     managerPtr->join();
 
     // explicitly destroy AppInit and clear session data to avoid a segfault
-    Qsf::RequestHandler::destroyEverything();
+    soru::RequestHandler::destroyEverything();
 
     dlclose(appOpen);
     exit(0);

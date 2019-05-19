@@ -30,7 +30,7 @@
 #include <qsf/Cookie.h>
 #include <qsf/Universal.h>
 
-namespace Qsf {
+namespace soru {
     class Connection;
 
     /**
@@ -62,7 +62,7 @@ namespace Qsf {
          * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
          */
         static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
-        Qsf::Connection& connection; /**< Reference to the Connection object in order to access objects. */
+        soru::Connection& connection; /**< Reference to the Connection object in order to access objects. */
         /**
          * Pointer to the session data struct for the current session, if established.
          * Can be used to check whether a session is established by checking shared_ptr::use_count()
@@ -126,7 +126,7 @@ namespace Qsf {
          * - httpOnly: send the HttpOnly attribute with the cookie.
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
          */
-        void start(Qsf::Cookie properties = Cookie());
+        void start(soru::Cookie properties = Cookie());
         /**
          * Check whether a session is currently active (has been started).
          * @return True if session is established, false otherwise.

@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace Qsf {
+namespace soru {
     namespace Engines {
 
         /**

@@ -28,7 +28,7 @@
 #include <utility>
 #include <boost/functional/hash.hpp>
 
-namespace Qsf {
+namespace soru {
     /**
      * Reader for config files and accessor to config values.
      */

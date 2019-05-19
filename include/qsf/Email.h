@@ -29,7 +29,7 @@
 #include <vector>
 #include <memory>
 
-namespace Qsf {
+namespace soru {
 
     /**
      * Replacement rules for emails are just a string -> string map. All occurrences of the key string should be

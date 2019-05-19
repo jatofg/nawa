@@ -7,7 +7,7 @@
 
 #include <qsf/Engines/HashTypeTable.h>
 
-namespace Qsf {
+namespace soru {
     namespace Engines {
 
         class DefaultHashTypeTable: public HashTypeTable {

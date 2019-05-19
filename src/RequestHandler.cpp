@@ -35,8 +35,8 @@
 #include <qsf/SysException.h>
 
 namespace {
-    Qsf::handleRequest_t* appHandleRequest;
-    Qsf::Log LOG;
+    soru::handleRequest_t* appHandleRequest;
+    soru::Log LOG;
     size_t postMax = 0; /* Maximum post size, in bytes, read from the config by setAppRequestHandler(...). */
     // Integer value referring to the raw post access level, as described by the QSF_RAWPOST_* macros.
     unsigned int rawPostAccess = 1;
@@ -44,7 +44,7 @@ namespace {
     // the AppInit. The Config object will be copied upon each request into a non-static member of Connection,
     // so it can be modified at runtime.
     // unique_ptr necessary so we can explicitly destruct it and avoid a segmentation fault on termination
-    std::unique_ptr<Qsf::AppInit> appInitPtr; /* The initialization struct as returned by the app init() function. */
+    std::unique_ptr<soru::AppInit> appInitPtr; /* The initialization struct as returned by the app init() function. */
 
     /**
      * Check the conditions of an AccessFilter.
@@ -52,7 +52,7 @@ namespace {
      * @param flt The access filter that will be checked.
      * @return True if the filter matches, false otherwise.
      */
-    bool filterMatches(const std::vector<std::string> &requestPath, const Qsf::AccessFilter &flt) {
+    bool filterMatches(const std::vector<std::string> &requestPath, const soru::AccessFilter &flt) {
         if(!flt.pathFilter.empty()) {
             // path condition is set but does not match -> the whole filter does not match
             // all elements of the filter path must be in the request path
@@ -67,7 +67,7 @@ namespace {
 
         if(!flt.extensionFilter.empty()) {
             auto const &filename = requestPath.back();
-            if(Qsf::get_file_extension(filename) != flt.extensionFilter)
+            if(soru::get_file_extension(filename) != flt.extensionFilter)
                 return false;
         }
 
@@ -87,14 +87,14 @@ namespace {
 
 }
 
-bool Qsf::RequestHandler::response() {
+bool soru::RequestHandler::response() {
     // check AppInitPtr for safety
     if(!appInitPtr) {
-        throw Qsf::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
+        throw soru::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
     }
 
-    Qsf::Request request(*this);
-    Qsf::Connection connection(request, appInitPtr->config);
+    soru::Request request(*this);
+    soru::Connection connection(request, appInitPtr->config);
 
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
@@ -108,12 +108,12 @@ bool Qsf::RequestHandler::response() {
     return true;
 }
 
-void Qsf::RequestHandler::flush(Qsf::Connection& connection) {
+void soru::RequestHandler::flush(soru::Connection& connection) {
     auto raw = connection.getRaw();
     dump(raw.c_str(), raw.size());
 }
 
-void Qsf::RequestHandler::setAppRequestHandler(const Qsf::Config &cfg, void *appOpen) {
+void soru::RequestHandler::setAppRequestHandler(const soru::Config &cfg, void *appOpen) {
     try {
         postMax = cfg.isSet({"post", "max_size"})
                       ? static_cast<size_t>(std::stoul(cfg[{"post", "max_size"}])) * 1024 : 0;
@@ -128,7 +128,7 @@ void Qsf::RequestHandler::setAppRequestHandler(const Qsf::Config &cfg, void *app
                    ? QSF_RAWPOST_NEVER : ((rawPostStr == "always") ? QSF_RAWPOST_ALWAYS : QSF_RAWPOST_NONSTANDARD);
 
     // load appHandleRequest function
-    appHandleRequest = (Qsf::handleRequest_t*) dlsym(appOpen, "handleRequest");
+    appHandleRequest = (soru::handleRequest_t*) dlsym(appOpen, "handleRequest");
     auto dlsymErr = dlerror();
     if(dlsymErr) {
         LOG(std::string("Fatal Error: Could not load handleRequest function from application: ") + dlsymErr);
@@ -136,9 +136,9 @@ void Qsf::RequestHandler::setAppRequestHandler(const Qsf::Config &cfg, void *app
     }
 }
 
-Qsf::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
+soru::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
 
-bool Qsf::RequestHandler::inProcessor() {
+bool soru::RequestHandler::inProcessor() {
     postContentType = environment().contentType;
     if(rawPostAccess == QSF_RAWPOST_NEVER) {
         return false;
@@ -152,19 +152,19 @@ bool Qsf::RequestHandler::inProcessor() {
     return false;
 }
 
-void Qsf::RequestHandler::setConfig(const Qsf::AppInit &_appInit) {
-    appInitPtr = std::make_unique<Qsf::AppInit>(_appInit);
+void soru::RequestHandler::setConfig(const soru::AppInit &_appInit) {
+    appInitPtr = std::make_unique<soru::AppInit>(_appInit);
 }
 
-void Qsf::RequestHandler::destroyEverything() {
+void soru::RequestHandler::destroyEverything() {
     appInitPtr.reset(nullptr);
-    Qsf::Session::destroy();
+    soru::Session::destroy();
 }
 
-bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
+bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
     // check AppInitPtr for safety
     if(!appInitPtr) {
-        throw Qsf::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
+        throw soru::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
     }
 
     // if filters are disabled, do not even check
@@ -186,7 +186,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
             connection.setBody(flt.response);
         }
         else {
-            connection.setBody(Qsf::generate_error_page(flt.status));
+            connection.setBody(soru::generate_error_page(flt.status));
         }
         // the request has been blocked, so no more filters have to be applied
         // returning true means: the request has been filtered
@@ -233,10 +233,10 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
             // case 2: credentials already sent
             else {
                 // split the authorization string, only the last part should contain base64
-                auto authResponse = Qsf::split_string(connection.request.env["authorization"], ' ', true);
+                auto authResponse = soru::split_string(connection.request.env["authorization"], ' ', true);
                 // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
                 if(authResponse.size() == 2 || authResponse.at(0) == "Basic") {
-                    auto credentials = Qsf::split_string(Qsf::Encoding::base64Decode(authResponse.at(1)), ':', true);
+                    auto credentials = soru::split_string(soru::Encoding::base64Decode(authResponse.at(1)), ':', true);
                     // credentials must also have 2 elements, a username and a password,
                     // and the auth function must be callable
                     if(credentials.size() == 2 && flt.authFunction) {
@@ -260,7 +260,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
                 connection.setBody(flt.response);
             }
             else {
-                connection.setBody(Qsf::generate_error_page(403));
+                connection.setBody(soru::generate_error_page(403));
             }
 
             // request blocked
@@ -281,7 +281,7 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
 
         std::stringstream filePath;
         filePath << flt.basePath;
-        if(flt.basePathExtension == Qsf::ForwardFilter::BY_PATH) {
+        if(flt.basePathExtension == soru::ForwardFilter::BY_PATH) {
             for(auto const &e: requestPath) {
                 filePath << '/' << e;
             }
@@ -295,14 +295,14 @@ bool Qsf::RequestHandler::applyFilters(Qsf::Connection &connection) {
         try {
             connection.sendFile(filePathStr, "", false, "", true);
         }
-        catch(Qsf::UserException&) {
+        catch(soru::UserException&) {
             // file does not exist, send 404
             connection.setStatus(404);
             if(!flt.response.empty()) {
                 connection.setBody(flt.response);
             }
             else {
-                connection.setBody(Qsf::generate_error_page(404));
+                connection.setBody(soru::generate_error_page(404));
             }
         }
 

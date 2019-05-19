@@ -27,15 +27,15 @@
 #include <qsf/Crypto.h>
 #include <qsf/UserException.h>
 
-std::mutex Qsf::Session::gLock;
-std::unordered_map<std::string, std::shared_ptr<Qsf::SessionData>> Qsf::Session::data;
+std::mutex soru::Session::gLock;
+std::unordered_map<std::string, std::shared_ptr<soru::SessionData>> soru::Session::data;
 
-Qsf::Session::Session(Qsf::Connection &connection) : connection(connection) {
+soru::Session::Session(soru::Connection &connection) : connection(connection) {
     // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
     // thus, it will be triggered by the Connection constructor
 }
 
-std::string Qsf::Session::generateID() {
+std::string soru::Session::generateID() {
     std::stringstream base;
 
     // Add 2 ints from random_device (should be in fact /dev/urandom), giving us (in general) 64 bits of entropy
@@ -49,7 +49,7 @@ std::string Qsf::Session::generateID() {
     return Crypto::sha1(base.str(), true);
 }
 
-void Qsf::Session::start(Cookie properties) {
+void soru::Session::start(Cookie properties) {
 
     // TODO check everything really carefully for possible race conditions
 
@@ -117,7 +117,7 @@ void Qsf::Session::start(Cookie properties) {
         do {
             sessionCookieStr = generateID();
         } while(data.count(sessionCookieStr) > 0);
-        currentData = std::make_shared<Qsf::SessionData>(connection.request.env["remoteAddr"]);
+        currentData = std::make_shared<soru::SessionData>(connection.request.env["remoteAddr"]);
         currentData->expires = time(nullptr) + sessionKeepalive;
         data[sessionCookieStr] = currentData;
     }
@@ -177,11 +177,11 @@ void Qsf::Session::start(Cookie properties) {
     }
 }
 
-bool Qsf::Session::established() const {
+bool soru::Session::established() const {
     return (currentData.use_count() > 0);
 }
 
-bool Qsf::Session::isSet(std::string key) const {
+bool soru::Session::isSet(std::string key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         return (currentData->data.count(key) == 1);
@@ -189,7 +189,7 @@ bool Qsf::Session::isSet(std::string key) const {
     return false;
 }
 
-Qsf::Universal Qsf::Session::operator[](std::string key) const {
+soru::Universal soru::Session::operator[](std::string key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         if(currentData->data.count(key) == 1) {
@@ -199,23 +199,23 @@ Qsf::Universal Qsf::Session::operator[](std::string key) const {
     return Universal();
 }
 
-void Qsf::Session::set(std::string key, const Qsf::Universal& value) {
+void soru::Session::set(std::string key, const soru::Universal& value) {
     if(!established()) {
-        throw UserException("Qsf::Session::set", 1, "Session not established.");
+        throw UserException("soru::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data[std::move(key)] = value;
 }
 
-void Qsf::Session::unset(const std::string& key) {
+void soru::Session::unset(const std::string& key) {
     if(!established()) {
-        throw UserException("Qsf::Session::set", 1, "Session not established.");
+        throw UserException("soru::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data.erase(key);
 }
 
-void Qsf::Session::collectGarbage() {
+void soru::Session::collectGarbage() {
     std::lock_guard<std::mutex> lockGuard(gLock);
     // no increment in for statement as we want to remove elements
     for(auto it = data.cbegin(); it != data.cend();) {
@@ -233,11 +233,11 @@ void Qsf::Session::collectGarbage() {
     }
 }
 
-void Qsf::Session::destroy() {
+void soru::Session::destroy() {
     data.clear();
 }
 
-void Qsf::Session::invalidate() {
+void soru::Session::invalidate() {
 
     // do nothing if no session has been established
     if(!established()) return;

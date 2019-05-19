@@ -7,18 +7,18 @@
 #include <regex>
 #include <qsf/Encoding.h>
 
-Qsf::Engines::Argon2HashingEngine::Argon2HashingEngine(Qsf::Engines::Argon2HashingEngine::Algorithm algorithm,
+soru::Engines::Argon2HashingEngine::Argon2HashingEngine(soru::Engines::Argon2HashingEngine::Algorithm algorithm,
                                                        uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,
                                                        std::string _salt, size_t hashLen)
         : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism), hashLen(hashLen) {
     salt = std::move(_salt);
 }
 
-std::string Qsf::Engines::Argon2HashingEngine::generateHash(std::string input) const {
+std::string soru::Engines::Argon2HashingEngine::generateHash(std::string input) const {
 
     // check validity of parameters
     if(!salt.empty() && salt.length() < ARGON2_MIN_SALT_LENGTH) {
-        throw UserException("Qsf::Engines::Argon2HashingEngine::generateHash", 10,
+        throw UserException("soru::Engines::Argon2HashingEngine::generateHash", 10,
                 "Provided user-defined salt is not long enough");
     }
 
@@ -70,14 +70,14 @@ std::string Qsf::Engines::Argon2HashingEngine::generateHash(std::string input) c
 
     // error handling
     if(errorCode != ARGON2_OK) {
-        throw UserException("Qsf::Engines::Argon2HashingEngine::generateHash", 10,
+        throw UserException("soru::Engines::Argon2HashingEngine::generateHash", 10,
                 std::string("Argon2 error: ") + argon2_error_message(errorCode));
     }
 
     return std::string(c_hash);
 }
 
-bool Qsf::Engines::Argon2HashingEngine::verifyHash(std::string input, std::string hash) const {
+bool soru::Engines::Argon2HashingEngine::verifyHash(std::string input, std::string hash) const {
 
     // split the hash and create a new object with the properties of the hash
     std::regex rgx(R"(\$argon2(i|d|id)\$(v=([0-9]+))?\$m=([0-9]+),t=([0-9]+),p=([0-9]+)\$([A-Za-z0-9+\/]+={0,2})\$([A-Za-z0-9+\/]+={0,2}))");

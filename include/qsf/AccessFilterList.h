@@ -29,7 +29,7 @@
 #include <regex>
 #include <functional>
 
-namespace Qsf {
+namespace soru {
 
     // TODO auth filters requesting the credentials on every request do not make sense
     //  --> possibly http auth should better be implemented somewhere else?

@@ -29,7 +29,7 @@
 #include <memory>
 #include <qsf/UserException.h>
 
-namespace Qsf {
+namespace soru {
     /**
      * Wrapper to store a variable or object of arbitrary type somewhere else on the heap. Some properties:
      *
@@ -136,12 +136,12 @@ namespace Qsf {
         T get() const {
             // throw an exception if no value set
             if(!set) {
-                throw UserException("Qsf::Types::Universal::get<T>", 1, "Cast of void value requested");
+                throw UserException("soru::Types::Universal::get<T>", 1, "Cast of void value requested");
             }
             // check for type equality and throw exception if not matching
             std::type_index Tindex(typeid(T));
             if(Tindex != typeIndex) {
-                throw UserException("Qsf::Types::Universal::get<T>", 2, "Cast to wrong type requested");
+                throw UserException("soru::Types::Universal::get<T>", 2, "Cast to wrong type requested");
             }
             return *(T*)ptr;
         }

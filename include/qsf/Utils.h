@@ -28,7 +28,7 @@
 #include <regex>
 #include <unordered_map>
 
-namespace Qsf {
+namespace soru {
     /**
      * ASCII (byte-)string based regex_replace variant which takes a callback function as format parameter. This
      * function may be used to generate individual replacements for each match.

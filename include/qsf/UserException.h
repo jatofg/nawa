@@ -27,7 +27,7 @@
 #include <string>
 #include <sstream>
 
-namespace Qsf {
+namespace soru {
 
     /**
      * Exception class that can be used by apps to catch errors resulting from QSF function calls.

@@ -7,7 +7,7 @@
 
 #include <qsf/AccessFilterList.h>
 
-namespace Qsf {
+namespace soru {
     struct AppInit {
         /**
          * You can use this to modify the default configuration for every request during initialization.

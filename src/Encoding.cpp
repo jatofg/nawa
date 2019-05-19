@@ -541,7 +541,7 @@ namespace {
 
 }
 
-std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
+std::string soru::Encoding::htmlEncode(std::string input, bool encodeAll) {
     if(!encodeAll) {
         boost::replace_all(input, "&", "&amp;");
         boost::replace_all(input, "\"", "&quot;");
@@ -598,7 +598,7 @@ std::string Qsf::Encoding::htmlEncode(std::string input, bool encodeAll) {
     return input;
 }
 
-std::string Qsf::Encoding::htmlDecode(std::string input) {
+std::string soru::Encoding::htmlDecode(std::string input) {
 
     if(htmlDecodeTable.empty()) initializeHtmlDecodeTable();
 
@@ -652,7 +652,7 @@ std::string Qsf::Encoding::htmlDecode(std::string input) {
     return input;
 }
 
-std::string Qsf::Encoding::urlEncode(const std::string& input) {
+std::string soru::Encoding::urlEncode(const std::string& input) {
     std::stringstream out;
 
     // check if character is valid, unreserved URL character, otherwise apply url encoding
@@ -671,7 +671,7 @@ std::string Qsf::Encoding::urlEncode(const std::string& input) {
     return out.str();
 }
 
-std::string Qsf::Encoding::urlDecode(std::string input) {
+std::string soru::Encoding::urlDecode(std::string input) {
     // match url codes by regex
     std::regex matchCode(R"(%([0-9A-F]{2}))");
 
@@ -685,7 +685,7 @@ std::string Qsf::Encoding::urlDecode(std::string input) {
     return input;
 }
 
-bool Qsf::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
+bool soru::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
     std::regex rgx;
     if(allowWhitespaces) {
         rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
@@ -696,15 +696,15 @@ bool Qsf::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
     return std::regex_match(input, rgx);
 }
 
-std::string Qsf::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
+std::string soru::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
     return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length(), breakAfter, breakSequence);
 }
 
-std::string Qsf::Encoding::base64Decode(const std::string &input) {
+std::string soru::Encoding::base64Decode(const std::string &input) {
     return base64_decode(input);
 }
 
-std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
+std::string soru::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
         bool replaceCrlf, bool qEncoding) {
     std::stringstream ret;
     int lineCount = 0;
@@ -732,14 +732,14 @@ std::string Qsf::Encoding::quotedPrintableEncode(const std::string &input, const
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
-            ret << "=" << Qsf::to_uppercase(Qsf::hex_dump(std::string(1, c)));
+            ret << "=" << soru::to_uppercase(soru::hex_dump(std::string(1, c)));
             lineCount += 3;
         }
     }
     return ret.str();
 }
 
-std::string Qsf::Encoding::quotedPrintableDecode(std::string input) {
+std::string soru::Encoding::quotedPrintableDecode(std::string input) {
     std::regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function
@@ -753,7 +753,7 @@ std::string Qsf::Encoding::quotedPrintableDecode(std::string input) {
     return input;
 }
 
-std::string Qsf::Encoding::makeEncodedWord(const std::string &input, bool base64) {
+std::string soru::Encoding::makeEncodedWord(const std::string &input, bool base64) {
     std::stringstream ret;
     ret << "=?utf-8?";
     if(base64) {

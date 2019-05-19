@@ -24,26 +24,26 @@ namespace {
 
         // Use MD5 sum of a random integer
         std::random_device rd;
-        ret << Qsf::Crypto::md5(std::to_string(rd()));
+        ret << soru::Crypto::md5(std::to_string(rd()));
 
         return ret.str();
     }
 
-    std::string multipartTypeToString(const Qsf::MimeEmail::MimePartList::MultipartType &multipartType) {
+    std::string multipartTypeToString(const soru::MimeEmail::MimePartList::MultipartType &multipartType) {
         switch(multipartType) {
-            case Qsf::MimeEmail::MimePartList::MIXED:
+            case soru::MimeEmail::MimePartList::MIXED:
                 return "mixed";
-            case Qsf::MimeEmail::MimePartList::DIGEST:
+            case soru::MimeEmail::MimePartList::DIGEST:
                 return "digest";
-            case Qsf::MimeEmail::MimePartList::ALTERNATIVE:
+            case soru::MimeEmail::MimePartList::ALTERNATIVE:
                 return "alternative";
-            case Qsf::MimeEmail::MimePartList::RELATED:
+            case soru::MimeEmail::MimePartList::RELATED:
                 return "related";
-            case Qsf::MimeEmail::MimePartList::REPORT:
+            case soru::MimeEmail::MimePartList::REPORT:
                 return "report";
-            case Qsf::MimeEmail::MimePartList::SIGNED:
+            case soru::MimeEmail::MimePartList::SIGNED:
                 return "signed";
-            case Qsf::MimeEmail::MimePartList::ENCRYPTED:
+            case soru::MimeEmail::MimePartList::ENCRYPTED:
                 return "encrypted";
         }
         return "";
@@ -54,8 +54,8 @@ namespace {
      * @param mimePartList The MimePartList object representing the MIME parts to be converted.
      * @return Tuple containing the boundary string (for inclusion in the header) and the MIME parts as a string.
      */
-    std::string mergeMimePartList(const Qsf::MimeEmail::MimePartList &mimePartList, const std::string& boundary,
-            const Qsf::ReplacementRules& replacementRules) {
+    std::string mergeMimePartList(const soru::MimeEmail::MimePartList &mimePartList, const std::string& boundary,
+            const soru::ReplacementRules& replacementRules) {
         std::stringstream ret;
 
         // iterate through the list
@@ -74,23 +74,23 @@ namespace {
 
                 // apply the replacement rules (only if necessary) and the selected encoding afterwards
                 switch(mimePart.applyEncoding) {
-                    case Qsf::MimeEmail::MimePart::BASE64:
+                    case soru::MimeEmail::MimePart::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
-                        ret << Qsf::Encoding::base64Encode(
+                        ret << soru::Encoding::base64Encode(
                                 (mimePart.allowReplacements && !replacementRules.empty())
-                                ? Qsf::string_replace(mimePart.data, replacementRules) : mimePart.data,
+                                ? soru::string_replace(mimePart.data, replacementRules) : mimePart.data,
                                 76, "\r\n");
                         break;
-                    case Qsf::MimeEmail::MimePart::QUOTED_PRINTABLE:
+                    case soru::MimeEmail::MimePart::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-                        ret << Qsf::Encoding::quotedPrintableEncode(
+                        ret << soru::Encoding::quotedPrintableEncode(
                                 (mimePart.allowReplacements && !replacementRules.empty())
-                                ? Qsf::string_replace(mimePart.data, replacementRules) : mimePart.data
+                                ? soru::string_replace(mimePart.data, replacementRules) : mimePart.data
                                 );
                         break;
-                    case Qsf::MimeEmail::MimePart::NONE:
+                    case soru::MimeEmail::MimePart::NONE:
                         ret << "\r\n" << ((mimePart.allowReplacements && !replacementRules.empty())
-                        ? Qsf::string_replace(mimePart.data, replacementRules) : mimePart.data);
+                        ? soru::string_replace(mimePart.data, replacementRules) : mimePart.data);
                         break;
                 }
 
@@ -111,7 +111,7 @@ namespace {
     }
 }
 
-std::string Qsf::EmailAddress::get(bool includeName) const {
+std::string soru::EmailAddress::get(bool includeName) const {
     std::stringstream ret;
     if(includeName) {
         ret << name << " ";
@@ -120,12 +120,12 @@ std::string Qsf::EmailAddress::get(bool includeName) const {
     return ret.str();
 }
 
-bool Qsf::EmailAddress::isValid() const {
+bool soru::EmailAddress::isValid() const {
     std::regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", std::regex::icase);
     return std::regex_match(address, emCheck);
 }
 
-std::string Qsf::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
+std::string soru::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
 
     for(auto const &e: headers) {
@@ -147,19 +147,19 @@ std::string Qsf::SimpleEmail::getRaw(const ReplacementRules &replacementRules) c
     return ret.str();
 }
 
-Qsf::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::MimeEmail::MimePartOrList &other) {
+soru::MimeEmail::MimePartOrList::MimePartOrList(const soru::MimeEmail::MimePartOrList &other) {
     operator=(other);
 }
 
-Qsf::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::MimeEmail::MimePart &_mimePart) {
+soru::MimeEmail::MimePartOrList::MimePartOrList(const soru::MimeEmail::MimePart &_mimePart) {
     operator=(_mimePart);
 }
 
-Qsf::MimeEmail::MimePartOrList::MimePartOrList(const Qsf::MimeEmail::MimePartList &_mimePartList) {
+soru::MimeEmail::MimePartOrList::MimePartOrList(const soru::MimeEmail::MimePartList &_mimePartList) {
     operator=(_mimePartList);
 }
 
-Qsf::MimeEmail::MimePartOrList &Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePartOrList &other) {
+soru::MimeEmail::MimePartOrList &soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePartOrList &other) {
     if(&other == this) {
         return *this;
     }
@@ -184,7 +184,7 @@ Qsf::MimeEmail::MimePartOrList &Qsf::MimeEmail::MimePartOrList::operator=(const 
     return *this;
 }
 
-Qsf::MimeEmail::MimePartOrList &Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePart &_mimePart) {
+soru::MimeEmail::MimePartOrList &soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePart &_mimePart) {
     if(!mimePart) {
         mimePart = std::make_unique<MimePart>();
     }
@@ -195,8 +195,8 @@ Qsf::MimeEmail::MimePartOrList &Qsf::MimeEmail::MimePartOrList::operator=(const 
     return *this;
 }
 
-Qsf::MimeEmail::MimePartOrList &
-Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePartList &_mimePartList) {
+soru::MimeEmail::MimePartOrList &
+soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePartList &_mimePartList) {
     if(!mimePartList) {
         mimePartList = std::make_unique<MimePartList>();
     }
@@ -207,7 +207,7 @@ Qsf::MimeEmail::MimePartOrList::operator=(const Qsf::MimeEmail::MimePartList &_m
     return *this;
 }
 
-std::string Qsf::MimeEmail::getRaw(const ReplacementRules &replacementRules) const {
+std::string soru::MimeEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
     for(auto const &e: headers) {
         if(e.first == "MIME-Version" || e.first == "Content-Type") continue;

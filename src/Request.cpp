@@ -26,7 +26,7 @@
 #include <qsf/Request.h>
 #include <qsf/SysException.h>
 
-std::string Qsf::Request::Env::operator[](std::string envVar) const {
+std::string soru::Request::Env::operator[](std::string envVar) const {
     std::string ret;
     if(envVar == "host") ret = requestHandler.environment().host; // server hostname
     else if(envVar == "userAgent") ret = requestHandler.environment().userAgent; // user agent string
@@ -85,26 +85,26 @@ std::string Qsf::Request::Env::operator[](std::string envVar) const {
     return ret;
 }
 
-std::vector<std::string> Qsf::Request::Env::getAcceptLanguages() const {
+std::vector<std::string> soru::Request::Env::getAcceptLanguages() const {
     return requestHandler.environment().acceptLanguages;
 }
 
-std::vector<std::string> Qsf::Request::Env::getRequestPath() const {
+std::vector<std::string> soru::Request::Env::getRequestPath() const {
     // TODO is this function really necessary? get RP via operator[] when switched to Universal?
     // TODO what does environment().pathInfo do?
     //return requestHandler.environment().pathInfo;
-    return Qsf::split_path(requestHandler.environment().requestUri);
+    return soru::split_path(requestHandler.environment().requestUri);
 }
 
-Fastcgipp::Address Qsf::Request::Env::getServerAddr() const {
+Fastcgipp::Address soru::Request::Env::getServerAddr() const {
     return requestHandler.environment().serverAddress;
 }
 
-Fastcgipp::Address Qsf::Request::Env::getRemoteAddr() const {
+Fastcgipp::Address soru::Request::Env::getRemoteAddr() const {
     return requestHandler.environment().remoteAddress;
 }
 
-Qsf::Request::GPC::GPC(RequestHandler &request, uint source)
+soru::Request::GPC::GPC(RequestHandler &request, uint source)
         : requestHandler(request), source(source) {
     switch (source) {
         case QSF_REQ_COOKIE:
@@ -117,17 +117,17 @@ Qsf::Request::GPC::GPC(RequestHandler &request, uint source)
             data = request.environment().gets;
             break;
         default:
-            throw Qsf::SysException(__FILE__, __LINE__, "Invalid source for QsfRequest::GPC given");
+            throw soru::SysException(__FILE__, __LINE__, "Invalid source for QsfRequest::GPC given");
     }
 }
 
-std::string Qsf::Request::GPC::operator[](std::string gpcVar) const {
+std::string soru::Request::GPC::operator[](std::string gpcVar) const {
     auto e = data.find(gpcVar);
     if(e != data.end()) return e->second;
     else return "";
 }
 
-std::vector<std::string> Qsf::Request::GPC::getVector(std::string gpcVar) const {
+std::vector<std::string> soru::Request::GPC::getVector(std::string gpcVar) const {
     std::vector<std::string> ret;
     auto e = data.equal_range(gpcVar);
     for(auto it = e.first; it != e.second; ++it) {
@@ -136,53 +136,53 @@ std::vector<std::string> Qsf::Request::GPC::getVector(std::string gpcVar) const 
     return ret;
 }
 
-unsigned long Qsf::Request::GPC::count(std::string gpcVar) const {
+unsigned long soru::Request::GPC::count(std::string gpcVar) const {
     return data.count(gpcVar);
 }
 
-std::multimap<std::string, std::string>& Qsf::Request::GPC::getMultimap() {
+std::multimap<std::string, std::string>& soru::Request::GPC::getMultimap() {
     return data;
 }
 
-std::multimap<std::string, std::string>::const_iterator Qsf::Request::GPC::begin() const {
+std::multimap<std::string, std::string>::const_iterator soru::Request::GPC::begin() const {
     return data.begin();
 }
 
-std::multimap<std::string, std::string>::const_iterator Qsf::Request::GPC::end() const {
+std::multimap<std::string, std::string>::const_iterator soru::Request::GPC::end() const {
     return data.end();
 }
 
-Qsf::Request::Request(RequestHandler &request)
+soru::Request::Request(RequestHandler &request)
         : env(request), get(request, QSF_REQ_GET), post(request), cookie(request, QSF_REQ_COOKIE) {}
 
-Qsf::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {}
+soru::Request::Post::Post(RequestHandler &request) : GPC(request, QSF_REQ_POST) {}
 
-std::string& Qsf::Request::Post::getRaw() const {
+std::string& soru::Request::Post::getRaw() const {
     return requestHandler.rawPost;
 }
 
-std::vector<Qsf::Request::File> Qsf::Request::Post::getFileVector(std::string postVar) const {
-    std::vector<Qsf::Request::File> ret;
+std::vector<soru::Request::File> soru::Request::Post::getFileVector(std::string postVar) const {
+    std::vector<soru::Request::File> ret;
     auto e = requestHandler.environment().files.equal_range(postVar);
     for(auto it = e.first; it != e.second; ++it) {
-        Qsf::Request::File tmp(it->second);
+        soru::Request::File tmp(it->second);
         ret.push_back(tmp);
     }
     return ret;
 }
 
-std::string Qsf::Request::Post::getContentType() const {
+std::string soru::Request::Post::getContentType() const {
     return requestHandler.postContentType;
 }
 
-Qsf::Request::File::File(const Fastcgipp::Http::File<char> &file) : filename(file.filename),
+soru::Request::File::File(const Fastcgipp::Http::File<char> &file) : filename(file.filename),
         contentType(file.contentType), size(file.size), dataPtrRef(file.data) {}
 
-std::string Qsf::Request::File::copyFile() {
+std::string soru::Request::File::copyFile() {
     return std::string(dataPtrRef.get(), size);
 }
 
-bool Qsf::Request::File::writeFile(std::string path) {
+bool soru::Request::File::writeFile(std::string path) {
     std::ofstream outfile;
     std::ios_base::iostate exceptionMask = outfile.exceptions() | std::ios::failbit;
     outfile.exceptions(exceptionMask);

@@ -31,7 +31,7 @@
 #include <qsf/Request.h>
 #include <qsf/Session.h>
 
-namespace Qsf {
+namespace soru {
     /**
      * Response object to be passed back to QSF and accessor to the request.
      */
@@ -44,14 +44,14 @@ namespace Qsf {
         void clearStream();
         void mergeStream();
     public:
-        const Qsf::Request& request; /**< Access the Request object representing the current request. */
-        Qsf::Session session;
+        const soru::Request& request; /**< Access the Request object representing the current request. */
+        soru::Session session;
         /**
          * Access the QSF configuration. This is a copy of the Config object that contains the values of the config file
          * which was read at the startup of QSF. You can use the Config::set method to change values at runtime, however,
          * these changes only affect the current connection.
          */
-        Qsf::Config config;
+        soru::Config config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
         /**
          * Create a Connection object.

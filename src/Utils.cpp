@@ -152,7 +152,7 @@ namespace {
 }
 
 void
-Qsf::regex_replace_callback(std::string &s, const std::regex &rgx, std::function<std::string(const std::vector<std::string>&)> fmt) {
+soru::regex_replace_callback(std::string &s, const std::regex &rgx, std::function<std::string(const std::vector<std::string>&)> fmt) {
     // how many submatches do we have to deal with?
     int marks = rgx.mark_count();
     // we want to iterate through all submatches (to collect them in a vector passed to fmt())
@@ -187,7 +187,7 @@ Qsf::regex_replace_callback(std::string &s, const std::regex &rgx, std::function
     s = out.str();
 }
 
-std::string Qsf::hex_dump(const std::string &in) {
+std::string soru::hex_dump(const std::string &in) {
     std::stringstream rets;
     rets << std::hex << std::setfill('0');
     for(char c: in) {
@@ -196,17 +196,17 @@ std::string Qsf::hex_dump(const std::string &in) {
     return rets.str();
 }
 
-std::string Qsf::to_lowercase(std::string s) {
+std::string soru::to_lowercase(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;
 }
 
-std::string Qsf::to_uppercase(std::string s) {
+std::string soru::to_uppercase(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), ::toupper);
     return s;
 }
 
-std::string Qsf::generate_error_page(unsigned int httpStatus) {
+std::string soru::generate_error_page(unsigned int httpStatus) {
     std::string errorStr;
     std::string explanation;
     switch(httpStatus) {
@@ -284,7 +284,7 @@ std::string Qsf::generate_error_page(unsigned int httpStatus) {
     return ep.str();
 }
 
-std::string Qsf::get_file_extension(const std::string &filename) {
+std::string soru::get_file_extension(const std::string &filename) {
     try {
         return filename.substr(filename.find_last_of('.') + 1);
     }
@@ -293,7 +293,7 @@ std::string Qsf::get_file_extension(const std::string &filename) {
     return std::string();
 }
 
-std::string Qsf::content_type_by_extension(std::string extension) {
+std::string soru::content_type_by_extension(std::string extension) {
     auto ext = to_lowercase(std::move(extension));
     if(contentTypeMap.count(ext) == 1) {
         return contentTypeMap.at(ext);
@@ -301,7 +301,7 @@ std::string Qsf::content_type_by_extension(std::string extension) {
     return "application/octet-stream";
 }
 
-std::string Qsf::make_http_time(time_t time1) {
+std::string soru::make_http_time(time_t time1) {
     std::stringstream httpTime;
     tm gmt;
     gmtime_r(&time1, &gmt);
@@ -311,7 +311,7 @@ std::string Qsf::make_http_time(time_t time1) {
     return httpTime.str();
 }
 
-time_t Qsf::read_http_time(const std::string &httpTime) {
+time_t soru::read_http_time(const std::string &httpTime) {
     std::istringstream timeStream(httpTime);
     tm timeStruct;
     timeStream >> std::get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
@@ -320,7 +320,7 @@ time_t Qsf::read_http_time(const std::string &httpTime) {
     return timegm(&timeStruct);
 }
 
-std::string Qsf::make_smtp_time(time_t time1) {
+std::string soru::make_smtp_time(time_t time1) {
     std::stringstream smtpTime;
     tm ltime;
     localtime_r(&time1, &ltime);
@@ -330,7 +330,7 @@ std::string Qsf::make_smtp_time(time_t time1) {
     return smtpTime.str();
 }
 
-time_t Qsf::read_smtp_time(const std::string &smtpTime) {
+time_t soru::read_smtp_time(const std::string &smtpTime) {
     std::istringstream timeStream(smtpTime);
     tm timeStruct;
     timeStream >> std::get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
@@ -339,7 +339,7 @@ time_t Qsf::read_smtp_time(const std::string &smtpTime) {
     return mktime(&timeStruct);
 }
 
-std::vector<std::string> Qsf::split_string(std::string str, char delimiter, bool ignoreEmpty) {
+std::vector<std::string> soru::split_string(std::string str, char delimiter, bool ignoreEmpty) {
     std::vector<std::string> ret;
     for(size_t pos = 0; !str.empty();) {
         pos = str.find_first_of(delimiter);
@@ -357,7 +357,7 @@ std::vector<std::string> Qsf::split_string(std::string str, char delimiter, bool
     return ret;
 }
 
-std::string Qsf::merge_path(const std::vector<std::string> &path) {
+std::string soru::merge_path(const std::vector<std::string> &path) {
     std::stringstream stringPath;
     for(auto const &e: path) {
         stringPath << '/' << e;
@@ -365,12 +365,12 @@ std::string Qsf::merge_path(const std::vector<std::string> &path) {
     return stringPath.str();
 }
 
-std::vector<std::string> Qsf::split_path(const std::string &pathString) {
+std::vector<std::string> soru::split_path(const std::string &pathString) {
     auto ret = split_string(pathString, '/', true);
     return ret;
 }
 
-std::string Qsf::convert_line_endings(const std::string &in, const std::string &ending) {
+std::string soru::convert_line_endings(const std::string &in, const std::string &ending) {
     std::stringstream ret;
     for(const auto &c: in) {
         if(c == '\n') ret << ending;
@@ -379,13 +379,13 @@ std::string Qsf::convert_line_endings(const std::string &in, const std::string &
     return ret.str();
 }
 
-std::string Qsf::get_file_contents(const std::string &path) {
+std::string soru::get_file_contents(const std::string &path) {
     // open file as binary
     std::ifstream f(path, std::ifstream::binary);
 
     // throw exception if file cannot be opened
     if(!f) {
-        throw Qsf::UserException("Qsf::Utils::file_get_contents", 1, "Cannot open file for reading");
+        throw soru::UserException("soru::Utils::file_get_contents", 1, "Cannot open file for reading");
     }
 
     // get file size
@@ -400,7 +400,7 @@ std::string Qsf::get_file_contents(const std::string &path) {
     return ret;
 }
 
-std::string Qsf::string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns) {
+std::string soru::string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns) {
     for(const auto &pattern: patterns) {
         for(size_t pos = input.find(pattern.first); pos != std::string::npos;) {
             input.replace(pos, pattern.first.length(), pattern.second);
