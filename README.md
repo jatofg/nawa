@@ -1,9 +1,9 @@
-QSF
+soru
 ===
 
-QSF is a framework for web applications written in C++(14). It aims to 
+soru is a framework for web applications written in C++(14). It aims to 
 make writing a natively running web app nearly as easy as writing it 
-in, for example, PHP. QSF communicates with the web server via 
+in, for example, PHP. soru communicates with the web server via 
 FastCGI and currently uses the eddic/fastcgipp library for request 
 handling.
 
@@ -20,7 +20,7 @@ configuration engine
 - Set the response body, either at once or using C++ streams
 - Flush the response before it is complete (given that this is 
 supported by your web server)
-- Session management: QSF will manage session cookies by itself, if 
+- Session management: soru will manage session cookies by itself, if 
 you want, and allows you to store and receive session-specific data 
 without having to care about session management yourself
 - Cryptographic functions and other useful functions to make your life 
@@ -37,26 +37,26 @@ More features will come. For the full documentation, have a look at:
 
 ## Example
 
-A QSF app consists of:
+A soru app consists of:
 
 - A simple config file with properties concerning the behavior of the 
 application, and
 - A shared object file containing the application itself.
 
-For a simple QSF app:
+For a simple soru app:
 [TBA]
 
 The path to the object file is included in the config file, and QSF 
 will take care of setting everything up and starting the app. You 
 can run it like this:
 
-`$ qsfrunner config.ini`
+`$ sorun config.ini`
 
 Of course, it is also possible to start it as a systemd service.
 
 ## Building
 
-QSF has been tested on Linux only, but it might also run on macOS. 
+soru has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
 Windows is not supported and will never be. 
 Before building, make sure that you have the dependencies installed:
 
@@ -66,18 +66,18 @@ Before building, make sure that you have the dependencies installed:
 - libcurl4-openssl-dev
 - libargon2-0-dev 
 
-For actually running applications with qsfrunner, only libfastcgi++ 
+For actually running applications with sorun, only libfastcgi++ 
 is required (and the others have to be installed, too...)
 
 To build qsfrunner, pull the source code, open a terminal, and 
-switch to the qsf directory.
+switch to the soru directory.
 
 First, create a directory for the build files:
 
 `$ mkdir build`<br>
 `$ cd build`
 
-Then, build QSF:
+Then, build soru:
 
 `$ cmake --build ..`
 
