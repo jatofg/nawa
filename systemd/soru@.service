@@ -1,0 +1,11 @@
+[Unit]
+Description=sorun - soru App Daemon (App: %I)
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sorun %i
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

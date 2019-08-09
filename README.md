@@ -52,7 +52,13 @@ can run it like this:
 
 `$ sorun config.ini`
 
-Of course, it is also possible to start it as a systemd service.
+If systemd is present on your system, a systemd service file will 
+also be installed on your system. You can start an app as a 
+daemon using the path to its ini file:
+
+`# systemctl start soru@/path/to/config.ini`
+
+For automatically starting an app on boot, use `systemctl enable`.
 
 ## Building
 

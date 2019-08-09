@@ -113,6 +113,11 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/soru"
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/soru/Application.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/soru
         COMPONENT Development)
+if(EXISTS /etc/systemd/system)
+    install(FILES "${PROJECT_SOURCE_DIR}/systemd/soru@.service"
+            DESTINATION /etc/systemd/system
+            COMPONENT Runtime)
+endif()
 
 # build documentation
 find_package(Doxygen)
