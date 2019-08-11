@@ -7,6 +7,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(SORU_VERSION_MAJOR 0)
 set(SORU_VERSION_MINOR 1)
 
+# build options
+option(BuildTests "Build tests" ON)
+option(BuildExamples "Build examples" ON)
+option(BuildDocs "Build docs" ON)
+
 # only unix-based OS are supported
 if(NOT UNIX)
     message(FATAL_ERROR "Unsupported operating system")
@@ -72,29 +77,32 @@ target_include_directories(sorun PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-add_library(sorutest SHARED
-        tests/app.h
-        tests/sorutest.cpp)
-target_include_directories(sorutest PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+if(BuildTests)
+    add_library(sorutest SHARED
+            tests/app.h
+            tests/sorutest.cpp)
+    target_include_directories(sorutest PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-add_library(sessiontest SHARED
-        tests/app.h
-        tests/sessiontest.cpp)
-target_include_directories(sessiontest PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    add_library(sessiontest SHARED
+            tests/app.h
+            tests/sessiontest.cpp)
+    target_include_directories(sessiontest PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-add_library(emailtest SHARED
-        tests/app.h
-        tests/emailtest.cpp)
-target_include_directories(emailtest PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    add_library(emailtest SHARED
+            tests/app.h
+            tests/emailtest.cpp)
+    target_include_directories(emailtest PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+endif()
+
 
 set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
@@ -121,7 +129,7 @@ endif()
 
 # build documentation
 find_package(Doxygen)
-if(DOXYGEN_FOUND)
+if(DOXYGEN_FOUND AND BuildDocs)
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in"
             "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" @ONLY)
     add_custom_target(docs
@@ -131,4 +139,4 @@ if(DOXYGEN_FOUND)
     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/docs"
             DESTINATION ${CMAKE_INSTALL_DOCDIR}
             OPTIONAL)
-endif(DOXYGEN_FOUND)
+endif()
