@@ -1,6 +1,6 @@
 /**
  * \file main.cpp
- * \brief Application main file for sorun
+ * \brief Application main file for sorun.
  */
 
 /*

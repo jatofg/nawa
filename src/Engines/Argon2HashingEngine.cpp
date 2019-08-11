@@ -1,3 +1,8 @@
+/**
+ * \file Argon2HashingEngine.cpp
+ * \brief Implementation of the Argon2HashingEngine class.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *

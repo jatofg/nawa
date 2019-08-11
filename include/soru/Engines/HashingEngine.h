@@ -1,3 +1,8 @@
+/**
+ * \file HashingEngine.h
+ * \brief Abstract base class for hashing engines.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *

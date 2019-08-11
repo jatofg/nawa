@@ -1,3 +1,8 @@
+/**
+ * \file AppInit.h
+ * \brief Structure passed to the init function of soru apps.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *

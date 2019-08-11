@@ -1,6 +1,6 @@
 /**
  * \file qsftest.cpp
- * \brief QSF app with a set of basic tests.
+ * \brief soru app with a set of basic tests.
  */
 
 /*
@@ -34,6 +34,12 @@
 
 using namespace soru;
 
+/**
+ * Generate a random string of size len with a random combination of selected unicode characters.
+ * @param len Length of the resulting string.
+ * @param rseed Seed for the random engine.
+ * @return The random string.
+ */
 std::string genRandomUnicode(size_t len, unsigned int rseed) {
     const char cl[][50] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
                             "s", "t", "u", "v", "w", "x", "y", "z", " ", "\t", "<", ">", "\"", "=", "ä", "ö", "ü", "ß",
@@ -144,8 +150,6 @@ int init(soru::AppInit& appInit) {
     }
     catch(const UserException&) {}
     std::cout << "TEST 4.1 passed" << std::endl;
-
-    exit(0);
 
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;

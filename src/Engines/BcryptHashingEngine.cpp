@@ -1,3 +1,8 @@
+/**
+ * \file BcryptHashingEngine.cpp
+ * \brief Implementation of the BcryptHashingEngine class.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *

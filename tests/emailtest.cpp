@@ -1,3 +1,8 @@
+/**
+ * \file emailtest.cpp
+ * \brief Tests for SmtpMailer.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
@@ -106,7 +111,7 @@ int handleRequest(Connection& connection) {
         connection.response << "\r\n";
 
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
-        SmtpMailer smtp("s4.quicktools.org", 587, SmtpMailer::REQUIRE_STARTTLS, true, "qsftest@tobias-flaig.de", "875EMKJK4xLc5ur");
+        SmtpMailer smtp("s4.quicktools.org", 587, SmtpMailer::REQUIRE_STARTTLS, true, "test@example.com", "12345");
         smtp.enqueue(std::make_shared<MimeEmail>(email2), to, std::make_shared<EmailAddress>(from), replacementRules);
 
         try {

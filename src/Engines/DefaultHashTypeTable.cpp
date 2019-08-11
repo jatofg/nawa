@@ -1,3 +1,8 @@
+/**
+ * \file DefaultHashTypeTable.cpp
+ * \brief Implementation of the DefaultHashTypeTable class.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *

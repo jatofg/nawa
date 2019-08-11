@@ -1,6 +1,6 @@
 /**
  * \file app.h
- * \brief A very basic header for a QSF application.
+ * \brief A very basic header for a soru application.
  */
 
 /*

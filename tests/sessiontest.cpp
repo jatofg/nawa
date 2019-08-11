@@ -1,3 +1,8 @@
+/**
+ * \file sessiontest.cpp
+ * \brief Test simultaneous access to session variables in multi-threading environments.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *

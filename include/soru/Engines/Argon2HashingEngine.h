@@ -1,3 +1,8 @@
+/**
+ * \file BcryptHashingEngine.h
+ * \brief Hashing engine for password hashing using Argon2.
+ */
+
 /*
  * Copyright (C) 2019 Jan Flaig.
  *
