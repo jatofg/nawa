@@ -48,8 +48,8 @@ int handleRequest(Connection& connection) {
     replacementRules.insert({"Test", "T€st"});
     replacementRules.insert({"email", "émail"});
 
-    EmailAddress from("QSF Test", "qsftest@tobias-flaig.de");
-    EmailAddress to("Tobias Flaig", "me@tobias-flaig.de");
+    EmailAddress from("John Doe", "johndoe@example.com");
+    EmailAddress to("The Admin", "theadmin@example.com");
 
     // part 1: simple email
     connection.response << "+++++ TEST 1: SimpleEmail +++++\r\n\r\n";
@@ -111,7 +111,7 @@ int handleRequest(Connection& connection) {
         connection.response << "\r\n";
 
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
-        SmtpMailer smtp("s4.quicktools.org", 587, SmtpMailer::REQUIRE_STARTTLS, true, "test@example.com", "12345");
+        SmtpMailer smtp("example.com", 587, SmtpMailer::REQUIRE_STARTTLS, true, "test@example.com", "12345");
         smtp.enqueue(std::make_shared<MimeEmail>(email2), to, std::make_shared<EmailAddress>(from), replacementRules);
 
         try {

@@ -103,6 +103,14 @@ if(BuildTests)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 endif()
 
+if(BuildExamples)
+    add_library(contactform SHARED
+            examples/contactform.cpp)
+    target_include_directories(contactform PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+endif()
 
 set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
