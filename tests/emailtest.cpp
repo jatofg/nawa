@@ -124,4 +124,6 @@ int handleRequest(Connection& connection) {
 
     }
 
+    return 0;
+
 }

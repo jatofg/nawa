@@ -70,7 +70,7 @@ void soru::Log::write(std::string msg) {
     auto now = std::time(nullptr);
 
     *out << std::put_time(std::localtime(&now), "%b %d %H:%M:%S ") << hostname << ' ' << program_invocation_short_name
-         << '[' << pid << "]: [QSF] " << msg << std::endl;
+         << '[' << pid << "]: [soru] " << msg << std::endl;
 }
 
 void soru::Log::operator()(std::string msg) {

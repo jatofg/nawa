@@ -71,7 +71,7 @@ add_executable(sorun
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
-target_link_libraries(sorun -ldl -lfastcgipp -lcrypto -lcurl -largon2 ${CMAKE_BINARY_DIR}/libbcrypt.a)
+target_link_libraries(sorun -ldl -lfastcgipp -lcrypto -lcurl -largon2 bcrypt)
 target_include_directories(sorun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -107,6 +107,13 @@ if(BuildExamples)
     add_library(contactform SHARED
             examples/contactform.cpp)
     target_include_directories(contactform PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    add_library(multipage SHARED
+            examples/multipage.cpp)
+    target_include_directories(multipage PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
