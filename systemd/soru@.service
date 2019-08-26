@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/sorun %i
+ExecStart=sorun "%I"
 Restart=always
 
 [Install]

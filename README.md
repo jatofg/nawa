@@ -54,9 +54,9 @@ can run it like this:
 
 If systemd is present on your system, a systemd service file will 
 also be installed on your system. You can start an app as a 
-daemon using the path to its ini file:
+daemon using the path to its ini file (/path/to/config.ini):
 
-`# systemctl start soru@/path/to/config.ini`
+`# systemctl start soru@-path-to-config.ini`
 
 For automatically starting an app on boot, use `systemctl enable`.
 
