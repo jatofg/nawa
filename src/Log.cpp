@@ -35,6 +35,8 @@ soru::Log::Log() {
     hostname = chostname;
     // get pid
     pid = getpid();
+    // appname is soru by default
+    appname = "soru";
 }
 
 soru::Log::Log(std::ostream *os) : Log() {
@@ -66,11 +68,15 @@ void soru::Log::setOutfile(std::string filename) {
     out = &logFile;
 }
 
+void soru::Log::setAppname(std::string appname_) {
+    appname = std::move(appname_);
+}
+
 void soru::Log::write(std::string msg) {
     auto now = std::time(nullptr);
 
     *out << std::put_time(std::localtime(&now), "%b %d %H:%M:%S ") << hostname << ' ' << program_invocation_short_name
-         << '[' << pid << "]: [soru] " << msg << std::endl;
+         << '[' << pid << "]: [" << appname << "] " << msg << std::endl;
 }
 
 void soru::Log::operator()(std::string msg) {

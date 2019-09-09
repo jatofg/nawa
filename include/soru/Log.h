@@ -37,6 +37,7 @@ namespace soru {
         std::ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
         // TODO synchronization with a mutex? (does not make sense right now, as there is no global object)
         std::string hostname;
+        std::string appname;
         __pid_t pid = 0;
     public:
         /**
@@ -72,6 +73,12 @@ namespace soru {
          * @param filename Path to the log file.
          */
         void setOutfile(std::string filename);
+        /**
+         * Set the app name to use in debugging output. Defaults to soru, but can be changed in order to use this
+         * logging class inside of soru apps.
+         * @param appname The app name, which will be include in the log in brackets.
+         */
+        void setAppname(std::string appname);
         /**
          * Write a message to the log.
          * @param msg The message.
