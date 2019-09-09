@@ -67,15 +67,17 @@ Windows is not supported and will never be.
 Before building, make sure that you have the dependencies installed:
 
 - libfastcgi++ (pull from eddic/fastcgipp)
-- libssl-dev (should be available in your distro)
-- libboost-dev < 67
-- libcurl4-openssl-dev
-- libargon2-0-dev 
+- libssl-dev (should be available in your distro) >= 1.1.1
+- libboost-dev >= 1.65.1.0
+- libcurl4-openssl-dev >= 7.58.0
+- libargon2-0-dev >= 0~20161029-1.1
 
-For actually running applications with sorun, only libfastcgi++ 
-is required (and the others have to be installed, too...)
+The documentation will be built if doxygen is installed.
 
-To build qsfrunner, pull the source code, open a terminal, and 
+For actually running applications with sorun, libfastcgi++, libcurl4 
+(>= 7.58.0), and libargon2 (>= 0~20161029-1.1) have to be installed.
+
+To build sorun, pull the source code, open a terminal, and 
 switch to the soru directory.
 
 First, create a directory for the build files:

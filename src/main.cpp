@@ -235,7 +235,13 @@ int main(int argc, char** argv) {
     {
         soru::AppInit appInit1;
         appInit1.config = config;
-        appInit(appInit1);
+        auto initReturn = appInit(appInit1);
+
+        // init function of the app should return 0 on sucess
+        if(initReturn != 0) {
+            LOG("Fatal Error: App init function returned " + std::to_string(initReturn) + " -- exiting");
+            return 1;
+        }
         soru::RequestHandler::setConfig(appInit1);
     }
 

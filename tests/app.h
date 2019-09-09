@@ -26,7 +26,4 @@
 
 #include <soru/Application.h>
 
-extern "C" int init(soru::AppInit& appInit);
-extern "C" int handleRequest(soru::Connection& connection);
-
 #endif //QSF_APP_H

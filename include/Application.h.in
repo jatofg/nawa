@@ -32,5 +32,7 @@
 
 extern "C" const int soru_version_major = SORU_VERSION_MAJOR;
 extern "C" const int soru_version_minor = SORU_VERSION_MINOR;
+extern "C" int init(soru::AppInit& appInit);
+extern "C" int handleRequest(soru::Connection& connection);
 
 #endif //QSF_APPLICATION_H
