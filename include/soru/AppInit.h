@@ -36,6 +36,11 @@ namespace soru {
          * List of static access filters that can be evaluated before forwarding a request to your app.
          */
         AccessFilterList accessFilters;
+        /**
+         * Contains the number of started worker threads for information purposes
+         * (e.g., to determine dimension of thread pools).
+         */
+        size_t numThreads;
     };
 }
 

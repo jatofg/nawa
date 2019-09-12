@@ -235,6 +235,7 @@ int main(int argc, char** argv) {
     {
         soru::AppInit appInit1;
         appInit1.config = config;
+        appInit1.numThreads = cInt;
         auto initReturn = appInit(appInit1);
 
         // init function of the app should return 0 on sucess

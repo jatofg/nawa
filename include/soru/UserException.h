@@ -1,6 +1,6 @@
 /**
  * \file UserException.h
- * \brief Exception class that can be used by apps to catch errors resulting from QSF function calls.
+ * \brief Exception class that can be used by apps to catch errors resulting from soru function calls.
  */
 
 /*
