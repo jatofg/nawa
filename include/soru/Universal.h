@@ -84,11 +84,22 @@ namespace soru {
          * @param value The object.
          */
         template<typename T>
-        explicit Universal(T value) : typeIndex(typeid(value)), set(true) {
+        Universal(T value) : typeIndex(typeid(value)), set(true) {
             T* tPtr = new T(std::move(value));
             ptr = (void*) tPtr;
             deleter = &Universal::deleteValue<T>;
             copier = &Universal::copyValue<T>;
+        }
+
+        /**
+         * Special handling for string literals: Always save them as strings. It's always better, seriously.
+         * @param value A string literal.
+         */
+        Universal(const char* value) : typeIndex(typeid(std::string)), set(true) {
+            std::string* tPtr = new std::string(value);
+            ptr = (void*) tPtr;
+            deleter = &Universal::deleteValue<std::string>;
+            copier = &Universal::copyValue<std::string>;
         }
 
         Universal& operator=(const Universal& value) {
