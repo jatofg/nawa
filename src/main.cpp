@@ -222,6 +222,9 @@ int main(int argc, char** argv) {
         LOG("Fatal Error: Unknown FastCGI socket mode in config.ini");
         return 1;
     }
+    if(config[{"fastcgi", "reuseaddr"}] != "off") {
+        managerPtr->reuseAddress(true);
+    }
 
     // do privilege downgrade
     if(privUid == 0) {

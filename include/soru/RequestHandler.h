@@ -23,9 +23,6 @@
 
 #ifndef SORU_REQUESTHANDLER_H
 #define SORU_REQUESTHANDLER_H
-#define SORU_RAWPOST_NEVER 0
-#define SORU_RAWPOST_NONSTANDARD 1
-#define SORU_RAWPOST_ALWAYS 2
 
 #include <fastcgi++/request.hpp>
 #include <soru/Config.h>

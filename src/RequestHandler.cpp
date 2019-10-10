@@ -37,14 +37,22 @@
 namespace {
     soru::handleRequest_t* appHandleRequest;
     soru::Log LOG;
-    size_t postMax = 0; /* Maximum post size, in bytes, read from the config by setAppRequestHandler(...). */
-    // Integer value referring to the raw post access level, as described by the QSF_RAWPOST_* macros.
-    unsigned int rawPostAccess = 1;
+    size_t postMax = 0; /**< Maximum post size, in bytes, read from the config by setAppRequestHandler(...). */
+
+    /**
+     * Stores the raw post access level, as read from the config file.
+     */
+    enum class RawPostAccess {
+        NEVER,
+        NONSTANDARD,
+        ALWAYS
+    } rawPostAccess;
+
     // The config read from the config file (and possibly modified by the app's init() function) will be stored in
     // the AppInit. The Config object will be copied upon each request into a non-static member of Connection,
     // so it can be modified at runtime.
     // unique_ptr necessary so we can explicitly destruct it and avoid a segmentation fault on termination
-    std::unique_ptr<soru::AppInit> appInitPtr; /* The initialization struct as returned by the app init() function. */
+    std::unique_ptr<soru::AppInit> appInitPtr; /**< The initialization struct as returned by the app init() function. */
 
     /**
      * Check the conditions of an AccessFilter.
@@ -125,7 +133,7 @@ void soru::RequestHandler::setAppRequestHandler(const soru::Config &cfg, void *a
     // raw_access is translated to an integer according to the macros defined in RequestHandler.h
     std::string rawPostStr = cfg[{"post", "raw_access"}];
     rawPostAccess = (rawPostStr == "never")
-                   ? SORU_RAWPOST_NEVER : ((rawPostStr == "always") ? SORU_RAWPOST_ALWAYS : SORU_RAWPOST_NONSTANDARD);
+                   ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS : RawPostAccess::NONSTANDARD);
 
     // load appHandleRequest function
     appHandleRequest = (soru::handleRequest_t*) dlsym(appOpen, "handleRequest");
@@ -140,10 +148,10 @@ soru::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
 
 bool soru::RequestHandler::inProcessor() {
     postContentType = environment().contentType;
-    if(rawPostAccess == SORU_RAWPOST_NEVER) {
+    if(rawPostAccess == RawPostAccess::NEVER) {
         return false;
     }
-    else if (rawPostAccess == SORU_RAWPOST_NONSTANDARD &&
+    else if (rawPostAccess == RawPostAccess::NONSTANDARD &&
             (postContentType == "multipart/form-data" || postContentType == "application/x-www-form-urlencoded")) {
         return false;
     }
