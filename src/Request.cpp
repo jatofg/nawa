@@ -26,7 +26,7 @@
 #include <soru/Request.h>
 #include <soru/SysException.h>
 
-std::string soru::Request::Env::operator[](std::string envVar) const {
+std::string soru::Request::Env::operator[](const std::string& envVar) const {
     std::string ret;
     if(envVar == "host") ret = requestHandler.environment().host; // server hostname
     else if(envVar == "userAgent") ret = requestHandler.environment().userAgent; // user agent string
@@ -104,30 +104,30 @@ Fastcgipp::Address soru::Request::Env::getRemoteAddr() const {
     return requestHandler.environment().remoteAddress;
 }
 
-soru::Request::GPC::GPC(RequestHandler &request, uint source)
+soru::Request::GPC::GPC(RequestHandler &request, Source source)
         : requestHandler(request), source(source) {
     switch (source) {
-        case SORU_REQ_COOKIE:
+        case Source::COOKIE:
             data = request.environment().cookies;
             break;
-        case SORU_REQ_POST:
+        case Source::POST:
             data = request.environment().posts;
             break;
-        case SORU_REQ_GET:
+        case Source::GET:
             data = request.environment().gets;
             break;
         default:
-            throw soru::SysException(__FILE__, __LINE__, "Invalid source for QsfRequest::GPC given");
+            throw soru::SysException(__FILE__, __LINE__, "Invalid source for soru::Request::GPC given");
     }
 }
 
-std::string soru::Request::GPC::operator[](std::string gpcVar) const {
+std::string soru::Request::GPC::operator[](const std::string& gpcVar) const {
     auto e = data.find(gpcVar);
     if(e != data.end()) return e->second;
     else return "";
 }
 
-std::vector<std::string> soru::Request::GPC::getVector(std::string gpcVar) const {
+std::vector<std::string> soru::Request::GPC::getVector(const std::string& gpcVar) const {
     std::vector<std::string> ret;
     auto e = data.equal_range(gpcVar);
     for(auto it = e.first; it != e.second; ++it) {
@@ -136,7 +136,7 @@ std::vector<std::string> soru::Request::GPC::getVector(std::string gpcVar) const
     return ret;
 }
 
-unsigned long soru::Request::GPC::count(std::string gpcVar) const {
+unsigned long soru::Request::GPC::count(const std::string& gpcVar) const {
     return data.count(gpcVar);
 }
 
@@ -153,15 +153,15 @@ std::multimap<std::string, std::string>::const_iterator soru::Request::GPC::end(
 }
 
 soru::Request::Request(RequestHandler &request)
-        : env(request), get(request, SORU_REQ_GET), post(request), cookie(request, SORU_REQ_COOKIE) {}
+        : env(request), get(request, GPC::Source::GET), post(request), cookie(request, GPC::Source::COOKIE) {}
 
-soru::Request::Post::Post(RequestHandler &request) : GPC(request, SORU_REQ_POST) {}
+soru::Request::Post::Post(RequestHandler &request) : GPC(request, GPC::Source::POST) {}
 
 std::string& soru::Request::Post::getRaw() const {
     return requestHandler.rawPost;
 }
 
-std::vector<soru::Request::File> soru::Request::Post::getFileVector(std::string postVar) const {
+std::vector<soru::Request::File> soru::Request::Post::getFileVector(const std::string& postVar) const {
     std::vector<soru::Request::File> ret;
     auto e = requestHandler.environment().files.equal_range(postVar);
     for(auto it = e.first; it != e.second; ++it) {
@@ -182,7 +182,7 @@ std::string soru::Request::File::copyFile() {
     return std::string(dataPtrRef.get(), size);
 }
 
-bool soru::Request::File::writeFile(std::string path) {
+bool soru::Request::File::writeFile(const std::string& path) {
     std::ofstream outfile;
     std::ios_base::iostate exceptionMask = outfile.exceptions() | std::ios::failbit;
     outfile.exceptions(exceptionMask);

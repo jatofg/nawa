@@ -23,9 +23,6 @@
 
 #ifndef SORU_SORUREQUEST_H
 #define SORU_SORUREQUEST_H
-#define SORU_REQ_GET 1
-#define SORU_REQ_POST 2
-#define SORU_REQ_COOKIE 3
 
 #include <string>
 #include <fastcgi++/request.hpp>
@@ -63,7 +60,7 @@ namespace soru {
              * @param path File name and path where to write the file.
              * @return true on success, false on failure
              */
-            bool writeFile(std::string path);
+            bool writeFile(const std::string& path);
         };
 
         /**
@@ -79,7 +76,7 @@ namespace soru {
              * @param envVar Name of the environment variable.
              * @return Content of the environment variable. Empty string if not set.
              */
-            std::string operator [](std::string envVar) const;
+            std::string operator [](const std::string& envVar) const;
             /**
              * Receive the languages accepted by the client (from HTTP Header).
              * @return Vector of strings containing the accepted languages. Empty if not set.
@@ -111,12 +108,18 @@ namespace soru {
          * Accessor for GET, POST, and COOKIE variables.
          */
         class GPC {
+        public:
+            enum class Source {
+                GET,
+                POST,
+                COOKIE
+            };
         protected:
             RequestHandler& requestHandler;
-            uint source;
+            Source source;
             std::multimap<std::basic_string<char>, std::basic_string<char>> data;
         public:
-            GPC(RequestHandler& request, uint source);
+            GPC(RequestHandler& request, Source source);
             virtual ~GPC() = default;
             /**
              * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
@@ -127,19 +130,19 @@ namespace soru {
              * @return Value of the variable. Empty string if not set
              * (or empty - use count() for checking whether the variable is set).
              */
-            std::string operator [](std::string gpcVar) const;
+            std::string operator [](const std::string& gpcVar) const;
             /**
              * Get all GET, POST, or COOKIE variables with the given name.
              * @param gpcVar Name of the variables.
              * @return Vector of values. Empty if not set.
              */
-            std::vector<std::string> getVector(std::string gpcVar) const;
+            std::vector<std::string> getVector(const std::string& gpcVar) const;
             /**
              * Get the number of submitted GET, POST, or COOKIE variables with the given name.
              * @param gpcVar Name of the variables.
              * @return Number of occurrences.
              */
-            unsigned long count(std::string gpcVar) const;
+            unsigned long count(const std::string& gpcVar) const;
             /**
              * Get a reference to the GET, POST, or COOKIE multimap.
              * @return Reference to the multimap.
@@ -178,7 +181,7 @@ namespace soru {
              * @param postVar Name of the files.
              * @return Vector of files. Empty if no file with the given name exists.
              */
-            std::vector<Request::File> getFileVector(std::string postVar) const;
+            std::vector<Request::File> getFileVector(const std::string& postVar) const;
         };
 
         const Request::Env env; /**< The Env object you should use to access environment variables. */
