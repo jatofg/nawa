@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2019 Jan Flaig.
+ * Copyright (C) 2019 Tobias Flaig.
  *
  * This file is part of soru.
  *
