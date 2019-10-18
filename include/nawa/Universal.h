@@ -6,30 +6,30 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_UNIVERSAL_H
-#define SORU_UNIVERSAL_H
+#ifndef NAWA_UNIVERSAL_H
+#define NAWA_UNIVERSAL_H
 
 #include <typeinfo>
 #include <typeindex>
 #include <memory>
-#include <soru/UserException.h>
+#include <nawa/UserException.h>
 
-namespace soru {
+namespace nawa {
     /**
      * Wrapper to store a variable or object of arbitrary type somewhere else on the heap. Some properties:
      *
@@ -147,12 +147,12 @@ namespace soru {
         T get() const {
             // throw an exception if no value set
             if(!set) {
-                throw UserException("soru::Types::Universal::get<T>", 1, "Cast of void value requested");
+                throw UserException("nawa::Types::Universal::get<T>", 1, "Cast of void value requested");
             }
             // check for type equality and throw exception if not matching
             std::type_index Tindex(typeid(T));
             if(Tindex != typeIndex) {
-                throw UserException("soru::Types::Universal::get<T>", 2, "Cast to wrong type requested");
+                throw UserException("nawa::Types::Universal::get<T>", 2, "Cast to wrong type requested");
             }
             return *(T*)ptr;
         }
@@ -197,4 +197,4 @@ namespace soru {
     };
 }
 
-#endif //SORU_UNIVERSAL_H
+#endif //NAWA_UNIVERSAL_H

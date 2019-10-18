@@ -6,30 +6,30 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_ACCESSRULES_H
-#define SORU_ACCESSRULES_H
+#ifndef NAWA_ACCESSRULES_H
+#define NAWA_ACCESSRULES_H
 
 #include <string>
 #include <vector>
 #include <regex>
 #include <functional>
 
-namespace soru {
+namespace nawa {
 
     // TODO auth filters requesting the credentials on every request do not make sense
     //  --> possibly http auth should better be implemented somewhere else?
@@ -73,7 +73,7 @@ namespace soru {
         /**
          * The response that will be sent to the client if the request is not forwarded to the app (i.e., the request
          * is blocked, the file to forward is not found, or access has been denied).
-         * If empty, a standard QSF error document will be sent.
+         * If empty, a standard NAWA error document will be sent.
          */
         std::string response;
     };
@@ -111,14 +111,14 @@ namespace soru {
         /**
          * A short description of the required authentication that may be shown by the browser ("realm") (optional).
          * This value should only contain alphanumeric characters and must not contain double quotes or newlines.
-         * It will not be checked for validity by QSF, instead, authentication may fail and the server might even become
+         * It will not be checked for validity by NAWA, instead, authentication may fail and the server might even become
          * unaccessible in case of non-compliance. If this value comes from a user, make sure to check it thoroughly
          * (by the way, it shouldn't).
          */
         std::string authName;
         /**
          * Use sessions to remember the authenticated user. This will create a std::string session variable
-         * "_qsf_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
+         * "_nawa_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
          * You can use it in your application to find out which user has authenticated and delete it to log the user
          * out. This is usually not necessary (but might be more effective or extend the scope of the authorization,
          * and lets you access the user name), as browsers will usually send the authentication string on every single
@@ -128,7 +128,7 @@ namespace soru {
     };
 
     /**
-     * Filter to bypass the QSF app for certain requests and directly forward files to the client. This is especially
+     * Filter to bypass the NAWA app for certain requests and directly forward files to the client. This is especially
      * useful for media files, e.g. images, as well as CSS stylesheets.
      */
     struct ForwardFilter: public AccessFilter {
@@ -161,4 +161,4 @@ namespace soru {
     };
 }
 
-#endif //SORU_ACCESSRULES_H
+#endif //NAWA_ACCESSRULES_H

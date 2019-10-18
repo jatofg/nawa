@@ -1,36 +1,36 @@
 /**
  * \file UserException.h
- * \brief Exception class that can be used by apps to catch errors resulting from soru function calls.
+ * \brief Exception class that can be used by apps to catch errors resulting from nawa function calls.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_USEREXCEPTION_H
-#define SORU_USEREXCEPTION_H
+#ifndef NAWA_USEREXCEPTION_H
+#define NAWA_USEREXCEPTION_H
 
 #include <string>
 #include <sstream>
 
-namespace soru {
+namespace nawa {
 
     /**
-     * Exception class that can be used by apps to catch errors resulting from QSF function calls.
+     * Exception class that can be used by apps to catch errors resulting from NAWA function calls.
      */
     class UserException: public std::exception {
         int errorCode; /**< The error code so that the app can distinguish different exceptions from a function. */
@@ -44,7 +44,7 @@ namespace soru {
          */
         UserException(const std::string& inFunction, int errorCode, const std::string& _message) : errorCode(errorCode) {
             std::stringstream mstream;
-            mstream << "QSF: UserException #" << errorCode << " in " << inFunction << ": " << _message;
+            mstream << "NAWA: UserException #" << errorCode << " in " << inFunction << ": " << _message;
             message = mstream.str();
         }
         /**
@@ -54,7 +54,7 @@ namespace soru {
          */
         UserException(const std::string& inFunction, int errorCode) : errorCode(errorCode) {
             std::stringstream mstream;
-            mstream << "QSF: UserException #" << errorCode << " in " << inFunction;
+            mstream << "NAWA: UserException #" << errorCode << " in " << inFunction;
             message = mstream.str();
         }
         /**
@@ -74,4 +74,4 @@ namespace soru {
     };
 }
 
-#endif //SORU_USEREXCEPTION_H
+#endif //NAWA_USEREXCEPTION_H

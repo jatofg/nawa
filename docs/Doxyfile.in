@@ -32,13 +32,13 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "soru"
+PROJECT_NAME           = "nawa"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = @SORU_VERSION_MAJOR@
+PROJECT_NUMBER         = @NAWA_VERSION_MAJOR@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -792,8 +792,8 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/soru" \
-                         "@CMAKE_CURRENT_BINARY_DIR@/include/soru" \
+INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/nawa" \
+                         "@CMAKE_CURRENT_BINARY_DIR@/include/nawa" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/src" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/README.md" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/docs"

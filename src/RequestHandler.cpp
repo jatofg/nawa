@@ -6,19 +6,19 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <unistd.h>
@@ -26,17 +26,17 @@
 #include <chrono>
 #include <thread>
 #include <dlfcn.h>
-#include <soru/RequestHandler.h>
-#include <soru/Utils.h>
-#include <soru/Encoding.h>
-#include <soru/Request.h>
-#include <soru/Connection.h>
-#include <soru/Log.h>
-#include <soru/SysException.h>
+#include <nawa/RequestHandler.h>
+#include <nawa/Utils.h>
+#include <nawa/Encoding.h>
+#include <nawa/Request.h>
+#include <nawa/Connection.h>
+#include <nawa/Log.h>
+#include <nawa/SysException.h>
 
 namespace {
-    soru::handleRequest_t* appHandleRequest;
-    soru::Log LOG;
+    nawa::handleRequest_t* appHandleRequest;
+    nawa::Log LOG;
     size_t postMax = 0; /**< Maximum post size, in bytes, read from the config by setAppRequestHandler(...). */
 
     /**
@@ -52,7 +52,7 @@ namespace {
     // the AppInit. The Config object will be copied upon each request into a non-static member of Connection,
     // so it can be modified at runtime.
     // unique_ptr necessary so we can explicitly destruct it and avoid a segmentation fault on termination
-    std::unique_ptr<soru::AppInit> appInitPtr; /**< The initialization struct as returned by the app init() function. */
+    std::unique_ptr<nawa::AppInit> appInitPtr; /**< The initialization struct as returned by the app init() function. */
 
     /**
      * Check the conditions of an AccessFilter.
@@ -60,7 +60,7 @@ namespace {
      * @param flt The access filter that will be checked.
      * @return True if the filter matches, false otherwise.
      */
-    bool filterMatches(const std::vector<std::string> &requestPath, const soru::AccessFilter &flt) {
+    bool filterMatches(const std::vector<std::string> &requestPath, const nawa::AccessFilter &flt) {
         if(!flt.pathFilter.empty()) {
             // path condition is set but does not match -> the whole filter does not match
             // all elements of the filter path must be in the request path
@@ -75,7 +75,7 @@ namespace {
 
         if(!flt.extensionFilter.empty()) {
             auto const &filename = requestPath.back();
-            if(soru::get_file_extension(filename) != flt.extensionFilter)
+            if(nawa::get_file_extension(filename) != flt.extensionFilter)
                 return false;
         }
 
@@ -95,14 +95,14 @@ namespace {
 
 }
 
-bool soru::RequestHandler::response() {
+bool nawa::RequestHandler::response() {
     // check AppInitPtr for safety
     if(!appInitPtr) {
-        throw soru::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
+        throw nawa::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
     }
 
-    soru::Request request(*this);
-    soru::Connection connection(request, appInitPtr->config);
+    nawa::Request request(*this);
+    nawa::Connection connection(request, appInitPtr->config);
 
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
@@ -116,12 +116,12 @@ bool soru::RequestHandler::response() {
     return true;
 }
 
-void soru::RequestHandler::flush(soru::Connection& connection) {
+void nawa::RequestHandler::flush(nawa::Connection& connection) {
     auto raw = connection.getRaw();
     dump(raw.c_str(), raw.size());
 }
 
-void soru::RequestHandler::setAppRequestHandler(const soru::Config &cfg, void *appOpen) {
+void nawa::RequestHandler::setAppRequestHandler(const nawa::Config &cfg, void *appOpen) {
     try {
         postMax = cfg.isSet({"post", "max_size"})
                       ? static_cast<size_t>(std::stoul(cfg[{"post", "max_size"}])) * 1024 : 0;
@@ -136,7 +136,7 @@ void soru::RequestHandler::setAppRequestHandler(const soru::Config &cfg, void *a
                    ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS : RawPostAccess::NONSTANDARD);
 
     // load appHandleRequest function
-    appHandleRequest = (soru::handleRequest_t*) dlsym(appOpen, "handleRequest");
+    appHandleRequest = (nawa::handleRequest_t*) dlsym(appOpen, "handleRequest");
     auto dlsymErr = dlerror();
     if(dlsymErr) {
         LOG(std::string("Fatal Error: Could not load handleRequest function from application: ") + dlsymErr);
@@ -144,9 +144,9 @@ void soru::RequestHandler::setAppRequestHandler(const soru::Config &cfg, void *a
     }
 }
 
-soru::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
+nawa::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
 
-bool soru::RequestHandler::inProcessor() {
+bool nawa::RequestHandler::inProcessor() {
     postContentType = environment().contentType;
     if(rawPostAccess == RawPostAccess::NEVER) {
         return false;
@@ -160,19 +160,19 @@ bool soru::RequestHandler::inProcessor() {
     return false;
 }
 
-void soru::RequestHandler::setConfig(const soru::AppInit &_appInit) {
-    appInitPtr = std::make_unique<soru::AppInit>(_appInit);
+void nawa::RequestHandler::setConfig(const nawa::AppInit &_appInit) {
+    appInitPtr = std::make_unique<nawa::AppInit>(_appInit);
 }
 
-void soru::RequestHandler::destroyEverything() {
+void nawa::RequestHandler::destroyEverything() {
     appInitPtr.reset(nullptr);
-    soru::Session::destroy();
+    nawa::Session::destroy();
 }
 
-bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
+bool nawa::RequestHandler::applyFilters(nawa::Connection &connection) {
     // check AppInitPtr for safety
     if(!appInitPtr) {
-        throw soru::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
+        throw nawa::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
     }
 
     // if filters are disabled, do not even check
@@ -194,7 +194,7 @@ bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
             connection.setBody(flt.response);
         }
         else {
-            connection.setBody(soru::generate_error_page(flt.status));
+            connection.setBody(nawa::generate_error_page(flt.status));
         }
         // the request has been blocked, so no more filters have to be applied
         // returning true means: the request has been filtered
@@ -217,7 +217,7 @@ bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
         // check session variable for this filter, if session usage is on
         if(flt.useSessions) {
             connection.session.start();
-            sessionCookieName = "_qsf_authfilter" + std::to_string(authFilterID);
+            sessionCookieName = "_nawa_authfilter" + std::to_string(authFilterID);
             if(connection.session.isSet(sessionCookieName)) {
                 isAuthenticated = true;
             }
@@ -241,10 +241,10 @@ bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
             // case 2: credentials already sent
             else {
                 // split the authorization string, only the last part should contain base64
-                auto authResponse = soru::split_string(connection.request.env["authorization"], ' ', true);
+                auto authResponse = nawa::split_string(connection.request.env["authorization"], ' ', true);
                 // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
                 if(authResponse.size() == 2 || authResponse.at(0) == "Basic") {
-                    auto credentials = soru::split_string(soru::Encoding::base64Decode(authResponse.at(1)), ':', true);
+                    auto credentials = nawa::split_string(nawa::Encoding::base64Decode(authResponse.at(1)), ':', true);
                     // credentials must also have 2 elements, a username and a password,
                     // and the auth function must be callable
                     if(credentials.size() == 2 && flt.authFunction) {
@@ -268,7 +268,7 @@ bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
                 connection.setBody(flt.response);
             }
             else {
-                connection.setBody(soru::generate_error_page(403));
+                connection.setBody(nawa::generate_error_page(403));
             }
 
             // request blocked
@@ -289,7 +289,7 @@ bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
 
         std::stringstream filePath;
         filePath << flt.basePath;
-        if(flt.basePathExtension == soru::ForwardFilter::BY_PATH) {
+        if(flt.basePathExtension == nawa::ForwardFilter::BY_PATH) {
             for(auto const &e: requestPath) {
                 filePath << '/' << e;
             }
@@ -303,14 +303,14 @@ bool soru::RequestHandler::applyFilters(soru::Connection &connection) {
         try {
             connection.sendFile(filePathStr, "", false, "", true);
         }
-        catch(soru::UserException&) {
+        catch(nawa::UserException&) {
             // file does not exist, send 404
             connection.setStatus(404);
             if(!flt.response.empty()) {
                 connection.setBody(flt.response);
             }
             else {
-                connection.setBody(soru::generate_error_page(404));
+                connection.setBody(nawa::generate_error_page(404));
             }
         }
 

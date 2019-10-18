@@ -1,10 +1,10 @@
 [Unit]
-Description=sorun - soru App Daemon (App: %I)
+Description=nawarun - NAWA App Daemon (App: %I)
 After=syslog.target network.target
 
 [Service]
 Type=simple
-ExecStart=sorun "%I"
+ExecStart=nawarun "%I"
 Restart=always
 
 [Install]

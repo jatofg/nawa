@@ -6,29 +6,29 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_CONFIG_H
-#define SORU_CONFIG_H
+#ifndef NAWA_CONFIG_H
+#define NAWA_CONFIG_H
 
 #include <unordered_map>
 #include <utility>
 #include <boost/functional/hash.hpp>
 
-namespace soru {
+namespace nawa {
     /**
      * Reader for config files and accessor to config values.
      */
@@ -85,4 +85,4 @@ namespace soru {
     };
 }
 
-#endif //SORU_CONFIG_H
+#endif //NAWA_CONFIG_H

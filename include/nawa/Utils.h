@@ -1,34 +1,34 @@
 /**
  * \file Utils.h
- * \brief Contains useful functions that improve the readability and facilitate maintenance of the QSF code.
+ * \brief Contains useful functions that improve the readability and facilitate maintenance of the NAWA code.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_UTILS_H
-#define SORU_UTILS_H
+#ifndef NAWA_UTILS_H
+#define NAWA_UTILS_H
 
 #include <string>
 #include <regex>
 #include <unordered_map>
 
-namespace soru {
+namespace nawa {
     /**
      * ASCII (byte-)string based regex_replace variant which takes a callback function as format parameter. This
      * function may be used to generate individual replacements for each match.
@@ -154,4 +154,4 @@ namespace soru {
     std::string string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns);
 }
 
-#endif //SORU_UTILS_H
+#endif //NAWA_UTILS_H

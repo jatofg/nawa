@@ -1,39 +1,39 @@
 /**
  * \file Connection.h
- * \brief Response object to be passed back to QSF and accessor to the request.
+ * \brief Response object to be passed back to NAWA and accessor to the request.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_RESPONSE_H
-#define SORU_RESPONSE_H
+#ifndef NAWA_RESPONSE_H
+#define NAWA_RESPONSE_H
 
 #include <string>
 #include <unordered_map>
 #include <sstream>
-#include <soru/Cookie.h>
-#include <soru/Request.h>
-#include <soru/Session.h>
+#include <nawa/Cookie.h>
+#include <nawa/Request.h>
+#include <nawa/Session.h>
 
-namespace soru {
+namespace nawa {
     /**
-     * Response object to be passed back to QSF and accessor to the request.
+     * Response object to be passed back to NAWA and accessor to the request.
      */
     class Connection {
         std::string bodyString;
@@ -44,19 +44,19 @@ namespace soru {
         void clearStream();
         void mergeStream();
     public:
-        const soru::Request& request; /**< Access the Request object representing the current request. */
-        soru::Session session;
+        const nawa::Request& request; /**< Access the Request object representing the current request. */
+        nawa::Session session;
         /**
-         * Access the QSF configuration. This is a copy of the Config object that contains the values of the config file
-         * which was read at the startup of QSF. You can use the Config::set method to change values at runtime, however,
+         * Access the NAWA configuration. This is a copy of the Config object that contains the values of the config file
+         * which was read at the startup of NAWA. You can use the Config::set method to change values at runtime, however,
          * these changes only affect the current connection.
          */
-        soru::Config config;
+        nawa::Config config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
         /**
          * Create a Connection object.
          * @param request Reference to the request object (needed to import cookies and flush the response).
-         * @param config Reference to the Config object containing the QSF configuration.
+         * @param config Reference to the Config object containing the NAWA configuration.
          */
         Connection(Request& request, Config& config);
         /**
@@ -71,7 +71,7 @@ namespace soru {
          * You are responsible to check request headers (such as accepts and if-modified-since). If the file cannot
          * be read, a UserException with error code 1 will be thrown.
          * @param path Path to the file, including the file name of course (better use absolute paths).
-         * @param contentType The content-type string (such as image/png). If left empty, QSF will try to guess the
+         * @param contentType The content-type string (such as image/png). If left empty, NAWA will try to guess the
          * content type itself (this will only work for a few common file types), and use "application/octet-stream"
          * if that fails. Content type guessing is done solely based on the file extension.
          * @param forceDownload Ask the browser to download the file by sending "content-disposition: attachment".
@@ -100,7 +100,7 @@ namespace soru {
         void setHeader(std::string key, std::string value);
         /**
          * Unset the HTTP header with the specified key if it exists (otherwise do nothing). Please note that you can
-         * only unset headers that were previously set in QSF (including content-type), not those that are set by,
+         * only unset headers that were previously set in NAWA (including content-type), not those that are set by,
          * for example, the web server.
          * @param key Key of the HTTP header (case-insensitive).
          */
@@ -130,7 +130,7 @@ namespace soru {
          */
         void setCookiePolicy(Cookie policy);
         /**
-         * Get the raw HTTP source of the request. This function is intended to be used primarily by QSF itself.
+         * Get the raw HTTP source of the request. This function is intended to be used primarily by NAWA itself.
          * @return A string containing the raw HTTP source (containing headers, incl. cookies, and the body)
          */
         std::string getRaw();
@@ -147,4 +147,4 @@ namespace soru {
 // TODO add stream modifiers if needed (or remove the stream modifiers altogether and advise to use .body)
 //  - it is actually impossible to implement everything, e.g. integers, floats, ... -> better let the stream handle this
 
-#endif //SORU_RESPONSE_H
+#endif //NAWA_RESPONSE_H

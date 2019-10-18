@@ -1,38 +1,38 @@
 /**
- * \file qsftest.cpp
- * \brief soru app with a set of basic tests.
+ * \file nawatest.cpp
+ * \brief nawa app with a set of basic tests.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "app.h"
 
 #include <iostream>
 #include <random>
-#include <soru/Engines/Argon2HashingEngine.h>
-#include <soru/Encoding.h>
-#include <soru/Session.h>
-#include <soru/Universal.h>
-#include <soru/Crypto.h>
-#include <soru/Utils.h>
+#include <nawa/Engines/Argon2HashingEngine.h>
+#include <nawa/Encoding.h>
+#include <nawa/Session.h>
+#include <nawa/Universal.h>
+#include <nawa/Crypto.h>
+#include <nawa/Utils.h>
 
-using namespace soru;
+using namespace nawa;
 
 /**
  * Generate a random string of size len with a random combination of selected unicode characters.
@@ -53,9 +53,9 @@ std::string genRandomUnicode(size_t len, unsigned int rseed) {
     return ret.str();
 }
 
-int init(soru::AppInit& appInit) {
+int init(nawa::AppInit& appInit) {
 
-//    // GROUP 1: soru::Encoding
+//    // GROUP 1: nawa::Encoding
 //
 //    std::string decoded;
 //    for(unsigned int rseed = 0; rseed < 10; ++rseed) {
@@ -98,7 +98,7 @@ int init(soru::AppInit& appInit) {
 //        assert(Encoding::quotedPrintableDecode(qpEncoded) == decoded);
 //        std::cout << "TEST 1.4 passed" << std::endl;
 //
-//        // GROUP 2: soru::Crypto
+//        // GROUP 2: nawa::Crypto
 //
 //        // TEST 2.1: password hashing using bcrypt
 //        auto hashedPw = Crypto::passwordHash(decoded, Engines::BcryptHashingEngine(8));
@@ -131,7 +131,7 @@ int init(soru::AppInit& appInit) {
 //    assert(read_smtp_time(make_smtp_time(currentTime)) == currentTime);
 //    std::cout << "TEST 3.1 passed" << std::endl;
 //
-//    // GROUP 4: soru::Universal
+//    // GROUP 4: nawa::Universal
 //
 //    // TEST 4.1: Universal test
 //    Universal u1(decoded);

@@ -6,31 +6,31 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_SESSION_H
-#define SORU_SESSION_H
+#ifndef NAWA_SESSION_H
+#define NAWA_SESSION_H
 
 #include <vector>
 #include <mutex>
 #include <unordered_map>
-#include <soru/Cookie.h>
-#include <soru/Universal.h>
+#include <nawa/Cookie.h>
+#include <nawa/Universal.h>
 
-namespace soru {
+namespace nawa {
     class Connection;
 
     /**
@@ -62,7 +62,7 @@ namespace soru {
          * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
          */
         static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
-        soru::Connection& connection; /**< Reference to the Connection object in order to access objects. */
+        nawa::Connection& connection; /**< Reference to the Connection object in order to access objects. */
         /**
          * Pointer to the session data struct for the current session, if established.
          * Can be used to check whether a session is established by checking shared_ptr::use_count()
@@ -83,7 +83,7 @@ namespace soru {
         static void collectGarbage();
         /**
          * Reset the data map to delete all session data. This function is not thread-safe and should be used only
-         * on QSF termination.
+         * on NAWA termination.
          */
         static void destroy();
         // RequestHandler should be able to call destroy()
@@ -102,10 +102,10 @@ namespace soru {
          *
          * 1. the Cookie object that may be passed as an optional parameter to this function and will be used as a
          *    template for the cookie. See the param description on how to use it.
-         * 2. the configuration in the QSF configuration file,
+         * 2. the configuration in the NAWA configuration file,
          * 3. and, of course, by the cookie policy that can be set via Connection::setCookiePolicy.
          *
-         * The duration (keep-alive) of the session is defined in the QSF config file, but can be overridden by setting
+         * The duration (keep-alive) of the session is defined in the NAWA config file, but can be overridden by setting
          * the attribute maxAge of the parameter object, see below.
          *
          * **IMPORTANT!** This function will NOT work correctly after flushing the response (as setting a session cookie
@@ -116,17 +116,17 @@ namespace soru {
          * - content: will be ignored (and replaced by the session ID)
          * - expires: set this to > 0 (e.g., to 1), if the Expires and Max-Age attributes should be set for the cookie.
          *   The value will be replaced by the proper expiry time. If 0, attribute inclusion can still be forced by the
-         *   QSF configuration or Connection::setCookiePolicy. Please note that if using setCookiePolicy, the attributes
+         *   NAWA configuration or Connection::setCookiePolicy. Please note that if using setCookiePolicy, the attributes
          *   will be added after Session has set the cookie and the contents will thus be determined by the policy, not
          *   by the session. This may lead to unwanted behavior, so please make sure that you set this attribute to > 0
          *   here if you are using setCookiePolicy.
          * - maxAge: will be used as the session duration (inactive keep-alive, server-side!) if > 0. If expires == 0
-         *   (and is also not overridden by the QSF config), this attribute will be reset to 0 before setting the cookie.
+         *   (and is also not overridden by the NAWA config), this attribute will be reset to 0 before setting the cookie.
          * - secure: send the Secure attribute with the cookie.
          * - httpOnly: send the HttpOnly attribute with the cookie.
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
          */
-        void start(soru::Cookie properties = Cookie());
+        void start(nawa::Cookie properties = Cookie());
         /**
          * Check whether a session is currently active (has been started).
          * @return True if session is established, false otherwise.
@@ -201,4 +201,4 @@ namespace soru {
 }
 
 
-#endif //SORU_SESSION_H
+#endif //NAWA_SESSION_H

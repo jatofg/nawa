@@ -1,32 +1,32 @@
 /**
  * \file AppInit.h
- * \brief Structure passed to the init function of soru apps.
+ * \brief Structure passed to the init function of nawa apps.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_APPINIT_H
-#define SORU_APPINIT_H
+#ifndef NAWA_APPINIT_H
+#define NAWA_APPINIT_H
 
-#include <soru/AccessFilterList.h>
+#include <nawa/AccessFilterList.h>
 
-namespace soru {
+namespace nawa {
     struct AppInit {
         /**
          * You can use this to modify the default configuration for every request during initialization.
@@ -44,4 +44,4 @@ namespace soru {
     };
 }
 
-#endif //SORU_APPINIT_H
+#endif //NAWA_APPINIT_H

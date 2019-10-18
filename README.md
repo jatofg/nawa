@@ -1,9 +1,9 @@
-soru
+nawa
 ===
 
-soru is a framework for web applications written in C++(14). It aims to 
+nawa is a framework for web applications written in C++(14). It aims to 
 make writing a natively running web app nearly as easy as writing it 
-in, for example, PHP. soru communicates with the web server via 
+in, for example, PHP. nawa communicates with the web server via 
 FastCGI and currently uses the eddic/fastcgipp library for request 
 handling.
 
@@ -20,7 +20,7 @@ configuration engine
 - Set the response body, either at once or using C++ streams
 - Flush the response before it is complete (given that this is 
 supported by your web server)
-- Session management: soru will manage session cookies by itself, if 
+- Session management: nawa will manage session cookies by itself, if 
 you want, and allows you to store and receive session-specific data 
 without having to care about session management yourself
 - Cryptographic functions and other useful functions to make your life 
@@ -37,32 +37,32 @@ More features will come. For the full documentation, have a look at:
 
 ## Example
 
-A soru app consists of:
+A nawa app consists of:
 
 - A simple config file with properties concerning the behavior of the 
 application, and
 - A shared object file containing the application itself.
 
-For a simple soru app:
+For a simple nawa app:
 [TBA]
 
-The path to the object file is included in the config file, and QSF 
+The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
 can run it like this:
 
-`$ sorun config.ini`
+`$ nawarun config.ini`
 
 If systemd is present on your system, a systemd service file will 
 also be installed on your system. You can start an app as a 
 daemon using the path to its ini file (/path/to/config.ini):
 
-`# systemctl start soru@-path-to-config.ini`
+`# systemctl start nawa@-path-to-config.ini`
 
 For automatically starting an app on boot, use `systemctl enable`.
 
 ## Building
 
-soru has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
+nawa has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
 Windows is not supported and will never be. 
 Before building, make sure that you have the dependencies installed:
 
@@ -74,18 +74,18 @@ Before building, make sure that you have the dependencies installed:
 
 The documentation will be built if doxygen is installed.
 
-For actually running applications with sorun, libfastcgi++, libcurl4 
+For actually running applications with nawarun, libfastcgi++, libcurl4 
 (>= 7.58.0), and libargon2 (>= 0~20161029-1.1) have to be installed.
 
-To build sorun, pull the source code, open a terminal, and 
-switch to the soru directory.
+To build nawarun, pull the source code, open a terminal, and 
+switch to the nawa directory.
 
 First, create a directory for the build files:
 
 `$ mkdir build`<br>
 `$ cd build`
 
-Then, build soru:
+Then, build nawa:
 
 `$ cmake --build ..`
 

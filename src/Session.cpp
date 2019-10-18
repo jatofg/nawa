@@ -6,36 +6,36 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <random>
-#include <soru/Session.h>
-#include <soru/Connection.h>
-#include <soru/Crypto.h>
-#include <soru/UserException.h>
+#include <nawa/Session.h>
+#include <nawa/Connection.h>
+#include <nawa/Crypto.h>
+#include <nawa/UserException.h>
 
-std::mutex soru::Session::gLock;
-std::unordered_map<std::string, std::shared_ptr<soru::SessionData>> soru::Session::data;
+std::mutex nawa::Session::gLock;
+std::unordered_map<std::string, std::shared_ptr<nawa::SessionData>> nawa::Session::data;
 
-soru::Session::Session(soru::Connection &connection) : connection(connection) {
+nawa::Session::Session(nawa::Connection &connection) : connection(connection) {
     // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
     // thus, it will be triggered by the Connection constructor
 }
 
-std::string soru::Session::generateID() {
+std::string nawa::Session::generateID() {
     std::stringstream base;
 
     // Add 2 ints from random_device (should be in fact /dev/urandom), giving us (in general) 64 bits of entropy
@@ -49,7 +49,7 @@ std::string soru::Session::generateID() {
     return Crypto::sha1(base.str(), true);
 }
 
-void soru::Session::start(Cookie properties) {
+void nawa::Session::start(Cookie properties) {
 
     // TODO check everything really carefully for possible race conditions
 
@@ -93,7 +93,7 @@ void soru::Session::start(Cookie properties) {
             if(data.at(sessionCookieStr)->expires <= time(nullptr)) {
                 data.erase(sessionCookieStr);
             }
-            // validate_ip enabled in QSF config and IP mismatch?
+            // validate_ip enabled in NAWA config and IP mismatch?
             else if((sessionValidateIP == "strict" || sessionValidateIP == "lax")
                     && data.at(sessionCookieStr)->sourceIP != connection.request.env["remoteAddress"]) {
                 if(sessionValidateIP == "strict") {
@@ -117,12 +117,12 @@ void soru::Session::start(Cookie properties) {
         do {
             sessionCookieStr = generateID();
         } while(data.count(sessionCookieStr) > 0);
-        currentData = std::make_shared<soru::SessionData>(connection.request.env["remoteAddr"]);
+        currentData = std::make_shared<nawa::SessionData>(connection.request.env["remoteAddr"]);
         currentData->expires = time(nullptr) + sessionKeepalive;
         data[sessionCookieStr] = currentData;
     }
 
-    // set the response cookie and its properties according to the Cookie parameter or the QSF config
+    // set the response cookie and its properties according to the Cookie parameter or the NAWA config
     std::string cookieExpiresStr;
     if(properties.expires > 0 || connection.config[{"session", "cookie_expires"}] != "off") {
         properties.expires = time(nullptr) + sessionKeepalive;
@@ -177,11 +177,11 @@ void soru::Session::start(Cookie properties) {
     }
 }
 
-bool soru::Session::established() const {
+bool nawa::Session::established() const {
     return (currentData.use_count() > 0);
 }
 
-bool soru::Session::isSet(std::string key) const {
+bool nawa::Session::isSet(std::string key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         return (currentData->data.count(key) == 1);
@@ -189,7 +189,7 @@ bool soru::Session::isSet(std::string key) const {
     return false;
 }
 
-soru::Universal soru::Session::operator[](std::string key) const {
+nawa::Universal nawa::Session::operator[](std::string key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         if(currentData->data.count(key) == 1) {
@@ -199,23 +199,23 @@ soru::Universal soru::Session::operator[](std::string key) const {
     return Universal();
 }
 
-void soru::Session::set(std::string key, const soru::Universal& value) {
+void nawa::Session::set(std::string key, const nawa::Universal& value) {
     if(!established()) {
-        throw UserException("soru::Session::set", 1, "Session not established.");
+        throw UserException("nawa::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data[std::move(key)] = value;
 }
 
-void soru::Session::unset(const std::string& key) {
+void nawa::Session::unset(const std::string& key) {
     if(!established()) {
-        throw UserException("soru::Session::set", 1, "Session not established.");
+        throw UserException("nawa::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data.erase(key);
 }
 
-void soru::Session::collectGarbage() {
+void nawa::Session::collectGarbage() {
     std::lock_guard<std::mutex> lockGuard(gLock);
     // no increment in for statement as we want to remove elements
     for(auto it = data.cbegin(); it != data.cend();) {
@@ -233,11 +233,11 @@ void soru::Session::collectGarbage() {
     }
 }
 
-void soru::Session::destroy() {
+void nawa::Session::destroy() {
     data.clear();
 }
 
-void soru::Session::invalidate() {
+void nawa::Session::invalidate() {
 
     // do nothing if no session has been established
     if(!established()) return;

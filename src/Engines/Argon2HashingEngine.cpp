@@ -6,42 +6,42 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/Engines/Argon2HashingEngine.h>
+#include <nawa/Engines/Argon2HashingEngine.h>
 #include <cstring>
 #include <cstdlib>
 #include <argon2.h>
-#include <soru/UserException.h>
+#include <nawa/UserException.h>
 #include <random>
 #include <regex>
-#include <soru/Encoding.h>
+#include <nawa/Encoding.h>
 
-soru::Engines::Argon2HashingEngine::Argon2HashingEngine(soru::Engines::Argon2HashingEngine::Algorithm algorithm,
+nawa::Engines::Argon2HashingEngine::Argon2HashingEngine(nawa::Engines::Argon2HashingEngine::Algorithm algorithm,
                                                        uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,
                                                        std::string _salt, size_t hashLen)
         : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism), hashLen(hashLen) {
     salt = std::move(_salt);
 }
 
-std::string soru::Engines::Argon2HashingEngine::generateHash(std::string input) const {
+std::string nawa::Engines::Argon2HashingEngine::generateHash(std::string input) const {
 
     // check validity of parameters
     if(!salt.empty() && salt.length() < ARGON2_MIN_SALT_LENGTH) {
-        throw UserException("soru::Engines::Argon2HashingEngine::generateHash", 10,
+        throw UserException("nawa::Engines::Argon2HashingEngine::generateHash", 10,
                 "Provided user-defined salt is not long enough");
     }
 
@@ -93,14 +93,14 @@ std::string soru::Engines::Argon2HashingEngine::generateHash(std::string input) 
 
     // error handling
     if(errorCode != ARGON2_OK) {
-        throw UserException("soru::Engines::Argon2HashingEngine::generateHash", 10,
+        throw UserException("nawa::Engines::Argon2HashingEngine::generateHash", 10,
                 std::string("Argon2 error: ") + argon2_error_message(errorCode));
     }
 
     return std::string(c_hash);
 }
 
-bool soru::Engines::Argon2HashingEngine::verifyHash(std::string input, std::string hash) const {
+bool nawa::Engines::Argon2HashingEngine::verifyHash(std::string input, std::string hash) const {
 
     // split the hash and create a new object with the properties of the hash
     std::regex rgx(R"(\$argon2(i|d|id)\$(v=([0-9]+))?\$m=([0-9]+),t=([0-9]+),p=([0-9]+)\$([A-Za-z0-9+\/]+={0,2})\$([A-Za-z0-9+\/]+={0,2}))");

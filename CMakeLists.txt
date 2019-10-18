@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
-project(soru VERSION 0.1)
+project(nawa VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 14)
 
 # version
-set(SORU_VERSION_MAJOR 0)
-set(SORU_VERSION_MINOR 1)
+set(NAWA_VERSION_MAJOR 0)
+set(NAWA_VERSION_MINOR 1)
 
 # build options
 option(BuildTests "Build tests" ON)
@@ -19,35 +19,35 @@ endif()
 
 # configure the file that we need for version checking
 configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
-        ${PROJECT_BINARY_DIR}/include/soru/Application.h)
+        ${PROJECT_BINARY_DIR}/include/nawa/Application.h)
 
 # ... SysException.h Types/Compound.h Connection.cpp ...
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
 
-add_executable(sorun
-        include/soru/Request.h
-        include/soru/RequestHandler.h
-        include/soru/SysException.h
-        include/soru/Connection.h
-        include/soru/Encoding.h
-        include/soru/Utils.h
-        include/soru/Session.h
-        include/soru/Config.h
-        include/soru/Crypto.h
-        include/soru/UserException.h
-        include/soru/Cookie.h
-        include/soru/Log.h
-        include/soru/AccessFilterList.h
-        include/soru/AppInit.h
-        include/soru/SmtpMailer.h
-        include/soru/Email.h
-        include/soru/Universal.h
-        include/soru/Engines/HashingEngine.h
-        include/soru/Engines/Argon2HashingEngine.h
-        include/soru/Engines/BcryptHashingEngine.h
-        include/soru/Engines/HashTypeTable.h
-        include/soru/Engines/DefaultHashTypeTable.h
+add_executable(nawarun
+        include/nawa/Request.h
+        include/nawa/RequestHandler.h
+        include/nawa/SysException.h
+        include/nawa/Connection.h
+        include/nawa/Encoding.h
+        include/nawa/Utils.h
+        include/nawa/Session.h
+        include/nawa/Config.h
+        include/nawa/Crypto.h
+        include/nawa/UserException.h
+        include/nawa/Cookie.h
+        include/nawa/Log.h
+        include/nawa/AccessFilterList.h
+        include/nawa/AppInit.h
+        include/nawa/SmtpMailer.h
+        include/nawa/Email.h
+        include/nawa/Universal.h
+        include/nawa/Engines/HashingEngine.h
+        include/nawa/Engines/Argon2HashingEngine.h
+        include/nawa/Engines/BcryptHashingEngine.h
+        include/nawa/Engines/HashTypeTable.h
+        include/nawa/Engines/DefaultHashTypeTable.h
 
         src/main.cpp
         src/Request.cpp
@@ -71,17 +71,17 @@ add_executable(sorun
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
-target_link_libraries(sorun -ldl -lfastcgipp -lcrypto -lcurl -largon2 bcrypt)
-target_include_directories(sorun PUBLIC
+target_link_libraries(nawarun -ldl -lfastcgipp -lcrypto -lcurl -largon2 bcrypt)
+target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 if(BuildTests)
-    add_library(sorutest SHARED
+    add_library(nawatest SHARED
             tests/app.h
-            tests/sorutest.cpp)
-    target_include_directories(sorutest PUBLIC
+            tests/nawatest.cpp)
+    target_include_directories(nawatest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
@@ -124,20 +124,20 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 # install targets, components should be checked again w.r.t. packaging
 include(GNUInstallDirs)
-install(TARGETS sorun
+install(TARGETS nawarun
         DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT Runtime)
 install(FILES "${PROJECT_SOURCE_DIR}/config.ini"
-        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/soru
+        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/nawa
         COMPONENT Runtime)
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/soru"
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/nawa"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT Development)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/soru/Application.h"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/soru
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/nawa/Application.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nawa
         COMPONENT Development)
 if(EXISTS /etc/systemd/system)
-    install(FILES "${PROJECT_SOURCE_DIR}/systemd/soru@.service"
+    install(FILES "${PROJECT_SOURCE_DIR}/systemd/nawa@.service"
             DESTINATION /etc/systemd/system
             COMPONENT Runtime)
 endif()

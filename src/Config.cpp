@@ -6,54 +6,54 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/Config.h>
-#include <soru/SysException.h>
+#include <nawa/Config.h>
+#include <nawa/SysException.h>
 #include "../libs/inih/ini.h"
 
-soru::Config::Config(std::string iniFile) {
+nawa::Config::Config(std::string iniFile) {
     read(std::move(iniFile));
 }
 
-soru::Config &soru::Config::operator=(const soru::Config &other) {
+nawa::Config &nawa::Config::operator=(const nawa::Config &other) {
     if(this != &other) {
         values = other.values;
     }
     return *this;
 }
 
-void soru::Config::read(std::string iniFile) {
+void nawa::Config::read(std::string iniFile) {
     auto valueHandler = [](void* obj, const char* section, const char* name, const char* value) -> int {
-        auto _this = (soru::Config*) obj;
+        auto _this = (nawa::Config*) obj;
         std::pair<std::string, std::string> keyToInsert (section, name);
         std::pair<std::pair<std::string, std::string>, std::string> pairToInsert (keyToInsert, value);
         _this->values.insert(pairToInsert);
         return 1;
     };
     if(ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
-        throw soru::SysException(__FILE__, __LINE__, "Could not read config file.");
+        throw nawa::SysException(__FILE__, __LINE__, "Could not read config file.");
     }
 }
 
-bool soru::Config::isSet(std::pair<std::string, std::string> key) const {
+bool nawa::Config::isSet(std::pair<std::string, std::string> key) const {
     return (values.count(key) == 1);
 }
 
-std::string soru::Config::operator[](std::pair<std::string, std::string> key) const {
+std::string nawa::Config::operator[](std::pair<std::string, std::string> key) const {
     if(values.count(key) == 1) {
         return values.at(key);
     }
@@ -62,10 +62,10 @@ std::string soru::Config::operator[](std::pair<std::string, std::string> key) co
     }
 }
 
-void soru::Config::set(std::pair<std::string, std::string> key, std::string value) {
+void nawa::Config::set(std::pair<std::string, std::string> key, std::string value) {
     values[std::move(key)] = std::move(value);
 }
 
-void soru::Config::set(std::string section, std::string key, std::string value) {
+void nawa::Config::set(std::string section, std::string key, std::string value) {
     set(std::pair<std::string, std::string> (std::move(section), std::move(key)), std::move(value));
 }

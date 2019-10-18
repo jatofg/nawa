@@ -6,30 +6,30 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_EMAIL_H
-#define SORU_EMAIL_H
+#ifndef NAWA_EMAIL_H
+#define NAWA_EMAIL_H
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <memory>
 
-namespace soru {
+namespace nawa {
 
     /**
      * Replacement rules for emails are just a string -> string map. All occurrences of the key string should be
@@ -273,4 +273,4 @@ namespace soru {
 
 }
 
-#endif //SORU_EMAIL_H
+#endif //NAWA_EMAIL_H

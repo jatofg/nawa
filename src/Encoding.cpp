@@ -6,19 +6,19 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <boost/algorithm/string.hpp>
@@ -28,8 +28,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <iomanip>
-#include <soru/Encoding.h>
-#include <soru/Utils.h>
+#include <nawa/Encoding.h>
+#include <nawa/Utils.h>
 #include "../libs/base64/base64.h"
 
 namespace {
@@ -541,7 +541,7 @@ namespace {
 
 }
 
-std::string soru::Encoding::htmlEncode(std::string input, bool encodeAll) {
+std::string nawa::Encoding::htmlEncode(std::string input, bool encodeAll) {
     if(!encodeAll) {
         boost::replace_all(input, "&", "&amp;");
         boost::replace_all(input, "\"", "&quot;");
@@ -598,7 +598,7 @@ std::string soru::Encoding::htmlEncode(std::string input, bool encodeAll) {
     return input;
 }
 
-std::string soru::Encoding::htmlDecode(std::string input) {
+std::string nawa::Encoding::htmlDecode(std::string input) {
 
     if(htmlDecodeTable.empty()) initializeHtmlDecodeTable();
 
@@ -652,7 +652,7 @@ std::string soru::Encoding::htmlDecode(std::string input) {
     return input;
 }
 
-std::string soru::Encoding::urlEncode(const std::string& input) {
+std::string nawa::Encoding::urlEncode(const std::string& input) {
     std::stringstream out;
 
     // check if character is valid, unreserved URL character, otherwise apply url encoding
@@ -671,7 +671,7 @@ std::string soru::Encoding::urlEncode(const std::string& input) {
     return out.str();
 }
 
-std::string soru::Encoding::urlDecode(std::string input) {
+std::string nawa::Encoding::urlDecode(std::string input) {
     // match url codes by regex
     std::regex matchCode(R"(%([0-9A-F]{2}))");
 
@@ -685,7 +685,7 @@ std::string soru::Encoding::urlDecode(std::string input) {
     return input;
 }
 
-bool soru::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
+bool nawa::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
     std::regex rgx;
     if(allowWhitespaces) {
         rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
@@ -696,15 +696,15 @@ bool soru::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
     return std::regex_match(input, rgx);
 }
 
-std::string soru::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
+std::string nawa::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
     return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length(), breakAfter, breakSequence);
 }
 
-std::string soru::Encoding::base64Decode(const std::string &input) {
+std::string nawa::Encoding::base64Decode(const std::string &input) {
     return base64_decode(input);
 }
 
-std::string soru::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
+std::string nawa::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
         bool replaceCrlf, bool qEncoding) {
     std::stringstream ret;
     int lineCount = 0;
@@ -732,14 +732,14 @@ std::string soru::Encoding::quotedPrintableEncode(const std::string &input, cons
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
-            ret << "=" << soru::to_uppercase(soru::hex_dump(std::string(1, c)));
+            ret << "=" << nawa::to_uppercase(nawa::hex_dump(std::string(1, c)));
             lineCount += 3;
         }
     }
     return ret.str();
 }
 
-std::string soru::Encoding::quotedPrintableDecode(std::string input) {
+std::string nawa::Encoding::quotedPrintableDecode(std::string input) {
     std::regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function
@@ -753,7 +753,7 @@ std::string soru::Encoding::quotedPrintableDecode(std::string input) {
     return input;
 }
 
-std::string soru::Encoding::makeEncodedWord(const std::string &input, bool base64) {
+std::string nawa::Encoding::makeEncodedWord(const std::string &input, bool base64) {
     std::stringstream ret;
     ret << "=?utf-8?";
     if(base64) {

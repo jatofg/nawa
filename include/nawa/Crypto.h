@@ -6,31 +6,31 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_CRYPTO_H
-#define SORU_CRYPTO_H
+#ifndef NAWA_CRYPTO_H
+#define NAWA_CRYPTO_H
 
 #include <string>
-#include <soru/Engines/HashingEngine.h>
-#include <soru/Engines/BcryptHashingEngine.h>
-#include <soru/Engines/HashTypeTable.h>
-#include <soru/Engines/DefaultHashTypeTable.h>
+#include <nawa/Engines/HashingEngine.h>
+#include <nawa/Engines/BcryptHashingEngine.h>
+#include <nawa/Engines/HashTypeTable.h>
+#include <nawa/Engines/DefaultHashTypeTable.h>
 
-namespace soru {
+namespace nawa {
     namespace Crypto {
         /**
          * Get SHA-1 hash of a string.
@@ -103,8 +103,8 @@ namespace soru {
          * @param password Password (user input) to be verified.
          * @param hash Hash (e.g., from a database) to verify the user password against.
          * @param hashTypeTable Object providing a function that is able to determine a hashing engine that can verify
-         * the given hash. The default HashTypeTable shipped with QSF recognizes all hashing engines that also ship
-         * with QSF.
+         * the given hash. The default HashTypeTable shipped with NAWA recognizes all hashing engines that also ship
+         * with NAWA.
          * @return True if the password matches, false otherwise.
          */
         bool passwordVerify(const std::string& password, const std::string& hash,
@@ -112,4 +112,4 @@ namespace soru {
     };
 }
 
-#endif //SORU_CRYPTO_H
+#endif //NAWA_CRYPTO_H

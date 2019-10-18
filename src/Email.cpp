@@ -1,35 +1,35 @@
 /**
  * \file Email.cpp
- * \brief Implementation of methods in email-related structs in the Qsf::Types namespace.
+ * \brief Implementation of methods in email-related structs in the Nawa::Types namespace.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/Email.h>
-#include <soru/Crypto.h>
+#include <nawa/Email.h>
+#include <nawa/Crypto.h>
 #include <sstream>
 #include <regex>
 #include <random>
-#include <soru/UserException.h>
+#include <nawa/UserException.h>
 #include <fstream>
-#include <soru/Encoding.h>
-#include <soru/Utils.h>
+#include <nawa/Encoding.h>
+#include <nawa/Utils.h>
 
 namespace {
     /**
@@ -42,26 +42,26 @@ namespace {
 
         // Use MD5 sum of a random integer
         std::random_device rd;
-        ret << soru::Crypto::md5(std::to_string(rd()));
+        ret << nawa::Crypto::md5(std::to_string(rd()));
 
         return ret.str();
     }
 
-    std::string multipartTypeToString(const soru::MimeEmail::MimePartList::MultipartType &multipartType) {
+    std::string multipartTypeToString(const nawa::MimeEmail::MimePartList::MultipartType &multipartType) {
         switch(multipartType) {
-            case soru::MimeEmail::MimePartList::MIXED:
+            case nawa::MimeEmail::MimePartList::MIXED:
                 return "mixed";
-            case soru::MimeEmail::MimePartList::DIGEST:
+            case nawa::MimeEmail::MimePartList::DIGEST:
                 return "digest";
-            case soru::MimeEmail::MimePartList::ALTERNATIVE:
+            case nawa::MimeEmail::MimePartList::ALTERNATIVE:
                 return "alternative";
-            case soru::MimeEmail::MimePartList::RELATED:
+            case nawa::MimeEmail::MimePartList::RELATED:
                 return "related";
-            case soru::MimeEmail::MimePartList::REPORT:
+            case nawa::MimeEmail::MimePartList::REPORT:
                 return "report";
-            case soru::MimeEmail::MimePartList::SIGNED:
+            case nawa::MimeEmail::MimePartList::SIGNED:
                 return "signed";
-            case soru::MimeEmail::MimePartList::ENCRYPTED:
+            case nawa::MimeEmail::MimePartList::ENCRYPTED:
                 return "encrypted";
         }
         return "";
@@ -72,8 +72,8 @@ namespace {
      * @param mimePartList The MimePartList object representing the MIME parts to be converted.
      * @return Tuple containing the boundary string (for inclusion in the header) and the MIME parts as a string.
      */
-    std::string mergeMimePartList(const soru::MimeEmail::MimePartList &mimePartList, const std::string& boundary,
-            const soru::ReplacementRules& replacementRules) {
+    std::string mergeMimePartList(const nawa::MimeEmail::MimePartList &mimePartList, const std::string& boundary,
+            const nawa::ReplacementRules& replacementRules) {
         std::stringstream ret;
 
         // iterate through the list
@@ -92,23 +92,23 @@ namespace {
 
                 // apply the replacement rules (only if necessary) and the selected encoding afterwards
                 switch(mimePart.applyEncoding) {
-                    case soru::MimeEmail::MimePart::BASE64:
+                    case nawa::MimeEmail::MimePart::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
-                        ret << soru::Encoding::base64Encode(
+                        ret << nawa::Encoding::base64Encode(
                                 (mimePart.allowReplacements && !replacementRules.empty())
-                                ? soru::string_replace(mimePart.data, replacementRules) : mimePart.data,
+                                ? nawa::string_replace(mimePart.data, replacementRules) : mimePart.data,
                                 76, "\r\n");
                         break;
-                    case soru::MimeEmail::MimePart::QUOTED_PRINTABLE:
+                    case nawa::MimeEmail::MimePart::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-                        ret << soru::Encoding::quotedPrintableEncode(
+                        ret << nawa::Encoding::quotedPrintableEncode(
                                 (mimePart.allowReplacements && !replacementRules.empty())
-                                ? soru::string_replace(mimePart.data, replacementRules) : mimePart.data
+                                ? nawa::string_replace(mimePart.data, replacementRules) : mimePart.data
                                 );
                         break;
-                    case soru::MimeEmail::MimePart::NONE:
+                    case nawa::MimeEmail::MimePart::NONE:
                         ret << "\r\n" << ((mimePart.allowReplacements && !replacementRules.empty())
-                        ? soru::string_replace(mimePart.data, replacementRules) : mimePart.data);
+                        ? nawa::string_replace(mimePart.data, replacementRules) : mimePart.data);
                         break;
                 }
 
@@ -129,7 +129,7 @@ namespace {
     }
 }
 
-std::string soru::EmailAddress::get(bool includeName) const {
+std::string nawa::EmailAddress::get(bool includeName) const {
     std::stringstream ret;
     if(includeName) {
         ret << name << " ";
@@ -138,12 +138,12 @@ std::string soru::EmailAddress::get(bool includeName) const {
     return ret.str();
 }
 
-bool soru::EmailAddress::isValid() const {
+bool nawa::EmailAddress::isValid() const {
     std::regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", std::regex::icase);
     return std::regex_match(address, emCheck);
 }
 
-std::string soru::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
+std::string nawa::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
 
     for(auto const &e: headers) {
@@ -165,19 +165,19 @@ std::string soru::SimpleEmail::getRaw(const ReplacementRules &replacementRules) 
     return ret.str();
 }
 
-soru::MimeEmail::MimePartOrList::MimePartOrList(const soru::MimeEmail::MimePartOrList &other) {
+nawa::MimeEmail::MimePartOrList::MimePartOrList(const nawa::MimeEmail::MimePartOrList &other) {
     operator=(other);
 }
 
-soru::MimeEmail::MimePartOrList::MimePartOrList(const soru::MimeEmail::MimePart &_mimePart) {
+nawa::MimeEmail::MimePartOrList::MimePartOrList(const nawa::MimeEmail::MimePart &_mimePart) {
     operator=(_mimePart);
 }
 
-soru::MimeEmail::MimePartOrList::MimePartOrList(const soru::MimeEmail::MimePartList &_mimePartList) {
+nawa::MimeEmail::MimePartOrList::MimePartOrList(const nawa::MimeEmail::MimePartList &_mimePartList) {
     operator=(_mimePartList);
 }
 
-soru::MimeEmail::MimePartOrList &soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePartOrList &other) {
+nawa::MimeEmail::MimePartOrList &nawa::MimeEmail::MimePartOrList::operator=(const nawa::MimeEmail::MimePartOrList &other) {
     if(&other == this) {
         return *this;
     }
@@ -202,7 +202,7 @@ soru::MimeEmail::MimePartOrList &soru::MimeEmail::MimePartOrList::operator=(cons
     return *this;
 }
 
-soru::MimeEmail::MimePartOrList &soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePart &_mimePart) {
+nawa::MimeEmail::MimePartOrList &nawa::MimeEmail::MimePartOrList::operator=(const nawa::MimeEmail::MimePart &_mimePart) {
     if(!mimePart) {
         mimePart = std::make_unique<MimePart>();
     }
@@ -213,8 +213,8 @@ soru::MimeEmail::MimePartOrList &soru::MimeEmail::MimePartOrList::operator=(cons
     return *this;
 }
 
-soru::MimeEmail::MimePartOrList &
-soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePartList &_mimePartList) {
+nawa::MimeEmail::MimePartOrList &
+nawa::MimeEmail::MimePartOrList::operator=(const nawa::MimeEmail::MimePartList &_mimePartList) {
     if(!mimePartList) {
         mimePartList = std::make_unique<MimePartList>();
     }
@@ -225,7 +225,7 @@ soru::MimeEmail::MimePartOrList::operator=(const soru::MimeEmail::MimePartList &
     return *this;
 }
 
-std::string soru::MimeEmail::getRaw(const ReplacementRules &replacementRules) const {
+std::string nawa::MimeEmail::getRaw(const ReplacementRules &replacementRules) const {
     std::stringstream ret;
     for(auto const &e: headers) {
         if(e.first == "MIME-Version" || e.first == "Content-Type") continue;

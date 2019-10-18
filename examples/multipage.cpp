@@ -7,25 +7,25 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/Application.h>
+#include <nawa/Application.h>
 
 using namespace std;
-using namespace soru;
+using namespace nawa;
 
 extern "C" int init(AppInit& appInit) {
 
@@ -55,7 +55,7 @@ extern "C" int init(AppInit& appInit) {
     };
     appInit.accessFilters.authFilters.push_back(authFilter);
 
-    // for an example of a BlockFilter and regex-based filtering see tests/sorutest.cpp
+    // for an example of a BlockFilter and regex-based filtering see tests/nawatest.cpp
 
     return 0;
 }
@@ -67,7 +67,7 @@ extern "C" int handleRequest(Connection& connection) {
     auto requestPath = connection.request.env.getRequestPath();
 
     connection.response << "<!DOCTYPE html><html><head>"
-                           "<title>soru Multipage Example</title>"
+                           "<title>nawa Multipage Example</title>"
                            "</head><body><p>Request Path Elements: ";
     for(auto const &e: requestPath) {
         connection.response << e << ", ";

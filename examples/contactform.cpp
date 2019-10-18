@@ -1,33 +1,33 @@
 /**
  * \file contactform.cpp
- * \brief A simple contact form application using soru.
+ * \brief A simple contact form application using nawa.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/Application.h>
+#include <nawa/Application.h>
 #include <random>
-#include <soru/SmtpMailer.h>
-#include <soru/Encoding.h>
+#include <nawa/SmtpMailer.h>
+#include <nawa/Encoding.h>
 
 using namespace std;
-using namespace soru;
+using namespace nawa;
 
 extern "C" int init(AppInit& appInit) {
 
@@ -90,7 +90,7 @@ extern "C" int handleRequest(Connection& connection) {
         // apply Q-encoding to the header, just in case the user used special chars in the subject
         email.headers["Subject"] = Encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
         email.quotedPrintableEncode = true;
-        email.text = "This contact form was sent via an example soru application!\r\n\r\n"
+        email.text = "This contact form was sent via an example nawa application!\r\n\r\n"
                      "Name of the sender: " + post["name"] + "\r\n"
                      "Email of the sender: " + post["email"] + "\r\n\r\n" + post["message"];
 

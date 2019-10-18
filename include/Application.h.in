@@ -1,38 +1,38 @@
 /**
  * \file Application.h
  * \brief This file will be configured by CMake and contains the necessary properties to ensure that a loaded app
- * has been compiled against the same soru version as the sorun executable loading it (or, at least, one with a compatible ABI).
+ * has been compiled against the same nawa version as the nawarun executable loading it (or, at least, one with a compatible ABI).
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_APPLICATION_H
-#define SORU_APPLICATION_H
-#define SORU_VERSION_MAJOR @SORU_VERSION_MAJOR@
-#define SORU_VERSION_MINOR @SORU_VERSION_MINOR@
+#ifndef NAWA_APPLICATION_H
+#define NAWA_APPLICATION_H
+#define NAWA_VERSION_MAJOR @NAWA_VERSION_MAJOR@
+#define NAWA_VERSION_MINOR @NAWA_VERSION_MINOR@
 
-#include <soru/Connection.h>
-#include <soru/AppInit.h>
+#include <nawa/Connection.h>
+#include <nawa/AppInit.h>
 
-extern "C" const int soru_version_major = SORU_VERSION_MAJOR;
-extern "C" const int soru_version_minor = SORU_VERSION_MINOR;
-extern "C" int init(soru::AppInit& appInit);
-extern "C" int handleRequest(soru::Connection& connection);
+extern "C" const int nawa_version_major = NAWA_VERSION_MAJOR;
+extern "C" const int nawa_version_minor = NAWA_VERSION_MINOR;
+extern "C" int init(nawa::AppInit& appInit);
+extern "C" int handleRequest(nawa::Connection& connection);
 
-#endif //QSF_APPLICATION_H
+#endif //NAWA_APPLICATION_H

@@ -6,27 +6,27 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/SmtpMailer.h>
-#include <soru/Utils.h>
+#include <nawa/SmtpMailer.h>
+#include <nawa/Utils.h>
 #include <curl/curl.h>
-#include <soru/UserException.h>
+#include <nawa/UserException.h>
 #include <random>
-#include <soru/Crypto.h>
+#include <nawa/Crypto.h>
 
 namespace {
     /**
@@ -35,9 +35,9 @@ namespace {
      * @param email Email to check and modify.
      * @param from EmailAddress object to set the From header from, if necessary.
      */
-    void addMissingHeaders(std::shared_ptr<soru::Email> &email, const std::shared_ptr<soru::EmailAddress> &from) {
+    void addMissingHeaders(std::shared_ptr<nawa::Email> &email, const std::shared_ptr<nawa::EmailAddress> &from) {
         if(!email->headers.count("Date")) {
-            email->headers["Date"] = soru::make_smtp_time(time(nullptr));
+            email->headers["Date"] = nawa::make_smtp_time(time(nullptr));
         }
         if(!email->headers.count("From") && !from->address.empty()) {
             email->headers["From"] = from->get();
@@ -51,13 +51,13 @@ namespace {
             timespec mtime;
             clock_gettime(CLOCK_REALTIME, &mtime);
             base << mtime.tv_sec << mtime.tv_nsec << from->address << rd();
-            mid << '<' << soru::Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos+1) << '>';
+            mid << '<' << nawa::Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos+1) << '>';
             email->headers["Message-ID"] = mid.str();
         }
     }
 }
 
-soru::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort, soru::SmtpMailer::TlsMode _tlsMode,
+nawa::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort, nawa::SmtpMailer::TlsMode _tlsMode,
                             bool _verifyTlsCert, std::string _authUsername, std::string _authPassword)
         : serverPort(_serverPort), tlsMode(_tlsMode), verifyTlsCert(_verifyTlsCert) {
     serverDomain = std::move(_serverDomain);
@@ -65,7 +65,7 @@ soru::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort
     authPassword = std::move(_authPassword);
 }
 
-void soru::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverPort, soru::SmtpMailer::TlsMode _tlsMode,
+void nawa::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverPort, nawa::SmtpMailer::TlsMode _tlsMode,
                                 bool _verifyTlsCert) {
     serverDomain = std::move(_serverDomain);
     serverPort = _serverPort;
@@ -73,18 +73,18 @@ void soru::SmtpMailer::setServer(std::string _serverDomain, unsigned int _server
     verifyTlsCert = _verifyTlsCert;
 }
 
-void soru::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassword) {
+void nawa::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassword) {
     authUsername = std::move(_authUsername);
     authPassword = std::move(_authPassword);
 }
 
-void soru::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
+void nawa::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
         ReplacementRules replacementRules) {
     bulkEnqueue(std::move(email), std::vector<EmailAddress>({std::move(to)}), std::move(from),
             std::move(replacementRules));
 }
 
-void soru::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
+void nawa::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
                                   std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules) {
     addMissingHeaders(email, from);
     std::unique_ptr<ReplacementRules> rulesPtr;
@@ -95,11 +95,11 @@ void soru::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<Ema
                               .replacementRules=std::move(rulesPtr)});
 }
 
-void soru::SmtpMailer::clearQueue() {
+void nawa::SmtpMailer::clearQueue() {
     queue.clear();
 }
 
-void soru::SmtpMailer::processQueue() const {
+void nawa::SmtpMailer::processQueue() const {
     CURL *curl;
     CURLcode res = CURLE_OK;
 
@@ -172,7 +172,7 @@ void soru::SmtpMailer::processQueue() const {
             // check for errors, throw exception if one happens
             if(res != CURLE_OK) {
                 curl_easy_cleanup(curl);
-                throw UserException("soru::SmtpMailer::processQueue()", 1,
+                throw UserException("nawa::SmtpMailer::processQueue()", 1,
                         std::string("CURL error: ") + curl_easy_strerror(res));
             }
 

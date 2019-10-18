@@ -6,31 +6,31 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <soru/Engines/BcryptHashingEngine.h>
-#include <soru/UserException.h>
+#include <nawa/Engines/BcryptHashingEngine.h>
+#include <nawa/UserException.h>
 #include <cstring>
 #include "../libs/libbcrypt/bcrypt.h"
 
-soru::Engines::BcryptHashingEngine::BcryptHashingEngine(int workFactor, std::string _salt) : workFactor(workFactor) {
+nawa::Engines::BcryptHashingEngine::BcryptHashingEngine(int workFactor, std::string _salt) : workFactor(workFactor) {
     salt = std::move(_salt);
 }
 
-std::string soru::Engines::BcryptHashingEngine::generateHash(std::string input) const {
+std::string nawa::Engines::BcryptHashingEngine::generateHash(std::string input) const {
     char bcsalt[BCRYPT_HASHSIZE];
     char hash[BCRYPT_HASHSIZE];
 
@@ -41,18 +41,18 @@ std::string soru::Engines::BcryptHashingEngine::generateHash(std::string input) 
         std::memcpy(hash, salt_res.c_str(), BCRYPT_HASHSIZE);
     }
     else if(bcrypt_gensalt(workFactor, bcsalt) != 0) {
-        throw UserException("soru::Engines::BcryptHashingEngine::generateHash", 10,
+        throw UserException("nawa::Engines::BcryptHashingEngine::generateHash", 10,
                 "Could not generate a salt (unknown bcrypt failure).");
     }
 
     if(bcrypt_hashpw(input.c_str(), bcsalt, hash) != 0) {
-        throw UserException("soru::Engines::BcryptHashingEngine::generateHash", 11,
+        throw UserException("nawa::Engines::BcryptHashingEngine::generateHash", 11,
                 "Could not hash this password (unknown bcrypt failure).");
     }
     return std::string(hash, 60);
 }
 
-bool soru::Engines::BcryptHashingEngine::verifyHash(std::string input, std::string hash) const {
+bool nawa::Engines::BcryptHashingEngine::verifyHash(std::string input, std::string hash) const {
     // return value of bcrypt_checkpw is -1 on failure, 0 on match, and >0 if not matching
     int ret = bcrypt_checkpw(input.c_str(), hash.c_str());
     return ret == 0;

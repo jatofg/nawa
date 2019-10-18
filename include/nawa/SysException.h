@@ -1,36 +1,36 @@
 /**
  * \file SysException.h
- * \brief Exception class to provide debugging output for severe errors in QSF itself.
+ * \brief Exception class to provide debugging output for severe errors in NAWA itself.
  */
 
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SORU_SORUEXCEPTION_H
-#define SORU_SORUEXCEPTION_H
+#ifndef NAWA_NAWAEXCEPTION_H
+#define NAWA_NAWAEXCEPTION_H
 
 #include <string>
 #include <sstream>
 
-namespace soru {
+namespace nawa {
 
     /**
-     * Exception class to provide debugging output for severe errors in QSF itself.
+     * Exception class to provide debugging output for severe errors in NAWA itself.
      */
     class SysException: public std::exception {
         std::string message; /**< The exception message will be stored here. */
@@ -42,7 +42,7 @@ namespace soru {
          */
         SysException(const std::string& file, unsigned int line) {
             std::stringstream ret;
-            ret << "QSF: SysException in " << file << " at line " << line;
+            ret << "NAWA: SysException in " << file << " at line " << line;
             message = ret.str();
         }
         /**
@@ -53,7 +53,7 @@ namespace soru {
          */
         SysException(const std::string& file, unsigned int line, const std::string& _message) {
             std::stringstream ret;
-            ret << "QSF: SysException in " << file << " at line " << line << ": " << _message;
+            ret << "NAWA: SysException in " << file << " at line " << line << ": " << _message;
             message = ret.str();
         }
         /**
@@ -69,4 +69,4 @@ namespace soru {
 
 
 
-#endif //SORU_SORUEXCEPTION_H
+#endif //NAWA_NAWAEXCEPTION_H

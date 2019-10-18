@@ -6,19 +6,19 @@
 /*
  * Copyright (C) 2019 Tobias Flaig.
  *
- * This file is part of soru.
+ * This file is part of nawa.
  *
- * soru is free software: you can redistribute it and/or modify
+ * nawa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License,
  * version 3, as published by the Free Software Foundation.
  *
- * soru is distributed in the hope that it will be useful,
+ * nawa is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with soru.  If not, see <https://www.gnu.org/licenses/>.
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <algorithm>
@@ -28,8 +28,8 @@
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <soru/Utils.h>
-#include <soru/Connection.h>
+#include <nawa/Utils.h>
+#include <nawa/Connection.h>
 
 namespace {
     const std::unordered_map<unsigned int, std::string> httpStatusCodes = {
@@ -53,13 +53,13 @@ namespace {
     };
 }
 
-void soru::Connection::setBody(std::string content) {
+void nawa::Connection::setBody(std::string content) {
     bodyString = std::move(content);
     clearStream();
 }
 
 void
-soru::Connection::sendFile(const std::string &path, const std::string &contentType, bool forceDownload,
+nawa::Connection::sendFile(const std::string &path, const std::string &contentType, bool forceDownload,
                           const std::string &downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
@@ -67,7 +67,7 @@ soru::Connection::sendFile(const std::string &path, const std::string &contentTy
 
     // throw exception if file cannot be opened
     if(!f) {
-        throw soru::UserException("soru::Connection::sendFile", 1, "Cannot open file for reading");
+        throw nawa::UserException("nawa::Connection::sendFile", 1, "Cannot open file for reading");
     }
 
     // get time of last modification
@@ -92,7 +92,7 @@ soru::Connection::sendFile(const std::string &path, const std::string &contentTy
     }
     else {
         // use the function from utils.h to guess the content type
-        setHeader("content-type", soru::content_type_by_extension(soru::get_file_extension(path)));
+        setHeader("content-type", nawa::content_type_by_extension(nawa::get_file_extension(path)));
     }
 
     // set the content-disposition header
@@ -121,7 +121,7 @@ soru::Connection::sendFile(const std::string &path, const std::string &contentTy
 
     // set the last-modified header (if possible)
     if(lastModified > 0) {
-        setHeader("last-modified", soru::make_http_time(lastModified));
+        setHeader("last-modified", nawa::make_http_time(lastModified));
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
@@ -133,20 +133,20 @@ soru::Connection::sendFile(const std::string &path, const std::string &contentTy
     clearStream();
 }
 
-void soru::Connection::setHeader(std::string key, std::string value) {
+void nawa::Connection::setHeader(std::string key, std::string value) {
     // convert to lowercase
     // TODO check for correctness, maybe using regex (or waste of cpu time?)
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers[key] = std::move(value);
 }
 
-void soru::Connection::unsetHeader(std::string key) {
+void nawa::Connection::unsetHeader(std::string key) {
     // convert to lowercase
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers.erase(key);
 }
 
-std::string soru::Connection::getRaw() {
+std::string nawa::Connection::getRaw() {
     mergeStream();
     std::stringstream raw;
 
@@ -172,7 +172,7 @@ std::string soru::Connection::getRaw() {
             // Expires option
             time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
             if(expiry > 0) {
-                raw << "; Expires=" << soru::make_http_time(expiry);
+                raw << "; Expires=" << nawa::make_http_time(expiry);
             }
             // Max-Age option
             unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
@@ -205,17 +205,17 @@ std::string soru::Connection::getRaw() {
     return raw.str();
 }
 
-void soru::Connection::mergeStream() {
+void nawa::Connection::mergeStream() {
     bodyString += response.str();
     clearStream();
 }
 
-void soru::Connection::clearStream() {
+void nawa::Connection::clearStream() {
     response.str(std::string());
     response.clear();
 }
 
-soru::Connection::Connection(Request& request, Config& config) : request(request), config(config), session(*this) {
+nawa::Connection::Connection(Request& request, Config& config) : request(request), config(config), session(*this) {
     headers["content-type"] = "text/html; charset=utf-8";
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
@@ -224,21 +224,21 @@ soru::Connection::Connection(Request& request, Config& config) : request(request
     }
 }
 
-void soru::Connection::setCookie(const std::string &key, soru::Cookie cookie) {
+void nawa::Connection::setCookie(const std::string &key, nawa::Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
     std::regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     std::regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
     if(!std::regex_match(key, matchKey) || !std::regex_match(cookie.content, matchContent)) {
-        throw UserException("soru::Connection::setCookie", 1, "Invalid characters in key or value");
+        throw UserException("nawa::Connection::setCookie", 1, "Invalid characters in key or value");
     }
     cookies[key] = std::move(cookie);
 }
 
-void soru::Connection::unsetCookie(const std::string &key) {
+void nawa::Connection::unsetCookie(const std::string &key) {
     cookies.erase(key);
 }
 
-void soru::Connection::flushResponse() {
+void nawa::Connection::flushResponse() {
     // access RequestHandler through Request::Env, which declares Connection as a friend
     request.env.requestHandler.flush(*this);
     // now that headers and cookies have been sent to the client, make sure they are not included anymore
@@ -247,7 +247,7 @@ void soru::Connection::flushResponse() {
     setBody("");
 }
 
-void soru::Connection::setStatus(unsigned int status) {
+void nawa::Connection::setStatus(unsigned int status) {
     std::stringstream hval;
     hval << status;
     if(httpStatusCodes.count(status) == 1) {
@@ -256,6 +256,6 @@ void soru::Connection::setStatus(unsigned int status) {
     headers["status"] = hval.str();
 }
 
-void soru::Connection::setCookiePolicy(Cookie policy) {
+void nawa::Connection::setCookiePolicy(Cookie policy) {
     cookiePolicy = std::move(policy);
 }
