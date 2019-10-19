@@ -1,0 +1,13 @@
+/*!
+
+\page manual NAWA Manual
+
+The following pages provide an introduction to NAWA app development and explain the use of its features.
+
+- \subpage gettingstarted : The basics, and how to write a simple "Hello World" app.
+- Sessions: How to use the comfortable NAWA session system to identify your users.
+- Environment: How to use environment parameters, GET and POST data, and cookies.
+- Filters: Equip your app with static filters, e.g., to comfortably deliver static files (images, stylesheets, ...).
+- And soon even more!
+
+*/
