@@ -22,7 +22,7 @@
  */
 
 #include <random>
-#include "app.h"
+#include <nawa/Application.h>
 
 using namespace nawa;
 

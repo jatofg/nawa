@@ -27,7 +27,7 @@
 using namespace std;
 using namespace nawa;
 
-extern "C" int init(AppInit& appInit) {
+int init(AppInit& appInit) {
 
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
@@ -60,7 +60,7 @@ extern "C" int init(AppInit& appInit) {
     return 0;
 }
 
-extern "C" int handleRequest(Connection& connection) {
+int handleRequest(Connection& connection) {
 
     // we do not have to care about requests for static resources -- the filters are doing that for us!
 

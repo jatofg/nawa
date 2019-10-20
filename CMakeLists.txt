@@ -79,7 +79,6 @@ target_include_directories(nawarun PUBLIC
 
 if(BuildTests)
     add_library(nawatest SHARED
-            tests/app.h
             tests/nawatest.cpp)
     target_include_directories(nawatest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
@@ -87,7 +86,6 @@ if(BuildTests)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     add_library(sessiontest SHARED
-            tests/app.h
             tests/sessiontest.cpp)
     target_include_directories(sessiontest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
@@ -95,7 +93,6 @@ if(BuildTests)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     add_library(emailtest SHARED
-            tests/app.h
             tests/emailtest.cpp)
     target_include_directories(emailtest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>

@@ -29,12 +29,12 @@
 using namespace std;
 using namespace nawa;
 
-extern "C" int init(AppInit& appInit) {
+int init(AppInit& appInit) {
 
     return 0;
 }
 
-extern "C" int handleRequest(Connection& connection) {
+int handleRequest(Connection& connection) {
 
     // make sure cookies are a bit more secure
     Cookie policy;

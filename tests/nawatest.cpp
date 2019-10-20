@@ -21,8 +21,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "app.h"
-
+#include <nawa/Application.h>
 #include <iostream>
 #include <random>
 #include <nawa/Engines/Argon2HashingEngine.h>

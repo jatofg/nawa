@@ -26,8 +26,8 @@
 #include <ctime>
 #include <iomanip>
 #include <nawa/SmtpMailer.h>
-#include "app.h"
-
+#include <nawa/Application.h>
+ 
 using namespace nawa;
 
 int init(AppInit& appInit) {
