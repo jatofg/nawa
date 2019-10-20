@@ -115,7 +115,9 @@ inconsistent logging style).
 
 `cd fastcgipp/build`
 
-`cmake --build -DCMAKE_BUILD_TYPE=RELEASE ..`
+`cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
+
+`make`
 
 Note: If you want to build the fastcgi++ docs, too, run 
 `make doc` now.
@@ -140,7 +142,9 @@ First, create a directory for the build files:
 
 Then, build NAWA:
 
-`cmake --build ..`
+`cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
+
+`make`
 
 And last, install it to the target directories so that the apps 
 can find it:

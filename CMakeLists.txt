@@ -8,7 +8,7 @@ set(NAWA_VERSION_MAJOR 0)
 set(NAWA_VERSION_MINOR 1)
 
 # build options
-option(BuildTests "Build tests" ON)
+option(BuildTests "Build tests" OFF)
 option(BuildExamples "Build examples" ON)
 option(BuildDocs "Build docs" ON)
 
