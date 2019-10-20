@@ -82,7 +82,11 @@ For automatically starting an app on boot, use `systemctl enable`.
 ## Building
 
 NAWA has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
-Windows is not supported and will never be. 
+Windows is not supported and will never be.
+
+**Please note:** All commands in the following instructions should be 
+run as an unprivileged user. Commands that must run as root are 
+prepended with `sudo`.
 
 ### Requirements
 
