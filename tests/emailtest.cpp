@@ -1,6 +1,6 @@
 /**
  * \file emailtest.cpp
- * \brief Tests for SmtpMailer.
+ * \brief Tests for SmtpMailer. Replace the email addresses and login data with existing ones to test.
  */
 
 /*

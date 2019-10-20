@@ -78,6 +78,13 @@ target_include_directories(nawarun PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 if(BuildTests)
+    add_library(assertions SHARED
+            tests/assertions.cpp)
+    target_include_directories(assertions PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
     add_library(nawatest SHARED
             tests/nawatest.cpp)
     target_include_directories(nawatest PUBLIC
@@ -101,6 +108,13 @@ if(BuildTests)
 endif()
 
 if(BuildExamples)
+    add_library(helloworld SHARED
+            examples/helloworld.cpp)
+    target_include_directories(helloworld PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
     add_library(contactform SHARED
             examples/contactform.cpp)
     target_include_directories(contactform PUBLIC

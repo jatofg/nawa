@@ -1,6 +1,7 @@
 /**
  * \file sessiontest.cpp
- * \brief Test simultaneous access to session variables in multi-threading environments.
+ * \brief Test simultaneous access to session variables in multi-threading environments. Use curl, for example, to 
+ * simulate simultaneous accesses (see tests/sessiontest.sh for an example).
  */
 
 /*
@@ -34,6 +35,7 @@ int init(AppInit& appInit) {
 int handleRequest(Connection& connection) {
     // run this a lot of times in parallel (flood requests) to test multi-threading
     // for example with curl: $ curl -b SESSION=... http://t1.local/test?it=[1-100]
+    // see sessiontest.sh for an example script
     std::random_device rd;
     unsigned int cm[1000];
 
