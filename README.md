@@ -47,6 +47,7 @@ without having to care about session management yourself
 easier are included (e.g., SHA-1/2 hasing, password hashing, hex 
 encoding, base64 encoding/decoding, date/time format conversions, 
 default page generation, content type guessing, string splitting)
+- Support for sending emails through SMTP.
 - Set up request filters to forward files and block or authenticate 
 requests.
 - Request handling may take place using multiple threads to exploit  
