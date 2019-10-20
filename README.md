@@ -151,6 +151,12 @@ can find it:
 
 `sudo make install`
 
+### Uninstalling
+
+In the build directory, run:
+
+`sudo xargs rm < install_manifest.txt`
+
 ## Binary packages
 
 Binary packages for Debian and Ubuntu might be provided in the future, 
