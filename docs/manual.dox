@@ -5,10 +5,11 @@
 The following pages provide an introduction to NAWA app development and explain the use of its features.
 
 - \subpage gettingstarted : The basics, and how to write a simple "Hello World" app.
-- Sessions: How to use the comfortable NAWA session system to identify your users.
-- Environment: How to use environment parameters, GET and POST data, and cookies.
-- Filters: Equip your app with static filters, e.g., to comfortably deliver static files (images, stylesheets, ...).
-- Email: How to send emails through SMTP within your NAWA app.
+- \subpage sessionsmanual : How to use the comfortable NAWA session system to identify your users.
+- \subpage environmentmanual : How to use environment parameters, GET and POST data, and cookies.
+- \subpage filtersmanual : Equip your app with static filters, e.g., to comfortably deliver static files
+(images, stylesheets, ...).
+- \subpage emailmanual : How to send emails through SMTP within your NAWA app.
 - And soon even more!
 
 */

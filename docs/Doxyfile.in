@@ -795,6 +795,8 @@ WARN_LOGFILE           =
 INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/nawa" \
                          "@CMAKE_CURRENT_BINARY_DIR@/include/nawa" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/src" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/examples" \
+                         "@CMAKE_CURRENT_SOURCE_DIR@/tests" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/README.md" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/docs"
 
@@ -963,7 +965,7 @@ USE_MDFILE_AS_MAINPAGE = "@CMAKE_CURRENT_SOURCE_DIR@/README.md"
 # also VERBATIM_HEADERS is set to NO.
 # The default value is: NO.
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.

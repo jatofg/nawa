@@ -1,7 +1,8 @@
 Getting Started {#gettingstarted}
 ===
 
-This page will explain how to write a simple, working NAWA application.
+This tutorial will explain how to write a simple, working "Hello World!" 
+NAWA application.
 
 A NAWA app consists of:
 - A config file in INI format with options concerning the NAWA 
@@ -76,9 +77,8 @@ For the start, you just need to include a single header file:
 #include <nawa/Application.h>
 ```
 
-There are two required functions you need to implement in your app:
-- `int init(AppInit &appInit)`
-- `int handleRequest(Connection &connection)`
+There are two required functions you need to implement in your app, 
+`init` and `handleRequest`.
 
 In the `init` function, you can alter the config (at least the options 
 concerning your own app), set up static filters, and do any 
@@ -129,6 +129,9 @@ will only be used after the response is flushed, either wenn the
 `handleRequest` function returns, or when you call 
 `connection.flushResponse()` manually. Instead of using the stream, you 
 could also do `connection.setBody("Hello World!")`.
+
+You can find the full source code of this example in the 
+`examples/helloworld.cpp` file.
 
 Now, compile your app and insert the correct path into your 
 `config.ini` file.
@@ -182,6 +185,7 @@ Of course, you can use `stop` to stop it, `restart` to restart it, and
 
 ## Learn more
 
-To learn more, you can have a look at the examples. Tutorials for other 
-topics, such as sessions, environment data (GET, POST, cookies, ...), 
-and more, will follow soon!
+To learn more, you can have a look at the examples. 
+The `examples/multipage.cpp` example is a good way to start.
+Tutorials for other topics, such as sessions, environment data 
+(GET, POST, cookies, ...), and more, will follow soon!
