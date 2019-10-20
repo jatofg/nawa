@@ -2,6 +2,5 @@ Filters {#filtersmanual}
 ===
 
 Coming soon! Until then, learn about static filters in the 
-`examples/multipage.cpp` example.
-
-And of course, you can use the class documentation :)
+`examples/multipage.cpp` example and have a look at the documentation 
+of the classes in `AccessFilterList.h`.
