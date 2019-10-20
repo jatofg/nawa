@@ -11,9 +11,9 @@ aspects of requests and responses (GET, POST, cookies, ...).
 NAWA communicates with the web server via FastCGI and currently uses 
 the fastcgi++ lite library for efficient request handling.
 
-You want to learn more? Have a look at the manual to see how easy 
-it is:<br>
-https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html
+You want to learn more? 
+[Have a look at the manual](https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html) 
+to see how easy it is.
 
 ### Warning!
 
@@ -68,13 +68,13 @@ The path to the object file is included in the config file, and NAWA
 will take care of setting everything up and starting the app. You 
 can run it like this:
 
-`$ nawarun config.ini`
+`nawarun config.ini`
 
 If systemd is present on your system, a systemd service file will 
 also be installed on your system. You can start an app as a 
 daemon using the path to its ini file (/path/to/config.ini):
 
-`# systemctl start nawa@-path-to-config.ini`
+`sudo systemctl start nawa@-path-to-config.ini`
 
 For automatically starting an app on boot, use `systemctl enable`.
 
@@ -83,35 +83,68 @@ For automatically starting an app on boot, use `systemctl enable`.
 NAWA has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
 Windows is not supported and will never be. 
 
-Before building, make sure that you have the dependencies installed:
+### Requirements
 
-- libfastcgi++ (lite works best -- pull from jatofg/fastcgipp)
-- libssl-dev (should be available in your distro) >= 1.1.1
+The requirements marked with * are also required for running nawa, the 
+others for building only.
+
+- libfastcgi++* (lite) (see next subsection)
+- libssl-dev >= 1.1.1 (OpenSSL* is probably already present on your 
+system)
 - libboost-dev >= 1.65.1.0
-- libcurl4-openssl-dev >= 7.58.0
-- libargon2-0-dev >= 0~20161029-1.1
+- libcurl4*, libcurl4-openssl-dev >= 7.58.0
+- libargon2*, libargon2-0-dev >= 0~20161029-1.1
 
-The documentation will be built if doxygen is installed.
+Git, CMake, gcc, and other basic tools for building software 
+are required, too.
 
-For actually running applications with nawarun, libfastcgi++, libcurl4 
-(>= 7.58.0), and libargon2 (>= 0~20161029-1.1) have to be installed.
+For building the docs, doxygen must be installed. However, you can also 
+[access the docs online](https://www.tobiasflaig.eu/nawa/docs/).
+
+### Clone, build, and install fastcgi++
+
+Run the following commands to build, run, and install fastcgi++ lite 
+(which is an optimized version of the fastcgi++ library by eddic). The 
+original library will work, too, with a few caveats (such as an 
+inconsistent logging style).
+
+`git clone https://github.com/jatofg/fastcgipp.git fastcgipp`
+
+`mkdir fastcgipp/build`
+
+`cd fastcgipp/build`
+
+`cmake --build -DCMAKE_BUILD_TYPE=RELEASE ..`
+
+Note: If you want to build the fastcgi++ docs, too, run 
+`make doc` now.
+
+`sudo make install`
+
+### Clone, build, and install NAWA
 
 To build nawarun, pull the source code, open a terminal, and 
-switch to the NAWA directory.
+switch to the NAWA directory. If you haven't pulled the source code 
+yet, do it:
+
+`git clone https://github.com/jatofg/nawa.git nawa`
+
+`cd nawa`
 
 First, create a directory for the build files:
 
-`$ mkdir build`<br>
-`$ cd build`
+`mkdir build`
+
+`cd build`
 
 Then, build NAWA:
 
-`$ cmake --build ..`
+`cmake --build ..`
 
 And last, install it to the target directories so that the apps 
 can find it:
 
-`$ sudo make install`
+`sudo make install`
 
 ## Binary packages
 
