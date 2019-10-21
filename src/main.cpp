@@ -21,11 +21,9 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <stdexcept>
 #include <fastcgi++/manager.hpp>
 #include <unistd.h>
-#include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
 #include <dlfcn.h>
@@ -37,23 +35,28 @@
 #include <nawa/Application.h>
 
 namespace {
+
     // this will make the manager instance and loaded app accessible for signal handlers
     std::unique_ptr<Fastcgipp::Manager<nawa::RequestHandler>> managerPtr;
     void* appOpen = nullptr;
+
     // use this for logging
     // TODO enable logging to log file through config
     nawa::Log LOG;
+
 }
 
 // signal handler for SIGINT, SIGTERM, and SIGUSR1
 void shutdown(int signum) {
     LOG("Terminating on signal " + std::to_string(signum));
+
     // terminate worker threads
     if(managerPtr) {
         // should unblock managerPtr->join() and execute the rest of the program
         // (in fact it doesn't, but at least new connections should not be accepted anymore)
         // TODO find the bug or reason for this behavior in libfastcgi++
         managerPtr->stop();
+
         // this normally doesn't work, so try harder
         sleep(10);
         if(managerPtr && signum != SIGUSR1) {
@@ -88,7 +91,7 @@ int main(int argc, char** argv) {
     signal(SIGTERM, shutdown);
     signal(SIGUSR1, shutdown);
 
-    // read config.ini
+    // read config file
     nawa::Config config;
     try {
         // nawarun will take the path to the config as an argument
@@ -140,16 +143,19 @@ int main(int argc, char** argv) {
         LOG(std::string("Fatal Error: Application file could not be loaded (main): ") + dlerror());
         return 1;
     }
+
     // reset dl errors
     dlerror();
+
     // load symbols and check for errors
     // first load nawa_version_major (defined in Application.h, included in Connection.h)
-    // the version the app has been compiled for should match the version of this nawarun
+    // the version the app has been compiled against should match the version of this nawarun
     std::string appVersionError = "Fatal Error: Could not read nawa version from application: ";
     auto appNawaVersionMajor = (int*) loadAppSymbol("nawa_version_major", appVersionError);
     auto appNawaVersionMinor = (int*) loadAppSymbol("nawa_version_minor", appVersionError);
     if(*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
-        LOG("Fatal Error: App has been compiled against another version of nawa.");
+        LOG("Fatal Error: App has been compiled against another version of NAWA.");
+        return 1;
     }
     auto appInit = (nawa::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
 
@@ -222,6 +228,8 @@ int main(int argc, char** argv) {
         LOG("Fatal Error: Unknown FastCGI socket mode in config.ini");
         return 1;
     }
+
+    // tell fastcgi to use SO_REUSEADDR if enabled in config
     if(config[{"fastcgi", "reuseaddr"}] != "off") {
         managerPtr->reuseAddress(true);
     }
@@ -246,6 +254,8 @@ int main(int argc, char** argv) {
             LOG("Fatal Error: App init function returned " + std::to_string(initReturn) + " -- exiting");
             return 1;
         }
+
+        // init could have altered the config, take it over
         nawa::RequestHandler::setConfig(appInit1);
     }
 
