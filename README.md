@@ -166,3 +166,11 @@ In the build directory, run:
 Binary packages for Debian and Ubuntu might be provided in the future, 
 as soon as this project reaches a more stable state. Currently, there 
 are not even releases available.
+
+## Third-party licenses
+
+This project includes the following libraries (in the libs directory) 
+with different (less strict) licenses:
+- base64: see `libs/base64/LICENSE` for details
+- inih: New BSD License, see `libs/inih/LICENSE.txt` for details
+- libbcrypt: CC0, see `libs/libbcrypt/COPYING` for details
