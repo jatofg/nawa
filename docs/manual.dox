@@ -10,6 +10,8 @@ The following pages provide an introduction to NAWA app development and explain 
 - \subpage filtersmanual : Equip your app with static filters, e.g., to comfortably deliver static files
 (images, stylesheets, ...).
 - \subpage emailmanual : How to send emails through SMTP within your NAWA app.
-- And soon even more!
+- Logging: Coming soon.
+- Encoding and Crypto: Coming soon.
+- Password Hashing: Coming soon.
 
 */
