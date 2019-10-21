@@ -90,7 +90,7 @@ std::vector<std::string> nawa::Request::Env::getAcceptLanguages() const {
 }
 
 std::vector<std::string> nawa::Request::Env::getRequestPath() const {
-    // TODO is this function really necessary? get RP via operator[] when switched to Universal?
+    // TODO is this function really necessary? get RP via operator[] when switched to Any?
     // TODO what does environment().pathInfo do?
     //return requestHandler.environment().pathInfo;
     return nawa::split_path(requestHandler.environment().requestUri);

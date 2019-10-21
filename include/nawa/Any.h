@@ -1,6 +1,6 @@
 /**
- * \file Universal.h
- * \brief Contains the Universal type, a wrapper for objects on the heap.
+ * \file Any.h
+ * \brief Contains the Any type, a wrapper for objects on the heap.
  */
 
 /*
@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NAWA_UNIVERSAL_H
-#define NAWA_UNIVERSAL_H
+#ifndef NAWA_ANY_H
+#define NAWA_ANY_H
 
 #include <typeinfo>
 #include <typeindex>
@@ -33,20 +33,20 @@ namespace nawa {
     /**
      * Wrapper to store a variable or object of arbitrary type somewhere else on the heap. Some properties:
      *
-     * (1) Type safety. While Universal can store an arbitrary type, accessing it requires explicitly stating it
+     * (1) Type safety. While Any can store an arbitrary type, accessing it requires explicitly stating it
      * as a template parameter. Type checking is done at runtime, an exception will be thrown when trying to
      * cast to the wrong type.
      * (2) Safe copying. Copying the object will also copy the attached object on the heap.
      * (3) Safe destruction. Memory will be freed when the destructor is called.
      */
-    class Universal {
+    class Any {
         std::type_index typeIndex; /**< Store type for comparison. */
         void* ptr; /**< Pointer to the piece of memory where the object is stored. */
-        bool set; /**< Is an object currently stored in the Universal? */
-        void (Universal::*deleter)(); /**< Pointer to destructor for the current object. */
-        void (Universal::*copier)(const Universal&); /**< Pointer to copy function for the current object. */
+        bool set; /**< Is an object currently stored in the Any? */
+        void (Any::*deleter)(); /**< Pointer to destructor for the current object. */
+        void (Any::*copier)(const Any&); /**< Pointer to copy function for the current object. */
 
-        // save a deleter function to properly call stored object destructor in Universal destructor
+        // save a deleter function to properly call stored object destructor in Any destructor
         void deleteNothing() {}
 
         template<typename T>
@@ -56,53 +56,53 @@ namespace nawa {
         }
 
         // copy function
-        void copyNothing(const Universal&) {}
+        void copyNothing(const Any&) {}
 
         template<typename T>
-        void copyValue(const Universal& from) {
+        void copyValue(const Any& from) {
             *this = from.get<T>();
         }
     public:
         /**
-         * Create an empty, uninitialized Universal.
+         * Create an empty, uninitialized Any.
          */
-        Universal() : typeIndex(typeid(void)), set(false), ptr(nullptr) {
-            deleter = &Universal::deleteNothing;
-            copier = &Universal::copyNothing;
+        Any() : typeIndex(typeid(void)), set(false), ptr(nullptr) {
+            deleter = &Any::deleteNothing;
+            copier = &Any::copyNothing;
         }
 
         // do not set set to true as operator= would call the deleter function then
-        Universal(const Universal& value) : typeIndex(value.typeIndex), set(false), ptr(nullptr) {
+        Any(const Any& value) : typeIndex(value.typeIndex), set(false), ptr(nullptr) {
             // members will be set by copier
             copier = value.copier;
             (this->*copier)(value);
         }
 
         /**
-         * Construct a new Universal and assign an object of arbitrary type.
+         * Construct a new Any and assign an object of arbitrary type.
          * @tparam T Type of the object (can usually be derived automatically by the compiler).
          * @param value The object.
          */
         template<typename T>
-        Universal(T value) : typeIndex(typeid(value)), set(true) {
+        Any(T value) : typeIndex(typeid(value)), set(true) {
             T* tPtr = new T(std::move(value));
             ptr = (void*) tPtr;
-            deleter = &Universal::deleteValue<T>;
-            copier = &Universal::copyValue<T>;
+            deleter = &Any::deleteValue<T>;
+            copier = &Any::copyValue<T>;
         }
 
         /**
          * Special handling for string literals: Always save them as strings. It's always better, seriously.
          * @param value A string literal.
          */
-        Universal(const char* value) : typeIndex(typeid(std::string)), set(true) {
+        Any(const char* value) : typeIndex(typeid(std::string)), set(true) {
             std::string* tPtr = new std::string(value);
             ptr = (void*) tPtr;
-            deleter = &Universal::deleteValue<std::string>;
-            copier = &Universal::copyValue<std::string>;
+            deleter = &Any::deleteValue<std::string>;
+            copier = &Any::copyValue<std::string>;
         }
 
-        Universal& operator=(const Universal& value) {
+        Any& operator=(const Any& value) {
             // copier will deal with this
             copier = value.copier;
             (this->*copier)(value);
@@ -110,13 +110,13 @@ namespace nawa {
         }
 
         /**
-         * Assign a new value (possibly of another type) to the Universal.
+         * Assign a new value (possibly of another type) to the Any.
          * @tparam T Type of the new value (usually derived automatically by the compiler).
          * @param value The object.
-         * @return Reference to the current Universal.
+         * @return Reference to the current Any.
          */
         template<typename T>
-        Universal& operator=(T value) {
+        Any& operator=(T value) {
             // delete current value first before assigning a new one
             if(set) {
                 (this->*deleter)();
@@ -126,20 +126,20 @@ namespace nawa {
             set = true;
             T* tPtr = new T(std::move(value));
             ptr = (void*) tPtr;
-            deleter = &Universal::deleteValue<T>;
-            copier = &Universal::copyValue<T>;
+            deleter = &Any::deleteValue<T>;
+            copier = &Any::copyValue<T>;
 
             return *this;
         }
 
-        ~Universal() {
+        ~Any() {
             (this->*deleter)();
         }
 
         /**
-         * Get value of the Universal (copy of the stored object). If T differs from the type of the stored object,
+         * Get value of the Any (copy of the stored object). If T differs from the type of the stored object,
          * a UserException with error code 2 will be thrown. On trying to access an uninitialized or unset
-         * Universal, a UserException with error code 1 will be thrown.
+         * Any, a UserException with error code 1 will be thrown.
          * @tparam T Type of the object. Must be provided explicitly.
          * @return Copy of the stored object.
          */
@@ -147,12 +147,12 @@ namespace nawa {
         T get() const {
             // throw an exception if no value set
             if(!set) {
-                throw UserException("nawa::Types::Universal::get<T>", 1, "Cast of void value requested");
+                throw UserException("nawa::Types::Any::get<T>", 1, "Cast of void value requested");
             }
             // check for type equality and throw exception if not matching
             std::type_index Tindex(typeid(T));
             if(Tindex != typeIndex) {
-                throw UserException("nawa::Types::Universal::get<T>", 2, "Cast to wrong type requested");
+                throw UserException("nawa::Types::Any::get<T>", 2, "Cast to wrong type requested");
             }
             return *(T*)ptr;
         }
@@ -169,8 +169,8 @@ namespace nawa {
         }
 
         /**
-         * Check if the Universal has been initialized and not been unset.
-         * @return True if the Universal currently contains a valid object, false otherwise.
+         * Check if the Any has been initialized and not been unset.
+         * @return True if the Any currently contains a valid object, false otherwise.
          */
         bool isSet() const {
             return set;
@@ -185,7 +185,7 @@ namespace nawa {
         }
 
         /**
-         * Remove stored object from the Universal and free the used heap memory.
+         * Remove stored object from the Any and free the used heap memory.
          */
         void unset() {
             // call deleter only if a value has been set
@@ -197,4 +197,4 @@ namespace nawa {
     };
 }
 
-#endif //NAWA_UNIVERSAL_H
+#endif //NAWA_ANY_H

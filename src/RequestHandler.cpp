@@ -253,7 +253,7 @@ bool nawa::RequestHandler::applyFilters(nawa::Connection &connection) {
                             isAuthenticated = true;
                             // now, if sessions are used, set the session variable to the username
                             if(flt.useSessions) {
-                                connection.session.set(sessionCookieName, Universal(credentials.at(0)));
+                                connection.session.set(sessionCookieName, Any(credentials.at(0)));
                             }
                         }
                     }

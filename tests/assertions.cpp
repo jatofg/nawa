@@ -130,21 +130,21 @@ int init(AppInit &appInit) {
     assert(read_smtp_time(make_smtp_time(currentTime)) == currentTime);
     std::cout << "TEST 3.1 passed" << std::endl;
 
-    // GROUP 4: Test the nawa::Universal class
+    // GROUP 4: Test the nawa::Any class
 
-    // TEST 4.1: Universal test
-    Universal u1(decoded);
-    Universal u2;
+    // TEST 4.1: Any test
+    Any u1(decoded);
+    Any u2;
     u2 = 5;
     assert(u2.get<int>() == 5);
     u2 = u1;
     u1.unset();
-    Universal u3 = u2;
+    Any u3 = u2;
     u2 = std::string("test2xyz");
     assert(u3.get<std::string>() == decoded);
     try {
         auto test = u2.get<int>();
-        std::cerr << "TEST 4.1 failed: could get an int from a string Universal" << std::endl;
+        std::cerr << "TEST 4.1 failed: could get an int from a string Any" << std::endl;
         exit(1);
     }
     catch(const UserException&) {}
