@@ -26,59 +26,106 @@
 #include <climits>
 #include <nawa/UserException.h>
 #include <nawa/Log.h>
+#include <atomic>
+#include <mutex>
 
-nawa::Log::Log() {
-    out = &std::cerr;
-    // get hostname
-    char chostname[HOST_NAME_MAX+1];
-    gethostname(chostname, HOST_NAME_MAX+1);
-    hostname = chostname;
-    // get pid
-    pid = getpid();
+namespace {
+    bool locked = false; /**< If true, the stream and outfile cannot be changed anymore. */
+    std::ostream* out; /**< Stream to send the logging output to. */
+    std::ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
+    std::unique_ptr<std::string> hostnameStr;
+    __pid_t pid = 0;
+    std::atomic_uint instanceCount(0);
+    std::mutex outLock;
+}
+
+nawa::Log::Log() noexcept {
+    if(instanceCount == 0) {
+        out = &std::cerr;
+
+        // get hostname
+        char chostname[HOST_NAME_MAX+1];
+        gethostname(chostname, HOST_NAME_MAX+1);
+        hostnameStr = std::make_unique<std::string>(chostname);
+
+        // get pid
+        pid = getpid();
+    }
+
     // appname is nawa by default
     appname = "nawa";
+
+    ++instanceCount;
 }
 
-nawa::Log::Log(std::ostream *os) : Log() {
-    out = os;
-}
-
-nawa::Log::Log(std::string filename) : Log() {
-    setOutfile(std::move(filename));
-}
-
-nawa::Log::~Log() {
-    if(logFile.is_open()) {
-        logFile.close();
-    }
-}
-
-void nawa::Log::setStream(std::ostream *os) {
-    out = os;
-}
-
-void nawa::Log::setOutfile(std::string filename) {
-    if(logFile.is_open()) {
-        logFile.close();
-    }
-    logFile.open(filename, std::ofstream::out | std::ofstream::app);
-    if(!logFile) {
-        throw UserException("nawa::Log::setOutfile", 1, "Failed to open requested file for writing.");
-    }
-    out = &logFile;
-}
-
-void nawa::Log::setAppname(std::string appname_) {
+nawa::Log::Log(std::string appname_) noexcept : Log() {
     appname = std::move(appname_);
 }
 
-void nawa::Log::write(std::string msg) {
+nawa::Log::Log(const nawa::Log &other) noexcept {
+    appname = other.appname;
+    ++instanceCount;
+}
+
+nawa::Log &nawa::Log::operator=(const nawa::Log &other) noexcept {
+    if(this != &other) {
+        appname = other.appname;
+        ++instanceCount;
+    }
+    return *this;
+}
+
+nawa::Log::~Log() {
+    --instanceCount;
+    if(instanceCount == 0) {
+        if(logFile.is_open()) {
+            logFile.close();
+        }
+        locked = false;
+        hostnameStr.reset(nullptr);
+    }
+}
+
+void nawa::Log::setStream(std::ostream *os) noexcept {
+    if(!locked) {
+        out = os;
+    }
+}
+
+void nawa::Log::setOutfile(const std::string &filename) {
+    if(!locked) {
+        if(logFile.is_open()) {
+            logFile.close();
+        }
+        logFile.open(filename, std::ofstream::out | std::ofstream::app);
+        if(!logFile) {
+            throw UserException("nawa::Log::setOutfile", 1,
+                    "Failed to open requested file for writing.");
+        }
+        out = &logFile;
+    }
+}
+
+void nawa::Log::lockStream() noexcept {
+    locked = true;
+}
+
+bool nawa::Log::isLocked() noexcept {
+    return locked;
+}
+
+void nawa::Log::setAppname(std::string appname_) noexcept {
+    appname = std::move(appname_);
+}
+
+void nawa::Log::write(const std::string &msg) {
     auto now = std::time(nullptr);
 
-    *out << std::put_time(std::localtime(&now), "%b %d %H:%M:%S ") << hostname << ' ' << program_invocation_short_name
+    std::lock_guard<std::mutex> l(outLock);
+    *out << std::put_time(std::localtime(&now), "%b %d %H:%M:%S ") << *hostnameStr << ' ' << program_invocation_short_name
          << '[' << pid << "]: [" << appname << "] " << msg << std::endl;
 }
 
-void nawa::Log::operator()(std::string msg) {
-    write(std::move(msg));
+void nawa::Log::operator()(const std::string &msg) {
+    write(msg);
 }

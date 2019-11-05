@@ -90,6 +90,9 @@ int main(int argc, char** argv) {
     signal(SIGINT, shutdown);
     signal(SIGTERM, shutdown);
     signal(SIGUSR1, shutdown);
+    
+    // set up logging
+    nawa::Log::lockStream();
 
     // read config file
     nawa::Config config;

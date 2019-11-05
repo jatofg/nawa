@@ -28,67 +28,76 @@
 #include <fstream>
 
 namespace nawa {
-    // TODO also 'improve' logging (change it to the correct format) in fastcgi++
     /**
-     * Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream
+     * Simple class for thread-safe logging to stderr or to any other output stream. This class uses the same ostream
+     * for logging in all instances and synchronizes the output. Every instance can have its own app name.
+     * By default, the logger will write to std::cout.
      */
     class Log {
-        std::ostream* out; /**< Stream to send the logging output to. */
-        std::ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
-        // TODO synchronization with a mutex? (does not make sense right now, as there is no global object)
-        std::string hostname;
-        std::string appname;
-        __pid_t pid = 0;
+        std::string appname; /**< Name of the current app, appears in brackets in the log. */
     public:
         /**
-         * Construct a Log object that writes to std::cerr by default.
+         * Construct a Log object with the default app name nawa (can be changed later).
          */
-        Log();
+        Log() noexcept;
         /**
-         * Construct a Log object that writes to the specified output stream by default.
-         * @param os Pointer to the output stream. Make sure that this stream will be available during the full lifetime
-         * of the Session object.
+         * Construct a Log object with a custom app name (can be changed later).
+         * @param appname_
          */
-        explicit Log(std::ostream* os);
-        /**
-         * Construct a Log object that appends to the specified log file. This function will invoke setOutfile() and
-         * may therefore throw exceptions.
-         * @param filename Path to the log file.
-         */
-        explicit Log(std::string filename);
-        // TODO implement copying if required
-        Log(const Log&) = delete;
-        Log& operator=(const Log&) = delete;
+        explicit Log(std::string appname_) noexcept;
+        Log(const Log& other) noexcept;
+        Log& operator=(const Log& other) noexcept;
         virtual ~Log();
         /**
-         * Change the output stream to the specified one.
-         * @param os Pointer to the output stream. Make sure that this stream will be available during the full lifetime
-         * of the Session object.
+         * Change the output stream to the specified one. This change will be permanent until every active Log
+         * object has been destructed. If the output stream is locked, this function will have no effect, and throw
+         * no exception (make sure to check isLocked() first).
+         * 
+         * This function is not thread-safe as long as the stream is unlocked. Please lock the stream before using 
+         * the logger in a multi-threaded environment.
+         * @param os Pointer to the output stream. Make sure that this stream will be available until NAWA terminates.
          */
-        void setStream(std::ostream* os);
+        static void setStream(std::ostream* os) noexcept;
         // TODO does std::ofstream file opening really throw exceptions or is there sth that has to be changed?
         /**
          * Change the output to append to the specified log file. Will throw a UserException with error code 1 if
-         * the requested file cannot be opened for writing.
+         * the requested file cannot be opened for writing. This change will be permanent until every active Log
+         * object has been destructed. If the output stream is locked, this function will have no effect, and throw
+         * no exception (make sure to check isLocked() first).
+         * 
+         * This function is not thread-safe as long as the stream is unlocked. Please lock the stream before using 
+         * the logger in a multi-threaded environment.
          * @param filename Path to the log file.
          */
-        void setOutfile(std::string filename);
+        static void setOutfile(const std::string &filename);
+        /**
+         * Lock the output stream. It will not be possible to change the output stream of the logger anymore as long as
+         * there is at least one active Log object. If the output stream is already locked, this will have no effect.
+         * This operation is not reversible. Please run this function before multiple threads might construct Log
+         * objects, as setting the output stream/file is not thread-safe.
+         */
+        static void lockStream() noexcept;
+        /**
+         * Check whether the output stream is locked.
+         * @return True if locked, false if not.
+         */
+        static bool isLocked() noexcept;
         /**
          * Set the app name to use in debugging output. Defaults to nawa, but can be changed in order to use this
-         * logging class inside of nawa apps.
+         * logging class inside of NAWA apps.
          * @param appname The app name, which will be include in the log in brackets.
          */
-        void setAppname(std::string appname);
+        void setAppname(std::string appname) noexcept;
         /**
          * Write a message to the log.
          * @param msg The message.
          */
-        void write(std::string msg);
+        void write(const std::string &msg);
         /**
          * Write a message to the log.
          * @param msg The message.
          */
-        void operator()(std::string msg);
+        void operator()(const std::string &msg);
     };
 }
 
