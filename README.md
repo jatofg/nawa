@@ -16,7 +16,7 @@ the fastcgi++ lite library for efficient request handling.
 The following example is the complete C++ source code of a NAWA app that 
 answers every request with the "Hello World!". It's that simple.
 
-```{.cpp}
+```cpp
 #include <nawa/Application.h>
 
 using namespace nawa;
