@@ -87,9 +87,7 @@ namespace nawa {
      */
     std::string make_http_time(time_t time);
     /**
-     * Create a time_t value (UNIX timestamp) from a HTTP header date/time string. This function will only work if the
-     * locale is set to "C" (classic locale). If your app updates the locale, make sure to reset it before calling this
-     * function. Locale changes might not be thread-safe, so you'd better use a mutex.
+     * Create a time_t value (UNIX timestamp) from a HTTP header date/time string.
      * @param httpTime Time string in the format:
      * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
      * @return UNIX timestamp value (time_t).
@@ -99,15 +97,13 @@ namespace nawa {
      * Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string.
      * @param time UNIX timestamp as a time_t value.
      * @return Time string in the format
-     * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> +<tzoffset(4)>".
+     * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> <tzoffset(5)>".
      */
     std::string make_smtp_time(time_t time);
     /**
-     * Create a time_t value (UNIX timestamp) from a SMTP header date/time string. This function will only work if the
-     * locale is set to "C" (classic locale). If your app updates the locale, make sure to reset it before calling this
-     * function. Locale changes might not be thread-safe, so you'd better use a mutex.
+     * Create a time_t value (UNIX timestamp) from a SMTP header date/time string.
      * @param smtpTime Time string in the format:
-     * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> +<tzoffset(4)>".
+     * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> <tzoffset(5)>".
      * @return UNIX timestamp value (time_t).
      */
     time_t read_smtp_time(const std::string &smtpTime);
