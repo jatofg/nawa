@@ -55,7 +55,7 @@ int init(AppInit &appInit) {
     // Testing of encoding and crypto functions will happen with different random input strings
     std::string decoded;
     for(unsigned int rseed = 0; rseed < 10; ++rseed) {
-        
+
         std::cout << "TESTING NOW WITH SEED " << rseed << std::endl;
         // generate a random string with this seed
         decoded = genRandomUnicode(100, rseed);
@@ -126,9 +126,29 @@ int init(AppInit &appInit) {
 
     // TEST 3.1: Time conversions
     time_t currentTime = time(nullptr);
-    assert(read_http_time(make_http_time(currentTime)) == currentTime);
-    assert(read_smtp_time(make_smtp_time(currentTime)) == currentTime);
+    std::string testTimeStr1 = "Thu,  7 Nov 2019 16:29:50 +0100";
+    if(read_http_time(make_http_time(currentTime)) != currentTime) {
+        std::cerr << "TEST 3.1.1 FAILED: currentTime = " << currentTime << "; make_http_time(currentTime) = "
+                  << make_http_time(currentTime) << "; read_http_time(...) = "
+                  << read_http_time(make_http_time(currentTime)) << std::endl;
+        return 1;
+    }
+    if(read_smtp_time(make_smtp_time(currentTime)) != currentTime) {
+        std::cerr << "TEST 3.1.2 FAILED: currentTime = " << currentTime << "; make_smtp_time(currentTime) = "
+                  << make_smtp_time(currentTime) << "; read_smtp_time(...) = "
+                  << read_smtp_time(make_smtp_time(currentTime)) << std::endl;
+        return 1;
+    }
+    assert(make_smtp_time(read_smtp_time(testTimeStr1)) == testTimeStr1);
     std::cout << "TEST 3.1 passed" << std::endl;
+
+    // TEST 3.2: Test path splitting
+    std::string t1 = "p1/p2/p3";
+    std::string t2 = "/p1/p2/p3";
+    std::string t3 = "/p1/p2/p3/";
+    auto t1_split = split_path(t1);
+    assert(t1_split == split_path(t2) && t1_split == split_path(t3));
+    std::cout << "TEST 3.2 passed" << std::endl;
 
     // GROUP 4: Test the nawa::Any class
 

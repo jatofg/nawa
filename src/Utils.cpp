@@ -331,12 +331,33 @@ std::string nawa::make_smtp_time(time_t time1) {
 }
 
 time_t nawa::read_smtp_time(const std::string &smtpTime) {
-    std::istringstream timeStream(smtpTime);
+    std::string smtpTimeM = smtpTime;
     tm timeStruct;
-    timeStream >> std::get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
+
+    // there seems to be a bug in get_time, %e parsing with leading space does not work, so this fails for
+    // days of month < 10:
+    //timeStream >> std::get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
+
+    // dirty hack
+    if(smtpTimeM.length() > 5 && smtpTimeM[5] == ' ') {
+        smtpTimeM[5] = '0';
+    }
+    std::istringstream timeStream(smtpTimeM);
+    timeStream >> std::get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S %z");
+
+    // timegm will create a time_t, but does not honor the time zone, unfortunately (not part of tm)
+    time_t unixTime = timegm(&timeStruct);
+
+    // so we'll have to add/subtract the difference manually
+    if(smtpTimeM.length() > 30) {
+        int tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
+        int tzH = std::stoi(smtpTimeM.substr(27, 2));
+        int tzM = std::stoi(smtpTimeM.substr(29, 2));
+        unixTime += tzAdjust * (tzH * 3600 + tzM * 60);
+    }
 
     // mktime will interpret the tm as local time and convert it to a time_t
-    return mktime(&timeStruct);
+    return unixTime;
 }
 
 std::vector<std::string> nawa::split_string(std::string str, char delimiter, bool ignoreEmpty) {
