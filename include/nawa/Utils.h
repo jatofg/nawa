@@ -140,8 +140,8 @@ namespace nawa {
      */
     std::string convert_line_endings(const std::string& in, const std::string& ending);
     /**
-     * Simple function to read a whole file into a string. Will a UserException with error code 1 if the file does not 
-     * exist.
+     * Simple function to read a whole file into a string. Will throw a UserException with error code 1 if the file
+     * does not exist.
      * @param path Path and filename.
      * @return String containing the whole file.
      */
