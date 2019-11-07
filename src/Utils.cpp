@@ -379,6 +379,9 @@ std::vector<std::string> nawa::split_string(std::string str, char delimiter, boo
 }
 
 std::string nawa::merge_path(const std::vector<std::string> &path) {
+    if(path.empty()) {
+        return "/";
+    }
     std::stringstream stringPath;
     for(auto const &e: path) {
         stringPath << '/' << e;

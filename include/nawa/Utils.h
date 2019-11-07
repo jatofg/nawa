@@ -117,6 +117,7 @@ namespace nawa {
     std::vector<std::string> split_string(std::string str, char delimiter, bool ignoreEmpty = false);
     /**
      * Convert a vector representation of a path ({"dir1", "dir2"}) to a string representation ("/dir1/dir2").
+     * An empty vector will result in the string representation "/".
      * @param path Vector representation of a path.
      * @return String representation of the given path.
      */
