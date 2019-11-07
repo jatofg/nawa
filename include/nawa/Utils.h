@@ -127,6 +127,7 @@ namespace nawa {
     std::string merge_path(const std::vector<std::string> &path);
     /**
      * Convert a string representation of a path ("/dir1/dir2") to a vector representation ({"dir1", "dir2"}).
+     * Query strings (starting with '?') are being ignored and will not be part of the returned vector.
      * @param pathString Sting representation of the path.
      * @return Vector representation of the given path.
      */

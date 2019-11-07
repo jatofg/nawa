@@ -387,8 +387,9 @@ std::string nawa::merge_path(const std::vector<std::string> &path) {
 }
 
 std::vector<std::string> nawa::split_path(const std::string &pathString) {
-    auto ret = split_string(pathString, '/', true);
-    return ret;
+    // remove query string
+    std::string rawPath = pathString.substr(0, pathString.find('?'));
+    return split_string(rawPath, '/', true);
 }
 
 std::string nawa::convert_line_endings(const std::string &in, const std::string &ending) {

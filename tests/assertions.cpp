@@ -146,8 +146,11 @@ int init(AppInit &appInit) {
     std::string t1 = "p1/p2/p3";
     std::string t2 = "/p1/p2/p3";
     std::string t3 = "/p1/p2/p3/";
+    std::string t4 = "/p1/p2/p3?test=/xyz";
+    std::string t5 = "/p1/p2/p3/?test=/xyz/";
     auto t1_split = split_path(t1);
-    assert(t1_split == split_path(t2) && t1_split == split_path(t3));
+    assert(t1_split == split_path(t2) && t1_split == split_path(t3) && t1_split == split_path(t4)
+        && t1_split == split_path(t5));
     std::cout << "TEST 3.2 passed" << std::endl;
 
     // GROUP 4: Test the nawa::Any class
