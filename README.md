@@ -97,6 +97,19 @@ daemon using the path to its ini file (/path/to/config.ini):
 
 For automatically starting an app on boot, use `systemctl enable`.
 
+### Using Docker
+
+You can also use the Docker images available in the GitHub Package 
+Registry. As they are built automatically, they should always be 
+up to date. See the [packages](https://github.com/jatofg/nawa/packages) 
+section to learn how to install them, and [the docs](https://www.tobiasflaig.eu/nawa/docs/usingdocker.html) 
+for using and building them.
+
+To install them, you need a GitHub account and access 
+token (click "Learn more" in the Packages section for more 
+information). After logging in with docker, use the command on 
+the package page to pull the image.
+
 ## Building
 
 NAWA has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
