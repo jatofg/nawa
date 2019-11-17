@@ -7,11 +7,11 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      VERSION_TS: $(date +%s)
 
     steps:
     - uses: actions/checkout@v1
+    - name: Save build timestamp
+      run: echo "::set-env name=VERSION_TS::$(date +%s)"
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag docker.pkg.github.com/jatofg/nawa/nawa:0.1-${VERSION_TS}
     - name: Publish the Docker image
