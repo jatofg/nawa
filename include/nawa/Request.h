@@ -72,7 +72,7 @@ namespace nawa {
         public:
             explicit Env(RequestHandler& request) : requestHandler(request) {}
             /**
-             * Get an environment variable.
+             * Get an environment variable. For a list of environment variables, see \ref environmentmanual
              * @param envVar Name of the environment variable.
              * @return Content of the environment variable. Empty string if not set.
              */
