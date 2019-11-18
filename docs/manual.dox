@@ -7,7 +7,7 @@ The following pages provide an introduction to NAWA app development and explain 
 - \subpage gettingstarted : The basics, and how to write a simple "Hello World" app.
 - \subpage usingdocker : How to use NAWA with Docker.
 - \subpage sessionsmanual : How to use the comfortable NAWA session system to identify your users.
-- \subpage environmentmanual : How to use environment parameters, GET and POST data, and cookies.
+- \subpage environmentmanual : How to use environment parameters, GET and POST data, cookies, and HTTP headers.
 - \subpage filtersmanual : Equip your app with static filters, e.g., to comfortably deliver static files
 (images, stylesheets, ...).
 - \subpage emailmanual : How to send emails through SMTP within your NAWA app.

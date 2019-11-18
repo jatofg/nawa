@@ -11,6 +11,13 @@ aspects of requests and responses (GET, POST, cookies, ...).
 NAWA communicates with the web server via FastCGI and currently uses 
 the fastcgi++ lite library for efficient request handling.
 
+## News
+- 2019-11-18: [Sessions](https://www.tobiasflaig.eu/nawa/docs/sessionsmanual.html) 
+and [Environment](https://www.tobiasflaig.eu/nawa/docs/environmentmanual.html) 
+manuals are now complete
+- 2019-11-17: [Docker builds](https://github.com/jatofg/nawa/packages/57471) 
+now available
+
 ## Example
 
 The following example is the complete C++ source code of a NAWA app that 
@@ -39,7 +46,7 @@ You want to learn more?
 This project is in a very early state (version 0.1!). It might contain 
 serious bugs that could compromise the security of your system. 
 So use it at your own risk, and better don't use it on a production 
-system yet. But you SHOULD test it (e.g., on a VM or container), report 
+system yet. But you SHOULD test it (e.g., using Docker or in a VM), report 
 any bugs, and help to make this project more stable! :)
 
 Also, it means that the ABI and API can change at any time, making 
