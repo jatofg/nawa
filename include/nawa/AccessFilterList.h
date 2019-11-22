@@ -96,7 +96,7 @@ namespace nawa {
         /**
          * The HTTP status that will be sent to the client if the request is blocked.
          */
-        unsigned int status = 403;
+        unsigned int status = 404;
     };
 
     /**
