@@ -32,23 +32,23 @@ int init(AppInit& appInit) {
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
 
-    // apply forward filters for images below '/test2/static/images' ...
+    // apply forward filters for images below '/test/static/images' and '/test2/static/images ...
     ForwardFilter imageFilter;
-    imageFilter.pathFilter = {"test2", "static", "images"};
-    imageFilter.extensionFilter = "png";
+    imageFilter.pathFilter = {{"test", "static", "images"}, {"test2", "static", "images"}};
+    imageFilter.extensionFilter = {"png", "jpeg", "jpg", "gif"};
     imageFilter.basePath = "/var/www/multipage/images";
     appInit.accessFilters.forwardFilters.push_back(imageFilter);
 
     // ... and html below '/test2/static/html'
     ForwardFilter htmlFilter;
-    htmlFilter.pathFilter = {"test2", "static", "html"};
-    htmlFilter.extensionFilter = "html";
+    htmlFilter.pathFilter = {{"test", "static", "html"}};
+    htmlFilter.extensionFilter = {"html", "htm"};
     htmlFilter.basePath = "/var/www/multipage/html";
     appInit.accessFilters.forwardFilters.push_back(htmlFilter);
 
     // authenticate access to all static resources
     AuthFilter authFilter;
-    authFilter.pathFilter = {"test2", "static"};
+    authFilter.pathFilter = {{"test2", "static"}};
     authFilter.authName = "Not for everyone!";
     authFilter.authFunction = [](std::string user, std::string password) -> bool {
         return (user == "test" && password == "supersecure");

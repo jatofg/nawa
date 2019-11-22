@@ -48,15 +48,16 @@ namespace nawa {
          */
         bool invert = false;
         /**
-         * For path filtering: A vector containing all directory names under the web root
-         * (e.g., ["dir1", "dir2"] for /dir1/dir2/). If empty, path filtering will not be applied.
+         * For path filtering: A vector containing all paths to match. Each path shall be provided as a vector of
+         * strings containing all directory names under the web root
+         * (e.g., {"dir1", "dir2"} for /dir1/dir2/). If empty, path filtering will not be applied.
          */
-        std::vector<std::string> pathFilter;
+        std::vector<std::vector<std::string>> pathFilter;
         /**
-         * For extension filtering: the file extension (the part behind the last '.'). If empty, extension filtering
-         * will not be applied.
+         * For extension filtering: A list of file extensions (the part behind the last '.') to match.
+         * If empty, extension filtering will not be applied.
          */
-        std::string extensionFilter;
+        std::vector<std::string> extensionFilter;
         /**
          * Regex filtering will be applied iff this value is set to true.\n
          * Please note that this filtering is very resource-intensive. Use it only if you cannot achieve your goal by

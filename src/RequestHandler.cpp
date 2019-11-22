@@ -62,21 +62,43 @@ namespace {
      */
     bool filterMatches(const std::vector<std::string> &requestPath, const nawa::AccessFilter &flt) {
         if(!flt.pathFilter.empty()) {
-            // path condition is set but does not match -> the whole filter does not match
-            // all elements of the filter path must be in the request path
-            if(requestPath.size() < flt.pathFilter.size())
+            // one of the paths in the path filter must match for the path filter to match
+            bool pathFilterMatches = false;
+            for(auto const &filter: flt.pathFilter) {
+                // path condition is set but does not match -> the whole filter does not match
+                // all elements of the filter path must be in the request path
+                if(requestPath.size() < filter.size()) {
+                    continue;
+                }
+                pathFilterMatches = true;
+                for(size_t i = 0; i < filter.size(); ++i) {
+                    if(filter.at(i) != requestPath.at(i)) {
+                        pathFilterMatches = false;
+                        break;
+                    }
+                }
+                if(pathFilterMatches) {
+                    break;
+                }
+            }
+            if(!pathFilterMatches) {
                 return false;
-            for(unsigned long i = 0; i < flt.pathFilter.size(); ++i) {
-                if(flt.pathFilter.at(i) != requestPath.at(i))
-                    return false;
             }
             // path condition matches -> continue to the next filter
         }
 
         if(!flt.extensionFilter.empty()) {
-            auto const &filename = requestPath.back();
-            if(nawa::get_file_extension(filename) != flt.extensionFilter)
+            auto fileExtension = nawa::get_file_extension(requestPath.back());
+            bool extensionFilterMatches = false;
+            for(auto const &e: flt.extensionFilter) {
+                if(fileExtension == e) {
+                    extensionFilterMatches = true;
+                    break;
+                }
+            }
+            if(!extensionFilterMatches) {
                 return false;
+            }
         }
 
         if(flt.regexFilterEnabled) {

@@ -35,22 +35,22 @@ int init(nawa::AppInit& appInit) {
 
     // apply a forward filter for images
     ForwardFilter forwardFilter;
-    forwardFilter.pathFilter = {"test", "images"};
-    forwardFilter.extensionFilter = "png";
+    forwardFilter.pathFilter = {{"test", "images"}, {"test2", "images"}};
+    forwardFilter.extensionFilter = {"png", "jpg", "svg"};
     forwardFilter.basePath = "/home/tobias/Pictures";
     appInit.accessFilters.forwardFilters.push_back(forwardFilter);
 
-    // apply a block filter for everything that is not in /test or /test/images (and some more restrictions)
+    // apply a block filter for everything that is not in /test{2} or /test{2}/images (and some more restrictions)
     BlockFilter blockFilter;
     blockFilter.invert = true;
     blockFilter.regexFilterEnabled = true;
-    blockFilter.regexFilter.assign(R"(/test(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
+    blockFilter.regexFilter.assign(R"(/test2?(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
     blockFilter.status = 404;
     appInit.accessFilters.blockFilters.push_back(blockFilter);
 
     // authenticate access to the images directory
     AuthFilter authFilter;
-    authFilter.pathFilter = {"test", "images"};
+    authFilter.pathFilter = {{"test", "images"}};
     authFilter.authName = "Not for everyone!";
     authFilter.authFunction = [](std::string user, std::string password) -> bool {
         return (user == "test" && password == "supersecure");

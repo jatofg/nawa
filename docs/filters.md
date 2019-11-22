@@ -4,7 +4,8 @@ Filters and Sending Files {#filtersmanual}
 Usually, a website also contains static elements such as images, templates, 
 stylesheets, and so on. The ForwardFilter feature of NAWA can deal with 
 this (and send static elements automatically) and keep this out of your 
-main application logic (in `handleRequest`).
+main application logic (in `handleRequest`). It takes care of content types 
+and cooperates with the browser for optimal caching of static resources.
 
 Additionally, BlockFilters can block access to certain paths and 
 AuthFilters authenticate access.
@@ -26,10 +27,11 @@ appInit.accessFilters.filtersEnabled = true;
 
 There are three criteria that can be used for filtering. A filter matches 
 if and only if **all** of the defined conditions match. A filter without 
-any conditions matches all requests.
+any conditions matches all requests. You can alter this behavior by 
+inverting the filter (see the end of this section).
 
-- Request path: You define a path. Only requests under this path match.
-- File extension: Only files with the given file extension match.
+- Request path: Only files below one of the given paths match.
+- File extension: Only files with one of the given file extensions match.
 - Regex: Only URIs matched by a regular expression match.
 
 As an example, we use a `ForwardFilter`, but `BlockFilter`s and 
@@ -39,16 +41,22 @@ As an example, we use a `ForwardFilter`, but `BlockFilter`s and
 nawa::ForwardFilter myFilter;
 ```
 
-To filter only URIs starting with `/static/images`:
+To apply a request path condition, provide a list (vector) of paths. Paths 
+in NAWA are represented by vectors of strings, for example, the path 
+`/static/images` would be represented by the vector `{"static", "images"}`. 
+All files below a given path are matched, in our example, a file 
+`/static/images/dir1/dir2/file.jpeg` would match. In the following example, 
+the paths `/static/images` and `/static2/images` would be matched:
 
 ```cpp
-myFilter.pathFilter = {"static", "images"};
+myFilter.pathFilter = {{"static", "images"}, {"static2", "images"}};
 ```
 
-To filter only files with file extension `.jpeg`:
+With an extension filter, you could limit the matched extensions to a 
+set of common image formats, for example:
 
 ```cpp
-myFilter.extensionFilter = "jpeg";
+myFilter.extensionFilter = {"jpeg", "jpg", "png", "gif", "svg"};
 ```
 
 To filter basing on a regular expression, you have to enable the regex 
@@ -62,7 +70,7 @@ myFilter.regexFilter.assign(R"(/test(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})
 The above example would match everything that is not in `/test`, 
 `/test/images`, and some more things. Please note that regex filters are 
 expensive (in CPU cycles) and create a lot of overhead on every request. 
-Use them only if your goal cannot be achieved without.
+Use them only if your goal cannot be achieved without them.
 
 You can also invert your filter, i.e., the filter matches when **none** of 
 your conditions matches. An inverted filter without conditions matches no 
@@ -87,8 +95,8 @@ Example for a forward filter mapping to :
 
 ```cpp
 nawa::ForwardFilter imageFilter;
-imageFilter.pathFilter = {"static", "images"};
-imageFilter.extensionFilter = "png";
+imageFilter.pathFilter = {{"static", "images"}};
+imageFilter.extensionFilter = {"png"};
 imageFilter.basePath = "/var/www/multipage/images";
 imageFilter.basePathExtension = nawa::ForwardFilter::BY_FILENAME; // could be skipped, default option anyway
 appInit.accessFilters.forwardFilters.push_back(imageFilter); // add the filter to appInit
@@ -110,7 +118,7 @@ of `/app`:
 
 ```cpp
 nawa::BlockFilter blockFilter;
-blockFilter.pathFilter = {"app"};
+blockFilter.pathFilter = {{"app"}};
 blockFilter.invert = true;
 blockFilter.status = 404;
 appInit.accessFilters.blockFilters.push_back(blockFilter);
@@ -134,7 +142,7 @@ and requires the user to provide the username "user" and the password
 
 ```cpp
 nawa::AuthFilter authFilter;
-authFilter.pathFilter = {"secret"};
+authFilter.pathFilter = {{"secret"}};
 authFilter.authName = "Top secret area!";
 authFilter.authFunction = [](std::string user, std::string password) -> bool {
     return (user == "user" && password == "super_secret");
