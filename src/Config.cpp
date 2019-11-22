@@ -36,7 +36,7 @@ nawa::Config &nawa::Config::operator=(const nawa::Config &other) {
     return *this;
 }
 
-void nawa::Config::read(std::string iniFile) {
+void nawa::Config::read(const std::string &iniFile) {
     auto valueHandler = [](void* obj, const char* section, const char* name, const char* value) -> int {
         auto _this = (nawa::Config*) obj;
         std::pair<std::string, std::string> keyToInsert (section, name);
@@ -49,11 +49,11 @@ void nawa::Config::read(std::string iniFile) {
     }
 }
 
-bool nawa::Config::isSet(std::pair<std::string, std::string> key) const {
+bool nawa::Config::isSet(const std::pair<std::string, std::string> &key) const {
     return (values.count(key) == 1);
 }
 
-std::string nawa::Config::operator[](std::pair<std::string, std::string> key) const {
+std::string nawa::Config::operator[](const std::pair<std::string, std::string>& key) const {
     if(values.count(key) == 1) {
         return values.at(key);
     }
