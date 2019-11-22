@@ -1,4 +1,4 @@
-Filters {#filtersmanual}
+Filters and Sending Files {#filtersmanual}
 ===
 
 Usually, a website also contains static elements such as images, templates, 
@@ -143,3 +143,9 @@ appInit.accessFilters.authFilters.push_back(authFilter);
 ```
 
 For a working example with static filters, see `examples/multipage.cpp`.
+
+## Manually sending files
+
+To respond to a request with a file from disk manually, you can use the 
+`connection.sendFile()` function, have a look at: 
+`nawa::Connection::sendFile()`
