@@ -54,10 +54,20 @@ namespace nawa {
          */
         std::vector<std::vector<std::string>> pathFilter;
         /**
+         * Invert the path filtering condition, i.e., the condition applies when the request URI is *outside* of
+         * the specified paths.
+         */
+        bool invertPathFilter = false;
+        /**
          * For extension filtering: A list of file extensions (the part behind the last '.') to match.
          * If empty, extension filtering will not be applied.
          */
         std::vector<std::string> extensionFilter;
+        /**
+         * Invert the extension filtering condition, i.e., the condition applies when a file has an extension which
+         * is not part of the given list of extensions.
+         */
+        bool invertExtensionFilter = false;
         /**
          * Regex filtering will be applied iff this value is set to true.\n
          * Please note that this filtering is very resource-intensive. Use it only if you cannot achieve your goal by

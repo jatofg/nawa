@@ -40,13 +40,21 @@ int init(nawa::AppInit& appInit) {
     forwardFilter.basePath = "/home/tobias/Pictures";
     appInit.accessFilters.forwardFilters.push_back(forwardFilter);
 
-    // apply a block filter for everything that is not in /test{2} or /test{2}/images (and some more restrictions)
+    // send 404 error for non-image files in /test{2}/images
     BlockFilter blockFilter;
-    blockFilter.invert = true;
-    blockFilter.regexFilterEnabled = true;
-    blockFilter.regexFilter.assign(R"(/test2?(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
+    blockFilter.pathFilter = {{"test", "images"}, {"test2", "images"}};
+    blockFilter.extensionFilter = {"png", "jpg", "svg"};
+    blockFilter.invertExtensionFilter = true;
     blockFilter.status = 404;
     appInit.accessFilters.blockFilters.push_back(blockFilter);
+
+    // apply a block filter for everything that is not in /test{2} or /test{2}/images (and some more restrictions)
+    BlockFilter blockFilter2;
+    blockFilter2.invert = true;
+    blockFilter2.regexFilterEnabled = true;
+    blockFilter2.regexFilter.assign(R"(/test2?(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
+    blockFilter2.status = 404;
+    appInit.accessFilters.blockFilters.push_back(blockFilter2);
 
     // authenticate access to the images directory
     AuthFilter authFilter;

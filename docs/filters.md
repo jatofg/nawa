@@ -41,6 +41,8 @@ As an example, we use a `ForwardFilter`, but `BlockFilter`s and
 nawa::ForwardFilter myFilter;
 ```
 
+### Request path condition
+
 To apply a request path condition, provide a list (vector) of paths. Paths 
 in NAWA are represented by vectors of strings, for example, the path 
 `/static/images` would be represented by the vector `{"static", "images"}`. 
@@ -52,12 +54,30 @@ the paths `/static/images` and `/static2/images` would be matched:
 myFilter.pathFilter = {{"static", "images"}, {"static2", "images"}};
 ```
 
+If you want to match files outside of the given paths instead, you can 
+invert the path filter condition:
+
+```cpp
+myFilter.invertPathFilter = true;
+```
+
+### File extension condition
+
 With an extension filter, you could limit the matched extensions to a 
 set of common image formats, for example:
 
 ```cpp
 myFilter.extensionFilter = {"jpeg", "jpg", "png", "gif", "svg"};
 ```
+
+You can also invert the extension filter to match only files with other 
+extensions:
+
+```cpp
+myFilter.invertExtensionFilter = true;
+```
+
+### Using regular expressions
 
 To filter basing on a regular expression, you have to enable the regex 
 filter explicitly, and then assign a regular expression:
@@ -72,9 +92,14 @@ The above example would match everything that is not in `/test`,
 expensive (in CPU cycles) and create a lot of overhead on every request. 
 Use them only if your goal cannot be achieved without them.
 
-You can also invert your filter, i.e., the filter matches when **none** of 
-your conditions matches. An inverted filter without conditions matches no 
-requests.
+It is not possible to invert the regex condition, as this can be achieved 
+by modifying the regular expression.
+
+### Inverting a filter
+
+You can invert your whole filter, so that your filter matches when 
+**none** of your conditions match. An inverted filter without conditions 
+matches no requests.
 
 ```cpp
 myFilter.invert = true;
@@ -114,11 +139,11 @@ The `status` attribute can be used to specify the HTTP status code that
 should be used (the message on the error page will be adapted to it).
 
 Example for a simple BlockFilter that blocks every request outside 
-of `/app`:
+of `/app` and `/static`:
 
 ```cpp
 nawa::BlockFilter blockFilter;
-blockFilter.pathFilter = {{"app"}};
+blockFilter.pathFilter = {{"app"}, {"static"}};
 blockFilter.invert = true;
 blockFilter.status = 404;
 appInit.accessFilters.blockFilters.push_back(blockFilter);

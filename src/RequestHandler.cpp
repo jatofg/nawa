@@ -81,10 +81,10 @@ namespace {
                     break;
                 }
             }
-            if(!pathFilterMatches) {
+            if((!pathFilterMatches && !flt.invertPathFilter) || (pathFilterMatches && flt.invertPathFilter)) {
                 return false;
             }
-            // path condition matches -> continue to the next filter
+            // path condition matches -> continue to the next filter condition
         }
 
         if(!flt.extensionFilter.empty()) {
@@ -96,9 +96,10 @@ namespace {
                     break;
                 }
             }
-            if(!extensionFilterMatches) {
+            if((!extensionFilterMatches && !flt.invertExtensionFilter) || (extensionFilterMatches && flt.invertExtensionFilter)) {
                 return false;
             }
+            // extension condition matches -> continue to the next filter condition
         }
 
         if(flt.regexFilterEnabled) {
