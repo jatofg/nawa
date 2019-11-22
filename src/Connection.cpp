@@ -234,6 +234,10 @@ void nawa::Connection::setCookie(const std::string &key, nawa::Cookie cookie) {
     cookies[key] = std::move(cookie);
 }
 
+void nawa::Connection::setCookie(const std::string &key, std::string cookieContent) {
+    setCookie(key, nawa::Cookie(std::move(cookieContent)));
+}
+
 void nawa::Connection::unsetCookie(const std::string &key) {
     cookies.erase(key);
 }

@@ -116,6 +116,15 @@ namespace nawa {
          */
         void setCookie(const std::string &key, Cookie cookie);
         /**
+         * Set a new HTTP cookie or overwrite the cookie with the given key. This function will create a Cookie 
+         * object with default attributes and the given content. It may throw a UserException with error code 1 if 
+         * the key or cookie content contain illicit characters. Works only before the response has been flushed.
+         * For more information about cookie setting and handling, see \ref environmentmanual
+         * @param key Key of the cookie. Valid characters in the key (as regex): [A-Za-z0-9!#$%&'*+\-.^_`|~]
+         * @param cookieContent Cookie object containing the value and options of the cookie.
+         */
+        void setCookie(const std::string &key, std::string cookieContent);
+        /**
          * Unset an HTTP cookie that was previously set using setCookie(). Will just do nothing if no cookie with the
          * given key exists. Won't remove a cookie from the user's browser, just undoes the `setCookie` operation.
          * @param key Key of the cookie.

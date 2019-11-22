@@ -121,9 +121,16 @@ For setting cookies, i.e., sending them with your response and requesting
 the browser to save them and send them back with its requests, there is 
 the method `connection.setCookie()` (`nawa::Connection::setCookie()`).
 
+You can use this method in the following way to create a cookie 
+*with default attributes* (since v0.2, see below):
+
+```cpp
+connection.setCookie("myCookie", "cookie_content");
+```
+
 A cookie does not only contain a value, but a lot of attributes. To set 
-a cookie, you'll have to create a `nawa::Cookie` object and set the 
-attributes accordingly, if desired. 
+a cookie with custom attributes, you can create a `nawa::Cookie` object 
+and set the attributes accordingly, if desired. 
 
 All attributes, except for the 
 actual content string, have default values that are determined by 
@@ -141,10 +148,12 @@ The default values for the `expires`, `maxAge`, `domain`, `path`, and
 cookie policy, or the config demands this).
 
 After defining your `nawa::Cookie` object, pass it to 
-`connection.setCookie()`. Without custom attributes, this would be enough:
+`connection.setCookie()`:
 
 ```cpp
-connection.setCookie("myCookie", nawa::Cookie("cookie_content"));
+nawa::Cookie myCookie("cookie_content");
+// set desired attributes ...
+connection.setCookie("myCookie", myCookie);
 ```
 
 **Please note:** This method won't have any effect after the response 

@@ -73,7 +73,7 @@ int handleRequest(Connection &connection) {
     // start a session
     connection.session.start();
 
-    connection.setCookie("TEST", Cookie("test"));
+    connection.setCookie("TEST", "test");
     Cookie policy;
     policy.httpOnly = true;
     connection.setCookiePolicy(policy);
