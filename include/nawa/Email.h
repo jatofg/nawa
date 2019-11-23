@@ -240,7 +240,7 @@ namespace nawa {
              * The type of this MIME container (content-type, e.g., `multipart/mixed` for independent parts, or
              * `multipart/alternative` for alternatives like plain text and HTML). See Wikipedia/MIME for details.
              */
-            enum MultipartType {
+            enum class MultipartType {
                 MIXED,
                 DIGEST,
                 ALTERNATIVE,
@@ -248,7 +248,7 @@ namespace nawa {
                 REPORT,
                 SIGNED,
                 ENCRYPTED
-            } multipartType = MIXED;
+            } multipartType = MultipartType::MIXED;
             /**
              * The list of MIME parts. The MimePartOrList type allows nesting, it can contain either a "final"
              * MIME part with payload, or another nested list of MIME parts.

@@ -93,12 +93,12 @@ int handleRequest(Connection& connection) {
 
     // create an alternative-type MIME container for text and html
     MimeEmail::MimePartList textAndHtml;
-    textAndHtml.multipartType = MimeEmail::MimePartList::ALTERNATIVE;
+    textAndHtml.multipartType = MimeEmail::MimePartList::MultipartType::ALTERNATIVE;
     textAndHtml.mimeParts.emplace_back(textPart);
     textAndHtml.mimeParts.emplace_back(htmlPart);
 
     // add the text/html alternative-type container and the attachment to an outer mixed-type container
-    email2.mimePartList.multipartType = MimeEmail::MimePartList::MIXED;
+    email2.mimePartList.multipartType = MimeEmail::MimePartList::MultipartType::MIXED;
     email2.mimePartList.mimeParts.emplace_back(textAndHtml);
     email2.mimePartList.mimeParts.emplace_back(attachmentPart);
 
