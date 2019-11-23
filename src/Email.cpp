@@ -49,19 +49,19 @@ namespace {
 
     std::string multipartTypeToString(const nawa::MimeEmail::MimePartList::MultipartType &multipartType) {
         switch(multipartType) {
-            case nawa::MimeEmail::MimePartList::MIXED:
+            case nawa::MimeEmail::MimePartList::MultipartType::MIXED:
                 return "mixed";
-            case nawa::MimeEmail::MimePartList::DIGEST:
+            case nawa::MimeEmail::MimePartList::MultipartType::DIGEST:
                 return "digest";
-            case nawa::MimeEmail::MimePartList::ALTERNATIVE:
+            case nawa::MimeEmail::MimePartList::MultipartType::ALTERNATIVE:
                 return "alternative";
-            case nawa::MimeEmail::MimePartList::RELATED:
+            case nawa::MimeEmail::MimePartList::MultipartType::RELATED:
                 return "related";
-            case nawa::MimeEmail::MimePartList::REPORT:
+            case nawa::MimeEmail::MimePartList::MultipartType::REPORT:
                 return "report";
-            case nawa::MimeEmail::MimePartList::SIGNED:
+            case nawa::MimeEmail::MimePartList::MultipartType::SIGNED:
                 return "signed";
-            case nawa::MimeEmail::MimePartList::ENCRYPTED:
+            case nawa::MimeEmail::MimePartList::MultipartType::ENCRYPTED:
                 return "encrypted";
         }
         return "";

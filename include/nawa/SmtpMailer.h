@@ -38,7 +38,7 @@ namespace nawa {
          * unencrypted connection. This might be a security risk, better don't use it.
          * - REQUIRE_STARTTLS: Use the STARTTLS command to establish an encrypted connection, abort if not possible.
          */
-        enum TlsMode {
+        enum class TlsMode {
             NONE,
             SMTPS,
             TRY_STARTTLS,
@@ -76,8 +76,9 @@ namespace nawa {
          * @param _authUsername Username for authentication.
          * @param _authPassword Password for authentication.
          */
-        explicit SmtpMailer(std::string _serverDomain = "localhost", unsigned int _serverPort = 25, TlsMode _tlsMode = NONE,
-                bool _verifyTlsCert = true, std::string _authUsername = "", std::string _authPassword = "");
+        explicit SmtpMailer(std::string _serverDomain = "localhost", unsigned int _serverPort = 25,
+                TlsMode _tlsMode = TlsMode::NONE, bool _verifyTlsCert = true, std::string _authUsername = "",
+                std::string _authPassword = "");
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
          * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
@@ -87,7 +88,7 @@ namespace nawa {
          * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
          */
-        void setServer(std::string _serverDomain, unsigned int _serverPort = 25, TlsMode _tlsMode = NONE,
+        void setServer(std::string _serverDomain, unsigned int _serverPort = 25, TlsMode _tlsMode = TlsMode::NONE,
                 bool _verifyTlsCert = true);
         /**
          * Set the authentication parameters for the SMTP connection.

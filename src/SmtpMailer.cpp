@@ -116,7 +116,7 @@ void nawa::SmtpMailer::processQueue() const {
         // build URL for curl
         {
             std::stringstream curlUrl;
-            if(tlsMode == SMTPS) {
+            if(tlsMode == TlsMode::SMTPS) {
                 curlUrl << "smtps://";
             }
             else {
@@ -127,13 +127,13 @@ void nawa::SmtpMailer::processQueue() const {
         }
 
         // set up TLS
-        if(tlsMode == REQUIRE_STARTTLS) {
+        if(tlsMode == TlsMode::REQUIRE_STARTTLS) {
             curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
         }
-        else if(tlsMode == TRY_STARTTLS) {
+        else if(tlsMode == TlsMode::TRY_STARTTLS) {
             curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_TRY);
         }
-        if(tlsMode != NONE && !verifyTlsCert) {
+        if(tlsMode != TlsMode::NONE && !verifyTlsCert) {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         }
