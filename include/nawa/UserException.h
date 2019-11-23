@@ -61,14 +61,14 @@ namespace nawa {
          * Get the integral error code that identifies the error that caused this exception.
          * @return The error code.
          */
-        virtual const int getErrorCode() const noexcept {
+        virtual int getErrorCode() const noexcept {
             return errorCode;
         }
         /**
          * Get the full constructed exception message.
          * @return The full exception message.
          */
-        virtual const char* what() const noexcept {
+        const char* what() const noexcept override {
             return message.c_str();
         }
     };

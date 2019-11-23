@@ -60,7 +60,7 @@ namespace nawa {
          * Get the full constructed exception message.
          * @return The full exception message.
          */
-        virtual const char* what() const noexcept {
+        const char* what() const noexcept override {
             return message.c_str();
         }
     };
