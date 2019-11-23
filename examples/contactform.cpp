@@ -95,7 +95,8 @@ int handleRequest(Connection& connection) {
                      "Email of the sender: " + post["email"] + "\r\n\r\n" + post["message"];
 
         // now use SmtpMailer to send the email to your mailbox
-        SmtpMailer smtp("example.com", 587, SmtpMailer::REQUIRE_STARTTLS, true, "test@example.com", "12345");
+        SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
+                true, "test@example.com", "12345");
         smtp.enqueue(std::make_shared<SimpleEmail>(email), to, std::make_shared<EmailAddress>(from));
 
         connection.response << "<p>Message sent successfully!</p></body></html>";

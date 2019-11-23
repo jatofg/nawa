@@ -111,7 +111,8 @@ int handleRequest(Connection& connection) {
         connection.response << "\r\n";
 
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
-        SmtpMailer smtp("example.com", 587, SmtpMailer::REQUIRE_STARTTLS, true, "test@example.com", "12345");
+        SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
+                true, "test@example.com", "12345");
         smtp.enqueue(std::make_shared<MimeEmail>(email2), to, std::make_shared<EmailAddress>(from), replacementRules);
 
         try {
