@@ -12,8 +12,10 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-- 2019-11-18: [Sessions](https://www.tobiasflaig.eu/nawa/docs/sessionsmanual.html) 
-and [Environment](https://www.tobiasflaig.eu/nawa/docs/environmentmanual.html) 
+- 2019-11-23: Version is now v0.2 after a lot of API-breaking changes
+- 2019-11-22: [Sessions](https://www.tobiasflaig.eu/nawa/docs/sessionsmanual.html), 
+[Environment](https://www.tobiasflaig.eu/nawa/docs/environmentmanual.html), 
+and [Filters](https://www.tobiasflaig.eu/nawa/docs/filtersmanual.html) 
 manuals are now complete
 - 2019-11-17: [Docker builds](https://github.com/jatofg/nawa/packages/57471) 
 now available
@@ -43,13 +45,14 @@ You want to learn more?
 
 ### Warning!
 
-This project is in a very early state (version 0.1!). It might contain 
-serious bugs that could compromise the security of your system. 
-So use it at your own risk, and better don't use it on a production 
-system yet. But you SHOULD test it (e.g., using Docker or in a VM), report 
-any bugs, and help to make this project more stable! :)
+This project is still in an early state (version 0.2!). It might, of 
+course, still contain serious bugs. Use it on your own risk. Using the 
+Docker container (or a VM) is recommended.
 
-Also, it means that the ABI and API can change at any time, making 
+If you use it, please report any bugs and wishes, so that this project 
+might reach a higher version number at some point :)
+
+Also, the ABI and API can still change at any time, making 
 modifications to your apps (or, at least, recompilation) necessary.
 
 ## Features (selection)

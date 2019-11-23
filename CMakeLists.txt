@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
-project(nawa VERSION 0.1)
+project(nawa VERSION 0.2)
 
 set(CMAKE_CXX_STANDARD 14)
 
 # version
 set(NAWA_VERSION_MAJOR 0)
-set(NAWA_VERSION_MINOR 1)
+set(NAWA_VERSION_MINOR 2)
 
 # build options
 option(BuildTests "Build tests" OFF)
