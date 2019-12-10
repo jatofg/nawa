@@ -86,7 +86,11 @@ int handleRequest(Connection &connection) {
                   "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
                   "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
                   "<p>Request URI: (" << connection.request.env.getRequestPath().size() << " elements): "
-                  << connection.request.env["requestUri"] << "</p>";
+                  << connection.request.env["requestUri"] << "</p>"
+                  "<p>HTTPS status: " << connection.request.env["https"] << "</p>"
+                  "<p>SERVER_NAME: " << connection.request.env["serverName"] << "</p>"
+                  "<p>Server software: " << connection.request.env["serverSoftware"] << "</p>"
+                  ;
 
     // alternative: connection.session["test"].isSet()
     if(connection.session.isSet("test")) {

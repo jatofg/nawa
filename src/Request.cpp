@@ -28,17 +28,18 @@
 
 std::string nawa::Request::Env::operator[](const std::string& envVar) const {
     std::string ret;
-    if(envVar == "host") ret = requestHandler.environment().host; // server hostname
-    else if(envVar == "userAgent") ret = requestHandler.environment().userAgent; // user agent string
-    else if(envVar == "acceptContentTypes") ret = requestHandler.environment().acceptContentTypes; // content types accepted by client
-    else if(envVar == "acceptCharsets") ret = requestHandler.environment().acceptCharsets; // charsets accepted by client
-    else if(envVar == "authorization") ret = requestHandler.environment().authorization; // http authorization string
-    else if(envVar == "referer") ret = requestHandler.environment().referer; // referral url
-    else if(envVar == "contentType") ret = requestHandler.environment().contentType; // content type of data from client
-    else if(envVar == "root") ret = requestHandler.environment().root; // http root directory
-    else if(envVar == "scriptName") ret = requestHandler.environment().scriptName; // filename of script relative to http root
+    auto const &renv = requestHandler.environment();
+    if(envVar == "host") ret = renv.host; // server hostname
+    else if(envVar == "userAgent") ret = renv.userAgent; // user agent string
+    else if(envVar == "acceptContentTypes") ret = renv.acceptContentTypes; // content types accepted by client
+    else if(envVar == "acceptCharsets") ret = renv.acceptCharsets; // charsets accepted by client
+    else if(envVar == "authorization") ret = renv.authorization; // http authorization string
+    else if(envVar == "referer") ret = renv.referer; // referral url
+    else if(envVar == "contentType") ret = renv.contentType; // content type of data from client
+    else if(envVar == "root") ret = renv.root; // http root directory
+    else if(envVar == "scriptName") ret = renv.scriptName; // filename of script relative to http root
     else if(envVar == "requestMethod") {
-        switch(requestHandler.environment().requestMethod) {
+        switch(renv.requestMethod) {
             case Fastcgipp::Http::RequestMethod::ERROR:
                 ret = "ERROR";
                 break;
@@ -68,20 +69,23 @@ std::string nawa::Request::Env::operator[](const std::string& envVar) const {
                 break;
         }
     }
-    else if(envVar == "requestUri") ret = requestHandler.environment().requestUri; // request uri
+    else if(envVar == "requestUri") ret = renv.requestUri; // request uri
     else if(envVar == "serverAddress") {
         std::stringstream stm;
-        stm << requestHandler.environment().serverAddress;
+        stm << renv.serverAddress;
         ret = stm.str();
     }
     else if(envVar == "remoteAddress") {
         std::stringstream stm;
-        stm << requestHandler.environment().remoteAddress;
+        stm << renv.remoteAddress;
         ret = stm.str();
     }
-    else if(envVar == "serverPort") ret = std::to_string(requestHandler.environment().serverPort);
-    else if(envVar == "remotePort") ret = std::to_string(requestHandler.environment().remotePort);
-    else if(envVar == "ifModifiedSince") ret = std::to_string(requestHandler.environment().ifModifiedSince); // unix timestamp
+    else if(envVar == "serverPort") ret = std::to_string(renv.serverPort);
+    else if(envVar == "remotePort") ret = std::to_string(renv.remotePort);
+    else if(envVar == "ifModifiedSince") ret = std::to_string(renv.ifModifiedSince); // unix timestamp
+    else if(envVar == "https") ret = renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""; // "on" if accessed via HTTPS
+    else if(envVar == "serverName") ret = renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""; // server's FQDN
+    else if(envVar == "serverSoftware") ret = renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""; // server software (e.g., Apache)
     return ret;
 }
 

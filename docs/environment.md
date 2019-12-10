@@ -62,6 +62,10 @@ the full list of environment variables that can be accessed this way.
 - `ifModifiedSince`: Unix timestamp sent by the client (to indicate that 
 a full response is only necessary if the requested content has been 
 modified since this date)
+- `https`: String should be "on" when the page has been accessed through 
+a secure (HTTPS) connection, otherwise undefined (most probably empty).
+- `serverName`: The server's FQDN (fully qualified domain name).
+- `serverSoftware`: The web server software, such as Apache.
 
 ## GET, POST, and COOKIE
 
