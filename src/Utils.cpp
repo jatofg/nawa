@@ -419,7 +419,7 @@ std::string nawa::get_file_contents(const std::string &path) {
     f.seekg(0);
 
     // load to string
-    std::string ret(static_cast<unsigned long>(fs) + 1, '\0');
+    std::string ret(static_cast<unsigned long>(fs), '\0');
     f.read(&ret[0], fs);
     
     return ret;
