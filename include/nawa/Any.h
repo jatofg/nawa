@@ -74,6 +74,7 @@ namespace nawa {
         // do not set set to true as operator= would call the deleter function then
         Any(const Any& value) : typeIndex(value.typeIndex), set(false), ptr(nullptr) {
             // members will be set by copier
+            deleter = value.deleter;
             copier = value.copier;
             (this->*copier)(value);
         }
@@ -104,6 +105,7 @@ namespace nawa {
 
         Any& operator=(const Any& value) {
             // copier will deal with this
+            deleter = value.deleter;
             copier = value.copier;
             (this->*copier)(value);
             return *this;
