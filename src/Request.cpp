@@ -86,6 +86,21 @@ std::string nawa::Request::Env::operator[](const std::string& envVar) const {
     else if(envVar == "https") ret = renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""; // "on" if accessed via HTTPS
     else if(envVar == "serverName") ret = renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""; // server's FQDN
     else if(envVar == "serverSoftware") ret = renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""; // server software (e.g., Apache)
+    else if(envVar == "fullUrlWithQS") {
+        std::stringstream stm;
+        auto https = renv.others.count("HTTPS");
+        stm << (https ? "https://" : "http://")
+            << renv.host;
+        if((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
+            stm << ":" << renv.serverPort;
+        }
+        stm << renv.requestUri;
+        ret = stm.str();
+    }
+    else if(envVar == "fullUrlWithoutQS") {
+        auto fullUrl = (*this)["fullUrlWithQS"];
+        ret = fullUrl.substr(0, fullUrl.find_first_of('?'));
+    }
     return ret;
 }
 

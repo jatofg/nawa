@@ -66,6 +66,10 @@ modified since this date)
 a secure (HTTPS) connection, otherwise undefined (most probably empty).
 - `serverName`: The server's FQDN (fully qualified domain name).
 - `serverSoftware`: The web server software, such as Apache.
+- `fullUrlWithQS`: The full URL of the current request, starting with 
+`http://` or `https://`, including the query string.
+- `fullUrlWithoutQS`: Same as `fullUrlWithQS`, but without the query 
+string.
 
 ## GET, POST, and COOKIE
 
