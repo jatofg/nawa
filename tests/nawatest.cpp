@@ -90,6 +90,7 @@ int handleRequest(Connection &connection) {
                   "<p>HTTPS status: " << connection.request.env["https"] << "</p>"
                   "<p>SERVER_NAME: " << connection.request.env["serverName"] << "</p>"
                   "<p>Server software: " << connection.request.env["serverSoftware"] << "</p>"
+                  "<p>Base URL: " << connection.request.env["baseUrl"] << "</p>"
                   "<p>Full URL with QS: " << connection.request.env["fullUrlWithQS"] << "</p>"
                   "<p>Full URL without QS: " << connection.request.env["fullUrlWithoutQS"] << "</p>"
                   ;
