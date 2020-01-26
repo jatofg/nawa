@@ -95,6 +95,23 @@ int handleRequest(Connection &connection) {
                   "<p>Full URL without QS: " << connection.request.env["fullUrlWithoutQS"] << "</p>"
                   ;
 
+    // test privileges
+    auto currentUid = getuid();
+    auto currentGid = getgid();
+    auto currentEUid = geteuid();
+    auto currentEGid = getegid();
+    int groupCount = getgroups(0, nullptr);
+    connection.response << "<p>Privileges: uid = " << currentUid << "; gid = " << currentGid << "; euid = "
+                        << currentEUid << "; egid = " << currentEGid << "</p>";
+    std::vector<gid_t> currentGL(groupCount, 0);
+    if(getgroups(groupCount, &currentGL[0]) >= 0) {
+        connection.response << "<p>Current groups: ";
+        for(auto const &e: currentGL) {
+            connection.response << e << ", ";
+        }
+        connection.response << "</p>";
+    }
+
     // alternative: connection.session["test"].isSet()
     if(connection.session.isSet("test")) {
         connection.response << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";

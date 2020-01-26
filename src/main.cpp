@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     signal(SIGINT, shutdown);
     signal(SIGTERM, shutdown);
     signal(SIGUSR1, shutdown);
-    
+
     // set up logging
     nawa::Log::lockStream();
 
@@ -113,8 +113,9 @@ int main(int argc, char** argv) {
 
     // prepare privilege downgrade and check for errors (downgrade will happen after socket setup)
     auto privUid = getuid();
-    passwd* privUser;
-    group* privGroup;
+    uid_t privUID = -1;
+    gid_t privGID = -1;
+    std::vector<gid_t> supplementaryGroups;
     if(privUid == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
             LOG("Fatal Error: Username or password not correctly set in config.ini");
@@ -122,14 +123,28 @@ int main(int argc, char** argv) {
         }
         std::string username = config[{"privileges", "user"}];
         std::string groupname = config[{"privileges", "group"}];
+        passwd* privUser;
+        group* privGroup;
         privUser = getpwnam(username.c_str());
         privGroup = getgrnam(groupname.c_str());
         if(privUser == nullptr || privGroup == nullptr) {
             LOG("Fatal Error: Username or groupname invalid");
             return 1;
         }
-        if(privUser->pw_uid == 0 || privGroup->gr_gid == 0) {
+        privUID = privUser->pw_uid;
+        privGID = privGroup->gr_gid;
+        if(privUID == 0 || privGID == 0) {
             LOG("WARNING: nawarun will be running as user or group root. Security risk!");
+        }
+        else {
+            // get supplementary groups for non-root user
+            int n = 0;
+            getgrouplist(username.c_str(), privGID, nullptr, &n);
+            supplementaryGroups.resize(n, 0);
+            if(getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
+                LOG("WARNING: Could not get supplementary groups for user " + username);
+                supplementaryGroups = {privGID};
+            }
         }
     } else {
         LOG("WARNING: Not starting as root, cannot set privileges");
@@ -239,7 +254,11 @@ int main(int argc, char** argv) {
 
     // do privilege downgrade
     if(privUid == 0) {
-        if(setgid(privGroup->gr_gid) != 0 || setuid(privUser->pw_uid) != 0) {
+        if(setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
+            LOG("Fatal Error: Could not set supplementary groups");
+            return 1;
+        }
+        if(setgid(privGID) != 0 || setuid(privUID) != 0) {
             LOG("Fatal Error: Could not set privileges");
             return 1;
         }
