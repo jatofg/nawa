@@ -112,11 +112,11 @@ int main(int argc, char** argv) {
     }
 
     // prepare privilege downgrade and check for errors (downgrade will happen after socket setup)
-    auto privUid = getuid();
+    auto initialUID = getuid();
     uid_t privUID = -1;
     gid_t privGID = -1;
     std::vector<gid_t> supplementaryGroups;
-    if(privUid == 0) {
+    if(initialUID == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
             LOG("Fatal Error: Username or password not correctly set in config.ini");
             return 1;
@@ -253,8 +253,8 @@ int main(int argc, char** argv) {
     }
 
     // do privilege downgrade
-    if(privUid == 0) {
-        if(setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
+    if(initialUID == 0) {
+        if(privUID != 0 && privGID != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
             LOG("Fatal Error: Could not set supplementary groups");
             return 1;
         }
