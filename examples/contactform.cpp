@@ -53,12 +53,12 @@ int handleRequest(Connection& connection) {
     connection.response << "<!DOCTYPE html><head><title>Contact Form</title></head><body>";
 
     // if there is POST data, and randVal is not empty, process it
-    if(randVal.isSet() && post.count("rand_val") == 1) {
+    if(randVal.has_value() && post.count("rand_val") == 1) {
 
         // check for correct rand_val
         bool randValid = false;
         try {
-            if(randVal.get<unsigned int>() == stoul(post["rand_val"])) {
+            if(any_cast<unsigned int>(randVal) == stoul(post["rand_val"])) {
                 randValid = true;
             }
         }
@@ -112,7 +112,7 @@ int handleRequest(Connection& connection) {
     // and show the form!
     connection.response << "<p>Please fill in the following form in order to contact us! All fields are required.</p>\r\n"
                            "<form name=\"contact\" method=\"post\" action=\"?\">"
-                           "<input type=\"hidden\" name=\"rand_val\" value=\"" << randVal.get<unsigned int>() << "\" />"
+                           "<input type=\"hidden\" name=\"rand_val\" value=\"" << any_cast<unsigned int>(randVal) << "\" />"
                            "<p>Your name: <input type=\"text\" name=\"name\" /></p>"
                            "<p>Email address: <input type=\"email\" name=\"email\" /></p>"
                            "<p>Subject: <input type=\"text\" name=\"subject\" /></p>"

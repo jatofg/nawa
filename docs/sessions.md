@@ -66,25 +66,23 @@ use a cast to save the correct type.
 ### Accessing variables
 
 To access a session variable with a certain key, use the `[]` operator. 
-It will return an object of the type `nawa::Any`. Using this object, 
-you can retrieve the original stored object by using the `get` function 
-(or casting):
+It will return an object of the type `std::any`. Using this object, 
+you can retrieve the original stored object by using `std::any_cast`:
 
 ```cpp
-int mySessionInt = connection.session["myInt"].get<int>();
-std::string mySessionString = connection.session["myString"].get<std::string>();
+int mySessionInt = std::any_cast<int>(connection.session["myInt"]);
+std::string mySessionString = std::any_cast<std::string>(connection.session["myString"]);
 ```
 
 To just check whether a variable exists, you can use 
 `connection.session.isSet("variable")` or 
-`connection.session["variable"].isSet()`.
+`connection.session["variable"].has_value()`.
 
 **Please note:** When trying to access a non-existent variable using 
-the `[]` operator, an empty `nawa::Any` object will be returned. 
-Casting it or calling `get()` on it will throw an exception. Calling 
-`get()` with the wrong type or casting to the wrong type will throw 
-an exception, too. For more information, see the docs of 
-`nawa::Any::get()`.
+the `[]` operator, a `std::any` object without value will be returned. 
+Casting it will throw an exception of type `std::bad_any_cast`. 
+Casting to the wrong type will throw 
+this exception, too.
 
 ### Unsetting variables
 

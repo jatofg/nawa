@@ -27,6 +27,7 @@
 #include <nawa/Session.h>
 
 using namespace nawa;
+using namespace std;
 
 int init(nawa::AppInit& appInit) {
 
@@ -60,7 +61,7 @@ int init(nawa::AppInit& appInit) {
     AuthFilter authFilter;
     authFilter.pathFilter = {{"test", "images"}};
     authFilter.authName = "Not for everyone!";
-    authFilter.authFunction = [](std::string user, std::string password) -> bool {
+    authFilter.authFunction = [](string user, string password) -> bool {
         return (user == "test" && password == "supersecure");
     };
     appInit.accessFilters.authFilters.push_back(authFilter);
@@ -78,8 +79,8 @@ int handleRequest(Connection &connection) {
     policy.httpOnly = true;
     connection.setCookiePolicy(policy);
 
-    std::string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
-    std::string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
+    string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
+    string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
 
     connection.response << "<!DOCTYPE html>\n"
                   "<html><head><title>Test</title></head><body>"
@@ -103,7 +104,7 @@ int handleRequest(Connection &connection) {
     int groupCount = getgroups(0, nullptr);
     connection.response << "<p>Privileges: uid = " << currentUid << "; gid = " << currentGid << "; euid = "
                         << currentEUid << "; egid = " << currentEGid << "</p>";
-    std::vector<gid_t> currentGL(groupCount, 0);
+    vector<gid_t> currentGL(groupCount, 0);
     if(getgroups(groupCount, &currentGL[0]) >= 0) {
         connection.response << "<p>Current groups: ";
         for(auto const &e: currentGL) {
@@ -114,10 +115,10 @@ int handleRequest(Connection &connection) {
 
     // alternative: connection.session["test"].isSet()
     if(connection.session.isSet("test")) {
-        connection.response << "<p>Session available! Value: " << connection.session["test"].get<std::string>() << "</p>";
+        connection.response << "<p>Session available! Value: " << any_cast<string>(connection.session["test"]) << "</p>";
         connection.session.invalidate();
         connection.session.start();
-        connection.session.set("test", std::string("and even more blah"));
+        connection.session.set("test", string("and even more blah"));
         
     }
     else {
@@ -125,7 +126,7 @@ int handleRequest(Connection &connection) {
         connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 
-    std::string encodedDecoded = Encoding::htmlDecode(encoded);
+    string encodedDecoded = Encoding::htmlDecode(encoded);
     if(decoded == encodedDecoded) {
         connection.response << "<p>yay!</p>";
     }

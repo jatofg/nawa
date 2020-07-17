@@ -27,8 +27,9 @@
 #include <vector>
 #include <mutex>
 #include <unordered_map>
+#include <any>
+#include <memory>
 #include <nawa/Cookie.h>
-#include <nawa/Any.h>
 
 namespace nawa {
     class Connection;
@@ -39,7 +40,7 @@ namespace nawa {
     struct SessionData {
         std::mutex dLock; /**< Lock for data. */
         std::mutex eLock; /**< Lock for expires.  */
-        std::unordered_map<std::string, Any> data; /**< Map containing all values of this session. */
+        std::unordered_map<std::string, std::any> data; /**< Map containing all values of this session. */
         time_t expires; /**< Time when this session expires. */
         const std::string sourceIP; /**< IP address of the session initiator, for optional IP checking. */
         /**
@@ -149,13 +150,13 @@ namespace nawa {
          * @return Value at key. If no value exists for that key or no session established, an empty Any will be
          * returned.
          */
-        Any operator[](std::string key) const;
+        std::any operator[](std::string key) const;
         /**
          * Set key to a Any value. Throws a UserException with error code 1 if no session has been established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */
-        void set(std::string key, const Any& value);
+        void set(std::string key, const std::any &value);
         /**
          * Set key to a string value. This function exists for convenience and makes sure that you do not save a
          * const char* (c-style string) into a session (a terrible idea, as such a pointer would not be available
@@ -168,11 +169,11 @@ namespace nawa {
          * @param value C-string that will be used as the value (will be stored as a std::string!).
          */
         void set(std::string key, const char* value) {
-            set(std::move(key), Any(std::string(value)));
+            set(std::move(key), std::make_any<std::string>(value));
         }
         /**
          * Set key to a variable of an arbitrary type. This function exists just for convenience and will create a
-         * new Any from the value type and call set(std::string, Any), and will therefore throw a
+         * new std::any from the value type and call set(std::string, std::any), and will therefore throw a
          * UserException with error code 1 if no session has been established. As you need to explicitly state the
          * type when receiving the value later on, explicitly constructing the desired type might make your code
          * more readable and less error-prone (if the value is directly constructed and not given as a variable).
@@ -182,7 +183,7 @@ namespace nawa {
          */
         template<typename T>
         void set(std::string key, const T& value) {
-            set(std::move(key), Any(value));
+            set(std::move(key), std::any(value));
         }
         /**
          * Remove the session variable with the given key. Throws a UserException with error code 1 if no session has

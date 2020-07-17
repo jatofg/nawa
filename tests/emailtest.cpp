@@ -27,8 +27,10 @@
 #include <iomanip>
 #include <nawa/SmtpMailer.h>
 #include <nawa/Application.h>
+#include <nawa/UserException.h>
  
 using namespace nawa;
+using namespace std;
 
 int init(AppInit& appInit) {
     return 0;
@@ -41,7 +43,7 @@ int handleRequest(Connection& connection) {
     time_t currentTime = time(nullptr);
     tm ltime;
     localtime_r(&currentTime, &ltime);
-    connection.response << std::put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
+    connection.response << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
     
     // The replacement rules to apply
     ReplacementRules replacementRules;
@@ -113,7 +115,7 @@ int handleRequest(Connection& connection) {
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
         SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
                 true, "test@example.com", "12345");
-        smtp.enqueue(std::make_shared<MimeEmail>(email2), to, std::make_shared<EmailAddress>(from), replacementRules);
+        smtp.enqueue(make_shared<MimeEmail>(email2), to, make_shared<EmailAddress>(from), replacementRules);
 
         try {
             smtp.processQueue();

@@ -31,6 +31,7 @@
 #include <nawa/Connection.h>
 #include <nawa/Log.h>
 #include <nawa/SysException.h>
+#include <nawa/UserException.h>
 
 namespace {
     nawa::handleRequest_t* appHandleRequest;
@@ -205,7 +206,7 @@ namespace {
                                 isAuthenticated = true;
                                 // now, if sessions are used, set the session variable to the username
                                 if(flt.useSessions) {
-                                    connection.session.set(sessionCookieName, nawa::Any(credentials.at(0)));
+                                    connection.session.set(sessionCookieName, std::any(credentials.at(0)));
                                 }
                             }
                         }

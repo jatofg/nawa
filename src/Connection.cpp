@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <nawa/Utils.h>
 #include <nawa/Connection.h>
+#include <nawa/UserException.h>
 
 namespace {
     const std::unordered_map<unsigned int, std::string> httpStatusCodes = {

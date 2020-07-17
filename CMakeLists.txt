@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
-project(nawa VERSION 0.2)
+project(nawa VERSION 0.3)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # version
 set(NAWA_VERSION_MAJOR 0)
-set(NAWA_VERSION_MINOR 2)
+set(NAWA_VERSION_MINOR 3)
 
 # build options
 option(BuildTests "Build tests" OFF)
@@ -42,7 +42,6 @@ add_executable(nawarun
         include/nawa/AppInit.h
         include/nawa/SmtpMailer.h
         include/nawa/Email.h
-        include/nawa/Any.h
         include/nawa/Engines/HashingEngine.h
         include/nawa/Engines/Argon2HashingEngine.h
         include/nawa/Engines/BcryptHashingEngine.h

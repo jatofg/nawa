@@ -189,17 +189,17 @@ bool nawa::Session::isSet(std::string key) const {
     return false;
 }
 
-nawa::Any nawa::Session::operator[](std::string key) const {
+std::any nawa::Session::operator[](std::string key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         if(currentData->data.count(key) == 1) {
             return currentData->data.at(key);
         }
     }
-    return Any();
+    return std::any();
 }
 
-void nawa::Session::set(std::string key, const nawa::Any& value) {
+void nawa::Session::set(std::string key, const std::any &value) {
     if(!established()) {
         throw UserException("nawa::Session::set", 1, "Session not established.");
     }
