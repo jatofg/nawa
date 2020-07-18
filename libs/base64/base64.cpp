@@ -7,7 +7,7 @@
    https://github.com/ReneNyffenegger/cpp-base64
 
    Copyright (original version): (C) 2004-2017 René Nyffenegger
-   Modifications (C) 2019 Tobias Flaig
+   Modifications (C) 2019-2020 Tobias Flaig
 
    This source code is provided 'as-is', without any express or implied
    warranty. In no event will the author be held liable for any damages
