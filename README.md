@@ -1,7 +1,7 @@
 NAWA
 ===
 
-NAWA is a framework for web applications written in C++(14). It aims to 
+NAWA is a framework for web applications written in C++(17). It aims to 
 make writing a natively running web app nearly as easy as writing it 
 in a specialized scripting language (such as PHP). It provides the 
 necessary features, such as sessions, static filters (for providing 
@@ -12,13 +12,14 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
+- 2020-07-18: Version is now v0.3 due to the move from `nawa::Any` to 
+`std::any`. C++17 is now required. The v0.2 tag points to the latest version 
+compatible with C++14.
 - 2019-11-23: Version is now v0.2 after a lot of API-breaking changes
 - 2019-11-22: [Sessions](https://www.tobiasflaig.eu/nawa/docs/sessionsmanual.html), 
 [Environment](https://www.tobiasflaig.eu/nawa/docs/environmentmanual.html), 
 and [Filters](https://www.tobiasflaig.eu/nawa/docs/filtersmanual.html) 
 manuals are now complete
-- 2019-11-17: [Docker builds](https://github.com/jatofg/nawa/packages/57471) 
-now available
 
 ## Example
 
@@ -45,7 +46,7 @@ You want to learn more?
 
 ### Warning!
 
-This project is still in an early state (version 0.2!). It might, of 
+This project is still in an early state (version 0.3!). It might, of 
 course, still contain serious bugs. Use it on your own risk. Using the 
 Docker container (or a VM) is recommended.
 
