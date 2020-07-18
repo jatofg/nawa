@@ -149,14 +149,14 @@ namespace nawa {
              */
             std::string contentDisposition;
             /**
-             * The encoding to apply to the MIME part. Choose BASE64 for file attachments, and QUOTED_PRINTABLE
+             * Encodings which can be applied to the MIME part. Choose BASE64 for file attachments, and QUOTED_PRINTABLE
              * for HTML, etc. Use NONE if and only if you made sure that the part contains only valid characters.
              */
             enum ApplyEncoding {
                 BASE64,
                 QUOTED_PRINTABLE,
                 NONE
-            } applyEncoding = QUOTED_PRINTABLE;
+            } applyEncoding = QUOTED_PRINTABLE; /**< The encoding to apply to the MIME part, see nawa::MimeEmail::MimePart::ApplyEncoding. */
             /**
              * Additional headers for this MIME part (such as Content-ID) can be added here.
              */
@@ -237,7 +237,7 @@ namespace nawa {
          */
         struct MimePartList {
             /**
-             * The type of this MIME container (content-type, e.g., `multipart/mixed` for independent parts, or
+             * Possible types of MIME containers (content-type, e.g., `multipart/mixed` for independent parts, or
              * `multipart/alternative` for alternatives like plain text and HTML). See Wikipedia/MIME for details.
              */
             enum class MultipartType {
@@ -248,7 +248,7 @@ namespace nawa {
                 REPORT,
                 SIGNED,
                 ENCRYPTED
-            } multipartType = MultipartType::MIXED;
+            } multipartType = MultipartType::MIXED; /**< The type of this MIME container, see nawa::MimeEmail::MimePartList::MultipartType. */
             /**
              * The list of MIME parts. The MimePartOrList type allows nesting, it can contain either a "final"
              * MIME part with payload, or another nested list of MIME parts.

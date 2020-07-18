@@ -25,11 +25,17 @@
 #include <random>
 #include <nawa/SmtpMailer.h>
 #include <nawa/Encoding.h>
+#include <nawa/UserException.h>
+#include <nawa/Log.h>
 
 using namespace std;
 using namespace nawa;
 
+Log LOG;
+
 int init(AppInit& appInit) {
+    // set up logging
+    LOG.setAppname("Contact form app");
 
     return 0;
 }
@@ -98,8 +104,16 @@ int handleRequest(Connection& connection) {
         SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
                 true, "test@example.com", "12345");
         smtp.enqueue(std::make_shared<SimpleEmail>(email), to, std::make_shared<EmailAddress>(from));
+        try {
+            smtp.processQueue();
+            connection.response << "<p>Message sent successfully!</p>";
+        }
+        catch(const UserException &e) {
+            connection.response << "<p>Message could not be sent due to a technical problem :(</p>";
+            LOG(string("Error sending email:") + e.what());
+        }
 
-        connection.response << "<p>Message sent successfully!</p></body></html>";
+        connection.response << "</body></html>";
 
         return 0;
     }
