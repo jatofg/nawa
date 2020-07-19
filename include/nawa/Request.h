@@ -26,7 +26,7 @@
 
 #include <string>
 #include <fastcgi++/request.hpp>
-#include <nawa/RequestHandler.h>
+#include <nawa/RequestHandlerLegacy.h>
 
 namespace nawa {
     /**
@@ -68,9 +68,9 @@ namespace nawa {
          */
         class Env {
         protected:
-            RequestHandler& requestHandler;
+            RequestHandlerLegacy& requestHandler;
         public:
-            explicit Env(RequestHandler& request) : requestHandler(request) {}
+            explicit Env(RequestHandlerLegacy& request) : requestHandler(request) {}
             /**
              * Get an environment variable. For a list of environment variables, see \ref environmentmanual
              * @param envVar Name of the environment variable.
@@ -115,11 +115,11 @@ namespace nawa {
                 COOKIE
             };
         protected:
-            RequestHandler& requestHandler;
+            RequestHandlerLegacy& requestHandler;
             Source source;
             std::multimap<std::basic_string<char>, std::basic_string<char>> data;
         public:
-            GPC(RequestHandler& request, Source source);
+            GPC(RequestHandlerLegacy& request, Source source);
             virtual ~GPC() = default;
             /**
              * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
@@ -164,7 +164,7 @@ namespace nawa {
          */
         class Post: public GPC {
         public:
-            explicit Post(RequestHandler& request);
+            explicit Post(RequestHandlerLegacy& request);
             ~Post() override = default;
             /**
              * Get the raw POST data (availability depends on the raw_access setting in the config).
@@ -188,7 +188,7 @@ namespace nawa {
         const Request::GPC get; /**< The GPC object you should use to access GET variables. */
         const Request::Post post; /**< The Post object you should use to access POST variables. */
         const Request::GPC cookie; /**< The GPC object you should use to access COOKIE variables. */
-        explicit Request(RequestHandler& request);
+        explicit Request(RequestHandlerLegacy& request);
     };
 }
 

@@ -88,7 +88,7 @@ namespace nawa {
          */
         static void destroy();
         // RequestHandler should be able to call destroy()
-        friend class RequestHandler;
+        friend class RequestHandlerLegacy;
     public:
         /**
          * Construct a new Session object. This will just store the Connection reference in the object.

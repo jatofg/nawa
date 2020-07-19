@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NAWA_REQUESTHANDLER_H
-#define NAWA_REQUESTHANDLER_H
+#ifndef NAWA_REQUESTHANDLERLEGACY_H
+#define NAWA_REQUESTHANDLERLEGACY_H
 
 #include <fastcgi++/request.hpp>
 #include <nawa/Config.h>
@@ -39,7 +39,7 @@ namespace nawa {
     /**
      * Class which connects NAWA to the fastcgi/web server communication library.
      */
-    class RequestHandler : public Fastcgipp::Request<char> {
+    class RequestHandlerLegacy : public Fastcgipp::Request<char> {
         // declare Request friend so it can access private members inherited from Fastcgipp::Request
         friend class nawa::Request;
         std::string postContentType; /**< Content type submitted by the browser in the request, set by inProcessor() */
@@ -78,8 +78,8 @@ namespace nawa {
         /**
          * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
          */
-        RequestHandler();
+        RequestHandlerLegacy();
     };
 }
 
-#endif //NAWA_REQUESTHANDLER_H
+#endif //NAWA_REQUESTHANDLERLEGACY_H

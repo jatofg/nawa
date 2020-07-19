@@ -24,7 +24,7 @@
 #include <iostream>
 #include <thread>
 #include <dlfcn.h>
-#include <nawa/RequestHandler.h>
+#include <nawa/RequestHandlerLegacy.h>
 #include <nawa/Utils.h>
 #include <nawa/Encoding.h>
 #include <nawa/Request.h>
@@ -279,7 +279,7 @@ namespace {
 
 }
 
-bool nawa::RequestHandler::response() {
+bool nawa::RequestHandlerLegacy::response() {
     // check AppInitPtr for safety
     if(!appInitPtr) {
         throw nawa::SysException("RequestHandler.cpp", __LINE__, "AppInit pointer empty");
@@ -300,12 +300,12 @@ bool nawa::RequestHandler::response() {
     return true;
 }
 
-void nawa::RequestHandler::flush(nawa::Connection& connection) {
+void nawa::RequestHandlerLegacy::flush(nawa::Connection& connection) {
     auto raw = connection.getRaw();
     dump(raw.c_str(), raw.size());
 }
 
-void nawa::RequestHandler::setAppRequestHandler(const nawa::Config &cfg, void *appOpen) {
+void nawa::RequestHandlerLegacy::setAppRequestHandler(const nawa::Config &cfg, void *appOpen) {
     try {
         postMax = cfg.isSet({"post", "max_size"})
                       ? static_cast<size_t>(std::stoul(cfg[{"post", "max_size"}])) * 1024 : 0;
@@ -328,9 +328,9 @@ void nawa::RequestHandler::setAppRequestHandler(const nawa::Config &cfg, void *a
     }
 }
 
-nawa::RequestHandler::RequestHandler() : Fastcgipp::Request<char>(postMax) {}
+nawa::RequestHandlerLegacy::RequestHandlerLegacy() : Fastcgipp::Request<char>(postMax) {}
 
-bool nawa::RequestHandler::inProcessor() {
+bool nawa::RequestHandlerLegacy::inProcessor() {
     postContentType = environment().contentType;
     if(rawPostAccess == RawPostAccess::NEVER) {
         return false;
@@ -344,11 +344,11 @@ bool nawa::RequestHandler::inProcessor() {
     return false;
 }
 
-void nawa::RequestHandler::setConfig(const nawa::AppInit &_appInit) {
+void nawa::RequestHandlerLegacy::setConfig(const nawa::AppInit &_appInit) {
     appInitPtr = std::make_unique<nawa::AppInit>(_appInit);
 }
 
-void nawa::RequestHandler::destroyEverything() {
+void nawa::RequestHandlerLegacy::destroyEverything() {
     appInitPtr.reset(nullptr);
     nawa::Session::destroy();
 }

@@ -126,7 +126,7 @@ Fastcgipp::Address nawa::Request::Env::getRemoteAddr() const {
     return requestHandler.environment().remoteAddress;
 }
 
-nawa::Request::GPC::GPC(RequestHandler &request, Source source)
+nawa::Request::GPC::GPC(RequestHandlerLegacy &request, Source source)
         : requestHandler(request), source(source) {
     switch (source) {
         case Source::COOKIE:
@@ -174,10 +174,10 @@ std::multimap<std::string, std::string>::const_iterator nawa::Request::GPC::end(
     return data.end();
 }
 
-nawa::Request::Request(RequestHandler &request)
+nawa::Request::Request(RequestHandlerLegacy &request)
         : env(request), get(request, GPC::Source::GET), post(request), cookie(request, GPC::Source::COOKIE) {}
 
-nawa::Request::Post::Post(RequestHandler &request) : GPC(request, GPC::Source::POST) {}
+nawa::Request::Post::Post(RequestHandlerLegacy &request) : GPC(request, GPC::Source::POST) {}
 
 std::string& nawa::Request::Post::getRaw() const {
     return requestHandler.rawPost;

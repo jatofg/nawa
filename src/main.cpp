@@ -28,7 +28,7 @@
 #include <grp.h>
 #include <dlfcn.h>
 #include <csignal>
-#include <nawa/RequestHandler.h>
+#include <nawa/RequestHandlerLegacy.h>
 #include <nawa/Config.h>
 #include <nawa/SysException.h>
 #include <nawa/Log.h>
@@ -37,7 +37,7 @@
 namespace {
 
     // this will make the manager instance and loaded app accessible for signal handlers
-    std::unique_ptr<Fastcgipp::Manager<nawa::RequestHandler>> managerPtr;
+    std::unique_ptr<Fastcgipp::Manager<nawa::RequestHandlerLegacy>> managerPtr;
     void* appOpen = nullptr;
 
     // use this for logging
@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
     // pass config and application to RequestHandler so it can load appHandleRequest
     // (config will be saved later, here it will only be used to load the appHandleRequest)
     // (app function already loaded here so that errors can be detected before setting up the socket)
-    nawa::RequestHandler::setAppRequestHandler(config, appOpen);
+    nawa::RequestHandlerLegacy::setAppRequestHandler(config, appOpen);
 
     // concurrency
     double cReal;
@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
     auto cInt = static_cast<unsigned int>(cReal);
 
     // set up fastcgi manager
-    managerPtr = std::make_unique<Fastcgipp::Manager<nawa::RequestHandler>>(cInt);
+    managerPtr = std::make_unique<Fastcgipp::Manager<nawa::RequestHandlerLegacy>>(cInt);
     //managerPtr->setupSignals();
 
     // socket handling
@@ -278,14 +278,14 @@ int main(int argc, char** argv) {
         }
 
         // init could have altered the config, take it over
-        nawa::RequestHandler::setConfig(appInit1);
+        nawa::RequestHandlerLegacy::setConfig(appInit1);
     }
 
     managerPtr->start();
     managerPtr->join();
 
     // explicitly destroy AppInit and clear session data to avoid a segfault
-    nawa::RequestHandler::destroyEverything();
+    nawa::RequestHandlerLegacy::destroyEverything();
 
     dlclose(appOpen);
     exit(0);

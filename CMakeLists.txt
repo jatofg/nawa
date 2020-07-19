@@ -27,7 +27,7 @@ add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
 
 add_executable(nawarun
         include/nawa/Request.h
-        include/nawa/RequestHandler.h
+        include/nawa/RequestHandlerLegacy.h
         include/nawa/SysException.h
         include/nawa/Connection.h
         include/nawa/Encoding.h
@@ -47,10 +47,12 @@ add_executable(nawarun
         include/nawa/Engines/BcryptHashingEngine.h
         include/nawa/Engines/HashTypeTable.h
         include/nawa/Engines/DefaultHashTypeTable.h
+        include/nawa/RequestHandlers/RequestHandler.h
+        include/nawa/RequestHandlers/FastcgiRequestHandler.h
 
         src/main.cpp
         src/Request.cpp
-        src/RequestHandler.cpp
+        src/RequestHandlerLegacy.cpp
         src/Connection.cpp
         src/Encoding.cpp
         src/Utils.cpp
