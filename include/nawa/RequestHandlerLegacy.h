@@ -1,5 +1,5 @@
 /**
- * \file RequestHandler.h
+ * \file RequestHandlerLegacy.h
  * \brief Class which connects NAWA to the fastcgi/web server communication library.
  */
 

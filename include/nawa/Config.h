@@ -45,11 +45,30 @@ namespace nawa {
          */
         explicit Config(std::string iniFile);
         /**
-         * Assignment operator.
+         * Copy constructor.
+         * @param other Object to copy from.
+         */
+        Config(Config const& other);
+        /**
+         * Move constructor.
+         * @param other Object to move from.
+         */
+        Config(Config&& other) noexcept;
+        /**
+         * Copy assignment operator.
          * @param other Object to copy from.
          * @return This object.
          */
         Config& operator=(const Config& other);
+        /**
+         * Move assignment operator.
+         * @param other Object to move from.
+         * @return This object.
+         */
+        Config& operator=(Config&& other) noexcept;
+        /**
+         * Default destructor.
+         */
         virtual ~Config() = default;
         /**
          * Read an ini file and add the values to the Config container. Throws a SysException on failure.

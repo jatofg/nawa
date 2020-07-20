@@ -1,6 +1,25 @@
-//
-// Created by tobias on 19/07/2020.
-//
+/**
+ * \file RequestHandler.h
+ * \brief Handles and serves incoming requests via the NAWA app.
+ */
+
+/*
+ * Copyright (C) 2019-2020 Tobias Flaig.
+ *
+ * This file is part of nawa.
+ *
+ * nawa is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * nawa is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef NAWA_REQUESTHANDLER_H
 #define NAWA_REQUESTHANDLER_H
@@ -14,28 +33,38 @@ namespace nawa {
     class Connection;
 
     // Types of functions that need to be accessed from NAWA applications
-    typedef int init_t(nawa::AppInit& appInit); /**< Type for the init() function of NAWA apps. */
-    typedef int handleRequest_t(nawa::Connection& connection); /**< Type for the handleRequest(Connection) function of NAWA apps. */
+    // TODO does not belong here, move it to somewhere else
+    using init_t = int(AppInit&); /**< Type for the init() function of NAWA apps. */
+    using handleRequest_t = int(Connection&); /**< Type for the handleRequest(Connection) function of NAWA apps. */
+
+    using HandleRequestFunction = std::function<int(nawa::Connection&)>;
 
     class RequestHandler {
+        HandleRequestFunction handleRequestFunction;
     protected:
-        nawa::Config config;
+        Config config;
+        // TODO if a segfault happens during shutdown, use a unique_ptr and destroy manually
+        AppInit appInit;
     public:
         /**
-         * Take over the config and dlopen handle to the app library file from main.
-         * @param cfg Reference to the Config object representing the NAWA config file(s).
-         * @param appOpen dlopen handle which will be used to load the app handleRequest(...) function.
+         * Set the handleRequest function of the app.
+         * @param handleRequestFunction The request handling function of the app.
          */
-        static void setAppRequestHandler(const nawa::Config &cfg, void *appOpen);
+        void setAppRequestHandler(HandleRequestFunction handleRequestFunction);
         /**
          * Take over the AppInit struct filled by the init() function of the app.
          * @param _appInit AppInit struct as filled by the app.
          */
-        static void setConfig(const nawa::AppInit &_appInit);
+        void setAppInit(AppInit appInit);
         /**
-         * Reset the pointer to the AppInit to avoid a segfault on termination and clear session data.
+         * Set the config.
+         * @param config The config.
          */
-        static void destroyEverything();
+        void setConfig(Config config);
+        /**
+         * Clear session data
+         */
+        static void destroyEverything(); // TODO still necessary to do this in RequestHandler? find a better place!
         /**
          * Flush response to the browser. This function will be invoked by Connection::flushResponse().
          * @param connection Reference to the Connection object the response will be read from.
@@ -58,7 +87,20 @@ namespace nawa {
          */
         virtual void join() = 0;
     protected:
-        int callHandleRequest(Connection& connection);
+        /**
+         * Handle request by processing the filters and calling the app's handleRequest function, if necessary
+         * @param connection The current Connection object.
+         */
+        void handleRequest(Connection& connection);
+    private:
+        /**
+         * Apply the filters set by the app (through AppInit), if filtering is enabled.
+         * @param connection Reference to the connection object to read the request from and write the response to,
+         * if the request has to be filtered.
+         * @return True if the request has been filtered and a response has already been set by this function
+         * (and the app should not be invoked on this request). False if the app should handle this request.
+         */
+        bool applyFilters(Connection &connection);
     };
 }
 

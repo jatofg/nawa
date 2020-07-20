@@ -69,3 +69,16 @@ void nawa::Config::set(std::pair<std::string, std::string> key, std::string valu
 void nawa::Config::set(std::string section, std::string key, std::string value) {
     set(std::pair<std::string, std::string> (std::move(section), std::move(key)), std::move(value));
 }
+
+nawa::Config::Config(const nawa::Config &other) {
+    values = other.values;
+}
+
+nawa::Config::Config(nawa::Config &&other) noexcept : values(std::move(other.values)) {}
+
+nawa::Config &nawa::Config::operator=(nawa::Config &&other) noexcept {
+    if(this != &other) {
+        values = std::move(other.values);
+    }
+    return *this;
+}

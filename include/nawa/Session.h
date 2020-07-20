@@ -24,6 +24,7 @@
 #ifndef NAWA_SESSION_H
 #define NAWA_SESSION_H
 
+#include <utility>
 #include <vector>
 #include <mutex>
 #include <unordered_map>
@@ -51,18 +52,13 @@ namespace nawa {
          * Construct an empty SessionData object with a source IP.
          * @param sIP IP address of the session initiator.
          */
-        explicit SessionData(const std::string& sIP) : expires(0), sourceIP(sIP) {}
+        explicit SessionData(std::string sIP) : expires(0), sourceIP(std::move(sIP)) {}
     };
 
     /**
      * Class for managing sessions and getting and setting connection-independent session data.
      */
     class Session {
-        static std::mutex gLock; /**< Lock for data. */
-        /**
-         * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
-         */
-        static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
         nawa::Connection& connection; /**< Reference to the Connection object in order to access objects. */
         /**
          * Pointer to the session data struct for the current session, if established.
@@ -88,6 +84,7 @@ namespace nawa {
          */
         static void destroy();
         // RequestHandler should be able to call destroy()
+        friend class RequestHandler;
         friend class RequestHandlerLegacy;
     public:
         /**
@@ -132,7 +129,7 @@ namespace nawa {
          * Check whether a session is currently active (has been started).
          * @return True if session is established, false otherwise.
          */
-        bool established() const;
+        [[nodiscard]] bool established() const;
         /**
          * Check whether there exists a stored Any for the given key. Please note that the behavior of this
          * function might differ from `[key].isSet()` - while this function will also return true if the key has been
@@ -140,7 +137,7 @@ namespace nawa {
          * @param key Key to check.
          * @return True if a value exists for this key, false otherwise. Always false if no session established.
          */
-        bool isSet(std::string key) const;
+        [[nodiscard]] bool isSet(const std::string &key) const;
         /**
          * Get the value at the given key (as a Any object). To actually receive the stored object, use
          * the `.get<T>()` function of the Any (e.g., `conn.session["test"].get<std::string>()`). You will have to
@@ -150,7 +147,7 @@ namespace nawa {
          * @return Value at key. If no value exists for that key or no session established, an empty Any will be
          * returned.
          */
-        std::any operator[](std::string key) const;
+        std::any operator[](const std::string &key) const;
         /**
          * Set key to a Any value. Throws a UserException with error code 1 if no session has been established.
          * @param key Key to set.

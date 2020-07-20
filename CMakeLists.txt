@@ -70,7 +70,7 @@ add_executable(nawarun
         libs/inih/ini.c
 
         libs/base64/base64.h
-        libs/base64/base64.cpp)
+        libs/base64/base64.cpp src/RequestHandlers/RequestHandler.cpp src/RequestHandlers/FastcgiRequestHandler.cpp)
 
 target_link_libraries(nawarun -ldl -lfastcgipp -lcrypto -lcurl -largon2 bcrypt)
 target_include_directories(nawarun PUBLIC

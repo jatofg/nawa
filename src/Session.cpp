@@ -27,8 +27,13 @@
 #include <nawa/Crypto.h>
 #include <nawa/UserException.h>
 
-std::mutex nawa::Session::gLock;
-std::unordered_map<std::string, std::shared_ptr<nawa::SessionData>> nawa::Session::data;
+namespace {
+    std::mutex gLock; /**< Lock for data. */
+    /**
+    * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
+    */
+    std::unordered_map<std::string, std::shared_ptr<nawa::SessionData>> data;
+}
 
 nawa::Session::Session(nawa::Connection &connection) : connection(connection) {
     // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
@@ -181,7 +186,7 @@ bool nawa::Session::established() const {
     return (currentData.use_count() > 0);
 }
 
-bool nawa::Session::isSet(std::string key) const {
+bool nawa::Session::isSet(const std::string &key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         return (currentData->data.count(key) == 1);
@@ -189,7 +194,7 @@ bool nawa::Session::isSet(std::string key) const {
     return false;
 }
 
-std::any nawa::Session::operator[](std::string key) const {
+std::any nawa::Session::operator[](const std::string &key) const {
     if(established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         if(currentData->data.count(key) == 1) {

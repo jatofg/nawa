@@ -24,16 +24,16 @@
 #ifndef NAWA_FASTCGIREQUESTHANDLER_H
 #define NAWA_FASTCGIREQUESTHANDLER_H
 
-#include <fastcgi++/request.hpp>
+#include <nawa/RequestHandlers/RequestHandler.h>
 
 namespace nawa {
-    class FastcgiRequestHandler : public Fastcgipp::Request<char> {
+    class FastcgiRequestHandler : public RequestHandler {
+        class FastcgippRequestAdapter;
+        struct FastcgippManagerAdapter;
+        std::unique_ptr<FastcgippRequestAdapter> fastcgippRequest;
+        std::unique_ptr<FastcgippManagerAdapter> fastcgippManager;
     public:
-        /**
-         * Run handleRequest(Connection) function of the loaded app upon a request.
-         * @return Returns true to satisfy the fastcgi library.
-         */
-        bool response() override;
+        FastcgiRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
 
     };
 }

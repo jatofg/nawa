@@ -1,6 +1,6 @@
 /**
- * \file RequestHandler.cpp
- * \brief Implementation of the RequestHandler class.
+ * \file RequestHandlerLegacy.cpp
+ * \brief Implementation of the RequestHandlerLegacy class.
  */
 
 /*
