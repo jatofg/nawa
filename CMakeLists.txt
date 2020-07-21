@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.11)
 project(nawa VERSION 0.3)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -24,6 +24,15 @@ configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
 # ... SysException.h Types/Compound.h Connection.cpp ...
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
+
+# include fastcgilite
+include(FetchContent)
+FetchContent_Declare(
+        fastcgilite
+        GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
+        GIT_TAG v3.1.0
+)
+FetchContent_MakeAvailable(fastcgilite)
 
 add_executable(nawarun
         include/nawa/Request.h
@@ -72,11 +81,13 @@ add_executable(nawarun
         libs/base64/base64.h
         libs/base64/base64.cpp src/RequestHandlers/RequestHandler.cpp src/RequestHandlers/FastcgiRequestHandler.cpp)
 
-target_link_libraries(nawarun -ldl -lfastcgipp -lcrypto -lcurl -largon2 bcrypt)
+target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fcgistatic)
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
 
 if(BuildTests)
     add_library(assertions SHARED

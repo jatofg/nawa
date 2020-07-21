@@ -135,7 +135,6 @@ prepended with `sudo`.
 The requirements marked with * are also required for running nawa, the 
 others for building only.
 
-- libfastcgi++* (lite) (see next subsection)
 - libssl-dev >= 1.1.1 (OpenSSL* is probably already present on your 
 system)
 - libboost-dev >= 1.65.1.0
@@ -150,25 +149,10 @@ For building the docs, doxygen must be installed. However, you can also
 
 ### Clone, build, and install fastcgi++
 
-Run the following commands to build, run, and install fastcgi++ lite 
-(which is an optimized version of the fastcgi++ library by eddic). The 
-original library will work, too, with a few caveats (such as an 
-inconsistent logging style).
-
-`git clone https://github.com/jatofg/fastcgipp.git fastcgipp`
-
-`mkdir fastcgipp/build`
-
-`cd fastcgipp/build`
-
-`cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
-
-`make`
-
-Note: If you want to build the fastcgi++ docs, too, run 
-`make doc` now.
-
-`sudo make install`
+Installing fastcgi++ manually is not necessary anymore. A modified and reduced 
+variant [fcgilite](https://github.com/jatofg/fastcgipp) is automatically downloaded 
+while configuring your project using `cmake` (see below). If your IDE supports CMake, 
+the fastcgi++ headers should be recognized automatically.
 
 ### Clone, build, and install NAWA
 

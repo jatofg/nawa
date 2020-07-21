@@ -32,15 +32,11 @@ using namespace std;
 class nawa::FastcgiRequestHandler::FastcgippRequestAdapter : public Fastcgipp::Request<char> {
 public:
     // TODO:
-    //  - in the constructor, set postMax (has to be set in a static function before)
-    //  - also use a static function to point to the request handler (RequestHandler::handleRequest)
-    //  - in Response, it is necessary to use this function to handle the request
-    //  - in the constructor, also make sure to pass the object (this) to FascgiRequestHandler
-    //      - to achieve this, it should be necessary to pass a ref/ptr to the FcgiRH object to the Adapter
-    //          using a static function
-    //  - as static functions are used, it is necessary to analyze the impact on obect orientation
-    //      - are the static objects bound to the FcgiRH object as this class is a FcgiRH non-static member?
-    //      - sounds unlikely :(
+    //  - in the constructor, set postMax (has to be passed via externalObject)
+    //  - also pass the request handler via the externalObject (RequestHandler::handleRequest)
+    //      - in Response, it is necessary to use this function to handle the request
+    //  - for flushing, use a callback saved in the Connection
+    //  - is the FastcgiRequestHandler object still required then?
 
     /**
      * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
