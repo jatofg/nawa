@@ -28,12 +28,14 @@
 
 namespace nawa {
     class FastcgiRequestHandler : public RequestHandler {
-        class FastcgippRequestAdapter;
         struct FastcgippManagerAdapter;
         std::unique_ptr<FastcgippManagerAdapter> fastcgippManager;
     public:
         FastcgiRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
-
+        void start() override;
+        void stop() override;
+        void terminate() override;
+        void join() override;
     };
 }
 

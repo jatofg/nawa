@@ -30,7 +30,7 @@ include(FetchContent)
 FetchContent_Declare(
         fastcgilite
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
-        GIT_TAG v3.1.0
+        GIT_TAG v3.1.2
 )
 FetchContent_MakeAvailable(fastcgilite)
 
@@ -81,7 +81,7 @@ add_executable(nawarun
         libs/base64/base64.h
         libs/base64/base64.cpp src/RequestHandlers/RequestHandler.cpp src/RequestHandlers/FastcgiRequestHandler.cpp)
 
-target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fcgistatic)
+target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>

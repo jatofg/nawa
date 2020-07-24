@@ -117,8 +117,9 @@ void RequestHandler::handleRequest(Connection &connection) {
     if(!applyFilters(connection)) {
         handleRequestFunction(connection);
     }
-    // TODO maybe we should instead add a std::function in Connection so that the RequestHandler can stay out of Connection
-    flush(connection);
+    // TODO we should instead add a std::function in Connection so that the RequestHandler can stay out of Connection
+    //      and flushing has to be done by the specific handler then, unfortunately
+    //flush(connection);
 }
 
 bool RequestHandler::applyFilters(Connection &connection) {

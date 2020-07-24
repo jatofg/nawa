@@ -69,7 +69,7 @@ namespace nawa {
          * Flush response to the browser. This function will be invoked by Connection::flushResponse().
          * @param connection Reference to the Connection object the response will be read from.
          */
-        virtual void flush(nawa::Connection& connection) = 0;
+        //virtual void flush(nawa::Connection& connection) = 0; // TODO should instead be handled by a callback
         /**
          * Start request handling.
          */
@@ -86,7 +86,6 @@ namespace nawa {
          * Block until request handling has shut down.
          */
         virtual void join() = 0;
-    protected:
         /**
          * Handle request by processing the filters and calling the app's handleRequest function, if necessary
          * @param connection The current Connection object.
