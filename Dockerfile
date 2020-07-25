@@ -14,7 +14,7 @@ RUN set -eux; \
 		libssl-dev libboost-dev libcurl4-openssl-dev libargon2-0-dev \
 		unzip g++ libc6-dev make cmake; \
 	cd /opt/fastcgisrc/; \
-	unzip -q lite.zip; \
+	unzip -q lite_legacy.zip; \
 	mkdir fastcgipp-lite/build; \
 	cd fastcgipp-lite/build; \
 	cmake -DCMAKE_BUILD_TYPE=RELEASE ..; \
