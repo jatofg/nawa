@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.11)
-project(nawa VERSION 0.3)
+project(nawa VERSION 0.5)
 
 set(CMAKE_CXX_STANDARD 17)
 
 # version
 set(NAWA_VERSION_MAJOR 0)
-set(NAWA_VERSION_MINOR 3)
+set(NAWA_VERSION_MINOR 5)
 
 # build options
 option(BuildTests "Build tests" OFF)
@@ -25,7 +25,7 @@ configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
 
-# include fastcgilite
+# dependencies
 include(FetchContent)
 FetchContent_Declare(
         fastcgilite
