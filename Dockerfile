@@ -6,7 +6,7 @@ COPY src /opt/nawasrc/src
 COPY systemd /opt/nawasrc/systemd
 COPY CMakeLists.txt /opt/nawasrc/
 COPY docker/nawa/config.ini /opt/nawasrc/
-ADD https://github.com/jatofg/fastcgipp/archive/lite.zip /opt/fastcgisrc/
+ADD https://github.com/jatofg/fastcgipp/archive/lite_legacy.zip /opt/fastcgisrc/
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
