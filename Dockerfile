@@ -15,8 +15,8 @@ RUN set -eux; \
 		unzip g++ libc6-dev make cmake; \
 	cd /opt/fastcgisrc/; \
 	unzip -q lite_legacy.zip; \
-	mkdir fastcgipp-lite/build; \
-	cd fastcgipp-lite/build; \
+	mkdir fastcgipp-lite_legacy/build; \
+	cd fastcgipp-lite_legacy/build; \
 	cmake -DCMAKE_BUILD_TYPE=RELEASE ..; \
 	make; \
 	make install; \
