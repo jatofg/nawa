@@ -26,6 +26,8 @@
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
 #include <nawa/Log.h>
+#include <nawa/Connection.h>
+#include <nawa/Utils.h>
 
 using namespace nawa;
 using namespace std;
@@ -73,6 +75,97 @@ bool FastcgippRequestAdapter::response() {
 }
 
 bool FastcgippRequestAdapter::inProcessor() {
+    RequestInitContainer requestInit;
+
+    // fill environment
+    {
+        auto const& renv = environment();
+        requestInit.environment = {
+                {"host", renv.host},
+                {"userAgent", renv.userAgent},
+                {"acceptContentTypes", renv.acceptContentTypes},
+                {"acceptCharsets", renv.acceptCharsets},
+                {"authorization", renv.authorization},
+                {"referer", renv.referer},
+                {"contentType", renv.contentType},
+                {"root", renv.root},
+                {"scriptName", renv.scriptName},
+                {"requestUri", renv.requestUri},
+                {"serverPort", to_string(renv.serverPort)},
+                {"remotePort", to_string(renv.remotePort)},
+                {"ifModifiedSince", to_string(renv.ifModifiedSince)},
+                {"https", renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""},
+                {"serverName", renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""},
+                {"serverSoftware", renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""},
+        };
+
+        auto& requestMethod = requestInit.environment["requestMethod"];
+        switch(renv.requestMethod) {
+            case Fastcgipp::Http::RequestMethod::ERROR:
+                requestMethod = "ERROR";
+                break;
+            case Fastcgipp::Http::RequestMethod::HEAD:
+                requestMethod = "HEAD";
+                break;
+            case Fastcgipp::Http::RequestMethod::GET:
+                requestMethod = "GET";
+                break;
+            case Fastcgipp::Http::RequestMethod::POST:
+                requestMethod = "POST";
+                break;
+            case Fastcgipp::Http::RequestMethod::PUT:
+                requestMethod = "PUT";
+                break;
+            case Fastcgipp::Http::RequestMethod::DELETE:
+                requestMethod = "DELETE";
+                break;
+            case Fastcgipp::Http::RequestMethod::TRACE:
+                requestMethod = "TRACE";
+                break;
+            case Fastcgipp::Http::RequestMethod::OPTIONS:
+                requestMethod = "OPTIONS";
+                break;
+            case Fastcgipp::Http::RequestMethod::CONNECT:
+                requestMethod = "CONNECT";
+                break;
+        }
+
+        {
+            stringstream serverAddr, remoteAddr;
+            serverAddr << renv.serverAddress;
+            remoteAddr << renv.remoteAddress;
+            requestInit.environment["serverAddress"] = serverAddr.str();
+            requestInit.environment["remoteAddress"] = remoteAddr.str();
+        }
+
+        {
+            // the base URL is the URL without the request URI, e.g., https://www.example.com
+            std::stringstream baseUrl;
+            auto https = renv.others.count("HTTPS");
+            baseUrl << (https ? "https://" : "http://")
+                << renv.host;
+            if((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
+                baseUrl << ":" << renv.serverPort;
+            }
+            auto baseUrlStr = baseUrl.str();
+            requestInit.environment["baseUrl"] = baseUrlStr;
+
+            // fullUrlWithQS is the full URL, e.g., https://www.example.com/test?a=b&c=d
+            requestInit.environment["fullUrlWithQS"] = baseUrlStr + renv.requestUri;
+
+            // fullUrlWithoutQS is the full URL without query string, e.g., https://www.example.com/test
+            baseUrl << renv.requestUri.substr(0, renv.requestUri.find_first_of('?'));
+            requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
+        }
+
+        for(const auto& [k, v]: renv.others) {
+            if(requestInit.environment.count(to_lowercase(k)) == 0) {
+                requestInit.environment[to_lowercase(k)] = v;
+            }
+        }
+
+    }
+
 //    postContentType = environment().contentType;
 //    if(rawPostAccess == RawPostAccess::NEVER) {
 //        return false;

@@ -21,200 +21,104 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
 #include <nawa/Utils.h>
 #include <nawa/Request.h>
 #include <nawa/SysException.h>
 
-std::string nawa::Request::Env::operator[](const std::string& envVar) const {
-    std::string ret;
-    auto const &renv = requestHandler.environment();
-    if(envVar == "host") ret = renv.host; // server hostname
-    else if(envVar == "userAgent") ret = renv.userAgent; // user agent string
-    else if(envVar == "acceptContentTypes") ret = renv.acceptContentTypes; // content types accepted by client
-    else if(envVar == "acceptCharsets") ret = renv.acceptCharsets; // charsets accepted by client
-    else if(envVar == "authorization") ret = renv.authorization; // http authorization string
-    else if(envVar == "referer") ret = renv.referer; // referral url
-    else if(envVar == "contentType") ret = renv.contentType; // content type of data from client
-    else if(envVar == "root") ret = renv.root; // http root directory
-    else if(envVar == "scriptName") ret = renv.scriptName; // filename of script relative to http root
-    else if(envVar == "requestMethod") {
-        switch(renv.requestMethod) {
-            case Fastcgipp::Http::RequestMethod::ERROR:
-                ret = "ERROR";
-                break;
-            case Fastcgipp::Http::RequestMethod::HEAD:
-                ret = "HEAD";
-                break;
-            case Fastcgipp::Http::RequestMethod::GET:
-                ret = "GET";
-                break;
-            case Fastcgipp::Http::RequestMethod::POST:
-                ret = "POST";
-                break;
-            case Fastcgipp::Http::RequestMethod::PUT:
-                ret = "PUT";
-                break;
-            case Fastcgipp::Http::RequestMethod::DELETE:
-                ret = "DELETE";
-                break;
-            case Fastcgipp::Http::RequestMethod::TRACE:
-                ret = "TRACE";
-                break;
-            case Fastcgipp::Http::RequestMethod::OPTIONS:
-                ret = "OPTIONS";
-                break;
-            case Fastcgipp::Http::RequestMethod::CONNECT:
-                ret = "CONNECT";
-                break;
-        }
+using namespace nawa;
+using namespace std;
+
+string Request::Env::operator[](const string &envVar) const {
+    if (environment.count(envVar)) {
+        return environment.at(envVar);
     }
-    else if(envVar == "requestUri") ret = renv.requestUri; // request uri
-    else if(envVar == "serverAddress") {
-        std::stringstream stm;
-        stm << renv.serverAddress;
-        ret = stm.str();
-    }
-    else if(envVar == "remoteAddress") {
-        std::stringstream stm;
-        stm << renv.remoteAddress;
-        ret = stm.str();
-    }
-    else if(envVar == "serverPort") ret = std::to_string(renv.serverPort);
-    else if(envVar == "remotePort") ret = std::to_string(renv.remotePort);
-    else if(envVar == "ifModifiedSince") ret = std::to_string(renv.ifModifiedSince); // unix timestamp
-    else if(envVar == "https") ret = renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""; // "on" if accessed via HTTPS
-    else if(envVar == "serverName") ret = renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""; // server's FQDN
-    else if(envVar == "serverSoftware") ret = renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""; // server software (e.g., Apache)
-    else if(envVar == "baseUrl") {
-        std::stringstream stm;
-        auto https = renv.others.count("HTTPS");
-        stm << (https ? "https://" : "http://")
-            << renv.host;
-        if((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
-            stm << ":" << renv.serverPort;
-        }
-        ret = stm.str();
-    }
-    else if(envVar == "fullUrlWithQS") {
-        auto baseUrl = (*this)["baseUrl"];
-        ret = baseUrl + renv.requestUri;
-    }
-    else if(envVar == "fullUrlWithoutQS") {
-        auto baseUrl = (*this)["baseUrl"];
-        ret = baseUrl + renv.requestUri.substr(0, renv.requestUri.find_first_of('?'));
-    }
-    return ret;
+    return string();
 }
 
-std::vector<std::string> nawa::Request::Env::getAcceptLanguages() const {
-    return requestHandler.environment().acceptLanguages;
+vector<string> Request::Env::getAcceptLanguages() const {
+    return acceptLanguages;
 }
 
-std::vector<std::string> nawa::Request::Env::getRequestPath() const {
-    // TODO is this function really necessary? get RP via operator[] when switched to Any?
-    // TODO what does environment().pathInfo do?
-    //return requestHandler.environment().pathInfo;
-    return nawa::split_path(requestHandler.environment().requestUri);
+vector<string> Request::Env::getRequestPath() const {
+    return split_path(operator[]("requestUri"));
 }
 
-Fastcgipp::Address nawa::Request::Env::getServerAddr() const {
-    return requestHandler.environment().serverAddress;
-}
+Request::Env::Env(const RequestInitContainer &initContainer) : environment(initContainer.environment),
+                                                               acceptLanguages(initContainer.acceptLanguages) {}
 
-Fastcgipp::Address nawa::Request::Env::getRemoteAddr() const {
-    return requestHandler.environment().remoteAddress;
-}
-
-nawa::Request::GPC::GPC(RequestHandlerLegacy &request, Source source)
-        : requestHandler(request), source(source) {
+Request::GPC::GPC(const RequestInitContainer &requestInit, Source source)
+        : source(source) {
     switch (source) {
         case Source::COOKIE:
-            data = request.environment().cookies;
+            data = requestInit.cookieVars;
             break;
         case Source::POST:
-            data = request.environment().posts;
+            data = requestInit.postVars;
             break;
         case Source::GET:
-            data = request.environment().gets;
+            data = requestInit.getVars;
             break;
         default:
-            throw nawa::SysException(__FILE__, __LINE__, "Invalid source for nawa::Request::GPC given");
+            throw SysException(__FILE__, __LINE__, "Invalid source for nawa::Request::GPC given");
     }
 }
 
-std::string nawa::Request::GPC::operator[](const std::string& gpcVar) const {
+string Request::GPC::operator[](const string &gpcVar) const {
     auto e = data.find(gpcVar);
-    if(e != data.end()) return e->second;
+    if (e != data.end()) return e->second;
     else return "";
 }
 
-std::vector<std::string> nawa::Request::GPC::getVector(const std::string& gpcVar) const {
-    std::vector<std::string> ret;
+vector<string> Request::GPC::getVector(const string &gpcVar) const {
+    vector<string> ret;
     auto e = data.equal_range(gpcVar);
-    for(auto it = e.first; it != e.second; ++it) {
+    for (auto it = e.first; it != e.second; ++it) {
         ret.push_back(it->second);
     }
     return ret;
 }
 
-unsigned long nawa::Request::GPC::count(const std::string& gpcVar) const {
+unsigned long Request::GPC::count(const string &gpcVar) const {
     return data.count(gpcVar);
 }
 
-std::multimap<std::string, std::string>& nawa::Request::GPC::getMultimap() {
+multimap<string, string> &Request::GPC::getMultimap() {
     return data;
 }
 
-std::multimap<std::string, std::string>::const_iterator nawa::Request::GPC::begin() const {
+multimap<string, string>::const_iterator Request::GPC::begin() const {
     return data.begin();
 }
 
-std::multimap<std::string, std::string>::const_iterator nawa::Request::GPC::end() const {
+multimap<string, string>::const_iterator Request::GPC::end() const {
     return data.end();
 }
 
-nawa::Request::Request(RequestHandlerLegacy &request)
-        : env(request), get(request, GPC::Source::GET), post(request), cookie(request, GPC::Source::COOKIE) {}
+Request::Request(const RequestInitContainer &initContainer)
+        : env(initContainer), get(initContainer, GPC::Source::GET), post(initContainer),
+          cookie(initContainer, GPC::Source::COOKIE) {}
 
-nawa::Request::Post::Post(RequestHandlerLegacy &request) : GPC(request, GPC::Source::POST) {}
+Request::Post::Post(const RequestInitContainer &requestInit) : GPC(requestInit, GPC::Source::POST),
+                                                               contentType(requestInit.postContentType),
+                                                               rawPostCallback(requestInit.rawPostCallback),
+                                                               fileVectorCallback(requestInit.fileVectorCallback) {}
 
-std::string& nawa::Request::Post::getRaw() const {
-    return requestHandler.rawPost;
+string Request::Post::getRaw() const {
+    return rawPostCallback();
 }
 
-std::vector<nawa::Request::File> nawa::Request::Post::getFileVector(const std::string& postVar) const {
-    std::vector<nawa::Request::File> ret;
-    auto e = requestHandler.environment().files.equal_range(postVar);
-    for(auto it = e.first; it != e.second; ++it) {
-        nawa::Request::File tmp(it->second);
-        ret.push_back(tmp);
-    }
-    return ret;
+vector<File> Request::Post::getFileVector(const string &postVar) const {
+    return fileVectorCallback(postVar);
+
+//    vector<File> ret;
+//    auto e = requestHandler.environment().files.equal_range(postVar);
+//    for(auto it = e.first; it != e.second; ++it) {
+//        Request::File tmp(it->second);
+//        ret.push_back(tmp);
+//    }
+//    return ret;
 }
 
-std::string nawa::Request::Post::getContentType() const {
-    return requestHandler.postContentType;
-}
-
-nawa::Request::File::File(const Fastcgipp::Http::File<char> &file) : filename(file.filename),
-        contentType(file.contentType), size(file.size), dataPtrRef(file.data) {}
-
-std::string nawa::Request::File::copyFile() {
-    return std::string(dataPtrRef.get(), size);
-}
-
-bool nawa::Request::File::writeFile(const std::string& path) {
-    std::ofstream outfile;
-    std::ios_base::iostate exceptionMask = outfile.exceptions() | std::ios::failbit;
-    outfile.exceptions(exceptionMask);
-    try {
-        outfile.open(path, std::ofstream::out | std::ofstream::binary);
-        outfile.write(dataPtrRef.get(), size);
-        outfile.close();
-    }
-    catch(std::ios_base::failure& e) {
-        return false;
-    }
-    return true;
+string Request::Post::getContentType() const {
+    return contentType;
 }

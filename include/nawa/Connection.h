@@ -44,7 +44,8 @@ namespace nawa {
         void clearStream();
         void mergeStream();
     public:
-        const nawa::Request& request; /**< Access the Request object representing the current request. */
+        FlushCallbackFunction flushCallback;
+        nawa::Request request; /**< The Request object representing the current request. */
         nawa::Session session;
         /**
          * Access the NAWA configuration. This is a copy of the Config object that contains the values of the config file
@@ -58,7 +59,7 @@ namespace nawa {
          * @param request Reference to the request object (needed to import cookies and flush the response).
          * @param config Reference to the Config object containing the NAWA configuration.
          */
-        Connection(Request& request, Config& config);
+        explicit Connection(const RequestInitContainer& initContainer);
         /**
          * Set the HTTP response body (everything that comes after the headers). This will overwrite everything
          * that was set previously. You can use the Response object as an ostream instead.

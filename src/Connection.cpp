@@ -22,8 +22,6 @@
  */
 
 #include <algorithm>
-#include <iomanip>
-#include <locale>
 #include <regex>
 #include <fstream>
 #include <sys/types.h>
@@ -216,11 +214,14 @@ void nawa::Connection::clearStream() {
     response.clear();
 }
 
-nawa::Connection::Connection(Request& request, Config& config) : request(request), config(config), session(*this) {
+nawa::Connection::Connection(const RequestInitContainer &initContainer) : flushCallback(initContainer.flushCallback),
+                                                                             request(request),
+                                                                             config(initContainer.config),
+                                                                             session(*this) {
     headers["content-type"] = "text/html; charset=utf-8";
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
-    if(config[{"session", "autostart"}] == "on") {
+    if (config[{"session", "autostart"}] == "on") {
         session.start();
     }
 }
@@ -244,8 +245,8 @@ void nawa::Connection::unsetCookie(const std::string &key) {
 }
 
 void nawa::Connection::flushResponse() {
-    // access RequestHandler through Request::Env, which declares Connection as a friend
-    request.env.requestHandler.flush(*this);
+    // use callback to flush response
+    flushCallback();
     // now that headers and cookies have been sent to the client, make sure they are not included anymore
     isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once

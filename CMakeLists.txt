@@ -79,7 +79,7 @@ add_executable(nawarun
         libs/inih/ini.c
 
         libs/base64/base64.h
-        libs/base64/base64.cpp src/RequestHandlers/RequestHandler.cpp src/RequestHandlers/FastcgiRequestHandler.cpp)
+        libs/base64/base64.cpp src/RequestHandlers/RequestHandler.cpp src/RequestHandlers/FastcgiRequestHandler.cpp include/nawa/File.h)
 
 target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
 target_include_directories(nawarun PUBLIC
