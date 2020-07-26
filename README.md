@@ -176,8 +176,12 @@ Then, build NAWA:
 
 `make`
 
+**Note: If you want to build the tests as well, pass the `-DBuildTests=ON` argument 
+to cmake.** You can disable building the examples and docs using the arguments 
+`-DBuildExamples=OFF` resp. `-DBuildDocs=OFF`.
+
 And last, install it to the target directories so that the apps 
-can find it:
+can find it (this will also install the headers needed for app development):
 
 `sudo make install`
 
