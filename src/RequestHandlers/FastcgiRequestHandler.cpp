@@ -298,6 +298,8 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     }
 }
 
+FastcgiRequestHandler::~FastcgiRequestHandler() {}
+
 void FastcgiRequestHandler::start() {
     if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->start();
