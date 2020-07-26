@@ -32,7 +32,7 @@ namespace nawa {
     /**
      * Exception class that can be used by apps to catch errors resulting from NAWA function calls.
      */
-    class UserException: public std::exception {
+    class UserException : public std::exception {
         int errorCode; /**< The error code so that the app can distinguish different exceptions from a function. */
         std::string message; /**< The exception message will be stored here. */
     public:
@@ -42,21 +42,24 @@ namespace nawa {
          * @param errorCode An integral error code identifying the error that caused this exception.
          * @param _message Additional message that will also be a part of what().
          */
-        UserException(const std::string& inFunction, int errorCode, const std::string& _message) : errorCode(errorCode) {
+        UserException(const std::string &inFunction, int errorCode, const std::string &_message) : errorCode(
+                errorCode) {
             std::stringstream mstream;
             mstream << "NAWA: UserException #" << errorCode << " in " << inFunction << ": " << _message;
             message = mstream.str();
         }
+
         /**
          * Construct a UserException without an additional message.
          * @param inFunction Function in which the exception occurred.
          * @param errorCode An integral error code identifying the error that caused this exception.
          */
-        UserException(const std::string& inFunction, int errorCode) : errorCode(errorCode) {
+        UserException(const std::string &inFunction, int errorCode) : errorCode(errorCode) {
             std::stringstream mstream;
             mstream << "NAWA: UserException #" << errorCode << " in " << inFunction;
             message = mstream.str();
         }
+
         /**
          * Get the integral error code that identifies the error that caused this exception.
          * @return The error code.
@@ -64,11 +67,12 @@ namespace nawa {
         virtual int getErrorCode() const noexcept {
             return errorCode;
         }
+
         /**
          * Get the full constructed exception message.
          * @return The full exception message.
          */
-        const char* what() const noexcept override {
+        const char *what() const noexcept override {
             return message.c_str();
         }
     };

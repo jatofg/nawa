@@ -77,8 +77,10 @@ namespace nawa {
          * @param _authPassword Password for authentication.
          */
         explicit SmtpMailer(std::string _serverDomain = "localhost", unsigned int _serverPort = 25,
-                TlsMode _tlsMode = TlsMode::NONE, bool _verifyTlsCert = true, std::string _authUsername = "",
-                std::string _authPassword = "");
+                            TlsMode _tlsMode = TlsMode::NONE, bool _verifyTlsCert = true,
+                            std::string _authUsername = "",
+                            std::string _authPassword = "");
+
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
          * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
@@ -89,7 +91,8 @@ namespace nawa {
          * (highly recommended).
          */
         void setServer(std::string _serverDomain, unsigned int _serverPort = 25, TlsMode _tlsMode = TlsMode::NONE,
-                bool _verifyTlsCert = true);
+                       bool _verifyTlsCert = true);
+
         /**
          * Set the authentication parameters for the SMTP connection.
          * @param _authUsername Username for authentication.
@@ -123,7 +126,8 @@ namespace nawa {
          * the rule set is empty, it will neither be saved along with the email nor evaluated.
          */
         void enqueue(std::shared_ptr<Email> email, EmailAddress to,
-                std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+                     std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+
         /**
          * This function will enqueue an email for a list of recipients. This improves efficiency, but it doesn't
          * allow the application of replacement rules for each recipient individually. Replacement rules can still be
@@ -137,11 +141,13 @@ namespace nawa {
          * to the email once and do not offer personalization to individual recipients.
          */
         void bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
-                std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+                         std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+
         /**
          * Clear the email queue.
          */
         void clearQueue();
+
         /**
          * Process the queue, i.e., establish an SMTP connection and send all emails in the queue. This function will
          * not modify the queue. In case of errors, a UserException with error code 1 will be thrown.

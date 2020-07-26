@@ -523,12 +523,11 @@ namespace {
 
     void initializeHtmlDecodeTable() {
         // add entities
-        for(auto &e: htmlEntities) {
+        for (auto &e: htmlEntities) {
             // if string is empty, we need to look at htmlLookahead
-            if(!e.second.empty()) {
+            if (!e.second.empty()) {
                 htmlDecodeTable.insert(std::make_pair(e.second, std::make_pair(e.first, U'\0')));
-            }
-            else if(htmlLookaheads.count(e.first) == 1) {
+            } else if (htmlLookaheads.count(e.first) == 1) {
                 auto const &lookahead = htmlLookaheads.at(e.first);
                 char32_t secondChar = lookahead.first;
                 htmlDecodeTable.insert(std::make_pair(lookahead.second, std::make_pair(e.first, secondChar)));
@@ -542,55 +541,50 @@ namespace {
 }
 
 std::string nawa::Encoding::htmlEncode(std::string input, bool encodeAll) {
-    if(!encodeAll) {
+    if (!encodeAll) {
         boost::replace_all(input, "&", "&amp;");
         boost::replace_all(input, "\"", "&quot;");
         boost::replace_all(input, "<", "&lt;");
         boost::replace_all(input, ">", "&gt;");
-    }
-    else {
+    } else {
         // convert to utf32 to iterate through the characters
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
         std::u32string uinput = cv.from_bytes(input);
         std::basic_stringstream<char32_t> uoutputs;
         char32_t lookahead = '\0';
-        for(char32_t c: uinput) {
-            if(lookahead != '\0') {
+        for (char32_t c: uinput) {
+            if (lookahead != '\0') {
                 // if we have a lookahead, check the htmlLookahead map if there is an entity for that
                 // (there should always be one, if the map is correct)
-                if(htmlLookaheads.count(lookahead) != 1) {
+                if (htmlLookaheads.count(lookahead) != 1) {
                     uoutputs << lookahead;
                     lookahead = '\0';
-                }
-                else {
+                } else {
                     // check whether the current char matches the second char for the entity
-                    auto& currentLA = htmlLookaheads.at(lookahead);
-                    if(currentLA.first == c) {
+                    auto &currentLA = htmlLookaheads.at(lookahead);
+                    if (currentLA.first == c) {
                         uoutputs << currentLA.second;
                         lookahead = '\0';
                         continue;
-                    }
-                    else {
+                    } else {
                         uoutputs << lookahead;
                         lookahead = '\0';
                     }
                 }
             }
-            if(htmlEntities.count(c) == 1) {
-                if(htmlEntities.at(c).empty()) {
+            if (htmlEntities.count(c) == 1) {
+                if (htmlEntities.at(c).empty()) {
                     // empty entity string means that entity stands for 2 characters
                     lookahead = c;
-                }
-                else {
+                } else {
                     uoutputs << htmlEntities.at(c);
                 }
-            }
-            else {
+            } else {
                 uoutputs << c;
             }
         }
         // if lookahead is not \0, the last char has been (falsely) identified as lookahead
-        if(lookahead != '\0') {
+        if (lookahead != '\0') {
             uoutputs << lookahead;
         }
         input = cv.to_bytes(uoutputs.str());
@@ -600,22 +594,21 @@ std::string nawa::Encoding::htmlEncode(std::string input, bool encodeAll) {
 
 std::string nawa::Encoding::htmlDecode(std::string input) {
 
-    if(htmlDecodeTable.empty()) initializeHtmlDecodeTable();
+    if (htmlDecodeTable.empty()) initializeHtmlDecodeTable();
 
     std::regex matchEntity(R"(&[A-Za-z0-9]{1,25}?;)");
 
     // callback function
-    auto replaceEntity = [](const std::vector<std::string>& matches) -> std::string {
+    auto replaceEntity = [](const std::vector<std::string> &matches) -> std::string {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
         auto entity32 = cv.from_bytes(matches.at(0));
-        if(htmlDecodeTable.count(entity32) != 1) {
+        if (htmlDecodeTable.count(entity32) != 1) {
             return matches.at(0);
-        }
-        else {
+        } else {
             std::basic_stringstream<char32_t> ret;
             ret << htmlDecodeTable.at(entity32).first;
             auto secondChar = htmlDecodeTable.at(entity32).second;
-            if(secondChar != '\0') {
+            if (secondChar != '\0') {
                 ret << secondChar;
             }
             return cv.to_bytes(ret.str());
@@ -627,21 +620,20 @@ std::string nawa::Encoding::htmlDecode(std::string input) {
 
     // unicode replacement
     std::regex matchUnicode(R"(&#(x([A-Fa-f0-9]{1,5})|([0-9]{1,6}));)");
-    auto replaceUnicode = [](const std::vector<std::string>& matches) -> std::string {
+    auto replaceUnicode = [](const std::vector<std::string> &matches) -> std::string {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
         // first alternative: decimal
         char32_t c;
-        if(matches.size() < 3) {
+        if (matches.size() < 3) {
             return "";
         }
-        if(matches.size() > 3 && !matches.at(3).empty()) {
+        if (matches.size() > 3 && !matches.at(3).empty()) {
             c = (char32_t) std::stoul(matches.at(3));
         }
-        // second alternative: hex
-        else if(!matches.at(2).empty()) {
+            // second alternative: hex
+        else if (!matches.at(2).empty()) {
             c = (char32_t) std::stoul(matches.at(2), nullptr, 16);
-        }
-        else {
+        } else {
             return "";
         }
         std::u32string outs(1, c);
@@ -652,18 +644,17 @@ std::string nawa::Encoding::htmlDecode(std::string input) {
     return input;
 }
 
-std::string nawa::Encoding::urlEncode(const std::string& input) {
+std::string nawa::Encoding::urlEncode(const std::string &input) {
     std::stringstream out;
 
     // check if character is valid, unreserved URL character, otherwise apply url encoding
-    for(char c: input) {
-        if(urlUnreserved.count(c) == 1) {
+    for (char c: input) {
+        if (urlUnreserved.count(c) == 1) {
             out << c;
-        }
-        else {
+        } else {
             std::ios init(nullptr);
             init.copyfmt(out);
-            out << '%' << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)c;
+            out << '%' << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (int) (unsigned char) c;
             out.copyfmt(init);
         }
     }
@@ -676,7 +667,7 @@ std::string nawa::Encoding::urlDecode(std::string input) {
     std::regex matchCode(R"(%([0-9A-F]{2}))");
 
     // replacement function
-    auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
+    auto replaceCode = [](const std::vector<std::string> &matches) -> std::string {
         return std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
     };
 
@@ -687,17 +678,18 @@ std::string nawa::Encoding::urlDecode(std::string input) {
 
 bool nawa::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
     std::regex rgx;
-    if(allowWhitespaces) {
+    if (allowWhitespaces) {
         rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
-    }
-    else {
+    } else {
         rgx.assign(R"([A-Za-z0-9\+/]+={0,2})");
     }
     return std::regex_match(input, rgx);
 }
 
-std::string nawa::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
-    return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length(), breakAfter, breakSequence);
+std::string
+nawa::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
+    return base64_encode(reinterpret_cast<const unsigned char *>(input.c_str()), input.length(), breakAfter,
+                         breakSequence);
 }
 
 std::string nawa::Encoding::base64Decode(const std::string &input) {
@@ -705,30 +697,27 @@ std::string nawa::Encoding::base64Decode(const std::string &input) {
 }
 
 std::string nawa::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
-        bool replaceCrlf, bool qEncoding) {
+                                                  bool replaceCrlf, bool qEncoding) {
     std::stringstream ret;
     int lineCount = 0;
-    for(const char c: input) {
+    for (const char c: input) {
         // TODO do not replace =09 (tabulator)? spaces at the end of a line (shoud be encoded =20)?
         if (c >= 32 && c <= 126 && c != 61 && !(qEncoding && (c == 32 || c == 63 || c == 95))) {
-            if(!qEncoding && lineCount >= 75) {
+            if (!qEncoding && lineCount >= 75) {
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
             ret << c;
             ++lineCount;
-        }
-        else if(!replaceCrlf && (c == 10 || c == 13)) {
+        } else if (!replaceCrlf && (c == 10 || c == 13)) {
             ret << c;
             lineCount = 0;
-        }
-        else if(qEncoding && c == 32) {
+        } else if (qEncoding && c == 32) {
             // space character represented by '_' in Q-encoding
             ret << '_';
             ++lineCount;
-        }
-        else {
-            if(!qEncoding && lineCount >= 73) {
+        } else {
+            if (!qEncoding && lineCount >= 73) {
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
@@ -743,9 +732,9 @@ std::string nawa::Encoding::quotedPrintableDecode(std::string input) {
     std::regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function
-    auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
+    auto replaceCode = [](const std::vector<std::string> &matches) -> std::string {
         return (matches.at(1) == "\r\n" || matches.at(1) == "\n")
-            ? std::string() : std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
+               ? std::string() : std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
     };
 
     regex_replace_callback(input, matchCode, replaceCode);
@@ -756,10 +745,9 @@ std::string nawa::Encoding::quotedPrintableDecode(std::string input) {
 std::string nawa::Encoding::makeEncodedWord(const std::string &input, bool base64) {
     std::stringstream ret;
     ret << "=?utf-8?";
-    if(base64) {
+    if (base64) {
         ret << "?B?" << base64Encode(input);
-    }
-    else {
+    } else {
         ret << "?Q?" << quotedPrintableEncode(input, "", true, true);
     }
     ret << "?=";

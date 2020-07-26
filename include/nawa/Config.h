@@ -39,61 +39,72 @@ namespace nawa {
          * Construct empty Config container.
          */
         Config() = default;
+
         /**
          * Construct Config container and directly parse an ini file. Throws a SysException on failure.
          * @param iniFile ini file to parse, values will be added to the Config container.
          */
-        explicit Config(std::string iniFile);
+        explicit Config(const std::string &iniFile);
+
         /**
          * Copy constructor.
          * @param other Object to copy from.
          */
-        Config(Config const& other);
+        Config(Config const &other);
+
         /**
          * Move constructor.
          * @param other Object to move from.
          */
-        Config(Config&& other) noexcept;
+        Config(Config &&other) noexcept;
+
         /**
          * Copy assignment operator.
          * @param other Object to copy from.
          * @return This object.
          */
-        Config& operator=(const Config& other);
+        Config &operator=(const Config &other);
+
         /**
          * Move assignment operator.
          * @param other Object to move from.
          * @return This object.
          */
-        Config& operator=(Config&& other) noexcept;
+        Config &operator=(Config &&other) noexcept;
+
         /**
          * Default destructor.
          */
         virtual ~Config() = default;
+
         /**
          * Read an ini file and add the values to the Config container. Throws a SysException on failure.
          * @param iniFile ini file to parse and import values from.
          */
         void read(const std::string &iniFile);
+
         /**
          * Check whether a key exists in this Config container.
          * @param key Key (pair of section and name of the value) to check for.
          * @return True if the key exists, false if not.
          */
-        bool isSet(const std::pair<std::string, std::string>& key) const;
+        bool isSet(const std::pair<std::string, std::string> &key) const;
+
         /**
          * Get the value belonging to the specified key from the Config container.
          * @param key Key (pair of section and name of the value).
          * @return The value belonging to the key if it exists, an empty string otherwise (for distinguishing between
          * an empty value and a non-existing one, use the isSet() function).
          */
-        std::string operator[](const std::pair<std::string, std::string>& key) const;
+        std::string operator[](const std::pair<std::string, std::string> &key) const;
+
         /**
          * Set a key to a new value or insert a new key with the given value.
          * @param key Pair of section and key string identifying the Config value that is to be set.
          * @param value The value to set.
          */
         void set(std::pair<std::string, std::string> key, std::string value);
+
         /**
          * Set a key to a new value or insert a new key with the given value.
          * @param section The config section in which the key is located.

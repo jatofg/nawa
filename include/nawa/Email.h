@@ -44,10 +44,12 @@ namespace nawa {
     struct EmailAddress {
         std::string name; /**< The name of the sender or recipient. */
         std::string address; /**< The email address itself. */
+
         /**
          * Construct an empty EmailAddress object.
          */
         EmailAddress() = default;
+
         /**
          * Construct an EmailAddress object and initialize it with an email address.
          * @param _address Email address.
@@ -55,6 +57,7 @@ namespace nawa {
         explicit EmailAddress(std::string _address) {
             address = std::move(_address);
         }
+
         /**
          * Construct an EmailAddress object and initialize it with a recipient (or sender) name and email address.
          * @param _name Name.
@@ -64,13 +67,15 @@ namespace nawa {
             name = std::move(_name);
             address = std::move(_address);
         }
+
         /**
          * Get the email address in a standard representation, i.e., `<john.doe\@example.com>` without name, or
          * `John Doe <john.doe\@example.com>` with name included.
          * @param includeName Include the name in the representation.
          * @return String representation.
          */
-        std::string get(bool includeName = true) const;
+        [[nodiscard]] std::string get(bool includeName = true) const;
+
         /**
          * Perform a very basic, regex-based validity check on the saved email address. This will only check that it
          * contains an \@ symbol and only valid characters before and after it, so if this function returns true,
@@ -78,7 +83,7 @@ namespace nawa {
          * send a confirmation email to it.
          * @return True if the email address could be valid, false if it is definitely not valid.
          */
-        bool isValid() const;
+        [[nodiscard]] bool isValid() const;
     };
 
     /**
@@ -111,7 +116,7 @@ namespace nawa {
      * Structure representing a basic email (just headers and payload, excluding the envelope). Please remember to
      * also set the headers in the headers map of the base class Email.
      */
-    struct SimpleEmail: public Email {
+    struct SimpleEmail : public Email {
         /**
          * The text part of the email.
          */
@@ -134,7 +139,7 @@ namespace nawa {
     /**
      * Structure representing a MIME email (headers and MIME parts, excluding the envelope).
      */
-    struct MimeEmail: public Email {
+    struct MimeEmail : public Email {
         /**
          * Structure representing a MIME part of a MIME email.
          */
@@ -184,39 +189,46 @@ namespace nawa {
              * Make sure default constructor exists.
              */
             MimePartOrList() = default;
+
             /**
              * Construct a MimePartOrList from a MimePart (also implicitly).
              * @param _mimePart The MimePart object this MimePartOrList should refer to.
              */
-            MimePartOrList(const MimePart& _mimePart);
+            MimePartOrList(const MimePart &_mimePart);
+
             /**
              * Construct a MimePartOrList from a MimePartList (also implicitly).
              * @param _mimePartList The MimePartList object this MimePartOrList should refer to.
              */
-            MimePartOrList(const MimePartList& _mimePartList);
+            MimePartOrList(const MimePartList &_mimePartList);
+
             /**
              * Copy constructor, as this struct contains smart pointers.
              * @param other Object to copy.
              */
-            MimePartOrList(const MimePartOrList& other);
+            MimePartOrList(const MimePartOrList &other);
+
             /**
              * Copy assignment operator, as this struct contains smart pointers.
              * @param other Object to copy from.
              * @return This object.
              */
-            MimePartOrList& operator=(const MimePartOrList& other);
+            MimePartOrList &operator=(const MimePartOrList &other);
+
             /**
              * Assign a MimePart object to this MimePartOrList.
              * @param _mimePart Object to assign.
              * @return This object.
              */
-            MimePartOrList& operator=(const MimePart& _mimePart);
+            MimePartOrList &operator=(const MimePart &_mimePart);
+
             /**
              * Assign a MimePartList object to this MimePartOrList.
              * @param _mimePartList Object to assign.
              * @return This object.
              */
-            MimePartOrList& operator=(const MimePartList& _mimePartList);
+            MimePartOrList &operator=(const MimePartList &_mimePartList);
+
             /**
              * Create a MIME part containing data. If this pointer contains a MimePart object, the second pointer
              * (for another MimePartList object) will be ignored (and not copied together with the object). Please
@@ -261,6 +273,7 @@ namespace nawa {
          * text (or HTML) part.
          */
         MimePartList mimePartList;
+
         /**
          * Get the raw source of the email.
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.

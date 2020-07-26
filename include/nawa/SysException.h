@@ -32,7 +32,7 @@ namespace nawa {
     /**
      * Exception class to provide debugging output for severe errors in NAWA itself.
      */
-    class SysException: public std::exception {
+    class SysException : public std::exception {
         std::string message; /**< The exception message will be stored here. */
     public:
         /**
@@ -40,33 +40,33 @@ namespace nawa {
          * @param file File in which the exception occurred.
          * @param line Line of the source code where the exception occurred.
          */
-        SysException(const std::string& file, unsigned int line) {
+        SysException(const std::string &file, unsigned int line) {
             std::stringstream ret;
             ret << "NAWA: SysException in " << file << " at line " << line;
             message = ret.str();
         }
+
         /**
          * Construct a SysException with an additional message.
          * @param file File in which the exception occurred.
          * @param line Line of the source code where the exception occurred.
          * @param _message The exception message that will be additionally provided to the (hopefully) developer.
          */
-        SysException(const std::string& file, unsigned int line, const std::string& _message) {
+        SysException(const std::string &file, unsigned int line, const std::string &_message) {
             std::stringstream ret;
             ret << "NAWA: SysException in " << file << " at line " << line << ": " << _message;
             message = ret.str();
         }
+
         /**
          * Get the full constructed exception message.
          * @return The full exception message.
          */
-        const char* what() const noexcept override {
+        const char *what() const noexcept override {
             return message.c_str();
         }
     };
 }
-
-
 
 
 #endif //NAWA_NAWAEXCEPTION_H

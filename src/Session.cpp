@@ -59,27 +59,26 @@ void nawa::Session::start(Cookie properties) {
     // TODO check everything really carefully for possible race conditions
 
     // if session already started, do not start it again
-    if(established()) return;
+    if (established()) return;
 
     // get name of session cookie from config
     cookieName = connection.config[{"session", "cookie_name"}];
-    if(cookieName.empty()) {
+    if (cookieName.empty()) {
         // TODO change?
         cookieName = "SESSION";
     }
 
     // session duration
     unsigned long sessionKeepalive = 1800;
-    if(properties.maxAge > 0) {
+    if (properties.maxAge > 0) {
         sessionKeepalive = properties.maxAge;
-    }
-    else {
+    } else {
         auto sessionKStr = connection.config[{"session", "keepalive"}];
-        if(!sessionKStr.empty()) {
+        if (!sessionKStr.empty()) {
             try {
                 sessionKeepalive = std::stoul(sessionKStr);
             }
-            catch(std::invalid_argument& e) {
+            catch (std::invalid_argument &e) {
                 sessionKeepalive = 1800;
             }
         }
@@ -87,26 +86,26 @@ void nawa::Session::start(Cookie properties) {
 
     // check whether client has submitted a session cookie
     auto sessionCookieStr = connection.request.cookie[cookieName];
-    if(!sessionCookieStr.empty()) {
+    if (!sessionCookieStr.empty()) {
         // check for validity
         // global data map may be accessed concurrently by different threads
         std::lock_guard<std::mutex> lockGuard(gLock);
-        if(data.count(sessionCookieStr) == 1) {
+        if (data.count(sessionCookieStr) == 1) {
             // read validate_ip setting from config (needed a few lines later)
             auto sessionValidateIP = connection.config[{"session", "validate_ip"}];
             // session already expired?
-            if(data.at(sessionCookieStr)->expires <= time(nullptr)) {
+            if (data.at(sessionCookieStr)->expires <= time(nullptr)) {
                 data.erase(sessionCookieStr);
             }
-            // validate_ip enabled in NAWA config and IP mismatch?
-            else if((sessionValidateIP == "strict" || sessionValidateIP == "lax")
-                    && data.at(sessionCookieStr)->sourceIP != connection.request.env["remoteAddress"]) {
-                if(sessionValidateIP == "strict") {
+                // validate_ip enabled in NAWA config and IP mismatch?
+            else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax")
+                     && data.at(sessionCookieStr)->sourceIP != connection.request.env["remoteAddress"]) {
+                if (sessionValidateIP == "strict") {
                     // in strict mode, session has to be invalidated
                     data.erase(sessionCookieStr);
                 }
             }
-            // session is valid
+                // session is valid
             else {
                 currentData = data.at(sessionCookieStr);
                 // reset expiry
@@ -116,12 +115,12 @@ void nawa::Session::start(Cookie properties) {
         }
     }
     // if currentData not yet set (sessionCookieStr empty or invalid) -> initiate new session
-    if(currentData.use_count() < 1) {
+    if (currentData.use_count() < 1) {
         // generate new session ID string (and check for duplicate - should not really occur)
         std::lock_guard<std::mutex> lockGuard(gLock);
         do {
             sessionCookieStr = generateID();
-        } while(data.count(sessionCookieStr) > 0);
+        } while (data.count(sessionCookieStr) > 0);
         currentData = std::make_shared<nawa::SessionData>(connection.request.env["remoteAddr"]);
         currentData->expires = time(nullptr) + sessionKeepalive;
         data[sessionCookieStr] = currentData;
@@ -129,27 +128,25 @@ void nawa::Session::start(Cookie properties) {
 
     // set the response cookie and its properties according to the Cookie parameter or the NAWA config
     std::string cookieExpiresStr;
-    if(properties.expires > 0 || connection.config[{"session", "cookie_expires"}] != "off") {
+    if (properties.expires > 0 || connection.config[{"session", "cookie_expires"}] != "off") {
         properties.expires = time(nullptr) + sessionKeepalive;
         properties.maxAge = sessionKeepalive;
-    }
-    else {
+    } else {
         // we need to reset the maxAge value to 0 if it should not be used for the cookie
         properties.maxAge = 0;
     }
 
-    if(!properties.secure && connection.config[{"session", "cookie_secure"}] != "off") {
+    if (!properties.secure && connection.config[{"session", "cookie_secure"}] != "off") {
         properties.secure = true;
     }
-    if(!properties.httpOnly && connection.config[{"session", "cookie_httponly"}] != "off") {
+    if (!properties.httpOnly && connection.config[{"session", "cookie_httponly"}] != "off") {
         properties.httpOnly = true;
     }
-    if(properties.sameSite == 0) {
+    if (properties.sameSite == 0) {
         auto sessionSameSite = connection.config[{"session", "cookie_samesite"}];
-        if(sessionSameSite == "lax") {
+        if (sessionSameSite == "lax") {
             properties.sameSite = 1;
-        }
-        else if(sessionSameSite != "off") {
+        } else if (sessionSameSite != "off") {
             properties.sameSite = 2;
         }
     }
@@ -165,18 +162,17 @@ void nawa::Session::start(Cookie properties) {
     unsigned long divisor;
     try {
         auto divisorStr = connection.config[{"session", "gc_divisor"}];
-        if(!divisorStr.empty()) {
+        if (!divisorStr.empty()) {
             divisor = std::stoul(divisorStr);
-        }
-        else {
+        } else {
             divisor = 100;
         }
     }
-    catch(std::invalid_argument& e) {
+    catch (std::invalid_argument &e) {
         divisor = 100;
     }
     std::random_device rd;
-    if(rd() % divisor == 0) {
+    if (rd() % divisor == 0) {
         // TODO make this async somehow
         collectGarbage();
     }
@@ -187,7 +183,7 @@ bool nawa::Session::established() const {
 }
 
 bool nawa::Session::isSet(const std::string &key) const {
-    if(established()) {
+    if (established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
         return (currentData->data.count(key) == 1);
     }
@@ -195,9 +191,9 @@ bool nawa::Session::isSet(const std::string &key) const {
 }
 
 std::any nawa::Session::operator[](const std::string &key) const {
-    if(established()) {
+    if (established()) {
         std::lock_guard<std::mutex> lockGuard(currentData->dLock);
-        if(currentData->data.count(key) == 1) {
+        if (currentData->data.count(key) == 1) {
             return currentData->data.at(key);
         }
     }
@@ -205,15 +201,15 @@ std::any nawa::Session::operator[](const std::string &key) const {
 }
 
 void nawa::Session::set(std::string key, const std::any &value) {
-    if(!established()) {
+    if (!established()) {
         throw UserException("nawa::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
     currentData->data[std::move(key)] = value;
 }
 
-void nawa::Session::unset(const std::string& key) {
-    if(!established()) {
+void nawa::Session::unset(const std::string &key) {
+    if (!established()) {
         throw UserException("nawa::Session::set", 1, "Session not established.");
     }
     std::lock_guard<std::mutex> lockGuard(currentData->dLock);
@@ -223,16 +219,15 @@ void nawa::Session::unset(const std::string& key) {
 void nawa::Session::collectGarbage() {
     std::lock_guard<std::mutex> lockGuard(gLock);
     // no increment in for statement as we want to remove elements
-    for(auto it = data.cbegin(); it != data.cend();) {
+    for (auto it = data.cbegin(); it != data.cend();) {
         bool toDelete = false;
         {
             std::lock_guard<std::mutex> eGuard(it->second->eLock);
             toDelete = (it->second->expires < time(nullptr));
         }
-        if(toDelete) {
+        if (toDelete) {
             it = data.erase(it);
-        }
-        else {
+        } else {
             ++it;
         }
     }
@@ -245,7 +240,7 @@ void nawa::Session::destroy() {
 void nawa::Session::invalidate() {
 
     // do nothing if no session has been established
-    if(!established()) return;
+    if (!established()) return;
 
     // reset currentData pointer, this will also make established() return false
     currentData.reset();

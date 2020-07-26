@@ -29,67 +29,91 @@
 
 namespace {
     std::unordered_map<std::string, std::string> contentTypeMap = {
-            {"aac", "audio/aac"},
-            {"arc", "application/x-freearc"},
-            {"avi", "video/x-msvideo"},
-            {"azw", "application/vnd.amazon.ebook"},
-            {"bmp", "image/bmp"},
-            {"bz", "application/x-bzip"}, {"bz2", "application/x-bzip2"},
-            {"csh", "application/x-csh"},
-            {"css", "text/css"},
-            {"csv", "text/csv"},
-            {"deb", "application/vnd.debian.binary-package"},
-            {"doc", "application/msword"}, {"dot", "application/msword"},
-            {"docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {"dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {"eot", "application/vnd.ms-fontobject"},
-            {"epub", "application/epub+zip"},
-            {"flv", "video/x-flv"}, {"f4v", "video/mp4"}, {"f4a", "audio/mp4"},
-            {"gif", "image/gif"},
-            {"gz", "application/x-gzip"},
-            {"htm", "text/html"}, {"html", "text/html"},
-            {"ico", "image/vnd.microsoft.icon"},
-            {"ics", "text/calendar"},
-            {"jar", "application/java-archive"}, {"java", "text/plain"},
-            {"jpg", "image/jpeg"}, {"jpeg", "image/jpeg"},
-            {"js", "text/javascript"}, {"json", "application/json"},
-            {"mid", "audio/x-midi"}, {"midi", "audio/x-midi"},
-            {"mjs", "application/javascript"},
-            {"mp3", "audio/mpeg"},
-            {"mpeg", "video/mpeg"}, {"mp4", "application/mp4"}, {"m4v", "video/mp4"}, {"m4a", "audio/mp4"},
-            {"mpkg", "application/vnd.apple.installer+xml"},
-            {"odp", "application/vnd.oasis.opendocument.presentation"}, {"otp", "application/vnd.oasis.opendocument.presentation"},
-            {"ods", "application/vnd.oasis.opendocument.spreadsheet"}, {"ots", "application/vnd.oasis.opendocument.spreadsheet"},
-            {"odt", "application/vnd.oasis.opendocument.text"}, {"ott", "application/vnd.oasis.opendocument.text"},
-            {"ogg", "application/ogg"}, {"ogx", "application/ogg"}, {"oga", "audio/ogg"}, {"ogv", "video/ogg"},
-            {"otf", "font/otf"},
-            {"png", "image/png"},
-            {"pdf", "application/pdf"},
-            {"ppt", "application/vnd.ms-powerpoint"},
-            {"pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
-            {"rar", "application/x-rar-compressed"},
-            {"rtf", "application/rtf"},
-            {"sh", "application/x-sh"},
-            {"svg", "image/svg+xml"},
-            {"swf", "application/x-shockwave-flash"},
-            {"tar", "application/x-tar"},
-            {"tif", "image/tiff"}, {"tiff", "image/tiff"},
-            {"ttf", "font/ttf"},
-            {"txt", "text/plain"},
-            {"vsd", "application/vnd.visio"},
-            {"wav", "audio/wav"},
-            {"weba", "audio/webm"}, {"webm", "video/webm"}, {"webp", "image/webp"},
-            {"woff", "font/woff"}, {"woff2", "font/woff2"},
+            {"aac",   "audio/aac"},
+            {"arc",   "application/x-freearc"},
+            {"avi",   "video/x-msvideo"},
+            {"azw",   "application/vnd.amazon.ebook"},
+            {"bmp",   "image/bmp"},
+            {"bz",    "application/x-bzip"},
+            {"bz2",   "application/x-bzip2"},
+            {"csh",   "application/x-csh"},
+            {"css",   "text/css"},
+            {"csv",   "text/csv"},
+            {"deb",   "application/vnd.debian.binary-package"},
+            {"doc",   "application/msword"},
+            {"dot",   "application/msword"},
+            {"docx",  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            {"dotx",  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            {"eot",   "application/vnd.ms-fontobject"},
+            {"epub",  "application/epub+zip"},
+            {"flv",   "video/x-flv"},
+            {"f4v",   "video/mp4"},
+            {"f4a",   "audio/mp4"},
+            {"gif",   "image/gif"},
+            {"gz",    "application/x-gzip"},
+            {"htm",   "text/html"},
+            {"html",  "text/html"},
+            {"ico",   "image/vnd.microsoft.icon"},
+            {"ics",   "text/calendar"},
+            {"jar",   "application/java-archive"},
+            {"java",  "text/plain"},
+            {"jpg",   "image/jpeg"},
+            {"jpeg",  "image/jpeg"},
+            {"js",    "text/javascript"},
+            {"json",  "application/json"},
+            {"mid",   "audio/x-midi"},
+            {"midi",  "audio/x-midi"},
+            {"mjs",   "application/javascript"},
+            {"mp3",   "audio/mpeg"},
+            {"mpeg",  "video/mpeg"},
+            {"mp4",   "application/mp4"},
+            {"m4v",   "video/mp4"},
+            {"m4a",   "audio/mp4"},
+            {"mpkg",  "application/vnd.apple.installer+xml"},
+            {"odp",   "application/vnd.oasis.opendocument.presentation"},
+            {"otp",   "application/vnd.oasis.opendocument.presentation"},
+            {"ods",   "application/vnd.oasis.opendocument.spreadsheet"},
+            {"ots",   "application/vnd.oasis.opendocument.spreadsheet"},
+            {"odt",   "application/vnd.oasis.opendocument.text"},
+            {"ott",   "application/vnd.oasis.opendocument.text"},
+            {"ogg",   "application/ogg"},
+            {"ogx",   "application/ogg"},
+            {"oga",   "audio/ogg"},
+            {"ogv",   "video/ogg"},
+            {"otf",   "font/otf"},
+            {"png",   "image/png"},
+            {"pdf",   "application/pdf"},
+            {"ppt",   "application/vnd.ms-powerpoint"},
+            {"pptx",  "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+            {"rar",   "application/x-rar-compressed"},
+            {"rtf",   "application/rtf"},
+            {"sh",    "application/x-sh"},
+            {"svg",   "image/svg+xml"},
+            {"swf",   "application/x-shockwave-flash"},
+            {"tar",   "application/x-tar"},
+            {"tif",   "image/tiff"},
+            {"tiff",  "image/tiff"},
+            {"ttf",   "font/ttf"},
+            {"txt",   "text/plain"},
+            {"vsd",   "application/vnd.visio"},
+            {"wav",   "audio/wav"},
+            {"weba",  "audio/webm"},
+            {"webm",  "video/webm"},
+            {"webp",  "image/webp"},
+            {"woff",  "font/woff"},
+            {"woff2", "font/woff2"},
             {"xhtml", "application/xhtml+xml"},
-            {"xls", "application/vnd.ms-excel"}, {"xlt", "application/vnd.ms-excel"},
-            {"xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-            {"xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-            {"xml", "application/xml"},
-            {"xul", "application/vnd.mozilla.xul+xml"},
-            {"xz", "application/x-xz"},
-            {"zip", "application/zip"},
-            {"3gp", "video/3gpp"}, {"3g2", "video/3gpp2"},
-            {"7z", "application/x-7z-compressed"}
+            {"xls",   "application/vnd.ms-excel"},
+            {"xlt",   "application/vnd.ms-excel"},
+            {"xlsx",  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {"xltx",  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {"xml",   "application/xml"},
+            {"xul",   "application/vnd.mozilla.xul+xml"},
+            {"xz",    "application/x-xz"},
+            {"zip",   "application/zip"},
+            {"3gp",   "video/3gpp"},
+            {"3g2",   "video/3gpp2"},
+            {"7z",    "application/x-7z-compressed"}
     };
 
     /**
@@ -110,15 +134,30 @@ namespace {
      */
     inline std::string getDayOfWeek(int dow) {
         std::string ret;
-        switch(dow) {
-            case 0: ret = "Sun"; break;
-            case 1: ret = "Mon"; break;
-            case 2: ret = "Tue"; break;
-            case 3: ret = "Wed"; break;
-            case 4: ret = "Thu"; break;
-            case 5: ret = "Fri"; break;
-            case 6: ret = "Sat"; break;
-            default: break;
+        switch (dow) {
+            case 0:
+                ret = "Sun";
+                break;
+            case 1:
+                ret = "Mon";
+                break;
+            case 2:
+                ret = "Tue";
+                break;
+            case 3:
+                ret = "Wed";
+                break;
+            case 4:
+                ret = "Thu";
+                break;
+            case 5:
+                ret = "Fri";
+                break;
+            case 6:
+                ret = "Sat";
+                break;
+            default:
+                break;
         }
         return ret;
     }
@@ -131,20 +170,45 @@ namespace {
      */
     inline std::string getMonth(int mon) {
         std::string ret;
-        switch(mon) {
-            case 0: ret = "Jan"; break;
-            case 1: ret = "Feb"; break;
-            case 2: ret = "Mar"; break;
-            case 3: ret = "Apr"; break;
-            case 4: ret = "May"; break;
-            case 5: ret = "Jun"; break;
-            case 6: ret = "Jul"; break;
-            case 7: ret = "Aug"; break;
-            case 8: ret = "Sep"; break;
-            case 9: ret = "Oct"; break;
-            case 10: ret = "Nov"; break;
-            case 11: ret = "Dec"; break;
-            default: break;
+        switch (mon) {
+            case 0:
+                ret = "Jan";
+                break;
+            case 1:
+                ret = "Feb";
+                break;
+            case 2:
+                ret = "Mar";
+                break;
+            case 3:
+                ret = "Apr";
+                break;
+            case 4:
+                ret = "May";
+                break;
+            case 5:
+                ret = "Jun";
+                break;
+            case 6:
+                ret = "Jul";
+                break;
+            case 7:
+                ret = "Aug";
+                break;
+            case 8:
+                ret = "Sep";
+                break;
+            case 9:
+                ret = "Oct";
+                break;
+            case 10:
+                ret = "Nov";
+                break;
+            case 11:
+                ret = "Dec";
+                break;
+            default:
+                break;
         }
         return ret;
     }
@@ -152,12 +216,13 @@ namespace {
 }
 
 void
-nawa::regex_replace_callback(std::string &s, const std::regex &rgx, std::function<std::string(const std::vector<std::string>&)> fmt) {
+nawa::regex_replace_callback(std::string &s, const std::regex &rgx,
+                             std::function<std::string(const std::vector<std::string> &)> fmt) {
     // how many submatches do we have to deal with?
     int marks = rgx.mark_count();
     // we want to iterate through all submatches (to collect them in a vector passed to fmt())
     std::vector<int> submatchList;
-    for(int i = -1; i <= marks; ++i) {
+    for (int i = -1; i <= marks; ++i) {
         submatchList.push_back(i);
     }
 
@@ -167,17 +232,15 @@ nawa::regex_replace_callback(std::string &s, const std::regex &rgx, std::functio
     // prefixes and submatches (should) alternate
     int submatch = -1;
     std::vector<std::string> submatchVector;
-    for(auto it = begin; it != end; ++it) {
-        if(submatch == -1) {
+    for (auto it = begin; it != end; ++it) {
+        if (submatch == -1) {
             out << it->str();
             ++submatch;
-        }
-        else {
+        } else {
             submatchVector.push_back(it->str());
-            if(submatch < marks) {
+            if (submatch < marks) {
                 ++submatch;
-            }
-            else {
+            } else {
                 out << fmt(submatchVector);
                 submatchVector.clear();
                 submatch = -1;
@@ -190,8 +253,8 @@ nawa::regex_replace_callback(std::string &s, const std::regex &rgx, std::functio
 std::string nawa::hex_dump(const std::string &in) {
     std::stringstream rets;
     rets << std::hex << std::setfill('0');
-    for(char c: in) {
-        rets << std::setw(2) << (int)(unsigned char)c;
+    for (char c: in) {
+        rets << std::setw(2) << (int) (unsigned char) c;
     }
     return rets.str();
 }
@@ -209,7 +272,7 @@ std::string nawa::to_uppercase(std::string s) {
 std::string nawa::generate_error_page(unsigned int httpStatus) {
     std::string errorStr;
     std::string explanation;
-    switch(httpStatus) {
+    switch (httpStatus) {
         case 400:
             errorStr = "Bad Request";
             explanation = "The server cannot process your request.";
@@ -288,14 +351,14 @@ std::string nawa::get_file_extension(const std::string &filename) {
     try {
         return filename.substr(filename.find_last_of('.') + 1);
     }
-    catch(std::out_of_range&) {}
+    catch (std::out_of_range &) {}
 
     return std::string();
 }
 
 std::string nawa::content_type_by_extension(std::string extension) {
     auto ext = to_lowercase(std::move(extension));
-    if(contentTypeMap.count(ext) == 1) {
+    if (contentTypeMap.count(ext) == 1) {
         return contentTypeMap.at(ext);
     }
     return "application/octet-stream";
@@ -339,7 +402,7 @@ time_t nawa::read_smtp_time(const std::string &smtpTime) {
     //timeStream >> std::get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
 
     // dirty hack
-    if(smtpTimeM.length() > 5 && smtpTimeM[5] == ' ') {
+    if (smtpTimeM.length() > 5 && smtpTimeM[5] == ' ') {
         smtpTimeM[5] = '0';
     }
     std::istringstream timeStream(smtpTimeM);
@@ -349,7 +412,7 @@ time_t nawa::read_smtp_time(const std::string &smtpTime) {
     time_t unixTime = timegm(&timeStruct);
 
     // so we'll have to add/subtract the difference manually
-    if(smtpTimeM.length() > 30) {
+    if (smtpTimeM.length() > 30) {
         int tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
         int tzH = std::stoi(smtpTimeM.substr(27, 2));
         int tzM = std::stoi(smtpTimeM.substr(29, 2));
@@ -362,16 +425,15 @@ time_t nawa::read_smtp_time(const std::string &smtpTime) {
 
 std::vector<std::string> nawa::split_string(std::string str, char delimiter, bool ignoreEmpty) {
     std::vector<std::string> ret;
-    for(size_t pos = 0; !str.empty();) {
+    for (size_t pos = 0; !str.empty();) {
         pos = str.find_first_of(delimiter);
         auto token = str.substr(0, pos);
-        if(!ignoreEmpty || !token.empty()) {
+        if (!ignoreEmpty || !token.empty()) {
             ret.push_back(str.substr(0, pos));
         }
-        if(pos < str.length()) {
+        if (pos < str.length()) {
             str = str.substr(pos + 1);
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -379,11 +441,11 @@ std::vector<std::string> nawa::split_string(std::string str, char delimiter, boo
 }
 
 std::string nawa::merge_path(const std::vector<std::string> &path) {
-    if(path.empty()) {
+    if (path.empty()) {
         return "/";
     }
     std::stringstream stringPath;
-    for(auto const &e: path) {
+    for (auto const &e: path) {
         stringPath << '/' << e;
     }
     return stringPath.str();
@@ -397,9 +459,9 @@ std::vector<std::string> nawa::split_path(const std::string &pathString) {
 
 std::string nawa::convert_line_endings(const std::string &in, const std::string &ending) {
     std::stringstream ret;
-    for(const auto &c: in) {
-        if(c == '\n') ret << ending;
-        else if(c != '\r') ret << c;
+    for (const auto &c: in) {
+        if (c == '\n') ret << ending;
+        else if (c != '\r') ret << c;
     }
     return ret.str();
 }
@@ -409,7 +471,7 @@ std::string nawa::get_file_contents(const std::string &path) {
     std::ifstream f(path, std::ifstream::binary);
 
     // throw exception if file cannot be opened
-    if(!f) {
+    if (!f) {
         throw nawa::UserException("nawa::Utils::file_get_contents", 1, "Cannot open file for reading");
     }
 
@@ -421,13 +483,13 @@ std::string nawa::get_file_contents(const std::string &path) {
     // load to string
     std::string ret(static_cast<unsigned long>(fs), '\0');
     f.read(&ret[0], fs);
-    
+
     return ret;
 }
 
 std::string nawa::string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns) {
-    for(const auto &pattern: patterns) {
-        for(size_t pos = input.find(pattern.first); pos != std::string::npos;) {
+    for (const auto &pattern: patterns) {
+        for (size_t pos = input.find(pattern.first); pos != std::string::npos;) {
             input.replace(pos, pattern.first.length(), pattern.second);
             pos = input.find(pattern.first, pos + pattern.second.length());
         }

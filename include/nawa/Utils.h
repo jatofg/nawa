@@ -38,25 +38,30 @@ namespace nawa {
      * as a string. The vector contains the full match at index 0 and, if capturing groups are used in the expression,
      * the submatches at the following indexes (capturing group 1 at index 1, ...)
      */
-    void regex_replace_callback(std::string& s, const std::regex& rgx, std::function<std::string(const std::vector<std::string>&)> fmt);
+    void regex_replace_callback(std::string &s, const std::regex &rgx,
+                                std::function<std::string(const std::vector<std::string> &)> fmt);
+
     /**
      * Apply hex encoding to every byte in a string of bytes.
      * @param in Byte string that should be converted.
      * @return String containing the hexadecimal representation of every byte (thus, twice as long as in).
      */
-    std::string hex_dump(const std::string& in);
+    std::string hex_dump(const std::string &in);
+
     /**
      * Convert every ASCII letter in the given string to lowercase.
      * @param s String to convert.
      * @return Lowercase string.
      */
     std::string to_lowercase(std::string s);
+
     /**
      * Convert every ASCII letter in the given string to uppercase.
      * @param s String to convert.
      * @return Uppercase string.
      */
     std::string to_uppercase(std::string s);
+
     /**
      * Generate a very basic HTML error page for a given HTTP status.
      * @param httpStatus The HTTP status. Currently supported: 400, 401, 403, 404, 405, 406, 408, 409, 410, 415, 418,
@@ -65,12 +70,14 @@ namespace nawa {
      * titled "Unknown error".
      */
     std::string generate_error_page(unsigned int httpStatus);
+
     /**
      * Get the extension (that is, everything after the last '.') out of a filename. Swallows out_of_range exceptions.
      * @param filename The filename.
      * @return String containing the extension, or an empty string if no extension has been found.
      */
-    std::string get_file_extension(const std::string& filename);
+    std::string get_file_extension(const std::string &filename);
+
     /**
      * Get the MIME content type string for a particular file extension. This function checks the extension against a
      * limited, incomplete set of file types (case-insensitive). If no match is found, "application/octet-stream"
@@ -79,6 +86,7 @@ namespace nawa {
      * @return A MIME content type string.
      */
     std::string content_type_by_extension(std::string extension);
+
     /**
      * Convert a time_t value (UNIX timestamp) to a HTTP header compatible date/time string.
      * @param time UNIX timestamp as a time_t value.
@@ -86,6 +94,7 @@ namespace nawa {
      * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
      */
     std::string make_http_time(time_t time);
+
     /**
      * Create a time_t value (UNIX timestamp) from a HTTP header date/time string.
      * @param httpTime Time string in the format:
@@ -93,6 +102,7 @@ namespace nawa {
      * @return UNIX timestamp value (time_t).
      */
     time_t read_http_time(const std::string &httpTime);
+
     /**
      * Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string.
      * @param time UNIX timestamp as a time_t value.
@@ -100,6 +110,7 @@ namespace nawa {
      * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> <tzoffset(5)>".
      */
     std::string make_smtp_time(time_t time);
+
     /**
      * Create a time_t value (UNIX timestamp) from a SMTP header date/time string.
      * @param smtpTime Time string in the format:
@@ -107,6 +118,7 @@ namespace nawa {
      * @return UNIX timestamp value (time_t).
      */
     time_t read_smtp_time(const std::string &smtpTime);
+
     /**
      * Split a string using a character as a delimiter.
      * @param str String to split.
@@ -115,6 +127,7 @@ namespace nawa {
      * @return Vector containing the elements.
      */
     std::vector<std::string> split_string(std::string str, char delimiter, bool ignoreEmpty = false);
+
     /**
      * Convert a vector representation of a path ({"dir1", "dir2"}) to a string representation ("/dir1/dir2").
      * An empty vector will result in the string representation "/".
@@ -122,6 +135,7 @@ namespace nawa {
      * @return String representation of the given path.
      */
     std::string merge_path(const std::vector<std::string> &path);
+
     /**
      * Convert a string representation of a path ("/dir1/dir2") to a vector representation ({"dir1", "dir2"}).
      * Query strings (starting with '?') are being ignored and will not be part of the returned vector.
@@ -129,20 +143,23 @@ namespace nawa {
      * @return Vector representation of the given path.
      */
     std::vector<std::string> split_path(const std::string &pathString);
+
     /**
      * Convert line endings in a string between LF (Unix) and CRLF (Windows/Email).
      * @param in Input string with CRLF or LF line endings
      * @param ending The new line ending (e.g., "\\n" or "\\r\\n")
      * @return String with converted line endings.
      */
-    std::string convert_line_endings(const std::string& in, const std::string& ending);
+    std::string convert_line_endings(const std::string &in, const std::string &ending);
+
     /**
      * Simple function to read a whole file into a string. Will throw a UserException with error code 1 if the file
      * does not exist.
      * @param path Path and filename.
      * @return String containing the whole file.
      */
-    std::string get_file_contents(const std::string& path);
+    std::string get_file_contents(const std::string &path);
+
     /**
      * Replace all occurrences of pattern keys by the corresponding pattern values in the input string.
      * @param input String in which the patterns shall be replaced.

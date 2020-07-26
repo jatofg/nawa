@@ -36,6 +36,7 @@ namespace nawa {
          * Create an empty Cookie.
          */
         Cookie() = default;
+
         /**
          * Create a cookie and directly set the content.
          * @param c Content of the cookie.
@@ -43,6 +44,7 @@ namespace nawa {
         explicit Cookie(std::string c) {
             content = std::move(c);
         }
+
         std::string content; /**< Content of the cookie. */
         std::time_t expires = 0; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
         unsigned long maxAge = 0; /**< Set Max-Age attribute. */

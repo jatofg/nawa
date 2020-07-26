@@ -35,19 +35,18 @@ std::string nawa::Engines::BcryptHashingEngine::generateHash(std::string input) 
     char hash[BCRYPT_HASHSIZE];
 
     // use the user-defined salt if necessary
-    if(!salt.empty()) {
+    if (!salt.empty()) {
         std::string salt_res = salt;
         salt_res.resize(BCRYPT_HASHSIZE, '\0');
         std::memcpy(hash, salt_res.c_str(), BCRYPT_HASHSIZE);
-    }
-    else if(bcrypt_gensalt(workFactor, bcsalt) != 0) {
+    } else if (bcrypt_gensalt(workFactor, bcsalt) != 0) {
         throw UserException("nawa::Engines::BcryptHashingEngine::generateHash", 10,
-                "Could not generate a salt (unknown bcrypt failure).");
+                            "Could not generate a salt (unknown bcrypt failure).");
     }
 
-    if(bcrypt_hashpw(input.c_str(), bcsalt, hash) != 0) {
+    if (bcrypt_hashpw(input.c_str(), bcsalt, hash) != 0) {
         throw UserException("nawa::Engines::BcryptHashingEngine::generateHash", 11,
-                "Could not hash this password (unknown bcrypt failure).");
+                            "Could not hash this password (unknown bcrypt failure).");
     }
     return std::string(hash, 60);
 }
