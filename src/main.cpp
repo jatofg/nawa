@@ -22,46 +22,54 @@
  */
 
 #include <stdexcept>
-#include <fastcgi++/manager.hpp>
 #include <unistd.h>
 #include <pwd.h>
 #include <grp.h>
 #include <dlfcn.h>
 #include <csignal>
-#include <nawa/RequestHandlerLegacy.h>
 #include <nawa/Config.h>
 #include <nawa/SysException.h>
 #include <nawa/Log.h>
 #include <nawa/Application.h>
+#include <nawa/RequestHandlers/RequestHandler.h>
+#include <thread>
+#include <nawa/UserException.h>
+
+using namespace nawa;
+using namespace std;
 
 namespace {
 
-    // this will make the manager instance and loaded app accessible for signal handlers
-    std::unique_ptr<Fastcgipp::Manager<nawa::RequestHandlerLegacy>> managerPtr;
+    // this will make the request handler and loaded app accessible for signal handlers
+    unique_ptr<RequestHandler> requestHandlerPtr;
     void* appOpen = nullptr;
 
     // use this for logging
     // TODO enable logging to log file through config
-    nawa::Log LOG;
+    Log LOG;
+
+    // Types of functions that need to be accessed from NAWA applications
+    using init_t = int(AppInit&); /**< Type for the init() function of NAWA apps. */
+    using handleRequest_t = int(Connection&); /**< Type for the handleRequest(Connection) function of NAWA apps. */
 
 }
 
 // signal handler for SIGINT, SIGTERM, and SIGUSR1
 void shutdown(int signum) {
-    LOG("Terminating on signal " + std::to_string(signum));
+    LOG("Terminating on signal " + to_string(signum));
 
     // terminate worker threads
-    if(managerPtr) {
+    if(requestHandlerPtr) {
         // should unblock managerPtr->join() and execute the rest of the program
         // (in fact it doesn't, but at least new connections should not be accepted anymore)
         // TODO find the bug or reason for this behavior in libfastcgi++
-        managerPtr->stop();
+        requestHandlerPtr->stop();
 
         // this normally doesn't work, so try harder
         sleep(10);
-        if(managerPtr && signum != SIGUSR1) {
+        if(requestHandlerPtr && signum != SIGUSR1) {
             LOG("Enforcing termination now, ignoring pending requests.");
-            managerPtr->terminate();
+            requestHandlerPtr->terminate();
         }
     }
     else {
@@ -74,7 +82,7 @@ void shutdown(int signum) {
 }
 
 // load a symbol from the app .so file
-void* loadAppSymbol(const char* symbolName, const std::string& error) {
+void* loadAppSymbol(const char* symbolName, const string& error) {
     void* symbol = dlsym(appOpen, symbolName);
     auto dlsymError = dlerror();
     if(dlsymError) {
@@ -92,10 +100,10 @@ int main(int argc, char** argv) {
     signal(SIGUSR1, shutdown);
 
     // set up logging
-    nawa::Log::lockStream();
+    Log::lockStream();
 
     // read config file
-    nawa::Config config;
+    Config config;
     try {
         // nawarun will take the path to the config as an argument
         // if no argument was given, look for a config.ini in the current path
@@ -106,8 +114,8 @@ int main(int argc, char** argv) {
             config.read("config.ini");
         }
     }
-    catch(nawa::SysException& e) {
-        LOG("Fatal Error: Could not read or parse the configuration file");
+    catch(SysException& e) {
+        LOG("Fatal Error: Could not read or parse the configuration file.");
         return 1;
     }
 
@@ -115,14 +123,14 @@ int main(int argc, char** argv) {
     auto initialUID = getuid();
     uid_t privUID = -1;
     gid_t privGID = -1;
-    std::vector<gid_t> supplementaryGroups;
+    vector<gid_t> supplementaryGroups;
     if(initialUID == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
-            LOG("Fatal Error: Username or password not correctly set in config.ini");
+            LOG("Fatal Error: Username or password not correctly set in config.ini.");
             return 1;
         }
-        std::string username = config[{"privileges", "user"}];
-        std::string groupname = config[{"privileges", "group"}];
+        string username = config[{"privileges", "user"}];
+        string groupname = config[{"privileges", "group"}];
         passwd* privUser;
         group* privGroup;
         privUser = getpwnam(username.c_str());
@@ -147,18 +155,18 @@ int main(int argc, char** argv) {
             }
         }
     } else {
-        LOG("WARNING: Not starting as root, cannot set privileges");
+        LOG("WARNING: Not starting as root, cannot set privileges.");
     }
 
     // load application init function
-    std::string appPath = config[{"application", "path"}];
+    string appPath = config[{"application", "path"}];
     if(appPath.empty()) {
-        LOG("Fatal Error: Application path not set in config file");
+        LOG("Fatal Error: Application path not set in config file.");
         return 1;
     }
     appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if(!appOpen) {
-        LOG(std::string("Fatal Error: Application file could not be loaded (main): ") + dlerror());
+        LOG(string("Fatal Error: Application file could not be loaded (main): ") + dlerror());
         return 1;
     }
 
@@ -168,124 +176,76 @@ int main(int argc, char** argv) {
     // load symbols and check for errors
     // first load nawa_version_major (defined in Application.h, included in Connection.h)
     // the version the app has been compiled against should match the version of this nawarun
-    std::string appVersionError = "Fatal Error: Could not read nawa version from application: ";
+    string appVersionError = "Fatal Error: Could not read nawa version from application: ";
     auto appNawaVersionMajor = (int*) loadAppSymbol("nawa_version_major", appVersionError);
     auto appNawaVersionMinor = (int*) loadAppSymbol("nawa_version_minor", appVersionError);
     if(*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
         LOG("Fatal Error: App has been compiled against another version of NAWA.");
         return 1;
     }
-    auto appInit = (nawa::init_t*) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
-
-    // pass config and application to RequestHandler so it can load appHandleRequest
-    // (config will be saved later, here it will only be used to load the appHandleRequest)
-    // (app function already loaded here so that errors can be detected before setting up the socket)
-    nawa::RequestHandlerLegacy::setAppRequestHandler(config, appOpen);
+    auto appInit = (init_t *) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
+    auto appHandleRequest = (handleRequest_t *) loadAppSymbol("handleRequest",
+                                                              "Fatal Error: Could not load handleRequest function from application: ");
 
     // concurrency
     double cReal;
     try {
         cReal = config.isSet({"system", "threads"})
-                ? std::stod(config[{"system", "threads"}]) : 1.0;
+                ? stod(config[{"system", "threads"}]) : 1.0;
     }
-    catch(std::invalid_argument& e) {
+    catch(invalid_argument& e) {
         LOG("WARNING: Invalid value given for system/concurrency given in the config file.");
         cReal = 1.0;
     }
     if(config[{"system", "concurrency"}] == "hardware") {
-        cReal = std::max(1.0, std::thread::hardware_concurrency() * cReal);
+        cReal = max(1.0, thread::hardware_concurrency() * cReal);
     }
     auto cInt = static_cast<unsigned int>(cReal);
 
-    // set up fastcgi manager
-    managerPtr = std::make_unique<Fastcgipp::Manager<nawa::RequestHandlerLegacy>>(cInt);
-    //managerPtr->setupSignals();
-
-    // socket handling
-    std::string mode = config[{"fastcgi", "mode"}];
-    if(mode == "tcp") {
-        auto fastcgiListen = config[{"fastcgi", "listen"}];
-        auto fastcgiPort = config[{"fastcgi", "port"}];
-        if(fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
-        const char* fastcgiListenC = fastcgiListen.c_str();
-        if(fastcgiListen == "all") fastcgiListenC = nullptr;
-        if(fastcgiPort.empty()) fastcgiPort = "8000";
-        if(!managerPtr->listen(fastcgiListenC, fastcgiPort.c_str())) {
-            LOG("Fatal Error: Could not create TCP socket");
-            return 1;
-        }
-    }
-    else if(mode == "unix") {
-        uint32_t permissions = 0xffffffffUL;
-        std::string permStr = config[{"fastcgi", "permissions"}];
-        // convert the value from the config file
-        if(!permStr.empty()) {
-            const char* psptr = permStr.c_str();
-            char* endptr;
-            long perm = strtol(psptr, &endptr, 8);
-            if(*endptr == '\0') {
-                permissions = (uint32_t) perm;
-            }
-        }
-
-        auto fastcgiSocketPath = config[{"fastcgi", "path"}];
-        if(fastcgiSocketPath.empty()) {
-            fastcgiSocketPath = "/etc/nawarun/sock.d/nawarun.sock";
-        }
-        auto fastcgiOwner = config[{"fastcgi", "owner"}];
-        auto fastcgiGroup = config[{"fastcgi", "group"}];
-
-        if(!managerPtr->listen(fastcgiSocketPath.c_str(), permissions,
-                fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
-                fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
-            LOG("Fatal Error: Could not create UNIX socket");
-            return 1;
-        }
-    }
-    else {
-        LOG("Fatal Error: Unknown FastCGI socket mode in config.ini");
+    // pass config, app function, and concurrency to RequestHandler
+    // already here to make (socket) preparation possible before privilege downgrade
+    try {
+        requestHandlerPtr = RequestHandler::getRequestHandler(appHandleRequest, config, cInt);
+    } catch (const UserException& e) {
+        LOG(e.what());
         return 1;
-    }
-
-    // tell fastcgi to use SO_REUSEADDR if enabled in config
-    if(config[{"fastcgi", "reuseaddr"}] != "off") {
-        managerPtr->reuseAddress(true);
     }
 
     // do privilege downgrade
     if(initialUID == 0) {
         if(privUID != 0 && privGID != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
-            LOG("Fatal Error: Could not set supplementary groups");
+            LOG("Fatal Error: Could not set supplementary groups.");
             return 1;
         }
         if(setgid(privGID) != 0 || setuid(privUID) != 0) {
-            LOG("Fatal Error: Could not set privileges");
+            LOG("Fatal Error: Could not set privileges.");
             return 1;
         }
     }
 
     // before manager starts, init app
     {
-        nawa::AppInit appInit1;
+        AppInit appInit1;
         appInit1.config = config;
         appInit1.numThreads = cInt;
         auto initReturn = appInit(appInit1);
 
         // init function of the app should return 0 on sucess
         if(initReturn != 0) {
-            LOG("Fatal Error: App init function returned " + std::to_string(initReturn) + " -- exiting");
+            LOG("Fatal Error: App init function returned " + to_string(initReturn) + " -- exiting.");
             return 1;
         }
 
         // init could have altered the config, take it over
-        nawa::RequestHandlerLegacy::setConfig(appInit1);
+        requestHandlerPtr->setAppInit(appInit1);
+        requestHandlerPtr->setConfig(appInit1.config);
     }
 
-    managerPtr->start();
-    managerPtr->join();
+    requestHandlerPtr->start();
+    requestHandlerPtr->join();
 
     // explicitly destroy AppInit and clear session data to avoid a segfault
-    nawa::RequestHandlerLegacy::destroyEverything();
+    //RequestHandlerLegacy::destroyEverything();
 
     dlclose(appOpen);
     exit(0);

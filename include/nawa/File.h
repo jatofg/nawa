@@ -36,26 +36,30 @@ namespace nawa {
         std::string filename; /**< Original file name (submitted by sender) */
         std::string contentType; /**< Content-Type string */
         size_t size; /**< File size in bytes */
-        const std::unique_ptr<char[]>& dataPtrRef; /**< Reference to a unique_ptr to the first byte of the memory area */
+        // TODO there must be a better solution wrt memory management
+        //      (e.g., adapting fastcgipp-lite, making data a shared_ptr)
+        char *dataPtr; /**< Pointer to the first byte of the memory area */
+
         /**
          * Copy the file into a std::string
          * @return std::string containing the whole file
          */
-        std::string copyFile() {
-            return std::string(dataPtrRef.get(), size);
+        [[nodiscard]] std::string copyFile() const {
+            return std::string(dataPtr, size);
         }
+
         /**
          * Write the file to disk.
          * @param path File name and path where to write the file.
          * @return true on success, false on failure
          */
-        bool writeFile(const std::string& path) {
+        bool writeFile(const std::string &path) const {
             std::ofstream outfile;
             std::ios_base::iostate exceptionMask = outfile.exceptions() | std::ios::failbit;
             outfile.exceptions(exceptionMask);
             try {
                 outfile.open(path, std::ofstream::out | std::ofstream::binary);
-                outfile.write(dataPtrRef.get(), size);
+                outfile.write(dataPtr, size);
                 outfile.close();
             }
             catch (std::ios_base::failure &e) {

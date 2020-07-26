@@ -21,39 +21,48 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/RequestHandlers/RequestHandler.h>
-#include <nawa/RequestHandlers/FastcgiRequestHandler.h>
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
+#include <nawa/RequestHandlers/RequestHandler.h>
+#include <nawa/RequestHandlers/FastcgiRequestHandler.h>
 #include <nawa/Log.h>
 #include <nawa/Connection.h>
 #include <nawa/Utils.h>
+#include <nawa/UserException.h>
 
 using namespace nawa;
 using namespace std;
 
 namespace {
     Log LOG;
+
+    /**
+     * Stores the raw post access level, as read from the config file.
+     */
+    enum class RawPostAccess {
+        NEVER,
+        NONSTANDARD,
+        ALWAYS
+    };
 }
 
 struct FastcgippArgumentContainer {
-    RequestHandler* requestHandler;
+    RequestHandler *requestHandler;
     size_t postMax;
+    Config &config;
+    RawPostAccess rawPostAccess;
 };
 
 class FastcgippRequestAdapter : public Fastcgipp::Request<char> {
+    FastcgippArgumentContainer argc;
+    string rawPost;
 public:
-    // TODO:
-    //  - in the constructor, set postMax (has to be passed via externalObject)
-    //  - also pass the request handler via the externalObject (RequestHandler::handleRequest)
-    //      - in Response, it is necessary to use this function to handle the request
-    //  - for flushing, use a callback saved in the Connection
-    //  - is the FastcgiRequestHandler object still required then?
-
     /**
      * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
      */
-    FastcgippRequestAdapter() : Fastcgipp::Request<char>(any_cast<FastcgippArgumentContainer>(m_externalObject).postMax) {}
+    FastcgippRequestAdapter() : Fastcgipp::Request<char>(
+            any_cast<FastcgippArgumentContainer>(m_externalObject).postMax),
+                                argc(any_cast<FastcgippArgumentContainer>(m_externalObject)) {}
 
     bool response() override;
 
@@ -62,45 +71,32 @@ public:
 
 bool FastcgippRequestAdapter::response() {
 
-    // create Request and Connection (have to be modified before)
-    // callback for flushing has to be in Connection as well, needs to be set here
-    //      auto raw = connection.getRaw();
-    //      dump(raw.c_str(), raw.size());
-    // call m_externalObject.requestHandler->handleRequest
-    //      maybe set the FastcgippArgumentContainer object as member
-    // flush response
-    // return true
-
-    return false;
-}
-
-bool FastcgippRequestAdapter::inProcessor() {
     RequestInitContainer requestInit;
 
     // fill environment
     {
-        auto const& renv = environment();
+        auto const &renv = environment();
         requestInit.environment = {
-                {"host", renv.host},
-                {"userAgent", renv.userAgent},
+                {"host",               renv.host},
+                {"userAgent",          renv.userAgent},
                 {"acceptContentTypes", renv.acceptContentTypes},
-                {"acceptCharsets", renv.acceptCharsets},
-                {"authorization", renv.authorization},
-                {"referer", renv.referer},
-                {"contentType", renv.contentType},
-                {"root", renv.root},
-                {"scriptName", renv.scriptName},
-                {"requestUri", renv.requestUri},
-                {"serverPort", to_string(renv.serverPort)},
-                {"remotePort", to_string(renv.remotePort)},
-                {"ifModifiedSince", to_string(renv.ifModifiedSince)},
-                {"https", renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""},
-                {"serverName", renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""},
-                {"serverSoftware", renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""},
+                {"acceptCharsets",     renv.acceptCharsets},
+                {"authorization",      renv.authorization},
+                {"referer",            renv.referer},
+                {"contentType",        renv.contentType},
+                {"root",               renv.root},
+                {"scriptName",         renv.scriptName},
+                {"requestUri",         renv.requestUri},
+                {"serverPort",         to_string(renv.serverPort)},
+                {"remotePort",         to_string(renv.remotePort)},
+                {"ifModifiedSince",    to_string(renv.ifModifiedSince)},
+                {"https",              renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""},
+                {"serverName",         renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""},
+                {"serverSoftware",     renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""},
         };
 
-        auto& requestMethod = requestInit.environment["requestMethod"];
-        switch(renv.requestMethod) {
+        auto &requestMethod = requestInit.environment["requestMethod"];
+        switch (renv.requestMethod) {
             case Fastcgipp::Http::RequestMethod::ERROR:
                 requestMethod = "ERROR";
                 break;
@@ -143,8 +139,8 @@ bool FastcgippRequestAdapter::inProcessor() {
             std::stringstream baseUrl;
             auto https = renv.others.count("HTTPS");
             baseUrl << (https ? "https://" : "http://")
-                << renv.host;
-            if((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
+                    << renv.host;
+            if ((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
                 baseUrl << ":" << renv.serverPort;
             }
             auto baseUrlStr = baseUrl.str();
@@ -158,24 +154,64 @@ bool FastcgippRequestAdapter::inProcessor() {
             requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
         }
 
-        for(const auto& [k, v]: renv.others) {
-            if(requestInit.environment.count(to_lowercase(k)) == 0) {
+        for (const auto&[k, v]: renv.others) {
+            if (requestInit.environment.count(to_lowercase(k)) == 0) {
                 requestInit.environment[to_lowercase(k)] = v;
             }
         }
 
+        // set acceptLanguages
+        requestInit.acceptLanguages = renv.acceptLanguages;
+
+        // GET, POST, COOKIE
+        requestInit.getVars = renv.gets;
+        requestInit.postVars = renv.posts;
+        requestInit.cookieVars = renv.cookies;
+        requestInit.postContentType = renv.contentType;
     }
 
-//    postContentType = environment().contentType;
-//    if(rawPostAccess == RawPostAccess::NEVER) {
-//        return false;
-//    }
-//    else if (rawPostAccess == RawPostAccess::NONSTANDARD &&
-//             (postContentType == "multipart/form-data" || postContentType == "application/x-www-form-urlencoded")) {
-//        return false;
-//    }
-//    auto postBuffer = environment().postBuffer();
-//    rawPost = std::string(postBuffer.data(), postBuffer.size());
+    requestInit.rawPostCallback = [this]() {
+        return rawPost;
+    };
+
+    requestInit.fileVectorCallback = [this](const string &postVar) {
+        vector<File> ret;
+        auto e = environment().files.equal_range(postVar);
+        for (auto it = e.first; it != e.second; ++it) {
+            File f;
+            f.filename = it->second.filename;
+            f.size = it->second.size;
+            f.contentType = it->second.contentType;
+            f.dataPtr = it->second.data.get();
+            ret.push_back(f);
+        }
+        return ret;
+    };
+
+    ConnectionInitContainer connectionInit;
+    connectionInit.requestInit = move(requestInit);
+    connectionInit.config = argc.config;
+
+    connectionInit.flushCallback = [this](const string &raw) {
+        dump(raw.c_str(), raw.size());
+    };
+
+    Connection connection(connectionInit);
+    argc.requestHandler->handleRequest(connection);
+    connection.flushResponse();
+
+    return true;
+}
+
+bool FastcgippRequestAdapter::inProcessor() {
+    auto postContentType = environment().contentType;
+    if (argc.rawPostAccess == RawPostAccess::NEVER || (argc.rawPostAccess == RawPostAccess::NONSTANDARD &&
+                                                       (postContentType == "multipart/form-data" ||
+                                                        postContentType == "application/x-www-form-urlencoded"))) {
+        return false;
+    }
+    auto postBuffer = environment().postBuffer();
+    rawPost = std::string(postBuffer.data(), postBuffer.size());
     return false;
 }
 
@@ -188,43 +224,100 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     setAppRequestHandler(move(handleRequestFunction_));
     setConfig(move(config_));
 
-    FastcgippArgumentContainer arg {
-        .requestHandler=this,
-        .postMax=0
+    std::string rawPostStr = config[{"post", "raw_access"}];
+    auto rawPostAccess = (rawPostStr == "never")
+                         ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
+                                                                            : RawPostAccess::NONSTANDARD);
+
+    FastcgippArgumentContainer arg{
+            .requestHandler=this,
+            .postMax=0,
+            .config=config,
+            .rawPostAccess=rawPostAccess
     };
 
     try {
         arg.postMax = config.isSet({"post", "max_size"})
-                  ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
+                      ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
     }
-    catch(std::invalid_argument& e) {
+    catch (std::invalid_argument &e) {
         LOG("WARNING: Invalid value given for post/max_size given in the config file.");
     }
 
     fastcgippManager = std::make_unique<FastcgippManagerAdapter>();
     fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, arg);
+
+    // socket handling
+    string mode = config[{"fastcgi", "mode"}];
+    if (mode == "tcp") {
+        auto fastcgiListen = config[{"fastcgi", "listen"}];
+        auto fastcgiPort = config[{"fastcgi", "port"}];
+        if (fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
+        const char *fastcgiListenC = fastcgiListen.c_str();
+        if (fastcgiListen == "all") fastcgiListenC = nullptr;
+        if (fastcgiPort.empty()) fastcgiPort = "8000";
+        if (!fastcgippManager->manager->listen(fastcgiListenC, fastcgiPort.c_str())) {
+            throw UserException("nawa::FastcgiRequestHandler::FastcgiRequestHandler", 1,
+                                "Fatal Error: Could not create TCP socket for FastCGI.");
+        }
+    } else if (mode == "unix") {
+        uint32_t permissions = 0xffffffffUL;
+        string permStr = config[{"fastcgi", "permissions"}];
+        // convert the value from the config file
+        if (!permStr.empty()) {
+            const char *psptr = permStr.c_str();
+            char *endptr;
+            long perm = strtol(psptr, &endptr, 8);
+            if (*endptr == '\0') {
+                permissions = (uint32_t) perm;
+            }
+        }
+
+        auto fastcgiSocketPath = config[{"fastcgi", "path"}];
+        if (fastcgiSocketPath.empty()) {
+            fastcgiSocketPath = "/etc/nawarun/sock.d/nawarun.sock";
+        }
+        auto fastcgiOwner = config[{"fastcgi", "owner"}];
+        auto fastcgiGroup = config[{"fastcgi", "group"}];
+
+        if (!fastcgippManager->manager->listen(fastcgiSocketPath.c_str(), permissions,
+                                               fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
+                                               fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
+            throw UserException("nawa::FastcgiRequestHandler::FastcgiRequestHandler", 2,
+                                "Fatal Error: Could not create UNIX socket for FastCGI.");
+
+        }
+    } else {
+        throw UserException("nawa::FastcgiRequestHandler::FastcgiRequestHandler", 3,
+                            "Fatal Error: Unknown FastCGI socket mode in config.ini.");
+    }
+
+    // tell fastcgi to use SO_REUSEADDR if enabled in config
+    if (config[{"fastcgi", "reuseaddr"}] != "off") {
+        fastcgippManager->manager->reuseAddress(true);
+    }
 }
 
 void FastcgiRequestHandler::start() {
-    if(fastcgippManager && fastcgippManager->manager) {
+    if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->start();
     }
 }
 
 void FastcgiRequestHandler::stop() {
-    if(fastcgippManager && fastcgippManager->manager) {
+    if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->stop();
     }
 }
 
 void FastcgiRequestHandler::terminate() {
-    if(fastcgippManager && fastcgippManager->manager) {
+    if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->terminate();
     }
 }
 
 void FastcgiRequestHandler::join() {
-    if(fastcgippManager && fastcgippManager->manager) {
+    if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->join();
     }
 }

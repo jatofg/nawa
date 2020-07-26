@@ -29,15 +29,9 @@
 
 namespace nawa {
     // forward declarations
-    class Request;
     class Connection;
 
-    // Types of functions that need to be accessed from NAWA applications
-    // TODO does not belong here, move it to somewhere else
-    using init_t = int(AppInit&); /**< Type for the init() function of NAWA apps. */
-    using handleRequest_t = int(Connection&); /**< Type for the handleRequest(Connection) function of NAWA apps. */
-
-    using HandleRequestFunction = std::function<int(nawa::Connection&)>;
+    using HandleRequestFunction = std::function<int(nawa::Connection &)>;
 
     class RequestHandler {
         HandleRequestFunction handleRequestFunction;
@@ -47,20 +41,34 @@ namespace nawa {
         AppInit appInit;
     public:
         /**
+         * Get a request handler object according to the config. May throw a UserException on failure (passed on
+         * from the constructor of the specific request handler.
+         * @param handleRequestFunction The handleRequest function of the app.
+         * @param config The config.
+         * @param concurrency Concurrency level (number of worker threads).
+         * @return A unique_ptr to the request handler.
+         */
+        static std::unique_ptr<RequestHandler>
+        getRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
+
+        /**
          * Set the handleRequest function of the app.
          * @param handleRequestFunction The request handling function of the app.
          */
         void setAppRequestHandler(HandleRequestFunction handleRequestFunction);
+
         /**
          * Take over the AppInit struct filled by the init() function of the app.
          * @param _appInit AppInit struct as filled by the app.
          */
         void setAppInit(AppInit appInit);
+
         /**
          * Set the config.
          * @param config The config.
          */
         void setConfig(Config config);
+
         /**
          * Clear session data
          */
@@ -74,23 +82,28 @@ namespace nawa {
          * Start request handling.
          */
         virtual void start() = 0;
+
         /**
          * Stop request handling.
          */
         virtual void stop() = 0;
+
         /**
          * Enforce termination of request handling.
          */
         virtual void terminate() = 0;
+
         /**
          * Block until request handling has shut down.
          */
         virtual void join() = 0;
+
         /**
          * Handle request by processing the filters and calling the app's handleRequest function, if necessary
          * @param connection The current Connection object.
          */
-        void handleRequest(Connection& connection);
+        void handleRequest(Connection &connection);
+
     private:
         /**
          * Apply the filters set by the app (through AppInit), if filtering is enabled.

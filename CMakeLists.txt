@@ -36,7 +36,6 @@ FetchContent_MakeAvailable(fastcgilite)
 
 add_executable(nawarun
         include/nawa/Request.h
-        include/nawa/RequestHandlerLegacy.h
         include/nawa/SysException.h
         include/nawa/Connection.h
         include/nawa/Encoding.h
@@ -51,6 +50,7 @@ add_executable(nawarun
         include/nawa/AppInit.h
         include/nawa/SmtpMailer.h
         include/nawa/Email.h
+        include/nawa/File.h
         include/nawa/Engines/HashingEngine.h
         include/nawa/Engines/Argon2HashingEngine.h
         include/nawa/Engines/BcryptHashingEngine.h
@@ -61,7 +61,6 @@ add_executable(nawarun
 
         src/main.cpp
         src/Request.cpp
-        src/RequestHandlerLegacy.cpp
         src/Connection.cpp
         src/Encoding.cpp
         src/Utils.cpp
@@ -74,12 +73,14 @@ add_executable(nawarun
         src/Engines/Argon2HashingEngine.cpp
         src/Engines/BcryptHashingEngine.cpp
         src/Engines/DefaultHashTypeTable.cpp
+        src/RequestHandlers/RequestHandler.cpp
+        src/RequestHandlers/FastcgiRequestHandler.cpp
 
         libs/inih/ini.h
         libs/inih/ini.c
 
         libs/base64/base64.h
-        libs/base64/base64.cpp src/RequestHandlers/RequestHandler.cpp src/RequestHandlers/FastcgiRequestHandler.cpp include/nawa/File.h)
+        libs/base64/base64.cpp)
 
 target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
 target_include_directories(nawarun PUBLIC

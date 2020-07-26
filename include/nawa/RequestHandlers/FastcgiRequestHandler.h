@@ -31,10 +31,20 @@ namespace nawa {
         struct FastcgippManagerAdapter;
         std::unique_ptr<FastcgippManagerAdapter> fastcgippManager;
     public:
+        /**
+         * Construct a FastcgiRequestHandler object. May throw a UserException on failure.
+         * @param handleRequestFunction The handleRequest function of the app.
+         * @param config The config.
+         * @param concurrency Concurrency level (number of worker threads).
+         */
         FastcgiRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
+
         void start() override;
+
         void stop() override;
+
         void terminate() override;
+
         void join() override;
     };
 }
