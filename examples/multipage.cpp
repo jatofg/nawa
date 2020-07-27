@@ -27,21 +27,23 @@
 using namespace std;
 using namespace nawa;
 
-int init(AppInit& appInit) {
+int init(AppInit &appInit) {
 
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
 
     // apply forward filters for images below '/test/static/images' and '/test2/static/images ...
     ForwardFilter imageFilter;
-    imageFilter.pathFilter = {{"test", "static", "images"}, {"test2", "static", "images"}};
+    imageFilter.pathFilter = {{"test",  "static", "images"},
+                              {"test2", "static", "images"}};
     imageFilter.extensionFilter = {"png", "jpeg", "jpg", "gif"};
     imageFilter.basePath = "/var/www/multipage/images";
     appInit.accessFilters.forwardFilters.push_back(imageFilter);
 
     // and block everything else in these directories
     BlockFilter blockNonImages;
-    blockNonImages.pathFilter = {{"test", "static", "images"}, {"test2", "static", "images"}};
+    blockNonImages.pathFilter = {{"test",  "static", "images"},
+                                 {"test2", "static", "images"}};
     blockNonImages.extensionFilter = {"png", "jpeg", "jpg", "gif"};
     blockNonImages.invertExtensionFilter = true;
     blockNonImages.status = 404;
@@ -64,7 +66,8 @@ int init(AppInit& appInit) {
 
     // authenticate access to all static resources
     AuthFilter authFilter;
-    authFilter.pathFilter = {{"test", "static"}, {"test2", "static"}};
+    authFilter.pathFilter = {{"test",  "static"},
+                             {"test2", "static"}};
     authFilter.authName = "Not for everyone!";
     authFilter.authFunction = [](std::string user, std::string password) -> bool {
         return (user == "test" && password == "supersecure");
@@ -76,7 +79,7 @@ int init(AppInit& appInit) {
     return 0;
 }
 
-int handleRequest(Connection& connection) {
+int handleRequest(Connection &connection) {
 
     // we do not have to care about requests for static resources -- the filters are doing that for us!
 
@@ -85,15 +88,15 @@ int handleRequest(Connection& connection) {
     connection.response << "<!DOCTYPE html><html><head>"
                            "<title>nawa Multipage Example</title>"
                            "</head><body><p>Request Path Elements: ";
-    for(auto const &e: requestPath) {
+    for (auto const &e: requestPath) {
         connection.response << e << ", ";
     }
     connection.response << "</p>";
 
-    if(requestPath.size() > 1) {
+    if (requestPath.size() > 1) {
 
         // if the request path starts with "/test/page1", show the following page
-        if(requestPath.at(0) == "test" && requestPath.at(1) == "page1") {
+        if (requestPath.at(0) == "test" && requestPath.at(1) == "page1") {
             connection.response << "<h1>First Page</h1>"
                                    "<p>Lorem ipsum sit dolor</p>"
                                    "</body></html>";

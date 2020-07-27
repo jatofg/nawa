@@ -45,17 +45,17 @@ std::string genRandomUnicode(size_t len, unsigned int rseed) {
     stringstream ret;
     default_random_engine dre(rseed);
     uniform_int_distribution<size_t> distribution(0, 49);
-    for(size_t i = len; i > 0; --i) {
+    for (size_t i = len; i > 0; --i) {
         ret << cl[distribution(dre)];
     }
     return ret.str();
 }
 
 int init(AppInit &appInit) {
-    
+
     // Testing of encoding and crypto functions will happen with different random input strings
     string decoded;
-    for(unsigned int rseed = 0; rseed < 10; ++rseed) {
+    for (unsigned int rseed = 0; rseed < 10; ++rseed) {
 
         cout << "TESTING NOW WITH SEED " << rseed << endl;
         // generate a random string with this seed
@@ -109,9 +109,13 @@ int init(AppInit &appInit) {
         cout << "TEST 2.1 passed, took " << elapsed.count() << " µs" << endl;
 
         // TEST 2.2: password hashing using argon2
-        hashedPw = Crypto::passwordHash(decoded, Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2ID, 2, 1 << 16, 2, "", 40));
-        auto hashedPw_i = Crypto::passwordHash(decoded, Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2I));
-        auto hashedPw_d = Crypto::passwordHash(decoded, Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2D));
+        hashedPw = Crypto::passwordHash(decoded,
+                                        Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2ID, 2, 1 << 16,
+                                                                     2, "", 40));
+        auto hashedPw_i = Crypto::passwordHash(decoded,
+                                               Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2I));
+        auto hashedPw_d = Crypto::passwordHash(decoded,
+                                               Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2D));
         startTime = chrono::steady_clock::now();
         cout << decoded << endl << hashedPw << endl;
         cout << hashedPw_i << endl << hashedPw_d << endl;
@@ -128,16 +132,16 @@ int init(AppInit &appInit) {
     // TEST 3.1: Time conversions
     time_t currentTime = time(nullptr);
     string testTimeStr1 = "Thu,  7 Nov 2019 16:29:50 +0100";
-    if(read_http_time(make_http_time(currentTime)) != currentTime) {
+    if (read_http_time(make_http_time(currentTime)) != currentTime) {
         cerr << "TEST 3.1.1 FAILED: currentTime = " << currentTime << "; make_http_time(currentTime) = "
-                  << make_http_time(currentTime) << "; read_http_time(...) = "
-                  << read_http_time(make_http_time(currentTime)) << endl;
+             << make_http_time(currentTime) << "; read_http_time(...) = "
+             << read_http_time(make_http_time(currentTime)) << endl;
         return 1;
     }
-    if(read_smtp_time(make_smtp_time(currentTime)) != currentTime) {
+    if (read_smtp_time(make_smtp_time(currentTime)) != currentTime) {
         cerr << "TEST 3.1.2 FAILED: currentTime = " << currentTime << "; make_smtp_time(currentTime) = "
-                  << make_smtp_time(currentTime) << "; read_smtp_time(...) = "
-                  << read_smtp_time(make_smtp_time(currentTime)) << endl;
+             << make_smtp_time(currentTime) << "; read_smtp_time(...) = "
+             << read_smtp_time(make_smtp_time(currentTime)) << endl;
         return 1;
     }
     assert(make_smtp_time(read_smtp_time(testTimeStr1)) == testTimeStr1);
@@ -151,12 +155,12 @@ int init(AppInit &appInit) {
     string t5 = "/p1/p2/p3/?test=/xyz/";
     auto t1_split = split_path(t1);
     assert(t1_split == split_path(t2) && t1_split == split_path(t3) && t1_split == split_path(t4)
-        && t1_split == split_path(t5));
+           && t1_split == split_path(t5));
     cout << "TEST 3.2 passed" << endl;
-    
+
     return 1;
 }
 
-int handleRequest(Connection&) {
+int handleRequest(Connection &) {
     return 0;
 }
