@@ -54,24 +54,31 @@ struct FastcgippArgumentContainer {
 };
 
 class FastcgippRequestAdapter : public Fastcgipp::Request<char> {
-    FastcgippArgumentContainer argc;
     string rawPost;
 public:
     /**
-     * Construct the RequestHandler object by passing the postMax (as set by setConfig(...)) to the fastcgi library.
+     * Request handling happens through a child class of Fastcgipp::Request. All necessary objects from outside that
+     * we need are induced by the fastcgipp-lite manager (which has been modified to achieve that).
      */
-    FastcgippRequestAdapter() : Fastcgipp::Request<char>(
-            any_cast<FastcgippArgumentContainer>(m_externalObject).postMax),
-                                argc(any_cast<FastcgippArgumentContainer>(m_externalObject)) {}
+    FastcgippRequestAdapter() : Fastcgipp::Request<char>() {}
 
+    /**
+     * The response function is responsible for handling the request in fastcgipp-lite.
+     * @return true, to indicate that we handled the request
+     */
     bool response() override;
 
+    /**
+     * The inProcessor function tells fastcgipp-lite processes POST data and tells fastcgipp-lite what to do with it
+     * afterwards.
+     * @return false, to indicate that the multimaps should still be filled by the library
+     */
     bool inProcessor() override;
 };
 
 bool FastcgippRequestAdapter::response() {
-
     RequestInitContainer requestInit;
+    auto argc = any_cast<FastcgippArgumentContainer>(m_externalObject);
 
     // fill environment
     {
@@ -204,12 +211,15 @@ bool FastcgippRequestAdapter::response() {
 }
 
 bool FastcgippRequestAdapter::inProcessor() {
+    auto argc = any_cast<FastcgippArgumentContainer>(m_externalObject);
     auto postContentType = environment().contentType;
+
     if (argc.rawPostAccess == RawPostAccess::NEVER || (argc.rawPostAccess == RawPostAccess::NONSTANDARD &&
                                                        (postContentType == "multipart/form-data" ||
                                                         postContentType == "application/x-www-form-urlencoded"))) {
         return false;
     }
+
     auto postBuffer = environment().postBuffer();
     rawPost = std::string(postBuffer.data(), postBuffer.size());
     return false;
@@ -245,7 +255,8 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     }
 
     fastcgippManager = std::make_unique<FastcgippManagerAdapter>();
-    fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, arg);
+    fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, arg.postMax,
+                                                                                              arg);
 
     // socket handling
     string mode = config[{"fastcgi", "mode"}];
@@ -298,7 +309,7 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     }
 }
 
-FastcgiRequestHandler::~FastcgiRequestHandler() {}
+FastcgiRequestHandler::~FastcgiRequestHandler() = default;
 
 void FastcgiRequestHandler::start() {
     if (fastcgippManager && fastcgippManager->manager) {

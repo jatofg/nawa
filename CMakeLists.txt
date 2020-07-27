@@ -30,7 +30,7 @@ include(FetchContent)
 FetchContent_Declare(
         fastcgilite
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
-        GIT_TAG v3.1.2
+        GIT_TAG v3.1.4
 )
 FetchContent_MakeAvailable(fastcgilite)
 

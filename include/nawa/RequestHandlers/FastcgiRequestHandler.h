@@ -40,7 +40,7 @@ namespace nawa {
         FastcgiRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
 
         // explicit destructor with implementation in source file is needed to destruct the unique_ptr
-        ~FastcgiRequestHandler();
+        ~FastcgiRequestHandler() override;
 
         void start() override;
 

@@ -40,6 +40,8 @@ namespace nawa {
         // TODO if a segfault happens during shutdown, use a unique_ptr and destroy manually
         AppInit appInit;
     public:
+        virtual ~RequestHandler() = default;
+
         /**
          * Get a request handler object according to the config. May throw a UserException on failure (passed on
          * from the constructor of the specific request handler.
