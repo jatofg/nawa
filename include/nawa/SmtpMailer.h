@@ -68,20 +68,20 @@ namespace nawa {
         /**
          * Construct an SmtpMailer object and optionally set the connection and authentication properties. Constructing
          * the object will not establish a connection to the SMTP server yet.
-         * @param serverDomain_ Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * @param serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
-         * @param serverPort_ Port of the SMTP server.
-         * @param tlsMode_ How TLS should be used, see TlsMode struct.
-         * @param verifyTlsCert_ Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
+         * @param serverPort Port of the SMTP server.
+         * @param tlsMode How TLS should be used, see TlsMode struct.
+         * @param verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
-         * @param authUsername_ Username for authentication.
-         * @param authPassword_ Password for authentication.
+         * @param authUsername Username for authentication.
+         * @param authPassword Password for authentication.
          * @param connectionTimeout Timeout for SMTP connection attempts in milliseconds.
          */
-        explicit SmtpMailer(std::string serverDomain_ = "localhost", unsigned int serverPort_ = 25,
-                            TlsMode tlsMode_ = TlsMode::NONE, bool verifyTlsCert_ = true,
-                            std::string authUsername_ = "",
-                            std::string authPassword_ = "", long connectionTimeout = 10000);
+        explicit SmtpMailer(std::string serverDomain = "localhost", unsigned int serverPort = 25,
+                            TlsMode tlsMode = TlsMode::NONE, bool verifyTlsCert = true,
+                            std::string authUsername = "",
+                            std::string authPassword = "", long connectionTimeout = 10000);
 
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
