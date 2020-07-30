@@ -109,7 +109,7 @@ namespace nawa {
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        virtual std::string getRaw(const ReplacementRules &replacementRules) const = 0;
+        virtual std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const = 0;
     };
 
     /**
@@ -133,7 +133,7 @@ namespace nawa {
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        std::string getRaw(const ReplacementRules &replacementRules) const override;
+        std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const override;
     };
 
     /**
@@ -279,7 +279,7 @@ namespace nawa {
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        std::string getRaw(const ReplacementRules &replacementRules) const override;
+        std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const override;
         // TODO add extra functions, e.g., for adding an attachment or easily creating alternative text and html
         //   parts (attachments read from a file, can use util function get_file_contents)
     };

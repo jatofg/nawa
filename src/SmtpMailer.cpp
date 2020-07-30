@@ -80,20 +80,16 @@ void nawa::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassw
 }
 
 void nawa::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
-                               ReplacementRules replacementRules) {
+                               std::shared_ptr<ReplacementRules> replacementRules) {
     bulkEnqueue(std::move(email), std::vector<EmailAddress>({std::move(to)}), std::move(from),
                 std::move(replacementRules));
 }
 
 void nawa::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
-                                   std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules) {
+                                   std::shared_ptr<EmailAddress> from, std::shared_ptr<ReplacementRules> replacementRules) {
     addMissingHeaders(email, from);
-    std::unique_ptr<ReplacementRules> rulesPtr;
-    if (!replacementRules.empty()) {
-        rulesPtr = std::make_unique<ReplacementRules>(replacementRules);
-    }
     queue.push_back(QueueElem{.email=std::move(email), .from=std::move(from), .recipients=std::move(recipients),
-            .replacementRules=std::move(rulesPtr)});
+            .replacementRules=std::move(replacementRules)});
 }
 
 void nawa::SmtpMailer::clearQueue() {
@@ -155,7 +151,7 @@ void nawa::SmtpMailer::processQueue() const {
             curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
 
             // specify how to read the mail data
-            std::string payload = mail.email->getRaw(*mail.replacementRules);
+            std::string payload = mail.email->getRaw(mail.replacementRules);
             // fmemopen will create a FILE* to read from the string (curl expects that, unfortunately)
             FILE *payloadFile = fmemopen((void *) payload.c_str(), payload.length(), "r");
             curl_easy_setopt(curl, CURLOPT_READDATA, (void *) payloadFile);

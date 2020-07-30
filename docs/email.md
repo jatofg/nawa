@@ -64,8 +64,14 @@ smtp.enqueue(std::make_shared<SimpleEmail>(email), to, std::make_shared<EmailAdd
 ```
 
 Use `std::make_shared` as this function requires the `nawa::Email` object and 
-sender (From) address to be passed as shared pointers. See `SmtpMailer::enqueue` 
+sender (From) address to be passed as shared pointers. You can optionally provide 
+a list of replacement rules as an additional parameter to this function, which is 
+useful for sending personalized messages to a large number of recipients without 
+having to create an Email object for each of them. See `SmtpMailer::enqueue` 
 for details.
+
+For sending the same email to multiple recipients, you can also use the function 
+`SmtpMailer::bulkEnqueue`.
 
 And finally, send the email:
 
@@ -81,7 +87,9 @@ If you should need to send multiple emails, add all of them to the queue before
 calling `processQueue`, so that one SMTP connection is used for all of them.
 
 Learning by example is the best way to learn, so have a look at 
- `examples/contactform.cpp` for a practical example.
+`examples/contactform.cpp` for a practical example. The documentation of the classes 
+used in this example might contain additional features not mentioned in this tutorial, 
+so make sure to read it as well :)
 
 ## MIME emails
 

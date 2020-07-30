@@ -52,7 +52,7 @@ namespace nawa {
             std::shared_ptr<const Email> email;
             std::shared_ptr<const EmailAddress> from;
             std::vector<EmailAddress> recipients;
-            std::unique_ptr<ReplacementRules> replacementRules;
+            std::shared_ptr<ReplacementRules> replacementRules;
         };
 
         std::string serverDomain;
@@ -126,7 +126,8 @@ namespace nawa {
          * the rule set is empty, it will neither be saved along with the email nor evaluated.
          */
         void enqueue(std::shared_ptr<Email> email, EmailAddress to,
-                     std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+                     std::shared_ptr<EmailAddress> from,
+                     std::shared_ptr<ReplacementRules> replacementRules = std::shared_ptr<ReplacementRules>());
 
         /**
          * This function will enqueue an email for a list of recipients. This improves efficiency, but it doesn't
@@ -141,7 +142,8 @@ namespace nawa {
          * to the email once and do not offer personalization to individual recipients.
          */
         void bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
-                         std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+                         std::shared_ptr<EmailAddress> from,
+                         std::shared_ptr<ReplacementRules> replacementRules = std::shared_ptr<ReplacementRules>());
 
         /**
          * Clear the email queue.

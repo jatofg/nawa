@@ -46,9 +46,9 @@ int handleRequest(Connection &connection) {
     connection.response << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
 
     // The replacement rules to apply
-    ReplacementRules replacementRules;
-    replacementRules.insert({"Test", "T€st"});
-    replacementRules.insert({"email", "émail"});
+    shared_ptr<ReplacementRules> replacementRules;
+    replacementRules->insert({"Test", "T€st"});
+    replacementRules->insert({"email", "émail"});
 
     EmailAddress from("John Doe", "johndoe@example.com");
     EmailAddress to("The Admin", "theadmin@example.com");
