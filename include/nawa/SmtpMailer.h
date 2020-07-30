@@ -61,46 +61,56 @@ namespace nawa {
         bool verifyTlsCert;
         std::string authUsername;
         std::string authPassword;
+        long connectionTimeout;
         std::vector<QueueElem> queue;
     public:
 
         /**
          * Construct an SmtpMailer object and optionally set the connection and authentication properties. Constructing
          * the object will not establish a connection to the SMTP server yet.
-         * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * @param serverDomain_ Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
-         * @param _serverPort Port of the SMTP server.
-         * @param _tlsMode How TLS should be used, see TlsMode struct.
-         * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
+         * @param serverPort_ Port of the SMTP server.
+         * @param tlsMode_ How TLS should be used, see TlsMode struct.
+         * @param verifyTlsCert_ Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
-         * @param _authUsername Username for authentication.
-         * @param _authPassword Password for authentication.
+         * @param authUsername_ Username for authentication.
+         * @param authPassword_ Password for authentication.
+         * @param connectionTimeout Timeout for SMTP connection attempts in milliseconds.
          */
-        explicit SmtpMailer(std::string _serverDomain = "localhost", unsigned int _serverPort = 25,
-                            TlsMode _tlsMode = TlsMode::NONE, bool _verifyTlsCert = true,
-                            std::string _authUsername = "",
-                            std::string _authPassword = "");
+        explicit SmtpMailer(std::string serverDomain_ = "localhost", unsigned int serverPort_ = 25,
+                            TlsMode tlsMode_ = TlsMode::NONE, bool verifyTlsCert_ = true,
+                            std::string authUsername_ = "",
+                            std::string authPassword_ = "", long connectionTimeout = 10000);
 
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
-         * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * @param serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
-         * @param _serverPort Port of the SMTP server.
-         * @param _tlsMode How TLS should be used, see TlsMode struct.
-         * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
+         * @param serverPort Port of the SMTP server.
+         * @param tlsMode How TLS should be used, see TlsMode struct.
+         * @param verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
          */
-        void setServer(std::string _serverDomain, unsigned int _serverPort = 25, TlsMode _tlsMode = TlsMode::NONE,
-                       bool _verifyTlsCert = true);
+        void setServer(std::string serverDomain, unsigned int serverPort = 25, TlsMode tlsMode = TlsMode::NONE,
+                       bool verifyTlsCert = true);
 
         /**
          * Set the authentication parameters for the SMTP connection.
-         * @param _authUsername Username for authentication.
-         * @param _authPassword Password for authentication.
+         * @param authUsername Username for authentication.
+         * @param authPassword Password for authentication.
          */
-        void setAuth(std::string _authUsername, std::string _authPassword);
+        void setAuth(std::string authUsername, std::string authPassword);
+
+        /**
+         * Set the timeout for SMTP connection attempts.
+         * @param connectionTimeout Timeout for SMTP connection attempts in milliseconds.
+         */
+        void setTimeout(long connectionTimeout);
+
         // TODO send emails async?
         // TODO signing and encryption?
+
         /**
          * Add an email to the sending queue. The email will be sent upon calling processQueue().
          * @param email The Email object representing the email to be enqueued. This function will expect a shared_ptr

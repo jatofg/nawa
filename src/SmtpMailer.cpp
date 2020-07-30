@@ -57,12 +57,14 @@ namespace {
     }
 }
 
-nawa::SmtpMailer::SmtpMailer(std::string _serverDomain, unsigned int _serverPort, nawa::SmtpMailer::TlsMode _tlsMode,
-                             bool _verifyTlsCert, std::string _authUsername, std::string _authPassword)
-        : serverPort(_serverPort), tlsMode(_tlsMode), verifyTlsCert(_verifyTlsCert) {
-    serverDomain = std::move(_serverDomain);
-    authUsername = std::move(_authUsername);
-    authPassword = std::move(_authPassword);
+nawa::SmtpMailer::SmtpMailer(std::string serverDomain_, unsigned int serverPort_, nawa::SmtpMailer::TlsMode tlsMode_,
+                             bool verifyTlsCert_, std::string authUsername_, std::string authPassword_,
+                             long connectionTimeout_)
+        : serverPort(serverPort_), tlsMode(tlsMode_), verifyTlsCert(verifyTlsCert_),
+          connectionTimeout(connectionTimeout_) {
+    serverDomain = std::move(serverDomain_);
+    authUsername = std::move(authUsername_);
+    authPassword = std::move(authPassword_);
 }
 
 void
@@ -77,6 +79,10 @@ nawa::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverPort,
 void nawa::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassword) {
     authUsername = std::move(_authUsername);
     authPassword = std::move(_authPassword);
+}
+
+void nawa::SmtpMailer::setTimeout(long connectionTimeout_) {
+    connectionTimeout = connectionTimeout_;
 }
 
 void nawa::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
@@ -136,6 +142,9 @@ void nawa::SmtpMailer::processQueue() const {
 //        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
         FILE *devNull = fopen("/dev/null", "wb");
         curl_easy_setopt(curl, CURLOPT_STDERR, devNull);
+
+        // connection timeout
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, connectionTimeout);
 
         // iterate queue
         for (const auto &mail: queue) {

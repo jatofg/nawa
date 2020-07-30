@@ -72,16 +72,12 @@ int handleRequest(Connection &connection) {
 
         if (!randValid) {
             connection.response << "<p>No spamming, please!</p>";
-
             return 0;
         }
 
         // check whether the user filled in all required fields
-        if (!post.count("name") || !post.count("email") || !post.count("subject")
-            || !post.count("message")) {
-
+        if (post["name"].empty() || post["email"].empty() || post["subject"].empty() || post["message"].empty()) {
             connection.response << "<p>Please go back and fill in all required fields!</p></body></html>";
-
             return 0;
         }
 
