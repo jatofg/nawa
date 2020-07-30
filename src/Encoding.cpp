@@ -746,9 +746,9 @@ std::string nawa::Encoding::makeEncodedWord(const std::string &input, bool base6
     std::stringstream ret;
     ret << "=?utf-8?";
     if (base64) {
-        ret << "?B?" << base64Encode(input);
+        ret << "B?" << base64Encode(input);
     } else {
-        ret << "?Q?" << quotedPrintableEncode(input, "", true, true);
+        ret << "Q?" << quotedPrintableEncode(input, "", true, true);
     }
     ret << "?=";
     return ret.str();
