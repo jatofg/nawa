@@ -28,6 +28,7 @@
 #include <nawa/SmtpMailer.h>
 #include <nawa/Application.h>
 #include <nawa/UserException.h>
+#include <nawa/Encoding.h>
 
 using namespace nawa;
 using namespace std;
@@ -60,7 +61,7 @@ int handleRequest(Connection &connection) {
     email1.headers["From"] = from.get();
     email1.headers["To"] = to.get();
     email1.headers["Content-Type"] = "text/plain; charset=utf-8";
-    email1.headers["Subject"] = "Test mail";
+    email1.headers["Subject"] = Encoding::makeEncodedWord("Test mail");
     email1.text = "Test email 'm€ssage' =@#$%^&*()===";
     connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
 

@@ -115,9 +115,11 @@ namespace nawa::Encoding {
      * Convert a UTF8-encoded string to the encoded-word syntax for email headers.
      * @param input The input string to encode.
      * @param base64 Whether to use base64-encoding instead of Q-encoding (defaults to false).
+     * @param onlyIfNecessary Only apply q-encoding if special characters, which would be encoded, are present in the
+     * input (does not apply to base64 encoding).
      * @return Encoded string.
      */
-    std::string makeEncodedWord(const std::string &input, bool base64 = false);
+    std::string makeEncodedWord(const std::string &input, bool base64 = false, bool onlyIfNecessary = true);
 }
 
 #endif //NAWA_ENCODING_H
