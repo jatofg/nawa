@@ -46,7 +46,7 @@ int handleRequest(Connection &connection) {
     connection.response << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
 
     // The replacement rules to apply
-    shared_ptr<ReplacementRules> replacementRules;
+    auto replacementRules = make_shared<ReplacementRules>();
     replacementRules->insert({"Test", "T€st"});
     replacementRules->insert({"email", "émail"});
 
@@ -59,6 +59,7 @@ int handleRequest(Connection &connection) {
     SimpleEmail email1;
     email1.headers["From"] = from.get();
     email1.headers["To"] = to.get();
+    email1.headers["Content-Type"] = "text/plain; charset=utf-8";
     email1.headers["Subject"] = "Test mail";
     email1.text = "Test email 'm€ssage' =@#$%^&*()===";
     connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
@@ -115,6 +116,7 @@ int handleRequest(Connection &connection) {
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
         SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
                         true, "test@example.com", "12345");
+        smtp.enqueue(make_shared<SimpleEmail>(email1), to, make_shared<EmailAddress>(from), replacementRules);
         smtp.enqueue(make_shared<MimeEmail>(email2), to, make_shared<EmailAddress>(from), replacementRules);
 
         try {
