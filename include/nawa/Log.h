@@ -43,9 +43,9 @@ namespace nawa {
 
         /**
          * Construct a Log object with a custom app name (can be changed later).
-         * @param appname_
+         * @param appname The app name, appears in brackets in the log.
          */
-        explicit Log(std::string appname_) noexcept;
+        explicit Log(std::string appname) noexcept;
 
         Log(const Log &other) noexcept;
 
@@ -63,6 +63,7 @@ namespace nawa {
          * @param os Pointer to the output stream. Make sure that this stream will be available until NAWA terminates.
          */
         static void setStream(std::ostream *os) noexcept;
+
         // TODO does std::ofstream file opening really throw exceptions or is there sth that has to be changed?
         /**
          * Change the output to append to the specified log file. Will throw a UserException with error code 1 if
