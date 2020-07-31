@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
     // pass config, app function, and concurrency to RequestHandler
     // already here to make (socket) preparation possible before privilege downgrade
     try {
-        requestHandlerPtr = RequestHandler::getRequestHandler(appHandleRequest, config, cInt);
+        requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, cInt);
     } catch (const UserException& e) {
         LOG(e.what());
         return 1;

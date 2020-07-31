@@ -275,6 +275,6 @@ void RequestHandler::handleRequest(Connection &connection) {
 }
 
 std::unique_ptr<RequestHandler>
-RequestHandler::getRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency) {
+RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency) {
     return make_unique<FastcgiRequestHandler>(move(handleRequestFunction), move(config), concurrency);
 }

@@ -42,7 +42,7 @@ namespace nawa {
         virtual ~RequestHandler() = default;
 
         /**
-         * Get a request handler object according to the config. May throw a UserException on failure (passed on
+         * Create a new request handler object according to the config. May throw a UserException on failure (passed on
          * from the constructor of the specific request handler.
          * @param handleRequestFunction The handleRequest function of the app.
          * @param config The config.
@@ -50,7 +50,7 @@ namespace nawa {
          * @return A unique_ptr to the request handler.
          */
         static std::unique_ptr<RequestHandler>
-        getRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
+        newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
 
         /**
          * Set the handleRequest function of the app.
