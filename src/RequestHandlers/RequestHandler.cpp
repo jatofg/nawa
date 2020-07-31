@@ -95,6 +95,159 @@ namespace {
         // all conditions match or no condition has been set -> the filter matches
         return true;
     }
+
+    /**
+     * Apply the filters set by the app (through AppInit), if filtering is enabled.
+     * @param connection Reference to the connection object to read the request from and write the response to,
+     * if the request has to be filtered.
+     * @param accessFilters The filters to apply.
+     * @return True if the request has been filtered and a response has already been set by this function
+     * (and the app should not be invoked on this request). False if the app should handle this request.
+     */
+    bool applyFilters(Connection &connection, const AccessFilterList &accessFilters) {
+        // if filters are disabled, do not even check
+        if (!accessFilters.filtersEnabled) return false;
+
+        auto requestPath = connection.request.env.getRequestPath();
+
+        // check block filters
+        for (auto const &flt: accessFilters.blockFilters) {
+            // if the filter does not apply (or does in case of an inverted filter), go to the next
+            bool matches = filterMatches(requestPath, flt);
+            if ((!matches && !flt.invert) || (matches && flt.invert)) {
+                continue;
+            }
+
+            // filter matches -> apply block
+            connection.setStatus(flt.status);
+            if (!flt.response.empty()) {
+                connection.setBody(flt.response);
+            } else {
+                connection.setBody(generate_error_page(flt.status));
+            }
+            // the request has been blocked, so no more filters have to be applied
+            // returning true means: the request has been filtered
+            return true;
+        }
+
+        // the ID is used to identify the exact filter for session cookie creation
+        int authFilterID = -1;
+        for (auto const &flt: accessFilters.authFilters) {
+            ++authFilterID;
+
+            bool matches = filterMatches(requestPath, flt);
+            if ((!matches && !flt.invert) || (matches && flt.invert)) {
+                continue;
+            }
+
+            bool isAuthenticated = false;
+            string sessionCookieName;
+
+            // check session variable for this filter, if session usage is on
+            if (flt.useSessions) {
+                connection.session.start();
+                sessionCookieName = "_nawa_authfilter" + to_string(authFilterID);
+                if (connection.session.isSet(sessionCookieName)) {
+                    isAuthenticated = true;
+                }
+            }
+
+            // if this did not work, request authentication or invoke auth function if credentials have already been sent
+            if (!isAuthenticated) {
+                // case 1: no authorization header sent by client -> send a 401 without body
+                if (connection.request.env["authorization"].empty()) {
+                    connection.setStatus(401);
+                    stringstream hval;
+                    hval << "Basic";
+                    if (!flt.authName.empty()) {
+                        hval << " realm=\"" << flt.authName << '"';
+                    }
+                    connection.setHeader("www-authenticate", hval.str());
+
+                    // that's it, the response must be sent to the client directly so it can authenticate
+                    return true;
+                }
+                    // case 2: credentials already sent
+                else {
+                    // split the authorization string, only the last part should contain base64
+                    auto authResponse = split_string(connection.request.env["authorization"], ' ', true);
+                    // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
+                    if (authResponse.size() == 2 || authResponse.at(0) == "Basic") {
+                        auto credentials = split_string(Encoding::base64Decode(authResponse.at(1)), ':', true);
+                        // credentials must also have 2 elements, a username and a password,
+                        // and the auth function must be callable
+                        if (credentials.size() == 2 && flt.authFunction) {
+                            // now we can actually check the credentials with our function (if it is set)
+                            if (flt.authFunction(credentials.at(0), credentials.at(1))) {
+                                isAuthenticated = true;
+                                // now, if sessions are used, set the session variable to the username
+                                if (flt.useSessions) {
+                                    connection.session.set(sessionCookieName, any(credentials.at(0)));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // now, if the user is still not authenticated, send a 403 Forbidden
+            if (!isAuthenticated) {
+                connection.setStatus(403);
+                if (!flt.response.empty()) {
+                    connection.setBody(flt.response);
+                } else {
+                    connection.setBody(generate_error_page(403));
+                }
+
+                // request blocked
+                return true;
+            }
+
+            // if the user is authenticated, we can continue to process forward filters
+            break;
+
+        }
+
+        // check forward filters
+        for (auto const &flt: accessFilters.forwardFilters) {
+            bool matches = filterMatches(requestPath, flt);
+            if ((!matches && !flt.invert) || (matches && flt.invert)) {
+                continue;
+            }
+
+            stringstream filePath;
+            filePath << flt.basePath;
+            if (flt.basePathExtension == ForwardFilter::BY_PATH) {
+                for (auto const &e: requestPath) {
+                    filePath << '/' << e;
+                }
+            } else {
+                filePath << '/' << requestPath.back();
+            }
+
+            // send file if it exists, catch the "file does not exist" UserException and send 404 document if not
+            auto filePathStr = filePath.str();
+            try {
+                connection.sendFile(filePathStr, "", false, "", true);
+            }
+            catch (UserException &) {
+                // file does not exist, send 404
+                connection.setStatus(404);
+                if (!flt.response.empty()) {
+                    connection.setBody(flt.response);
+                } else {
+                    connection.setBody(generate_error_page(404));
+                }
+            }
+
+            // return true as the request has been filtered
+            return true;
+        }
+
+        // if no filters were triggered (and therefore returned true), return false so that the request can be handled by
+        // the app
+        return false;
+    }
 }
 
 void RequestHandler::setAppRequestHandler(HandleRequestFunction fn) {
@@ -116,159 +269,9 @@ void RequestHandler::destroyEverything() {
 void RequestHandler::handleRequest(Connection &connection) {
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
-    if (!applyFilters(connection)) {
+    if (!applyFilters(connection, appInit.accessFilters)) {
         handleRequestFunction(connection);
     }
-    // TODO we should instead add a std::function in Connection so that the RequestHandler can stay out of Connection
-    //      and flushing has to be done by the specific handler then, unfortunately
-    //flush(connection);
-}
-
-bool RequestHandler::applyFilters(Connection &connection) {
-    // TODO if we should return to a unique_ptr for appInit, check it here for safety
-
-    // if filters are disabled, do not even check
-    if (!appInit.accessFilters.filtersEnabled) return false;
-
-    auto requestPath = connection.request.env.getRequestPath();
-
-    // check block filters
-    for (auto const &flt: appInit.accessFilters.blockFilters) {
-        // if the filter does not apply (or does in case of an inverted filter), go to the next
-        bool matches = filterMatches(requestPath, flt);
-        if ((!matches && !flt.invert) || (matches && flt.invert)) {
-            continue;
-        }
-
-        // filter matches -> apply block
-        connection.setStatus(flt.status);
-        if (!flt.response.empty()) {
-            connection.setBody(flt.response);
-        } else {
-            connection.setBody(generate_error_page(flt.status));
-        }
-        // the request has been blocked, so no more filters have to be applied
-        // returning true means: the request has been filtered
-        return true;
-    }
-
-    // the ID is used to identify the exact filter for session cookie creation
-    int authFilterID = -1;
-    for (auto const &flt: appInit.accessFilters.authFilters) {
-        ++authFilterID;
-
-        bool matches = filterMatches(requestPath, flt);
-        if ((!matches && !flt.invert) || (matches && flt.invert)) {
-            continue;
-        }
-
-        bool isAuthenticated = false;
-        string sessionCookieName;
-
-        // check session variable for this filter, if session usage is on
-        if (flt.useSessions) {
-            connection.session.start();
-            sessionCookieName = "_nawa_authfilter" + to_string(authFilterID);
-            if (connection.session.isSet(sessionCookieName)) {
-                isAuthenticated = true;
-            }
-        }
-
-        // if this did not work, request authentication or invoke auth function if credentials have already been sent
-        if (!isAuthenticated) {
-            // case 1: no authorization header sent by client -> send a 401 without body
-            if (connection.request.env["authorization"].empty()) {
-                connection.setStatus(401);
-                stringstream hval;
-                hval << "Basic";
-                if (!flt.authName.empty()) {
-                    hval << " realm=\"" << flt.authName << '"';
-                }
-                connection.setHeader("www-authenticate", hval.str());
-
-                // that's it, the response must be sent to the client directly so it can authenticate
-                return true;
-            }
-                // case 2: credentials already sent
-            else {
-                // split the authorization string, only the last part should contain base64
-                auto authResponse = split_string(connection.request.env["authorization"], ' ', true);
-                // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
-                if (authResponse.size() == 2 || authResponse.at(0) == "Basic") {
-                    auto credentials = split_string(Encoding::base64Decode(authResponse.at(1)), ':', true);
-                    // credentials must also have 2 elements, a username and a password,
-                    // and the auth function must be callable
-                    if (credentials.size() == 2 && flt.authFunction) {
-                        // now we can actually check the credentials with our function (if it is set)
-                        if (flt.authFunction(credentials.at(0), credentials.at(1))) {
-                            isAuthenticated = true;
-                            // now, if sessions are used, set the session variable to the username
-                            if (flt.useSessions) {
-                                connection.session.set(sessionCookieName, any(credentials.at(0)));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // now, if the user is still not authenticated, send a 403 Forbidden
-        if (!isAuthenticated) {
-            connection.setStatus(403);
-            if (!flt.response.empty()) {
-                connection.setBody(flt.response);
-            } else {
-                connection.setBody(generate_error_page(403));
-            }
-
-            // request blocked
-            return true;
-        }
-
-        // if the user is authenticated, we can continue to process forward filters
-        break;
-
-    }
-
-    // check forward filters
-    for (auto const &flt: appInit.accessFilters.forwardFilters) {
-        bool matches = filterMatches(requestPath, flt);
-        if ((!matches && !flt.invert) || (matches && flt.invert)) {
-            continue;
-        }
-
-        stringstream filePath;
-        filePath << flt.basePath;
-        if (flt.basePathExtension == ForwardFilter::BY_PATH) {
-            for (auto const &e: requestPath) {
-                filePath << '/' << e;
-            }
-        } else {
-            filePath << '/' << requestPath.back();
-        }
-
-        // send file if it exists, catch the "file does not exist" UserException and send 404 document if not
-        auto filePathStr = filePath.str();
-        try {
-            connection.sendFile(filePathStr, "", false, "", true);
-        }
-        catch (UserException &) {
-            // file does not exist, send 404
-            connection.setStatus(404);
-            if (!flt.response.empty()) {
-                connection.setBody(flt.response);
-            } else {
-                connection.setBody(generate_error_page(404));
-            }
-        }
-
-        // return true as the request has been filtered
-        return true;
-    }
-
-    // if no filters were triggered (and therefore returned true), return false so that the request can be handled by
-    // the app
-    return false;
 }
 
 std::unique_ptr<RequestHandler>

@@ -37,7 +37,6 @@ namespace nawa {
         HandleRequestFunction handleRequestFunction;
     protected:
         Config config;
-        // TODO if a segfault happens during shutdown, use a unique_ptr and destroy manually
         AppInit appInit;
     public:
         virtual ~RequestHandler() = default;
@@ -105,16 +104,6 @@ namespace nawa {
          * @param connection The current Connection object.
          */
         void handleRequest(Connection &connection);
-
-    private:
-        /**
-         * Apply the filters set by the app (through AppInit), if filtering is enabled.
-         * @param connection Reference to the connection object to read the request from and write the response to,
-         * if the request has to be filtered.
-         * @return True if the request has been filtered and a response has already been set by this function
-         * (and the app should not be invoked on this request). False if the app should handle this request.
-         */
-        bool applyFilters(Connection &connection);
     };
 }
 
