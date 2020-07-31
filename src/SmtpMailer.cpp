@@ -28,6 +28,9 @@
 #include <random>
 #include <nawa/Crypto.h>
 
+using namespace nawa;
+using namespace std;
+
 namespace {
     /**
      * Check for the existence of the obligatory "Date" and "From" headers in the email, and set them if non-existent.
@@ -35,74 +38,74 @@ namespace {
      * @param email Email to check and modify.
      * @param from EmailAddress object to set the From header from, if necessary.
      */
-    void addMissingHeaders(std::shared_ptr<nawa::Email> &email, const std::shared_ptr<nawa::EmailAddress> &from) {
+    void addMissingHeaders(shared_ptr<Email> &email, const shared_ptr<EmailAddress> &from) {
         if (!email->headers.count("Date")) {
-            email->headers["Date"] = nawa::make_smtp_time(time(nullptr));
+            email->headers["Date"] = make_smtp_time(time(nullptr));
         }
         if (!email->headers.count("From") && !from->address.empty()) {
             email->headers["From"] = from->get();
         }
         unsigned long atPos;
         if (!email->headers.count("Message-ID") && !from->address.empty()
-            && (atPos = from->address.find_last_of('@')) != std::string::npos) {
-            std::stringstream mid;
-            std::stringstream base;
-            std::random_device rd;
+            && (atPos = from->address.find_last_of('@')) != string::npos) {
+            stringstream mid;
+            stringstream base;
+            random_device rd;
             timespec mtime;
             clock_gettime(CLOCK_REALTIME, &mtime);
             base << mtime.tv_sec << mtime.tv_nsec << from->address << rd();
-            mid << '<' << nawa::Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos + 1) << '>';
+            mid << '<' << Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos + 1) << '>';
             email->headers["Message-ID"] = mid.str();
         }
     }
 }
 
-nawa::SmtpMailer::SmtpMailer(std::string serverDomain_, unsigned int serverPort_, nawa::SmtpMailer::TlsMode tlsMode_,
-                             bool verifyTlsCert_, std::string authUsername_, std::string authPassword_,
-                             long connectionTimeout_)
+SmtpMailer::SmtpMailer(string serverDomain_, unsigned int serverPort_, SmtpMailer::TlsMode tlsMode_,
+                       bool verifyTlsCert_, string authUsername_, string authPassword_,
+                       long connectionTimeout_)
         : serverPort(serverPort_), tlsMode(tlsMode_), verifyTlsCert(verifyTlsCert_),
           connectionTimeout(connectionTimeout_) {
-    serverDomain = std::move(serverDomain_);
-    authUsername = std::move(authUsername_);
-    authPassword = std::move(authPassword_);
+    serverDomain = move(serverDomain_);
+    authUsername = move(authUsername_);
+    authPassword = move(authPassword_);
 }
 
 void
-nawa::SmtpMailer::setServer(std::string _serverDomain, unsigned int _serverPort, nawa::SmtpMailer::TlsMode _tlsMode,
-                            bool _verifyTlsCert) {
-    serverDomain = std::move(_serverDomain);
+SmtpMailer::setServer(string _serverDomain, unsigned int _serverPort, SmtpMailer::TlsMode _tlsMode,
+                      bool _verifyTlsCert) {
+    serverDomain = move(_serverDomain);
     serverPort = _serverPort;
     tlsMode = _tlsMode;
     verifyTlsCert = _verifyTlsCert;
 }
 
-void nawa::SmtpMailer::setAuth(std::string _authUsername, std::string _authPassword) {
-    authUsername = std::move(_authUsername);
-    authPassword = std::move(_authPassword);
+void SmtpMailer::setAuth(string _authUsername, string _authPassword) {
+    authUsername = move(_authUsername);
+    authPassword = move(_authPassword);
 }
 
-void nawa::SmtpMailer::setTimeout(long connectionTimeout_) {
+void SmtpMailer::setTimeout(long connectionTimeout_) {
     connectionTimeout = connectionTimeout_;
 }
 
-void nawa::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
-                               std::shared_ptr<ReplacementRules> replacementRules) {
-    bulkEnqueue(std::move(email), std::vector<EmailAddress>({std::move(to)}), std::move(from),
-                std::move(replacementRules));
+void SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<EmailAddress> from,
+                         shared_ptr<ReplacementRules> replacementRules) {
+    bulkEnqueue(move(email), vector<EmailAddress>({move(to)}), move(from),
+                move(replacementRules));
 }
 
-void nawa::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
-                                   std::shared_ptr<EmailAddress> from, std::shared_ptr<ReplacementRules> replacementRules) {
+void SmtpMailer::bulkEnqueue(shared_ptr<Email> email, vector<EmailAddress> recipients,
+                             shared_ptr<EmailAddress> from, shared_ptr<ReplacementRules> replacementRules) {
     addMissingHeaders(email, from);
-    queue.push_back(QueueElem{.email=std::move(email), .from=std::move(from), .recipients=std::move(recipients),
-            .replacementRules=std::move(replacementRules)});
+    queue.push_back(QueueElem{.email=move(email), .from=move(from), .recipients=move(recipients),
+            .replacementRules=move(replacementRules)});
 }
 
-void nawa::SmtpMailer::clearQueue() {
+void SmtpMailer::clearQueue() {
     queue.clear();
 }
 
-void nawa::SmtpMailer::processQueue() const {
+void SmtpMailer::processQueue() const {
     CURL *curl;
     CURLcode res = CURLE_OK;
 
@@ -118,7 +121,7 @@ void nawa::SmtpMailer::processQueue() const {
 
         // build URL for curl
         {
-            std::stringstream curlUrl;
+            stringstream curlUrl;
             if (tlsMode == TlsMode::SMTPS) {
                 curlUrl << "smtps://";
             } else {
@@ -160,7 +163,7 @@ void nawa::SmtpMailer::processQueue() const {
             curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
 
             // specify how to read the mail data
-            std::string payload = mail.email->getRaw(mail.replacementRules);
+            string payload = mail.email->getRaw(mail.replacementRules);
             // fmemopen will create a FILE* to read from the string (curl expects that, unfortunately)
             FILE *payloadFile = fmemopen((void *) payload.c_str(), payload.length(), "r");
             curl_easy_setopt(curl, CURLOPT_READDATA, (void *) payloadFile);
@@ -177,7 +180,7 @@ void nawa::SmtpMailer::processQueue() const {
             if (res != CURLE_OK) {
                 curl_easy_cleanup(curl);
                 throw UserException("nawa::SmtpMailer::processQueue()", 1,
-                                    std::string("CURL error: ") + curl_easy_strerror(res));
+                                    string("CURL error: ") + curl_easy_strerror(res));
             }
 
         }

@@ -30,8 +30,11 @@
 #include <nawa/Connection.h>
 #include <nawa/UserException.h>
 
+using namespace nawa;
+using namespace std;
+
 namespace {
-    const std::unordered_map<unsigned int, std::string> httpStatusCodes = {
+    const unordered_map<unsigned int, string> httpStatusCodes = {
             {200, "OK"},
             {201, "Created"},
             {202, "Accepted"},
@@ -92,21 +95,21 @@ namespace {
     };
 }
 
-void nawa::Connection::setBody(std::string content) {
-    bodyString = std::move(content);
+void Connection::setBody(string content) {
+    bodyString = move(content);
     clearStream();
 }
 
 void
-nawa::Connection::sendFile(const std::string &path, const std::string &contentType, bool forceDownload,
-                           const std::string &downloadFilename, bool checkIfModifiedSince) {
+Connection::sendFile(const string &path, const string &contentType, bool forceDownload,
+                           const string &downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
-    std::ifstream f(path, std::ifstream::binary);
+    ifstream f(path, ifstream::binary);
 
     // throw exception if file cannot be opened
     if (!f) {
-        throw nawa::UserException("nawa::Connection::sendFile", 1, "Cannot open file for reading");
+        throw UserException("nawa::Connection::sendFile", 1, "Cannot open file for reading");
     }
 
     // get time of last modification
@@ -119,9 +122,9 @@ nawa::Connection::sendFile(const std::string &path, const std::string &contentTy
     // check if-modified if requested
     // TODO make ifModifiedSince available without converting it back and forth (universal? or not before v2?)
     // TODO implement other cache control headers, such as pragma, expires, ...
-    if (checkIfModifiedSince && std::stoul(request.env["ifModifiedSince"]) >= lastModified) {
+    if (checkIfModifiedSince && stoul(request.env["ifModifiedSince"]) >= lastModified) {
         setStatus(304);
-        setBody(std::string());
+        setBody(string());
         return;
     }
 
@@ -130,34 +133,34 @@ nawa::Connection::sendFile(const std::string &path, const std::string &contentTy
         setHeader("content-type", contentType);
     } else {
         // use the function from utils.h to guess the content type
-        setHeader("content-type", nawa::content_type_by_extension(nawa::get_file_extension(path)));
+        setHeader("content-type", content_type_by_extension(get_file_extension(path)));
     }
 
     // set the content-disposition header
     if (forceDownload) {
         if (!downloadFilename.empty()) {
-            std::stringstream hval;
+            stringstream hval;
             hval << "attachment; filename=\"" << downloadFilename << '"';
             setHeader("content-disposition", hval.str());
         } else {
             setHeader("content-disposition", "attachment");
         }
     } else if (!downloadFilename.empty()) {
-        std::stringstream hval;
+        stringstream hval;
         hval << "inline; filename=\"" << downloadFilename << '"';
         setHeader("content-disposition", hval.str());
     }
 
     // set the content-length header
     // get file size
-    f.seekg(0, std::ios::end);
+    f.seekg(0, ios::end);
     long fs = f.tellg();
     f.seekg(0);
-    setHeader("content-length", std::to_string(fs));
+    setHeader("content-length", to_string(fs));
 
     // set the last-modified header (if possible)
     if (lastModified > 0) {
-        setHeader("last-modified", nawa::make_http_time(lastModified));
+        setHeader("last-modified", make_http_time(lastModified));
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
@@ -169,22 +172,22 @@ nawa::Connection::sendFile(const std::string &path, const std::string &contentTy
     clearStream();
 }
 
-void nawa::Connection::setHeader(std::string key, std::string value) {
+void Connection::setHeader(string key, string value) {
     // convert to lowercase
     // TODO check for correctness, maybe using regex (or waste of cpu time?)
-    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-    headers[key] = std::move(value);
+    transform(key.begin(), key.end(), key.begin(), ::tolower);
+    headers[key] = move(value);
 }
 
-void nawa::Connection::unsetHeader(std::string key) {
+void Connection::unsetHeader(string key) {
     // convert to lowercase
-    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers.erase(key);
 }
 
-std::string nawa::Connection::getRaw() {
+string Connection::getRaw() {
     mergeStream();
-    std::stringstream raw;
+    stringstream raw;
 
     // include headers and cookies, but only when flushing for the first time
     if (!isFlushed) {
@@ -196,19 +199,19 @@ std::string nawa::Connection::getRaw() {
         for (auto const &e: cookies) {
             raw << "Set-Cookie: " << e.first << "=" << e.second.content;
             // Domain option
-            const std::string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
+            const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
             if (!domain.empty()) {
                 raw << "; Domain=" << domain;
             }
             // Path option
-            const std::string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
+            const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
             if (!path.empty()) {
                 raw << "; Path=" << path;
             }
             // Expires option
             time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
             if (expiry > 0) {
-                raw << "; Expires=" << nawa::make_http_time(expiry);
+                raw << "; Expires=" << make_http_time(expiry);
             }
             // Max-Age option
             unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
@@ -240,17 +243,17 @@ std::string nawa::Connection::getRaw() {
     return raw.str();
 }
 
-void nawa::Connection::mergeStream() {
+void Connection::mergeStream() {
     bodyString += response.str();
     clearStream();
 }
 
-void nawa::Connection::clearStream() {
-    response.str(std::string());
+void Connection::clearStream() {
+    response.str(string());
     response.clear();
 }
 
-nawa::Connection::Connection(const ConnectionInitContainer &connectionInit)
+Connection::Connection(const ConnectionInitContainer &connectionInit)
         : flushCallback(connectionInit.flushCallback),
           request(connectionInit.requestInit),
           config(connectionInit.config),
@@ -263,25 +266,25 @@ nawa::Connection::Connection(const ConnectionInitContainer &connectionInit)
     }
 }
 
-void nawa::Connection::setCookie(const std::string &key, nawa::Cookie cookie) {
+void Connection::setCookie(const string &key, Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
-    std::regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
-    std::regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
-    if (!std::regex_match(key, matchKey) || !std::regex_match(cookie.content, matchContent)) {
+    regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
+    regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
+    if (!regex_match(key, matchKey) || !regex_match(cookie.content, matchContent)) {
         throw UserException("nawa::Connection::setCookie", 1, "Invalid characters in key or value");
     }
-    cookies[key] = std::move(cookie);
+    cookies[key] = move(cookie);
 }
 
-void nawa::Connection::setCookie(const std::string &key, std::string cookieContent) {
-    setCookie(key, nawa::Cookie(std::move(cookieContent)));
+void Connection::setCookie(const string &key, string cookieContent) {
+    setCookie(key, Cookie(move(cookieContent)));
 }
 
-void nawa::Connection::unsetCookie(const std::string &key) {
+void Connection::unsetCookie(const string &key) {
     cookies.erase(key);
 }
 
-void nawa::Connection::flushResponse() {
+void Connection::flushResponse() {
     // use callback to flush response
     flushCallback(getRaw());
     // now that headers and cookies have been sent to the client, make sure they are not included anymore
@@ -290,8 +293,8 @@ void nawa::Connection::flushResponse() {
     setBody("");
 }
 
-void nawa::Connection::setStatus(unsigned int status) {
-    std::stringstream hval;
+void Connection::setStatus(unsigned int status) {
+    stringstream hval;
     hval << status;
     if (httpStatusCodes.count(status) == 1) {
         hval << " " << httpStatusCodes.at(status);
@@ -299,6 +302,6 @@ void nawa::Connection::setStatus(unsigned int status) {
     headers["status"] = hval.str();
 }
 
-void nawa::Connection::setCookiePolicy(Cookie policy) {
-    cookiePolicy = std::move(policy);
+void Connection::setCookiePolicy(Cookie policy) {
+    cookiePolicy = move(policy);
 }

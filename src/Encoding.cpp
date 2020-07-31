@@ -543,7 +543,7 @@ namespace {
 
 }
 
-string nawa::Encoding::htmlEncode(string input, bool encodeAll) {
+string Encoding::htmlEncode(string input, bool encodeAll) {
     if (!encodeAll) {
         boost::replace_all(input, "&", "&amp;");
         boost::replace_all(input, "\"", "&quot;");
@@ -595,7 +595,7 @@ string nawa::Encoding::htmlEncode(string input, bool encodeAll) {
     return input;
 }
 
-string nawa::Encoding::htmlDecode(string input) {
+string Encoding::htmlDecode(string input) {
 
     if (htmlDecodeTable.empty()) initializeHtmlDecodeTable();
 
@@ -647,7 +647,7 @@ string nawa::Encoding::htmlDecode(string input) {
     return input;
 }
 
-string nawa::Encoding::urlEncode(const string &input) {
+string Encoding::urlEncode(const string &input) {
     stringstream out;
 
     // check if character is valid, unreserved URL character, otherwise apply url encoding
@@ -665,7 +665,7 @@ string nawa::Encoding::urlEncode(const string &input) {
     return out.str();
 }
 
-string nawa::Encoding::urlDecode(string input) {
+string Encoding::urlDecode(string input) {
     // match url codes by regex
     regex matchCode(R"(%([0-9A-F]{2}))");
 
@@ -679,7 +679,7 @@ string nawa::Encoding::urlDecode(string input) {
     return input;
 }
 
-bool nawa::Encoding::isBase64(const string &input, bool allowWhitespaces) {
+bool Encoding::isBase64(const string &input, bool allowWhitespaces) {
     regex rgx;
     if (allowWhitespaces) {
         rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
@@ -690,17 +690,17 @@ bool nawa::Encoding::isBase64(const string &input, bool allowWhitespaces) {
 }
 
 string
-nawa::Encoding::base64Encode(const string &input, size_t breakAfter, const string &breakSequence) {
+Encoding::base64Encode(const string &input, size_t breakAfter, const string &breakSequence) {
     return base64_encode(reinterpret_cast<const unsigned char *>(input.c_str()), input.length(), breakAfter,
                          breakSequence);
 }
 
-string nawa::Encoding::base64Decode(const string &input) {
+string Encoding::base64Decode(const string &input) {
     return base64_decode(input);
 }
 
-string nawa::Encoding::quotedPrintableEncode(const string &input, const string &lineEnding,
-                                                  bool replaceCrlf, bool qEncoding) {
+string Encoding::quotedPrintableEncode(const string &input, const string &lineEnding,
+                                       bool replaceCrlf, bool qEncoding) {
     stringstream ret;
     int lineCount = 0;
     for (const char c: input) {
@@ -724,14 +724,14 @@ string nawa::Encoding::quotedPrintableEncode(const string &input, const string &
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
-            ret << "=" << nawa::to_uppercase(nawa::hex_dump(string(1, c)));
+            ret << "=" << to_uppercase(hex_dump(string(1, c)));
             lineCount += 3;
         }
     }
     return ret.str();
 }
 
-string nawa::Encoding::quotedPrintableDecode(string input) {
+string Encoding::quotedPrintableDecode(string input) {
     regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function
@@ -745,7 +745,7 @@ string nawa::Encoding::quotedPrintableDecode(string input) {
     return input;
 }
 
-string nawa::Encoding::makeEncodedWord(const string &input, bool base64, bool onlyIfNecessary) {
+string Encoding::makeEncodedWord(const string &input, bool base64, bool onlyIfNecessary) {
     stringstream ret;
     ret << "=?utf-8?";
     if (base64) {

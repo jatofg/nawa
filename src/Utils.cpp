@@ -27,8 +27,11 @@
 #include <fstream>
 #include <nawa/UserException.h>
 
+using namespace nawa;
+using namespace std;
+
 namespace {
-    std::unordered_map<std::string, std::string> contentTypeMap = {
+    unordered_map<string, string> contentTypeMap = {
             {"aac",   "audio/aac"},
             {"arc",   "application/x-freearc"},
             {"avi",   "video/x-msvideo"},
@@ -121,8 +124,8 @@ namespace {
      * but ideally, it should never have to update the locale. The app should not update the locale itself.
      */
 //    inline void resetLocale() {
-//        if(std::locale() != std::locale::classic()) {
-//            std::locale::global(std::locale::classic());
+//        if(locale() != locale::classic()) {
+//            locale::global(locale::classic());
 //        }
 //    }
 
@@ -132,8 +135,8 @@ namespace {
      * @param dow Day of week, range [0-6], where 0 is Sun and 6 is Sat.
      * @return Abbreviated weekday string representation.
      */
-    inline std::string getDayOfWeek(int dow) {
-        std::string ret;
+    inline string getDayOfWeek(int dow) {
+        string ret;
         switch (dow) {
             case 0:
                 ret = "Sun";
@@ -168,8 +171,8 @@ namespace {
      * @param mon Months since January (range [0-11]).
      * @return String representation.
      */
-    inline std::string getMonth(int mon) {
-        std::string ret;
+    inline string getMonth(int mon) {
+        string ret;
         switch (mon) {
             case 0:
                 ret = "Jan";
@@ -216,22 +219,22 @@ namespace {
 }
 
 void
-nawa::regex_replace_callback(std::string &s, const std::regex &rgx,
-                             std::function<std::string(const std::vector<std::string> &)> fmt) {
+nawa::regex_replace_callback(string &s, const regex &rgx,
+                             function<string(const vector<string> &)> fmt) {
     // how many submatches do we have to deal with?
     int marks = rgx.mark_count();
     // we want to iterate through all submatches (to collect them in a vector passed to fmt())
-    std::vector<int> submatchList;
+    vector<int> submatchList;
     for (int i = -1; i <= marks; ++i) {
         submatchList.push_back(i);
     }
 
-    std::sregex_token_iterator begin(s.begin(), s.end(), rgx, submatchList), end;
-    std::stringstream out;
+    sregex_token_iterator begin(s.begin(), s.end(), rgx, submatchList), end;
+    stringstream out;
 
     // prefixes and submatches (should) alternate
     int submatch = -1;
-    std::vector<std::string> submatchVector;
+    vector<string> submatchVector;
     for (auto it = begin; it != end; ++it) {
         if (submatch == -1) {
             out << it->str();
@@ -250,28 +253,28 @@ nawa::regex_replace_callback(std::string &s, const std::regex &rgx,
     s = out.str();
 }
 
-std::string nawa::hex_dump(const std::string &in) {
-    std::stringstream rets;
-    rets << std::hex << std::setfill('0');
+string nawa::hex_dump(const string &in) {
+    stringstream rets;
+    rets << hex << setfill('0');
     for (char c: in) {
-        rets << std::setw(2) << (int) (unsigned char) c;
+        rets << setw(2) << (int) (unsigned char) c;
     }
     return rets.str();
 }
 
-std::string nawa::to_lowercase(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+string nawa::to_lowercase(string s) {
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;
 }
 
-std::string nawa::to_uppercase(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+string nawa::to_uppercase(string s) {
+    transform(s.begin(), s.end(), s.begin(), ::toupper);
     return s;
 }
 
-std::string nawa::generate_error_page(unsigned int httpStatus) {
-    std::string errorStr;
-    std::string explanation;
+string nawa::generate_error_page(unsigned int httpStatus) {
+    string errorStr;
+    string explanation;
     switch (httpStatus) {
         case 400:
             errorStr = "Bad Request";
@@ -340,73 +343,73 @@ std::string nawa::generate_error_page(unsigned int httpStatus) {
             errorStr = "Unknown Error";
     }
 
-    std::stringstream ep;
+    stringstream ep;
     ep << "<!DOCTYPE html><html><head><title>" << httpStatus << ' ' << errorStr << "</title></head><body><h1>"
        << errorStr << "</h1><p>" << explanation << "</p></body></html>";
 
     return ep.str();
 }
 
-std::string nawa::get_file_extension(const std::string &filename) {
+string nawa::get_file_extension(const string &filename) {
     try {
         return filename.substr(filename.find_last_of('.') + 1);
     }
-    catch (std::out_of_range &) {}
+    catch (out_of_range &) {}
 
-    return std::string();
+    return string();
 }
 
-std::string nawa::content_type_by_extension(std::string extension) {
-    auto ext = to_lowercase(std::move(extension));
+string nawa::content_type_by_extension(string extension) {
+    auto ext = to_lowercase(move(extension));
     if (contentTypeMap.count(ext) == 1) {
         return contentTypeMap.at(ext);
     }
     return "application/octet-stream";
 }
 
-std::string nawa::make_http_time(time_t time1) {
-    std::stringstream httpTime;
+string nawa::make_http_time(time_t time1) {
+    stringstream httpTime;
     tm gmt;
     gmtime_r(&time1, &gmt);
-    httpTime << getDayOfWeek(gmt.tm_wday) << std::put_time(&gmt, ", %d ") << getMonth(gmt.tm_mon);
-    httpTime << std::put_time(&gmt, " %Y %H:%M:%S GMT");
+    httpTime << getDayOfWeek(gmt.tm_wday) << put_time(&gmt, ", %d ") << getMonth(gmt.tm_mon);
+    httpTime << put_time(&gmt, " %Y %H:%M:%S GMT");
 
     return httpTime.str();
 }
 
-time_t nawa::read_http_time(const std::string &httpTime) {
-    std::istringstream timeStream(httpTime);
+time_t nawa::read_http_time(const string &httpTime) {
+    istringstream timeStream(httpTime);
     tm timeStruct;
-    timeStream >> std::get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
+    timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
 
     // timegm will interpret the tm as UTC and convert it to a time_t
     return timegm(&timeStruct);
 }
 
-std::string nawa::make_smtp_time(time_t time1) {
-    std::stringstream smtpTime;
+string nawa::make_smtp_time(time_t time1) {
+    stringstream smtpTime;
     tm ltime;
     localtime_r(&time1, &ltime);
-    smtpTime << getDayOfWeek(ltime.tm_wday) << std::put_time(&ltime, ", %e ") << getMonth(ltime.tm_mon);
-    smtpTime << std::put_time(&ltime, " %Y %H:%M:%S %z");
+    smtpTime << getDayOfWeek(ltime.tm_wday) << put_time(&ltime, ", %e ") << getMonth(ltime.tm_mon);
+    smtpTime << put_time(&ltime, " %Y %H:%M:%S %z");
 
     return smtpTime.str();
 }
 
-time_t nawa::read_smtp_time(const std::string &smtpTime) {
-    std::string smtpTimeM = smtpTime;
+time_t nawa::read_smtp_time(const string &smtpTime) {
+    string smtpTimeM = smtpTime;
     tm timeStruct;
 
     // there seems to be a bug in get_time, %e parsing with leading space does not work, so this fails for
     // days of month < 10:
-    //timeStream >> std::get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
+    //timeStream >> get_time(&timeStruct, "%a, %e %b %Y %H:%M:%S %z");
 
     // dirty hack
     if (smtpTimeM.length() > 5 && smtpTimeM[5] == ' ') {
         smtpTimeM[5] = '0';
     }
-    std::istringstream timeStream(smtpTimeM);
-    timeStream >> std::get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S %z");
+    istringstream timeStream(smtpTimeM);
+    timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S %z");
 
     // timegm will create a time_t, but does not honor the time zone, unfortunately (not part of tm)
     time_t unixTime = timegm(&timeStruct);
@@ -414,8 +417,8 @@ time_t nawa::read_smtp_time(const std::string &smtpTime) {
     // so we'll have to add/subtract the difference manually
     if (smtpTimeM.length() > 30) {
         int tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
-        int tzH = std::stoi(smtpTimeM.substr(27, 2));
-        int tzM = std::stoi(smtpTimeM.substr(29, 2));
+        int tzH = stoi(smtpTimeM.substr(27, 2));
+        int tzM = stoi(smtpTimeM.substr(29, 2));
         unixTime += tzAdjust * (tzH * 3600 + tzM * 60);
     }
 
@@ -423,8 +426,8 @@ time_t nawa::read_smtp_time(const std::string &smtpTime) {
     return unixTime;
 }
 
-std::vector<std::string> nawa::split_string(std::string str, char delimiter, bool ignoreEmpty) {
-    std::vector<std::string> ret;
+vector<string> nawa::split_string(string str, char delimiter, bool ignoreEmpty) {
+    vector<string> ret;
     for (size_t pos = 0; !str.empty();) {
         pos = str.find_first_of(delimiter);
         auto token = str.substr(0, pos);
@@ -440,25 +443,25 @@ std::vector<std::string> nawa::split_string(std::string str, char delimiter, boo
     return ret;
 }
 
-std::string nawa::merge_path(const std::vector<std::string> &path) {
+string nawa::merge_path(const vector<string> &path) {
     if (path.empty()) {
         return "/";
     }
-    std::stringstream stringPath;
+    stringstream stringPath;
     for (auto const &e: path) {
         stringPath << '/' << e;
     }
     return stringPath.str();
 }
 
-std::vector<std::string> nawa::split_path(const std::string &pathString) {
+vector<string> nawa::split_path(const string &pathString) {
     // remove query string
-    std::string rawPath = pathString.substr(0, pathString.find('?'));
+    string rawPath = pathString.substr(0, pathString.find('?'));
     return split_string(rawPath, '/', true);
 }
 
-std::string nawa::convert_line_endings(const std::string &in, const std::string &ending) {
-    std::stringstream ret;
+string nawa::convert_line_endings(const string &in, const string &ending) {
+    stringstream ret;
     for (const auto &c: in) {
         if (c == '\n') ret << ending;
         else if (c != '\r') ret << c;
@@ -466,30 +469,30 @@ std::string nawa::convert_line_endings(const std::string &in, const std::string 
     return ret.str();
 }
 
-std::string nawa::get_file_contents(const std::string &path) {
+string nawa::get_file_contents(const string &path) {
     // open file as binary
-    std::ifstream f(path, std::ifstream::binary);
+    ifstream f(path, ifstream::binary);
 
     // throw exception if file cannot be opened
     if (!f) {
-        throw nawa::UserException("nawa::Utils::file_get_contents", 1, "Cannot open file for reading");
+        throw UserException("nawa::Utils::file_get_contents", 1, "Cannot open file for reading");
     }
 
     // get file size
-    f.seekg(0, std::ios::end);
+    f.seekg(0, ios::end);
     long fs = f.tellg();
     f.seekg(0);
 
     // load to string
-    std::string ret(static_cast<unsigned long>(fs), '\0');
+    string ret(static_cast<unsigned long>(fs), '\0');
     f.read(&ret[0], fs);
 
     return ret;
 }
 
-std::string nawa::string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns) {
+string nawa::string_replace(string input, const unordered_map<string, string> &patterns) {
     for (const auto &pattern: patterns) {
-        for (size_t pos = input.find(pattern.first); pos != std::string::npos;) {
+        for (size_t pos = input.find(pattern.first); pos != string::npos;) {
             input.replace(pos, pattern.first.length(), pattern.second);
             pos = input.find(pattern.first, pos + pattern.second.length());
         }

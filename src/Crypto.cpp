@@ -27,7 +27,10 @@
 #include <openssl/sha.h>
 #include <openssl/md5.h>
 
-std::string nawa::Crypto::sha1(const std::string &input, bool hex) {
+using namespace nawa;
+using namespace std;
+
+std::string Crypto::sha1(const std::string &input, bool hex) {
     auto sha1Base = (const unsigned char *) input.c_str();
     unsigned char sha1Hash[SHA_DIGEST_LENGTH];
     size_t sha1Size = input.size();
@@ -39,7 +42,7 @@ std::string nawa::Crypto::sha1(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string nawa::Crypto::sha224(const std::string &input, bool hex) {
+std::string Crypto::sha224(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA224_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -51,7 +54,7 @@ std::string nawa::Crypto::sha224(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string nawa::Crypto::sha256(const std::string &input, bool hex) {
+std::string Crypto::sha256(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA256_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -63,7 +66,7 @@ std::string nawa::Crypto::sha256(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string nawa::Crypto::sha384(const std::string &input, bool hex) {
+std::string Crypto::sha384(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA384_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -75,7 +78,7 @@ std::string nawa::Crypto::sha384(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string nawa::Crypto::sha512(const std::string &input, bool hex) {
+std::string Crypto::sha512(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA512_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -87,7 +90,7 @@ std::string nawa::Crypto::sha512(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string nawa::Crypto::md5(const std::string &input, bool hex) {
+std::string Crypto::md5(const std::string &input, bool hex) {
     auto md5Base = (const unsigned char *) input.c_str();
     unsigned char md5Hash[MD5_DIGEST_LENGTH];
     size_t md5Size = input.size();
@@ -99,12 +102,12 @@ std::string nawa::Crypto::md5(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string nawa::Crypto::passwordHash(const std::string &password, const Engines::HashingEngine &hashingEngine) {
+std::string Crypto::passwordHash(const std::string &password, const Engines::HashingEngine &hashingEngine) {
     // use the provided HashingEngine for generation
     return hashingEngine.generateHash(password);
 }
 
-bool nawa::Crypto::passwordVerify(const std::string &password, const std::string &hash,
+bool Crypto::passwordVerify(const std::string &password, const std::string &hash,
                                   const Engines::HashTypeTable &hashTypeTable) {
     if (hash.empty()) {
         throw UserException("nawa::Crypto::passwordVerify", 1, "Cannot verify an empty hash");

@@ -26,19 +26,22 @@
 #include <cstring>
 #include "../libs/libbcrypt/bcrypt.h"
 
-nawa::Engines::BcryptHashingEngine::BcryptHashingEngine(int workFactor, std::string _salt) : workFactor(workFactor) {
-    salt = std::move(_salt);
+using namespace nawa;
+using namespace std;
+
+Engines::BcryptHashingEngine::BcryptHashingEngine(int workFactor, string _salt) : workFactor(workFactor) {
+    salt = move(_salt);
 }
 
-std::string nawa::Engines::BcryptHashingEngine::generateHash(std::string input) const {
+string Engines::BcryptHashingEngine::generateHash(string input) const {
     char bcsalt[BCRYPT_HASHSIZE];
     char hash[BCRYPT_HASHSIZE];
 
     // use the user-defined salt if necessary
     if (!salt.empty()) {
-        std::string salt_res = salt;
+        string salt_res = salt;
         salt_res.resize(BCRYPT_HASHSIZE, '\0');
-        std::memcpy(hash, salt_res.c_str(), BCRYPT_HASHSIZE);
+        memcpy(hash, salt_res.c_str(), BCRYPT_HASHSIZE);
     } else if (bcrypt_gensalt(workFactor, bcsalt) != 0) {
         throw UserException("nawa::Engines::BcryptHashingEngine::generateHash", 10,
                             "Could not generate a salt (unknown bcrypt failure).");
@@ -48,10 +51,10 @@ std::string nawa::Engines::BcryptHashingEngine::generateHash(std::string input) 
         throw UserException("nawa::Engines::BcryptHashingEngine::generateHash", 11,
                             "Could not hash this password (unknown bcrypt failure).");
     }
-    return std::string(hash, 60);
+    return string(hash, 60);
 }
 
-bool nawa::Engines::BcryptHashingEngine::verifyHash(std::string input, std::string hash) const {
+bool Engines::BcryptHashingEngine::verifyHash(string input, string hash) const {
     // return value of bcrypt_checkpw is -1 on failure, 0 on match, and >0 if not matching
     int ret = bcrypt_checkpw(input.c_str(), hash.c_str());
     return ret == 0;
