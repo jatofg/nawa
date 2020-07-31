@@ -69,17 +69,6 @@ namespace nawa {
         std::shared_ptr<SessionData> currentData;
         std::string currentID; /**< The current session ID. */
         std::string cookieName; /**< Name of the session cookie, as determined by start(). */
-        /**
-         * Generate a random, 40 chars session ID.
-         * @return The session ID.
-         */
-        std::string generateID();
-
-        /**
-         * Garbage collection by removing every expired session from the data map.
-         * Would be best if run async and in fixed intervals (or with 0.xx chance on certain session actions -> see php)
-         */
-        static void collectGarbage();
 
         /**
          * Reset the data map to delete all session data. This function is not thread-safe and should be used only

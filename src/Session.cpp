@@ -36,25 +36,51 @@ namespace {
     * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
     */
     unordered_map<string, shared_ptr<SessionData>> sessionData;
+
+    /**
+     * Generate a random, 40 chars session ID.
+     * @param remoteAddress Remote address, which will be part of the random input.
+     * @return The session ID.
+     */
+    string generateID(const string &remoteAddress) {
+        stringstream base;
+
+        // Add 2 ints from random_device (should be in fact /dev/urandom), giving us (in general) 64 bits of entropy
+        random_device rd;
+        base << rd() << rd();
+
+        // Add client IP
+        base << remoteAddress;
+
+        // Calculate and return hex-formatted SHA1
+        return Crypto::sha1(base.str(), true);
+    }
+
+    /**
+     * Garbage collection by removing every expired session from the data map.
+     * Would be best if run async and in fixed intervals (or with 0.xx chance on certain session actions -> see php)
+     */
+    void collectGarbage() {
+        lock_guard<mutex> lockGuard(gLock);
+        // no increment in for statement as we want to remove elements
+        for (auto it = sessionData.cbegin(); it != sessionData.cend();) {
+            bool toDelete = false;
+            {
+                lock_guard<mutex> eGuard(it->second->eLock);
+                toDelete = (it->second->expires < time(nullptr));
+            }
+            if (toDelete) {
+                it = sessionData.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
 }
 
 Session::Session(Connection &connection) : connection(connection) {
     // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
     // thus, it will be triggered by the Connection constructor
-}
-
-string Session::generateID() {
-    stringstream base;
-
-    // Add 2 ints from random_device (should be in fact /dev/urandom), giving us (in general) 64 bits of entropy
-    random_device rd;
-    base << rd() << rd();
-
-    // Add client IP
-    base << connection.request.env["remoteAddress"];
-
-    // Calculate and return hex-formatted SHA1
-    return Crypto::sha1(base.str(), true);
 }
 
 void Session::start(Cookie properties) {
@@ -122,7 +148,7 @@ void Session::start(Cookie properties) {
         // generate new session ID string (and check for duplicate - should not really occur)
         lock_guard<mutex> lockGuard(gLock);
         do {
-            sessionCookieStr = generateID();
+            sessionCookieStr = generateID(connection.request.env["remoteAddress"]);
         } while (sessionData.count(sessionCookieStr) > 0);
         currentData = make_shared<SessionData>(connection.request.env["remoteAddr"]);
         currentData->expires = time(nullptr) + sessionKeepalive;
@@ -217,23 +243,6 @@ void Session::unset(const string &key) {
     }
     lock_guard<mutex> lockGuard(currentData->dLock);
     currentData->data.erase(key);
-}
-
-void Session::collectGarbage() {
-    lock_guard<mutex> lockGuard(gLock);
-    // no increment in for statement as we want to remove elements
-    for (auto it = sessionData.cbegin(); it != sessionData.cend();) {
-        bool toDelete = false;
-        {
-            lock_guard<mutex> eGuard(it->second->eLock);
-            toDelete = (it->second->expires < time(nullptr));
-        }
-        if (toDelete) {
-            it = sessionData.erase(it);
-        } else {
-            ++it;
-        }
-    }
 }
 
 void Session::destroy() {
