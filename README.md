@@ -12,14 +12,12 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-- 2020-07-18: Version is now v0.3 due to the move from `nawa::Any` to 
-`std::any`. C++17 is now required. The v0.2 tag points to the latest version 
-compatible with C++14.
-- 2019-11-23: Version is now v0.2 after a lot of API-breaking changes
-- 2019-11-22: [Sessions](https://www.tobiasflaig.eu/nawa/docs/sessionsmanual.html), 
-[Environment](https://www.tobiasflaig.eu/nawa/docs/environmentmanual.html), 
-and [Filters](https://www.tobiasflaig.eu/nawa/docs/filtersmanual.html) 
-manuals are now complete
+2020-07-31: v0.5 is now available! Apart from various bug fixes, it uses an entirely 
+new, modular request handler which paves the way for planned new features 
+(direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
+request handling functions). Building and development is now easier, as the FastCGI 
+library does not need to be built separately anymore, and its headers are not required 
+anymore for app development. CMake 3.11 is now required.
 
 ## Example
 
@@ -42,19 +40,20 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction in the manual.](https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html) 
 
 ### Warning!
 
-This project is still in an early state (version 0.3!). It might, of 
-course, still contain serious bugs. Use it on your own risk. Using the 
-Docker container (or a VM) is recommended.
+This project is still in an early state (version 0.5!). It might, of 
+course, still contain bugs. Use it on your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
 might reach a higher version number at some point :)
 
 Also, the ABI and API can still change at any time, making 
-modifications to your apps (or, at least, recompilation) necessary.
+modifications to your apps (or, at least, recompilation) necessary. When such 
+changes happen, the version number will be increased, so that NAWA will refuse to 
+load apps compiled against an older version.
 
 ## Features (selection)
 
@@ -123,11 +122,12 @@ the package page to pull the image.
 
 ## Building
 
-NAWA has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
+NAWA has been tested on Linux only so far, but it might also run on BSD derivates 
+and macOS. 
 Windows is not supported and will never be.
 
 **Please note:** All commands in the following instructions should be 
-run as an unprivileged user. Commands that must run as root are 
+run as an unprivileged user. Commands which must run as root are 
 prepended with `sudo`.
 
 ### Requirements
@@ -146,13 +146,6 @@ are required, too.
 
 For building the docs, doxygen must be installed. However, you can also 
 [access the docs online](https://www.tobiasflaig.eu/nawa/docs/).
-
-### Clone, build, and install fastcgi++
-
-Installing fastcgi++ manually is not necessary anymore. A modified and reduced 
-variant [fcgilite](https://github.com/jatofg/fastcgipp) is automatically downloaded 
-while configuring your project using `cmake` (see below). If your IDE supports CMake, 
-the fastcgi++ headers should be recognized automatically.
 
 ### Clone, build, and install NAWA
 
@@ -193,7 +186,7 @@ In the build directory, run:
 
 ## Binary packages
 
-Binary packages for Debian and Ubuntu might be provided in the future, 
+Binary packages for Debian and Ubuntu might be provided in future, 
 as soon as this project reaches a more stable state. Currently, there 
 are not even releases available.
 
