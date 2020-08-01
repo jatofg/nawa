@@ -60,9 +60,7 @@ void shutdown(int signum) {
 
     // terminate worker threads
     if(requestHandlerPtr) {
-        // should unblock managerPtr->join() and execute the rest of the program
-        // (in fact it doesn't, but at least new connections should not be accepted anymore)
-        // TODO find the bug or reason for this behavior in libfastcgi++
+        // should stop
         requestHandlerPtr->stop();
 
         // this normally doesn't work, so try harder
@@ -241,11 +239,15 @@ int main(int argc, char** argv) {
         requestHandlerPtr->setConfig(appInit1.config);
     }
 
-    requestHandlerPtr->start();
+    try {
+        requestHandlerPtr->start();
+    } catch (const UserException &e) {
+        LOG(string("Fatal error: ") + e.what());
+    }
+
     requestHandlerPtr->join();
 
-    // explicitly destroy AppInit and clear session data to avoid a segfault
-    //RequestHandlerLegacy::destroyEverything();
+    // if segfaults occur during shutdown in certain situations, it might be necessary to call Session::destroy.
 
     dlclose(appOpen);
     exit(0);

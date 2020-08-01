@@ -313,23 +313,30 @@ FastcgiRequestHandler::~FastcgiRequestHandler() = default;
 
 void FastcgiRequestHandler::start() {
     if (fastcgippManager && fastcgippManager->manager) {
-        fastcgippManager->manager->start();
+        try {
+            fastcgippManager->manager->start();
+        } catch (...) {
+            throw UserException("nawa::FastcgiRequestHandler::start", 1,
+                                "An unknown error occurred during start of request handling.");
+        }
+    } else {
+        throw UserException("nawa::FastcgiRequestHandler::start", 2, "FastCGI manager is not available.");
     }
 }
 
-void FastcgiRequestHandler::stop() {
+void FastcgiRequestHandler::stop() noexcept {
     if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->stop();
     }
 }
 
-void FastcgiRequestHandler::terminate() {
+void FastcgiRequestHandler::terminate() noexcept {
     if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->terminate();
     }
 }
 
-void FastcgiRequestHandler::join() {
+void FastcgiRequestHandler::join() noexcept {
     if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->join();
     }

@@ -43,7 +43,9 @@ namespace nawa {
 
         /**
          * Create a new request handler object according to the config. May throw a UserException on failure (passed on
-         * from the constructor of the specific request handler.
+         * from the constructor of the specific request handler). The constructor of a request handler should set up
+         * everything that's necessary already here (as the constructor is the only function of a request handler
+         * which is executed with full privileges).
          * @param handleRequestFunction The handleRequest function of the app.
          * @param config The config.
          * @param concurrency Concurrency level (number of worker threads).
@@ -56,51 +58,48 @@ namespace nawa {
          * Set the handleRequest function of the app.
          * @param handleRequestFunction The request handling function of the app.
          */
-        void setAppRequestHandler(HandleRequestFunction handleRequestFunction);
+        void setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept;
 
         /**
          * Take over the AppInit struct filled by the init() function of the app.
          * @param _appInit AppInit struct as filled by the app.
          */
-        void setAppInit(AppInit appInit);
+        void setAppInit(AppInit appInit) noexcept;
 
         /**
          * Set the config.
          * @param config The config.
          */
-        void setConfig(Config config);
+        void setConfig(Config config) noexcept;
 
         /**
-         * Clear session data
-         */
-        static void destroyEverything(); // TODO still necessary to do this in RequestHandler? find a better place!
-        /**
-         * Flush response to the browser. This function will be invoked by Connection::flushResponse().
-         * @param connection Reference to the Connection object the response will be read from.
-         */
-        //virtual void flush(nawa::Connection& connection) = 0; // TODO should instead be handled by a callback
-        /**
-         * Start request handling.
+         * Start request handling. Must not block and return immediately after request handling has started
+         * (in separate threads). May throw a UserException on failure, but ideally, all actions which could lead to
+         * errors (or preliminary checks to avoid errors) should be done in the constructor, to avoid unnecessary
+         * initialization steps.
          */
         virtual void start() = 0;
 
         /**
-         * Stop request handling.
+         * Stop request handling after current requests have been served. Must not block and return immediately after
+         * the shutdown has been initiated.
          */
-        virtual void stop() = 0;
+        virtual void stop() noexcept = 0;
 
         /**
-         * Enforce termination of request handling.
+         * Enforce termination of request handling. Must not block and return immediately after the termination of
+         * request handling has been initiated (nevertheless, the termination should only take a few milliseconds
+         * after this function has been called).
          */
-        virtual void terminate() = 0;
+        virtual void terminate() noexcept = 0;
 
         /**
-         * Block until request handling has shut down.
+         * Block until request handling has terminated. This is the only function that should block.
          */
-        virtual void join() = 0;
+        virtual void join() noexcept = 0;
 
         /**
-         * Handle request by processing the filters and calling the app's handleRequest function, if necessary
+         * Handle request by processing the filters and calling the app's handleRequest function, if necessary.
          * @param connection The current Connection object.
          */
         void handleRequest(Connection &connection);

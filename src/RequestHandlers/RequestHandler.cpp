@@ -250,20 +250,16 @@ namespace {
     }
 }
 
-void RequestHandler::setAppRequestHandler(HandleRequestFunction fn) {
+void RequestHandler::setAppRequestHandler(HandleRequestFunction fn) noexcept {
     handleRequestFunction = move(fn);
 }
 
-void RequestHandler::setAppInit(AppInit appInit_) {
+void RequestHandler::setAppInit(AppInit appInit_) noexcept {
     appInit = move(appInit_);
 }
 
-void RequestHandler::setConfig(Config config_) {
+void RequestHandler::setConfig(Config config_) noexcept {
     config = move(config_);
-}
-
-void RequestHandler::destroyEverything() {
-    Session::destroy();
 }
 
 void RequestHandler::handleRequest(Connection &connection) {

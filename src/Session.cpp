@@ -245,7 +245,7 @@ void Session::unset(const string &key) {
     currentData->data.erase(key);
 }
 
-void Session::destroy() {
+[[maybe_unused]] void Session::destroy() {
     sessionData.clear();
 }
 
@@ -258,8 +258,10 @@ void Session::invalidate() {
     currentData.reset();
 
     // erase this session from the data map
-    lock_guard<mutex> lockGuard(gLock);
-    sessionData.erase(currentID);
+    {
+        lock_guard<mutex> lockGuard(gLock);
+        sessionData.erase(currentID);
+    }
 
     // unset the session cookie, so that a new session can be started
     connection.unsetCookie(cookieName);

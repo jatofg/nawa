@@ -72,14 +72,9 @@ namespace nawa {
 
         /**
          * Reset the data map to delete all session data. This function is not thread-safe and should be used only
-         * on NAWA termination.
+         * on termination, if at all. May be removed soon.
          */
-        static void destroy();
-
-        // RequestHandler should be able to call destroy()
-        friend class RequestHandler;
-
-        friend class RequestHandlerLegacy;
+        [[maybe_unused]] static void destroy();
 
     public:
         /**

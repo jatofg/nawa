@@ -44,11 +44,11 @@ namespace nawa {
 
         void start() override;
 
-        void stop() override;
+        void stop() noexcept override;
 
-        void terminate() override;
+        void terminate() noexcept override;
 
-        void join() override;
+        void join() noexcept override;
     };
 }
 
