@@ -25,7 +25,7 @@
 #include <nawa/Utils.h>
 #include <nawa/Session.h>
 #include <nawa/Encoding.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <nawa/RequestHandlers/RequestHandler.h>
 #include <nawa/RequestHandlers/FastcgiRequestHandler.h>
 
@@ -230,7 +230,7 @@ namespace {
             try {
                 connection.sendFile(filePathStr, "", false, "", true);
             }
-            catch (UserException &) {
+            catch (Exception &) {
                 // file does not exist, send 404
                 connection.setStatus(404);
                 if (!flt.response.empty()) {

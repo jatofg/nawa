@@ -27,13 +27,12 @@
 #include <grp.h>
 #include <dlfcn.h>
 #include <csignal>
+#include <thread>
 #include <nawa/Config.h>
-#include <nawa/SysException.h>
 #include <nawa/Log.h>
 #include <nawa/Application.h>
 #include <nawa/RequestHandlers/RequestHandler.h>
-#include <thread>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 
 using namespace nawa;
 using namespace std;
@@ -112,8 +111,8 @@ int main(int argc, char** argv) {
             config.read("config.ini");
         }
     }
-    catch(SysException& e) {
-        LOG("Fatal Error: Could not read or parse the configuration file.");
+    catch(Exception& e) {
+        LOG("Fatal Error: " + e.getMessage());
         return 1;
     }
 
@@ -204,8 +203,8 @@ int main(int argc, char** argv) {
     // already here to make (socket) preparation possible before privilege downgrade
     try {
         requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, cInt);
-    } catch (const UserException& e) {
-        LOG(e.what());
+    } catch (const Exception& e) {
+        LOG("Fatal Error: " + e.getMessage());
         return 1;
     }
 
@@ -241,8 +240,8 @@ int main(int argc, char** argv) {
 
     try {
         requestHandlerPtr->start();
-    } catch (const UserException &e) {
-        LOG(string("Fatal error: ") + e.what());
+    } catch (const Exception &e) {
+        LOG("Fatal Error: " + e.getMessage());
     }
 
     requestHandlerPtr->join();

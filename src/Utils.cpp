@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <nawa/Utils.h>
 #include <fstream>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 
 using namespace nawa;
 using namespace std;
@@ -475,7 +475,7 @@ string nawa::get_file_contents(const string &path) {
 
     // throw exception if file cannot be opened
     if (!f) {
-        throw UserException("nawa::Utils::file_get_contents", 1, "Cannot open file for reading");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Cannot open file for reading");
     }
 
     // get file size

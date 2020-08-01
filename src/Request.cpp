@@ -23,7 +23,6 @@
 
 #include <nawa/Utils.h>
 #include <nawa/Request.h>
-#include <nawa/SysException.h>
 
 using namespace nawa;
 using namespace std;
@@ -46,32 +45,29 @@ vector<string> Request::Env::getRequestPath() const {
 Request::Env::Env(const RequestInitContainer &initContainer) : environment(initContainer.environment),
                                                                acceptLanguages(initContainer.acceptLanguages) {}
 
-Request::GPC::GPC(const RequestInitContainer &requestInit, Source source)
-        : source(source) {
-    switch (source) {
+Request::GPC::GPC(const RequestInitContainer &requestInit, Source source_)
+        : source(source_) {
+    switch (source_) {
         case Source::COOKIE:
-            data = requestInit.cookieVars;
+            dataMap = requestInit.cookieVars;
             break;
         case Source::POST:
-            data = requestInit.postVars;
-            break;
-        case Source::GET:
-            data = requestInit.getVars;
+            dataMap = requestInit.postVars;
             break;
         default:
-            throw SysException(__FILE__, __LINE__, "Invalid source for nawa::Request::GPC given");
+            dataMap = requestInit.getVars;
     }
 }
 
 string Request::GPC::operator[](const string &gpcVar) const {
-    auto e = data.find(gpcVar);
-    if (e != data.end()) return e->second;
+    auto e = dataMap.find(gpcVar);
+    if (e != dataMap.end()) return e->second;
     else return "";
 }
 
 vector<string> Request::GPC::getVector(const string &gpcVar) const {
     vector<string> ret;
-    auto e = data.equal_range(gpcVar);
+    auto e = dataMap.equal_range(gpcVar);
     for (auto it = e.first; it != e.second; ++it) {
         ret.push_back(it->second);
     }
@@ -79,19 +75,19 @@ vector<string> Request::GPC::getVector(const string &gpcVar) const {
 }
 
 unsigned long Request::GPC::count(const string &gpcVar) const {
-    return data.count(gpcVar);
+    return dataMap.count(gpcVar);
 }
 
 multimap<string, string> &Request::GPC::getMultimap() {
-    return data;
+    return dataMap;
 }
 
 multimap<string, string>::const_iterator Request::GPC::begin() const {
-    return data.begin();
+    return dataMap.begin();
 }
 
 multimap<string, string>::const_iterator Request::GPC::end() const {
-    return data.end();
+    return dataMap.end();
 }
 
 Request::Request(const RequestInitContainer &initContainer)

@@ -23,7 +23,7 @@
 
 #include <nawa/Crypto.h>
 #include <nawa/Utils.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <openssl/sha.h>
 #include <openssl/md5.h>
 
@@ -108,15 +108,15 @@ std::string Crypto::passwordHash(const std::string &password, const Engines::Has
 }
 
 bool Crypto::passwordVerify(const std::string &password, const std::string &hash,
-                                  const Engines::HashTypeTable &hashTypeTable) {
+                            const Engines::HashTypeTable &hashTypeTable) {
     if (hash.empty()) {
-        throw UserException("nawa::Crypto::passwordVerify", 1, "Cannot verify an empty hash");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Cannot verify an empty hash");
     }
 
     auto verifyer = hashTypeTable.getEngine(hash);
     if (verifyer.use_count() == 0) {
-        throw UserException("nawa::Crypto::passwordVerify", 2,
-                            "Could not determine a HashingEngine that is able to verify the given hash");
+        throw Exception(__PRETTY_FUNCTION__, 2,
+                        "Could not determine a HashingEngine that is able to verify the given hash");
     }
 
     return verifyer->verifyHash(password, hash);

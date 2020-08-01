@@ -25,7 +25,7 @@
 #include <nawa/Session.h>
 #include <nawa/Connection.h>
 #include <nawa/Crypto.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 
 using namespace nawa;
 using namespace std;
@@ -231,7 +231,7 @@ any Session::operator[](const string &key) const {
 
 void Session::set(string key, const any &value) {
     if (!established()) {
-        throw UserException("nawa::Session::set", 1, "Session not established.");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
     lock_guard<mutex> lockGuard(currentData->dLock);
     currentData->data[move(key)] = value;
@@ -239,7 +239,7 @@ void Session::set(string key, const any &value) {
 
 void Session::unset(const string &key) {
     if (!established()) {
-        throw UserException("nawa::Session::set", 1, "Session not established.");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
     lock_guard<mutex> lockGuard(currentData->dLock);
     currentData->data.erase(key);

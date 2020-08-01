@@ -94,7 +94,7 @@ namespace nawa {
             };
         protected:
             Source source;
-            std::multimap<std::basic_string<char>, std::basic_string<char>> data;
+            std::multimap<std::basic_string<char>, std::basic_string<char>> dataMap;
         public:
             GPC(const RequestInitContainer &requestInit, Source source);
 

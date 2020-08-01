@@ -22,7 +22,7 @@
  */
 
 #include <nawa/Config.h>
-#include <nawa/SysException.h>
+#include <nawa/Exception.h>
 #include "../libs/inih/ini.h"
 
 using namespace nawa;
@@ -48,7 +48,7 @@ void Config::read(const string &iniFile) {
         return 1;
     };
     if (ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
-        throw SysException(__FILE__, __LINE__, "Could not read config file.");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Could not read config file.");
     }
 }
 

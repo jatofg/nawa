@@ -26,7 +26,7 @@
 #include <regex>
 #include <argon2.h>
 #include <nawa/Encoding.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <nawa/Engines/Argon2HashingEngine.h>
 
 using namespace nawa;
@@ -43,8 +43,8 @@ string Engines::Argon2HashingEngine::generateHash(string input) const {
 
     // check validity of parameters
     if (!salt.empty() && salt.length() < ARGON2_MIN_SALT_LENGTH) {
-        throw UserException("nawa::Engines::Argon2HashingEngine::generateHash", 10,
-                            "Provided user-defined salt is not long enough");
+        throw Exception(__PRETTY_FUNCTION__, 10,
+                        "Provided user-defined salt is not long enough");
     }
 
     string actualSalt = salt;
@@ -97,8 +97,8 @@ string Engines::Argon2HashingEngine::generateHash(string input) const {
 
     // error handling
     if (errorCode != ARGON2_OK) {
-        throw UserException("nawa::Engines::Argon2HashingEngine::generateHash", 10,
-                            string("Argon2 error: ") + argon2_error_message(errorCode));
+        throw Exception(__PRETTY_FUNCTION__, 10,
+                        string("Argon2 error: ") + argon2_error_message(errorCode));
     }
 
     return string(c_hash);
@@ -146,7 +146,7 @@ bool Engines::Argon2HashingEngine::verifyHash(string input, string hash) const {
         inputHash = engine1.generateHash(input);
         inputHash = Encoding::base64Decode(inputHash.substr(inputHash.find_last_of('$') + 1));
     }
-    catch (const UserException &) {
+    catch (const Exception &) {
         return false;
     }
 

@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <nawa/Utils.h>
 #include <nawa/Connection.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 
 using namespace nawa;
 using namespace std;
@@ -109,7 +109,7 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
 
     // throw exception if file cannot be opened
     if (!f) {
-        throw UserException("nawa::Connection::sendFile", 1, "Cannot open file for reading");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Cannot open file for reading");
     }
 
     // get time of last modification
@@ -271,7 +271,7 @@ void Connection::setCookie(const string &key, Cookie cookie) {
     regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
     if (!regex_match(key, matchKey) || !regex_match(cookie.content, matchContent)) {
-        throw UserException("nawa::Connection::setCookie", 1, "Invalid characters in key or value");
+        throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
     cookies[key] = move(cookie);
 }

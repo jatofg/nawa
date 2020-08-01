@@ -24,7 +24,7 @@
 #include <iomanip>
 #include <unistd.h>
 #include <climits>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <nawa/Log.h>
 #include <atomic>
 #include <mutex>
@@ -102,8 +102,8 @@ void Log::setOutfile(const string &filename) {
         }
         logFile.open(filename, ofstream::out | ofstream::app);
         if (!logFile) {
-            throw UserException("nawa::Log::setOutfile", 1,
-                                "Failed to open requested file for writing.");
+            throw Exception(__PRETTY_FUNCTION__, 1,
+                            "Failed to open requested file for writing.");
         }
         out = &logFile;
     }

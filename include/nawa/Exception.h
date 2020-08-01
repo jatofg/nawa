@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NAWA_USEREXCEPTION_H
-#define NAWA_USEREXCEPTION_H
+#ifndef NAWA_EXCEPTION_H
+#define NAWA_EXCEPTION_H
 
 #include <string>
 #include <sstream>
@@ -32,21 +32,22 @@ namespace nawa {
     /**
      * Exception class that can be used by apps to catch errors resulting from NAWA function calls.
      */
-    class UserException : public std::exception {
+    class Exception : public std::exception {
         int errorCode; /**< The error code so that the app can distinguish different exceptions from a function. */
         std::string message; /**< The exception message will be stored here. */
+        std::string debugMessage; /**< The full debug message will be stored here. */
     public:
         /**
          * Construct a UserException with an additional message.
          * @param inFunction Function in which the exception occurred.
          * @param errorCode An integral error code identifying the error that caused this exception.
-         * @param _message Additional message that will also be a part of what().
+         * @param message_ Additional message that will also be a part of what().
          */
-        UserException(const std::string &inFunction, int errorCode, const std::string &_message) : errorCode(
-                errorCode) {
+        Exception(const std::string &inFunction, int errorCode, std::string message) : errorCode(errorCode),
+                                                                                       message(std::move(message)) {
             std::stringstream mstream;
-            mstream << "NAWA: UserException #" << errorCode << " in " << inFunction << ": " << _message;
-            message = mstream.str();
+            mstream << "[NAWA Exception #" << errorCode << " in " << inFunction << "] " << message;
+            debugMessage = mstream.str();
         }
 
         /**
@@ -54,7 +55,7 @@ namespace nawa {
          * @param inFunction Function in which the exception occurred.
          * @param errorCode An integral error code identifying the error that caused this exception.
          */
-        UserException(const std::string &inFunction, int errorCode) : errorCode(errorCode) {
+        Exception(const std::string &inFunction, int errorCode) : errorCode(errorCode) {
             std::stringstream mstream;
             mstream << "NAWA: UserException #" << errorCode << " in " << inFunction;
             message = mstream.str();
@@ -64,18 +65,35 @@ namespace nawa {
          * Get the integral error code that identifies the error that caused this exception.
          * @return The error code.
          */
-        virtual int getErrorCode() const noexcept {
+        [[nodiscard]] virtual int getErrorCode() const noexcept {
             return errorCode;
         }
 
         /**
-         * Get the full constructed exception message.
+         * Get the provided message as a string.
+         * @return The provided message.
+         */
+        [[nodiscard]] virtual std::string getMessage() const noexcept {
+            return message;
+        }
+
+        /**
+         * Get the full constructed debug message as a string.
+         * @return
+         */
+        [[nodiscard]] virtual std::string getDebugMessage() const noexcept {
+            return debugMessage;
+        }
+
+        /**
+         * Get the full constructed debug message. This function would be called and the message displayed when an
+         * uncaught Exception leads to termination. Use getMessage to get the message without debug information.
          * @return The full exception message.
          */
         const char *what() const noexcept override {
-            return message.c_str();
+            return debugMessage.c_str();
         }
     };
 }
 
-#endif //NAWA_USEREXCEPTION_H
+#endif //NAWA_EXCEPTION_H

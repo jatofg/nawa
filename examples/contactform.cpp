@@ -25,7 +25,7 @@
 #include <random>
 #include <nawa/SmtpMailer.h>
 #include <nawa/Encoding.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <nawa/Log.h>
 
 using namespace std;
@@ -105,9 +105,9 @@ int handleRequest(Connection &connection) {
             smtp.processQueue();
             connection.response << "<p>Message sent successfully!</p>";
         }
-        catch (const UserException &e) {
+        catch (const Exception &e) {
             connection.response << "<p>Message could not be sent due to a technical problem :(</p>";
-            LOG(string("Error sending email:") + e.what());
+            LOG("Error sending email:" + e.getMessage());
         }
 
         connection.response << "</body></html>";

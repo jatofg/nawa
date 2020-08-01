@@ -27,7 +27,7 @@
 #include <iomanip>
 #include <nawa/SmtpMailer.h>
 #include <nawa/Application.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <nawa/Encoding.h>
 
 using namespace nawa;
@@ -124,8 +124,8 @@ int handleRequest(Connection &connection) {
             smtp.processQueue();
             connection.response << "Mail sent successfully!";
         }
-        catch (const UserException &e) {
-            connection.response << "Error sending mail: " << e.what();
+        catch (const Exception &e) {
+            connection.response << "Error sending mail: " << e.getDebugMessage();
         }
 
     }

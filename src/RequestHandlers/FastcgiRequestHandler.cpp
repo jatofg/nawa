@@ -28,7 +28,7 @@
 #include <nawa/Log.h>
 #include <nawa/Connection.h>
 #include <nawa/Utils.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 
 using namespace nawa;
 using namespace std;
@@ -268,8 +268,8 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
         if (fastcgiListen == "all") fastcgiListenC = nullptr;
         if (fastcgiPort.empty()) fastcgiPort = "8000";
         if (!fastcgippManager->manager->listen(fastcgiListenC, fastcgiPort.c_str())) {
-            throw UserException("nawa::FastcgiRequestHandler::FastcgiRequestHandler", 1,
-                                "Fatal Error: Could not create TCP socket for FastCGI.");
+            throw Exception(__PRETTY_FUNCTION__, 1,
+                            "Could not create TCP socket for FastCGI.");
         }
     } else if (mode == "unix") {
         uint32_t permissions = 0xffffffffUL;
@@ -294,13 +294,13 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
         if (!fastcgippManager->manager->listen(fastcgiSocketPath.c_str(), permissions,
                                                fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
                                                fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
-            throw UserException("nawa::FastcgiRequestHandler::FastcgiRequestHandler", 2,
-                                "Fatal Error: Could not create UNIX socket for FastCGI.");
+            throw Exception(__PRETTY_FUNCTION__, 2,
+                            "Could not create UNIX socket for FastCGI.");
 
         }
     } else {
-        throw UserException("nawa::FastcgiRequestHandler::FastcgiRequestHandler", 3,
-                            "Fatal Error: Unknown FastCGI socket mode in config.ini.");
+        throw Exception(__PRETTY_FUNCTION__, 3,
+                        "Unknown FastCGI socket mode in config.ini.");
     }
 
     // tell fastcgi to use SO_REUSEADDR if enabled in config
@@ -316,11 +316,11 @@ void FastcgiRequestHandler::start() {
         try {
             fastcgippManager->manager->start();
         } catch (...) {
-            throw UserException("nawa::FastcgiRequestHandler::start", 1,
-                                "An unknown error occurred during start of request handling.");
+            throw Exception(__PRETTY_FUNCTION__, 1,
+                            "An unknown error occurred during start of request handling.");
         }
     } else {
-        throw UserException("nawa::FastcgiRequestHandler::start", 2, "FastCGI manager is not available.");
+        throw Exception(__PRETTY_FUNCTION__, 2, "FastCGI manager is not available.");
     }
 }
 

@@ -24,7 +24,7 @@
 #include <nawa/SmtpMailer.h>
 #include <nawa/Utils.h>
 #include <curl/curl.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <random>
 #include <nawa/Crypto.h>
 
@@ -179,7 +179,7 @@ void SmtpMailer::processQueue() const {
             // check for errors, throw exception if one happens
             if (res != CURLE_OK) {
                 curl_easy_cleanup(curl);
-                throw UserException("nawa::SmtpMailer::processQueue()", 1,
+                throw Exception(__PRETTY_FUNCTION__, 1,
                                     string("CURL error: ") + curl_easy_strerror(res));
             }
 

@@ -21,7 +21,6 @@ endif()
 configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
         ${PROJECT_BINARY_DIR}/include/nawa/Application.h)
 
-# ... SysException.h Types/Compound.h Connection.cpp ...
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
 
@@ -36,14 +35,13 @@ FetchContent_MakeAvailable(fastcgilite)
 
 add_executable(nawarun
         include/nawa/Request.h
-        include/nawa/SysException.h
         include/nawa/Connection.h
         include/nawa/Encoding.h
         include/nawa/Utils.h
         include/nawa/Session.h
         include/nawa/Config.h
         include/nawa/Crypto.h
-        include/nawa/UserException.h
+        include/nawa/Exception.h
         include/nawa/Cookie.h
         include/nawa/Log.h
         include/nawa/AccessFilterList.h
