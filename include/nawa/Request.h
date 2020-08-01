@@ -36,13 +36,32 @@ namespace nawa {
      * Internal container filled by the RequestHandler with prerequisites for creating Connection and Request objects.
      */
     struct RequestInitContainer {
+        /**
+         * Environment variables, see \ref environmentmanual
+         */
         std::unordered_map<std::string, std::string> environment; // TODO use a <std::any> vector instead?
+        /**
+         * Vector containing languages accepted by the browser.
+         */
         std::vector<std::string> acceptLanguages; // TODO improve this, should be part of environment
-        std::multimap<std::string, std::string> getVars;
+        std::multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
+        /**
+         * The HTTP POST vars, only if it is in standard format (content type `multipart/form-data` or
+         * `application/x-www-form-urlencoded`). Files are excluded and handled separately by fileVectorCallback.
+         */
         std::multimap<std::string, std::string> postVars;
-        std::multimap<std::string, std::string> cookieVars;
-        std::string postContentType;
+        std::multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
+        std::string postContentType; /**< The HTTP POST content type. */
+        /**
+         * A function which returns a std::string containing the raw POST data. Raw data does not have to be available
+         * when the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
+         * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`.
+         */
         RawPostCallbackFunction rawPostCallback; // TODO maybe everything should just be provided as it is and split here?
+        /**
+         * A function which takes the POST key as argument and returns a std::vector containing files submitted via POST
+         * with the given key (as nawa::File objects).
+         */
         FileVectorCallbackFunction fileVectorCallback;
     };
 

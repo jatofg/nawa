@@ -1,5 +1,5 @@
 /**
- * \file UserException.h
+ * \file Exception.h
  * \brief Exception class that can be used by apps to catch errors resulting from nawa function calls.
  */
 
@@ -41,7 +41,7 @@ namespace nawa {
          * Construct a UserException with an additional message.
          * @param inFunction Function in which the exception occurred.
          * @param errorCode An integral error code identifying the error that caused this exception.
-         * @param message_ Additional message that will also be a part of what().
+         * @param message Additional message that will also be a part of what().
          */
         Exception(const std::string &inFunction, int errorCode, std::string message) : errorCode(errorCode),
                                                                                        message(std::move(message)) {
@@ -57,7 +57,7 @@ namespace nawa {
          */
         Exception(const std::string &inFunction, int errorCode) : errorCode(errorCode) {
             std::stringstream mstream;
-            mstream << "NAWA: UserException #" << errorCode << " in " << inFunction;
+            mstream << "[NAWA Exception #" << errorCode << " in " << inFunction << "] No message provided.";
             message = mstream.str();
         }
 

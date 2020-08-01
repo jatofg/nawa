@@ -35,9 +35,9 @@ namespace nawa {
     using FlushCallbackFunction = std::function<void(const std::string &)>;
 
     struct ConnectionInitContainer {
-        FlushCallbackFunction flushCallback;
-        Config config;
-        RequestInitContainer requestInit;
+        FlushCallbackFunction flushCallback; /**< Callback function that flushes the response to the user. */
+        Config config; /**< The NAWA config. */
+        RequestInitContainer requestInit; /**< The RequestInitContainer containing necessary request data. */
     };
 
     /**
@@ -68,8 +68,7 @@ namespace nawa {
 
         /**
          * Create a Connection object.
-         * @param request Reference to the request object (needed to import cookies and flush the response).
-         * @param config Reference to the Config object containing the NAWA configuration.
+         * @param connectionInit The ConnectionInitContainer object containing the necessary parameters.
          */
         explicit Connection(const ConnectionInitContainer &connectionInit);
 
