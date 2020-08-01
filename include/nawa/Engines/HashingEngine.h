@@ -38,7 +38,7 @@ namespace nawa::Engines {
     public:
         /**
          * Generate a (salted) hash basing on the input (usually the password to be hashed). Throw a
-         * UserException with an error code >=10 in case of failure.
+         * nawa::Exception with an error code >=10 in case of failure.
          * @param input The input string (e.g., user password).
          * @return The hash in a standard format, including the salt and all information necessary to check it
          * (e.g., "$2a$10$...").

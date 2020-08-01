@@ -32,7 +32,7 @@ namespace nawa {
         std::unique_ptr<FastcgippManagerAdapter> fastcgippManager;
     public:
         /**
-         * Construct a FastcgiRequestHandler object. May throw a UserException on failure.
+         * Construct a FastcgiRequestHandler object. May throw a nawa::Exception on failure.
          * @param handleRequestFunction The handleRequest function of the app.
          * @param config The config.
          * @param concurrency Concurrency level (number of worker threads).

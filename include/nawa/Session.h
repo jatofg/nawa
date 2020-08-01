@@ -145,7 +145,7 @@ namespace nawa {
         std::any operator[](const std::string &key) const;
 
         /**
-         * Set key to a Any value. Throws a UserException with error code 1 if no session has been established.
+         * Set key to a Any value. Throws a nawa::Exception with error code 1 if no session has been established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */
@@ -157,7 +157,7 @@ namespace nawa {
          * anymore on the next request and therefore cause a segmentation fault). For std::string values, the next
          * specialization (arbitrary type) will be used. The c-style string will be wrapped into a std::string, which
          * will be wrapped into a Any value. As this function internally calls
-         * set(std::string, Any), a UserException with error code 1 will be thrown if no session has been
+         * set(std::string, Any), a nawa::Exception with error code 1 will be thrown if no session has been
          * established.
          * @param key Key to set.
          * @param value C-string that will be used as the value (will be stored as a std::string!).
@@ -169,7 +169,7 @@ namespace nawa {
         /**
          * Set key to a variable of an arbitrary type. This function exists just for convenience and will create a
          * new std::any from the value type and call set(std::string, std::any), and will therefore throw a
-         * UserException with error code 1 if no session has been established. As you need to explicitly state the
+         * nawa::Exception with error code 1 if no session has been established. As you need to explicitly state the
          * type when receiving the value later on, explicitly constructing the desired type might make your code
          * more readable and less error-prone (if the value is directly constructed and not given as a variable).
          * @tparam T Type of the value. Can usually be deducted automatically by the compiler.
@@ -182,7 +182,7 @@ namespace nawa {
         }
 
         /**
-         * Remove the session variable with the given key. Throws a UserException with error code 1 if no session has
+         * Remove the session variable with the given key. Throws a nawa::Exception with error code 1 if no session has
          * been established.
          * @param key Key to remove.
          */

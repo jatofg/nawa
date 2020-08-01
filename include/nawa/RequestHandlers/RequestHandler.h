@@ -42,7 +42,7 @@ namespace nawa {
         virtual ~RequestHandler() = default;
 
         /**
-         * Create a new request handler object according to the config. May throw a UserException on failure (passed on
+         * Create a new request handler object according to the config. May throw a nawa::Exception on failure (passed on
          * from the constructor of the specific request handler). The constructor of a request handler should set up
          * everything that's necessary already here (as the constructor is the only function of a request handler
          * which is executed with full privileges).
@@ -74,7 +74,7 @@ namespace nawa {
 
         /**
          * Start request handling. Must not block and return immediately after request handling has started
-         * (in separate threads). May throw a UserException on failure, but ideally, all actions which could lead to
+         * (in separate threads). May throw a nawa::Exception on failure, but ideally, all actions which could lead to
          * errors (or preliminary checks to avoid errors) should be done in the constructor, to avoid unnecessary
          * initialization steps.
          */

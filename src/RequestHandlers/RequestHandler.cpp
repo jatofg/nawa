@@ -225,7 +225,7 @@ namespace {
                 filePath << '/' << requestPath.back();
             }
 
-            // send file if it exists, catch the "file does not exist" UserException and send 404 document if not
+            // send file if it exists, catch the "file does not exist" nawa::Exception and send 404 document if not
             auto filePathStr = filePath.str();
             try {
                 connection.sendFile(filePathStr, "", false, "", true);

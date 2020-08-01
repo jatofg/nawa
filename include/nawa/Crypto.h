@@ -89,7 +89,7 @@ namespace nawa {
         /**
          * Create a (hopefully) secure password hash using a hash algorithm (bcrypt by default). \n
          * This function returns one-way hashes with pseudo-random salts. Use passwordVerify to validate a password.\n
-         * May throw a UserException on failure, the error codes are defined by the underlying hashing engine, but
+         * May throw a nawa::Exception on failure, the error codes are defined by the underlying hashing engine, but
          * should not be lower than 10.
          * Argon2 hashing might be added later, probably in a separate function.
          * @param password The password to hash.
@@ -105,7 +105,7 @@ namespace nawa {
          * Validate a password with a matching hashing engine (determined by a HashTypeTable). The underlying function
          * of the hashing engine should be designed in a way that prevents timing attacks (given that the compiler did
          * no bad optimizations).\n
-         * May throw a UserException on failure. Error codes: 1 (empty input hash), 2 (no hashing engine able to
+         * May throw a nawa::Exception on failure. Error codes: 1 (empty input hash), 2 (no hashing engine able to
          * verify the given hash could be determined by the HashTypeTable).
          * @param password Password (user input) to be verified.
          * @param hash Hash (e.g., from a database) to verify the user password against.

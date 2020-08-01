@@ -66,7 +66,7 @@ namespace nawa {
 
         // TODO does std::ofstream file opening really throw exceptions or is there sth that has to be changed?
         /**
-         * Change the output to append to the specified log file. Will throw a UserException with error code 1 if
+         * Change the output to append to the specified log file. Will throw a nawa::Exception with error code 1 if
          * the requested file cannot be opened for writing. This change will be permanent until every active Log
          * object has been destructed. If the output stream is locked, this function will have no effect, and throw
          * no exception (make sure to check isLocked() first).

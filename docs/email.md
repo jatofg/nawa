@@ -79,7 +79,7 @@ And finally, send the email:
 smtp.processQueue();
 ```
 
-You should, however, catch `nawa::UserException` here, as this function 
+You should, however, catch `nawa::Exception` here, as this function 
 establishes a connection to the SMTP server, which may fail. Errors may also 
 occur during sending.
 

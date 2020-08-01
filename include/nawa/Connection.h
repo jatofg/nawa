@@ -84,7 +84,7 @@ namespace nawa {
          * Send a file from disk to the client. This will automatically set the content-type, content-length, and
          * last-modified headers and replace the existing HTTP response body (if any) with the contents of the file.
          * You are responsible to check request headers (such as accepts and if-modified-since). If the file cannot
-         * be read, a UserException with error code 1 will be thrown.
+         * be read, a nawa::Exception with error code 1 will be thrown.
          * @param path Path to the file, including the file name of course (better use absolute paths).
          * @param contentType The content-type string (such as image/png). If left empty, NAWA will try to guess the
          * content type itself (this will only work for a few common file types), and use "application/octet-stream"
@@ -126,7 +126,7 @@ namespace nawa {
 
         /**
          * Set a new HTTP cookie or overwrite the cookie with the given key. Create a Cookie object first, setting at
-         * least the content of the cookie. This function may throw a UserException with error code 1 if the key or
+         * least the content of the cookie. This function may throw a nawa::Exception with error code 1 if the key or
          * cookie content contain illicit characters. Works only before the response has been flushed.
          * For more information about cookie setting and handling, see \ref environmentmanual
          * @param key Key of the cookie. Valid characters in the key (as regex): [A-Za-z0-9!#$%&'*+\-.^_`|~]
@@ -137,7 +137,7 @@ namespace nawa {
 
         /**
          * Set a new HTTP cookie or overwrite the cookie with the given key. This function will create a Cookie 
-         * object with default attributes and the given content. It may throw a UserException with error code 1 if 
+         * object with default attributes and the given content. It may throw a nawa::Exception with error code 1 if
          * the key or cookie content contain illicit characters. Works only before the response has been flushed.
          * For more information about cookie setting and handling, see \ref environmentmanual
          * @param key Key of the cookie. Valid characters in the key (as regex): [A-Za-z0-9!#$%&'*+\-.^_`|~]

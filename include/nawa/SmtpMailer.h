@@ -162,7 +162,7 @@ namespace nawa {
 
         /**
          * Process the queue, i.e., establish an SMTP connection and send all emails in the queue. This function will
-         * not modify the queue. In case of errors, a UserException with error code 1 will be thrown.
+         * not modify the queue. In case of errors, a nawa::Exception with error code 1 will be thrown.
          */
         void processQueue() const;
     };
