@@ -31,7 +31,14 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
         GIT_TAG v3.1.5
 )
-FetchContent_MakeAvailable(fastcgilite)
+
+# if Debian would ship cmake 3.14 instead of 3.13, we could just do the following
+#FetchContent_MakeAvailable(fastcgilite)
+FetchContent_GetProperties(fastcgilite)
+if(NOT fastcgilite_POPULATED)
+    FetchContent_Populate(fastcgilite)
+    add_subdirectory(${fastcgilite_SOURCE_DIR} ${fastcgilite_BINARY_DIR})
+endif()
 
 add_executable(nawarun
         include/nawa/Request.h

@@ -23,7 +23,7 @@ RUN set -eux; \
 	cp ../config.ini /nawa/; \
 	useradd -M nawa; \
 	chown -R nawa:nawa /nawa; \
-	echo "cd /; \
+	cd /; \
 	rm -R /opt/nawasrc; \
 	apt-get -y remove \
 		libssl-dev libboost-dev libcurl4-openssl-dev libargon2-0-dev \
