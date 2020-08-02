@@ -38,14 +38,14 @@ namespace nawa {
         size_t size; /**< File size in bytes */
         // TODO there must be a better solution wrt memory management
         //      (e.g., adapting fastcgipp-lite, making data a shared_ptr)
-        char *dataPtr; /**< Pointer to the first byte of the memory area */
+        std::shared_ptr<char[]> dataPtr; /**< Pointer to the first byte of the memory area */
 
         /**
          * Copy the file into a std::string
          * @return std::string containing the whole file
          */
         [[nodiscard]] std::string copyFile() const {
-            return std::string(dataPtr, size);
+            return std::string(dataPtr.get(), size);
         }
 
         /**
@@ -59,7 +59,7 @@ namespace nawa {
             outfile.exceptions(exceptionMask);
             try {
                 outfile.open(path, std::ofstream::out | std::ofstream::binary);
-                outfile.write(dataPtr, size);
+                outfile.write(dataPtr.get(), size);
                 outfile.close();
             }
             catch (std::ios_base::failure &e) {

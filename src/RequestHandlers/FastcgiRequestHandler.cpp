@@ -189,7 +189,7 @@ bool FastcgippRequestAdapter::response() {
             f.filename = it->second.filename;
             f.size = it->second.size;
             f.contentType = it->second.contentType;
-            f.dataPtr = it->second.data.get();
+            f.dataPtr = it->second.data;
             ret.push_back(f);
         }
         return ret;
