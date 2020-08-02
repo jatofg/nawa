@@ -116,6 +116,13 @@ if(BuildTests)
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    add_library(gpctest SHARED
+            tests/gpctest.cpp)
+    target_include_directories(gpctest PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 endif()
 
 if(BuildExamples)

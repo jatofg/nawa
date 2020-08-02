@@ -90,6 +90,10 @@ multimap<string, string>::const_iterator Request::GPC::end() const {
     return dataMap.end();
 }
 
+Request::GPC::operator bool() const {
+    return !dataMap.empty();
+}
+
 Request::Request(const RequestInitContainer &initContainer)
         : env(initContainer), get(initContainer, GPC::Source::GET), post(initContainer),
           cookie(initContainer, GPC::Source::COOKIE) {}
@@ -105,14 +109,6 @@ string Request::Post::getRaw() const {
 
 vector<File> Request::Post::getFileVector(const string &postVar) const {
     return fileVectorCallback(postVar);
-
-//    vector<File> ret;
-//    auto e = requestHandler.environment().files.equal_range(postVar);
-//    for(auto it = e.first; it != e.second; ++it) {
-//        Request::File tmp(it->second);
-//        ret.push_back(tmp);
-//    }
-//    return ret;
 }
 
 string Request::Post::getContentType() const {

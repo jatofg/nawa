@@ -161,6 +161,13 @@ namespace nawa {
              * @return Iterator to the end of the multimap.
              */
             [[nodiscard]] std::multimap<std::string, std::string>::const_iterator end() const;
+
+            /**
+             * Shortcut to check for the existence of GET/POST/COOKIE values. Does not take files uploaded via POST
+             * into account and does not check the request method.
+             * @return
+             */
+            operator bool() const;
         };
 
         /**

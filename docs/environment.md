@@ -78,7 +78,7 @@ string.
 
 You can access the GET, POST, and COOKIE variables through the `[]` 
 operator of `connection.request.get`, `connection.request.post`, and 
-`connection.request.env`, respectively. If the variable exists more than 
+`connection.request.cookie`, respectively. If the variable exists more than 
 once (which is possible), the operator will only access one definition 
 (usually the first one). Example:
 
@@ -96,8 +96,17 @@ Alternatively, you can get a multimap of all key-value pairs via
 GET, POST, or COOKIE data, for example:
 
 ```cpp
-for(auto const &e: connection.request.post) {
+for (auto const &e: connection.request.post) {
     connection.response << "<p>POST[" << e.first << "] = " << e.second << "</p>";
+}
+```
+
+To find out if anything has been submitted via POST at all, you can just use 
+`connection.request.post` as a boolean value:
+
+```cpp
+if (connection.request.post) {
+    // do something
 }
 ```
 
