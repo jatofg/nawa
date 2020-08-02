@@ -229,7 +229,8 @@ any Session::operator[](const string &key) const {
     return any();
 }
 
-void Session::set(string key, const any &value) {
+// doxygen bug requires std:: here
+void Session::set(std::string key, const std::any &value) {
     if (!established()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }

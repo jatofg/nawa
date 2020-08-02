@@ -60,32 +60,28 @@ namespace {
     }
 }
 
-SmtpMailer::SmtpMailer(string serverDomain_, unsigned int serverPort_, SmtpMailer::TlsMode tlsMode_,
-                       bool verifyTlsCert_, string authUsername_, string authPassword_,
-                       long connectionTimeout_)
-        : serverPort(serverPort_), tlsMode(tlsMode_), verifyTlsCert(verifyTlsCert_),
-          connectionTimeout(connectionTimeout_) {
-    serverDomain = move(serverDomain_);
-    authUsername = move(authUsername_);
-    authPassword = move(authPassword_);
-}
+SmtpMailer::SmtpMailer(string serverDomain, unsigned int serverPort, SmtpMailer::TlsMode serverTlsMode,
+                       bool verifyServerTlsCert, string authUsername, string authPassword,
+                       long connectionTimeout)
+        : serverDomain(move(serverDomain)), serverPort(serverPort), serverTlsMode(serverTlsMode),
+          verifyServerTlsCert(verifyServerTlsCert),
+          authUsername(move(authUsername)), authPassword(move(authPassword)), connectionTimeout(connectionTimeout) {}
 
 void
-SmtpMailer::setServer(string _serverDomain, unsigned int _serverPort, SmtpMailer::TlsMode _tlsMode,
-                      bool _verifyTlsCert) {
-    serverDomain = move(_serverDomain);
-    serverPort = _serverPort;
-    tlsMode = _tlsMode;
-    verifyTlsCert = _verifyTlsCert;
+SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
+    serverDomain = move(domain);
+    serverPort = port;
+    serverTlsMode = tlsMode;
+    verifyServerTlsCert = verifyTlsCert;
 }
 
-void SmtpMailer::setAuth(string _authUsername, string _authPassword) {
-    authUsername = move(_authUsername);
-    authPassword = move(_authPassword);
+void SmtpMailer::setAuth(string username, string password) {
+    authUsername = move(username);
+    authPassword = move(password);
 }
 
-void SmtpMailer::setTimeout(long connectionTimeout_) {
-    connectionTimeout = connectionTimeout_;
+void SmtpMailer::setConnectionTimeout(long timeout) {
+    connectionTimeout = timeout;
 }
 
 void SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<EmailAddress> from,
@@ -122,7 +118,7 @@ void SmtpMailer::processQueue() const {
         // build URL for curl
         {
             stringstream curlUrl;
-            if (tlsMode == TlsMode::SMTPS) {
+            if (serverTlsMode == TlsMode::SMTPS) {
                 curlUrl << "smtps://";
             } else {
                 curlUrl << "smtp://";
@@ -132,12 +128,12 @@ void SmtpMailer::processQueue() const {
         }
 
         // set up TLS
-        if (tlsMode == TlsMode::REQUIRE_STARTTLS) {
+        if (serverTlsMode == TlsMode::REQUIRE_STARTTLS) {
             curl_easy_setopt(curl, CURLOPT_USE_SSL, (long) CURLUSESSL_ALL);
-        } else if (tlsMode == TlsMode::TRY_STARTTLS) {
+        } else if (serverTlsMode == TlsMode::TRY_STARTTLS) {
             curl_easy_setopt(curl, CURLOPT_USE_SSL, (long) CURLUSESSL_TRY);
         }
-        if (tlsMode != TlsMode::NONE && !verifyTlsCert) {
+        if (serverTlsMode != TlsMode::NONE && !verifyServerTlsCert) {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         }
@@ -180,7 +176,7 @@ void SmtpMailer::processQueue() const {
             if (res != CURLE_OK) {
                 curl_easy_cleanup(curl);
                 throw Exception(__PRETTY_FUNCTION__, 1,
-                                    string("CURL error: ") + curl_easy_strerror(res));
+                                string("CURL error: ") + curl_easy_strerror(res));
             }
 
         }

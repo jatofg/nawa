@@ -57,8 +57,8 @@ namespace nawa {
 
         std::string serverDomain;
         unsigned int serverPort;
-        TlsMode tlsMode;
-        bool verifyTlsCert;
+        TlsMode serverTlsMode;
+        bool verifyServerTlsCert;
         std::string authUsername;
         std::string authPassword;
         long connectionTimeout;
@@ -71,42 +71,42 @@ namespace nawa {
          * @param serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
          * @param serverPort Port of the SMTP server.
-         * @param tlsMode How TLS should be used, see TlsMode struct.
-         * @param verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
+         * @param serverTlsMode How TLS should be used, see TlsMode struct.
+         * @param verifyServerTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
          * @param authUsername Username for authentication.
          * @param authPassword Password for authentication.
          * @param connectionTimeout Timeout for SMTP connection attempts in milliseconds.
          */
         explicit SmtpMailer(std::string serverDomain = "localhost", unsigned int serverPort = 25,
-                            TlsMode tlsMode = TlsMode::NONE, bool verifyTlsCert = true,
+                            TlsMode serverTlsMode = TlsMode::NONE, bool verifyServerTlsCert = true,
                             std::string authUsername = "",
                             std::string authPassword = "", long connectionTimeout = 10000);
 
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
-         * @param serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * @param domain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
-         * @param serverPort Port of the SMTP server.
+         * @param port Port of the SMTP server.
          * @param tlsMode How TLS should be used, see TlsMode struct.
          * @param verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
          */
-        void setServer(std::string serverDomain, unsigned int serverPort = 25, TlsMode tlsMode = TlsMode::NONE,
+        void setServer(std::string domain, unsigned int port = 25, TlsMode tlsMode = TlsMode::NONE,
                        bool verifyTlsCert = true);
 
         /**
          * Set the authentication parameters for the SMTP connection.
-         * @param authUsername Username for authentication.
-         * @param authPassword Password for authentication.
+         * @param username Username for authentication.
+         * @param password Password for authentication.
          */
-        void setAuth(std::string authUsername, std::string authPassword);
+        void setAuth(std::string username, std::string password);
 
         /**
          * Set the timeout for SMTP connection attempts.
-         * @param connectionTimeout Timeout for SMTP connection attempts in milliseconds.
+         * @param timeout Timeout for SMTP connection attempts in milliseconds.
          */
-        void setTimeout(long connectionTimeout);
+        void setConnectionTimeout(long timeout);
 
         // TODO send emails async?
         // TODO signing and encryption?

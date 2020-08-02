@@ -39,7 +39,7 @@ namespace nawa {
      * the submatches at the following indexes (capturing group 1 at index 1, ...)
      */
     void regex_replace_callback(std::string &s, const std::regex &rgx,
-                                std::function<std::string(const std::vector<std::string> &)> fmt);
+                                const std::function<std::string(const std::vector<std::string> &)> &fmt);
 
     /**
      * Apply hex encoding to every byte in a string of bytes.

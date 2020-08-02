@@ -64,7 +64,8 @@ string Config::operator[](const pair<string, string> &key) const {
     }
 }
 
-void Config::set(pair<string, string> key, string value) {
+// doxygen bug requires std:: here
+void Config::set(std::pair<string, string> key, std::string value) {
     values[move(key)] = move(value);
 }
 

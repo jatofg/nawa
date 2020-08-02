@@ -218,9 +218,10 @@ namespace {
 
 }
 
+// doxygen bug, somehow doxygen does not like std::function
 void
-nawa::regex_replace_callback(string &s, const regex &rgx,
-                             function<string(const vector<string> &)> fmt) {
+nawa::regex_replace_callback(std::string &s, const std::regex &rgx,
+                             const std::function<std::string(const std::vector<std::string> &)> &fmt) {
     // how many submatches do we have to deal with?
     int marks = rgx.mark_count();
     // we want to iterate through all submatches (to collect them in a vector passed to fmt())
