@@ -12,7 +12,7 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-2020-07-31: v0.5 is now available! Apart from various bug fixes, it uses an entirely 
+**v0.5 is here!** Apart from various bug fixes, it uses an entirely 
 new, modular request handler which paves the way for planned new features 
 (direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
 request handling functions). Building and development is now easier, as the FastCGI 
@@ -40,7 +40,7 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html) 
 
 ### Warning!
 
@@ -112,7 +112,7 @@ For automatically starting an app on boot, use `systemctl enable`.
 You can also use the Docker images available in the GitHub Package 
 Registry. As they are built automatically, they should always be 
 up to date. See the [packages](https://github.com/jatofg/nawa/packages) 
-section to learn how to install them, and [the docs](https://www.tobiasflaig.eu/nawa/docs/usingdocker.html) 
+section to learn how to install them, and [the docs](https://www.tobiasflaig.eu/nawa/0.5/docs/usingdocker.html) 
 for using and building them.
 
 To install them, you need a GitHub account and access 
@@ -145,7 +145,7 @@ Git, CMake, gcc, and other basic tools for building software
 are required, too.
 
 For building the docs, doxygen must be installed. However, you can also 
-[access the docs online](https://www.tobiasflaig.eu/nawa/docs/).
+[access the docs online](https://www.tobiasflaig.eu/nawa/0.5/docs/).
 
 ### Clone, build, and install NAWA
 
