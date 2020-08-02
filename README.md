@@ -90,8 +90,8 @@ application, and
 - A shared object file containing the application itself.
 
 You can find an introduction containing a simple "Hello World!" 
-NAWA app here:<br>
-https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html
+NAWA app here: 
+[Getting started.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html)
 
 The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
