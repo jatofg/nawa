@@ -167,7 +167,7 @@ namespace nawa {
              * into account and does not check the request method.
              * @return
              */
-            operator bool() const;
+            explicit operator bool() const;
         };
 
         /**
