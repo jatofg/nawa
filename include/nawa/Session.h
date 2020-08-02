@@ -125,27 +125,28 @@ namespace nawa {
         [[nodiscard]] bool established() const;
 
         /**
-         * Check whether there exists a stored Any for the given key. Please note that the behavior of this
-         * function might differ from `[key].isSet()` - while this function will also return true if the key has been
-         * set to an empty Any, the latter one only returns true if the Any contains an object.
+         * Check whether there exists a stored value for the given key. Please note that the behavior of this
+         * function might differ from `[key].has_value()` - while this function will also return true if the key has
+         * been set to an empty std::any, the latter one only returns true if the std::any contains an object.
          * @param key Key to check.
-         * @return True if a value exists for this key, false otherwise. Always false if no session established.
+         * @return True if a value exists for this key, false otherwise. Always false if no session is active.
          */
         [[nodiscard]] bool isSet(const std::string &key) const;
 
         /**
-         * Get the value at the given key (as a Any object). To actually receive the stored object, use
-         * the `.get<T>()` function of the Any (e.g., `conn.session["test"].get<std::string>()`). You will have to
-         * explicitly state the type of the stored object as a template argument in order to receive it
+         * Get the value at the given key (as a std::any object). To actually receive the stored object, use
+         * `std::any_cast` (example: `std::any_cast<std::string>(conn.session["test"])`). You will have to
+         * explicitly state the type of the stored object as a template argument of `std::any_cast`
          * (as C++ is statically typed).
          * @param key Key to get value for.
-         * @return Value at key. If no value exists for that key or no session established, an empty Any will be
-         * returned.
+         * @return Value at key. If no value exists for that key or no session established, a std::any without value
+         * will be returned.
          */
         std::any operator[](const std::string &key) const;
 
         /**
-         * Set key to a Any value. Throws a nawa::Exception with error code 1 if no session has been established.
+         * Set key to a value of type std::any. Throws a nawa::Exception with error code 1 if no session has been
+         * established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */

@@ -132,8 +132,7 @@ namespace nawa {
          * this function will set the "From" header from this address in case it doesn't exist in the email yet.
          * @param replacementRules An optional set of replacement rules. It is a map with a string as key (the text
          * to be replaced) and another string as value (the text to replace it with). This set is saved and evaluated
-         * for each recipient individually, so this is a relatively memory-efficient way to personalize emails. If
-         * the rule set is empty, it will neither be saved along with the email nor evaluated.
+         * for each recipient individually, so this is a relatively memory-efficient way to personalize emails.
          */
         void enqueue(std::shared_ptr<Email> email, EmailAddress to,
                      std::shared_ptr<EmailAddress> from,
@@ -162,7 +161,8 @@ namespace nawa {
 
         /**
          * Process the queue, i.e., establish an SMTP connection and send all emails in the queue. This function will
-         * not modify the queue. In case of errors, a nawa::Exception with error code 1 will be thrown.
+         * not modify (and therefore not clear) the queue. In case of errors, a nawa::Exception with error code 1 will
+         * be thrown.
          */
         void processQueue() const;
     };

@@ -45,14 +45,14 @@ You want to learn more?
 ### Warning!
 
 This project is still in an early state (version 0.5!). It might, of 
-course, still contain bugs. Use it on your own risk.
+course, still contain bugs. Use it at your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
 might reach a higher version number at some point :)
 
 Also, the ABI and API can still change at any time, making 
 modifications to your apps (or, at least, recompilation) necessary. When such 
-changes happen, the version number will be increased, so that NAWA will refuse to 
+changes happen, the version number will be increased, and nawarun will refuse to 
 load apps compiled against an older version.
 
 ## Features (selection)

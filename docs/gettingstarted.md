@@ -185,7 +185,6 @@ Of course, you can use `stop` to stop it, `restart` to restart it, and
 
 ## Learn more
 
-To learn more, you can have a look at the examples. 
-The `examples/multipage.cpp` example is a good way to start.
-Tutorials for other topics, such as sessions, environment data 
-(GET, POST, cookies, ...), and more, will follow soon!
+Apart from reading the other tutorials, having a look at the examples is a 
+good way to explore NAWA's features. 
+`examples/multipage.cpp` is a good place to start. 
