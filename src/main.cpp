@@ -163,7 +163,7 @@ int main(int argc, char** argv) {
     }
     appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if(!appOpen) {
-        LOG(string("Fatal Error: Application file could not be loaded (main): ") + dlerror());
+        LOG(string("Fatal Error: Application file could not be loaded: ") + dlerror());
         return 1;
     }
 
