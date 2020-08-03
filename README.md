@@ -15,9 +15,10 @@ the fastcgi++ lite library for efficient request handling.
 **v0.5 is here!** Apart from various bug fixes, it uses an entirely 
 new, modular request handler which paves the way for planned new features 
 (direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
-request handling functions). Building and development is now easier, as the FastCGI 
+request handling functions) and additionally allows to use NAWA as a library 
+(tutorial coming soon). Building and development is now easier, as the FastCGI 
 library does not need to be built separately anymore, and its headers are not required 
-anymore for app development. CMake 3.11 is now required.
+anymore for app development. CMake 3.13 is now required.
 
 ## Example
 
