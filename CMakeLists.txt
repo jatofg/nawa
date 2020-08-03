@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.13)
 project(nawa VERSION 0.5)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -11,6 +11,7 @@ set(NAWA_VERSION_MINOR 5)
 option(BuildTests "Build tests" OFF)
 option(BuildExamples "Build examples" ON)
 option(BuildDocs "Build docs" ON)
+option(BuildSharedLib "Build shared library" OFF)
 
 # only unix-based OS are supported
 if(NOT UNIX)
@@ -23,13 +24,14 @@ configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
 
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
+target_compile_options(bcrypt PUBLIC -fPIC)
 
 # dependencies
 include(FetchContent)
 FetchContent_Declare(
         fastcgilite
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
-        GIT_TAG v3.1.5
+        GIT_TAG v3.1.6
 )
 
 # if Debian would ship cmake 3.14 instead of 3.13, we could just do the following
@@ -40,7 +42,7 @@ if(NOT fastcgilite_POPULATED)
     add_subdirectory(${fastcgilite_SOURCE_DIR} ${fastcgilite_BINARY_DIR})
 endif()
 
-add_executable(nawarun
+set(NAWA_FILES
         include/nawa/Request.h
         include/nawa/Connection.h
         include/nawa/Encoding.h
@@ -64,7 +66,6 @@ add_executable(nawarun
         include/nawa/RequestHandlers/RequestHandler.h
         include/nawa/RequestHandlers/FastcgiRequestHandler.h
 
-        src/main.cpp
         src/Request.cpp
         src/Connection.cpp
         src/Encoding.cpp
@@ -87,6 +88,8 @@ add_executable(nawarun
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
+add_executable(nawarun src/main.cpp ${NAWA_FILES})
+
 target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
@@ -94,6 +97,20 @@ target_include_directories(nawarun PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
+
+target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
+target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
+
+if(BuildSharedLib)
+    add_library(nawa SHARED ${NAWA_FILES})
+    target_link_libraries(nawa -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
+    target_include_directories(nawa PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
+endif()
 
 if(BuildTests)
     add_library(assertions SHARED
@@ -155,8 +172,8 @@ if(BuildExamples)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
+#set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
+#set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 # install targets, components should be checked again w.r.t. packaging
 include(GNUInstallDirs)
@@ -175,6 +192,11 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/nawa/Application.h"
 if(EXISTS /etc/systemd/system)
     install(FILES "${PROJECT_SOURCE_DIR}/systemd/nawa@.service"
             DESTINATION /etc/systemd/system
+            COMPONENT Runtime)
+endif()
+if(BuildSharedLib)
+    install(TARGETS nawa
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT Runtime)
 endif()
 
