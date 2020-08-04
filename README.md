@@ -15,8 +15,8 @@ the fastcgi++ lite library for efficient request handling.
 **v0.5 is here!** Apart from various bug fixes, it uses an entirely 
 new, modular request handler which paves the way for planned new features 
 (direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
-request handling functions) and additionally allows to use NAWA as a library 
-(tutorial coming soon). Building and development is now easier, as the FastCGI 
+request handling functions) and additionally allows to use NAWA as a library. 
+Building and development is now easier, as the FastCGI 
 library does not need to be built separately anymore, and its headers are not required 
 anymore for app development. CMake 3.13 is now required.
 
@@ -42,6 +42,9 @@ int handleRequest(Connection &connection) {
 
 You want to learn more? 
 [Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html) 
+
+If you don't like the IoC-style approach, you can also use NAWA as a library. 
+[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.5/docs/aslibrary.html)
 
 ### Warning!
 
@@ -164,15 +167,19 @@ First, create a directory for the build files:
 
 `cd build`
 
-Then, build NAWA:
+Create the build configuration:
 
 `cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
 
-`make`
-
 **Note: If you want to build the tests as well, pass the `-DBuildTests=ON` argument 
-to cmake.** You can disable building the examples and docs using the arguments 
+to cmake. If you want to use NAWA as a library, pass `-DBuildSharedLib=ON`.** 
+You can disable building the examples and docs using the arguments 
 `-DBuildExamples=OFF` resp. `-DBuildDocs=OFF`.
+
+Build nawarun (and tests, the shared library, examples, docs, depending on your 
+cmake arguments):
+
+`make`
 
 And last, install it to the target directories so that the apps 
 can find it (this will also install the headers needed for app development):
@@ -185,11 +192,12 @@ In the build directory, run:
 
 `sudo xargs rm < install_manifest.txt`
 
+Uninstalling before installing a new version is recommended to avoid ancient 
+relics remaining on your system.
+
 ## Binary packages
 
-Binary packages for Debian and Ubuntu might be provided in future, 
-as soon as this project reaches a more stable state. Currently, there 
-are not even releases available.
+Binary packages are not available yet, just build it yourself :)
 
 ## Third-party licenses
 

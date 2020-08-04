@@ -229,9 +229,9 @@ struct nawa::FastcgiRequestHandler::FastcgippManagerAdapter {
     std::unique_ptr<Fastcgipp::Manager<FastcgippRequestAdapter>> manager;
 };
 
-nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction handleRequestFunction_,
+nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction handleRequestFunction,
                                                    nawa::Config config_, int concurrency) {
-    setAppRequestHandler(move(handleRequestFunction_));
+    setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config_));
 
     std::string rawPostStr = config[{"post", "raw_access"}];
