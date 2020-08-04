@@ -254,8 +254,8 @@ void RequestHandler::setAppRequestHandler(HandleRequestFunction fn) noexcept {
     handleRequestFunction = move(fn);
 }
 
-void RequestHandler::setAppInit(AppInit appInit_) noexcept {
-    appInit = move(appInit_);
+void RequestHandler::setAccessFilters(AccessFilterList accessFilterList) noexcept {
+    accessFilters = move(accessFilterList);
 }
 
 void RequestHandler::setConfig(Config config_) noexcept {
@@ -265,7 +265,7 @@ void RequestHandler::setConfig(Config config_) noexcept {
 void RequestHandler::handleRequest(Connection &connection) {
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
-    if (!applyFilters(connection, appInit.accessFilters)) {
+    if (!applyFilters(connection, accessFilters)) {
         handleRequestFunction(connection);
     }
 }

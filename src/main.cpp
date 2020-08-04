@@ -233,8 +233,9 @@ int main(int argc, char** argv) {
             return 1;
         }
 
-        // init could have altered the config, take it over
-        requestHandlerPtr->setAppInit(appInit1);
+        // set access filters as defined by init
+        requestHandlerPtr->setAccessFilters(appInit1.accessFilters);
+        // init could have altered the config, take over
         requestHandlerPtr->setConfig(appInit1.config);
     }
 

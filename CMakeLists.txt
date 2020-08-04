@@ -170,6 +170,15 @@ if(BuildExamples)
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    if(BuildSharedLib)
+        add_executable(aslibrary examples/aslibrary.cpp)
+        target_link_libraries(aslibrary nawa)
+        target_include_directories(aslibrary PUBLIC
+                $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    endif()
 endif()
 
 #set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")

@@ -25,7 +25,7 @@
 #define NAWA_REQUESTHANDLER_H
 
 #include <nawa/Config.h>
-#include <nawa/AppInit.h>
+#include <nawa/AccessFilterList.h>
 
 namespace nawa {
     // forward declarations
@@ -37,7 +37,7 @@ namespace nawa {
         HandleRequestFunction handleRequestFunction;
     protected:
         Config config;
-        AppInit appInit;
+        AccessFilterList accessFilters;
     public:
         virtual ~RequestHandler() = default;
 
@@ -61,10 +61,10 @@ namespace nawa {
         void setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept;
 
         /**
-         * Take over the AppInit struct filled by the init() function of the app.
-         * @param _appInit AppInit struct as filled by the app.
+         * Set access filters for static request filtering.
+         * @param accessFilterList The access filters.
          */
-        void setAppInit(AppInit appInit) noexcept;
+        void setAccessFilters(AccessFilterList accessFilterList) noexcept;
 
         /**
          * Set the config.
