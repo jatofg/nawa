@@ -52,17 +52,13 @@ namespace nawa {
         std::multimap<std::string, std::string> postVars;
         std::multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
         std::string postContentType; /**< The HTTP POST content type. */
+        std::multimap<std::string, File> postFiles; /**< Files submitted via POST. */
         /**
          * A function which returns a std::string containing the raw POST data. Raw data does not have to be available
          * when the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
          * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`.
          */
         RawPostCallbackFunction rawPostCallback; // TODO maybe everything should just be provided as it is and split here?
-        /**
-         * A function which takes the POST key as argument and returns a std::vector containing files submitted via POST
-         * with the given key (as nawa::File objects).
-         */
-        FileVectorCallbackFunction fileVectorCallback;
     };
 
     /**
@@ -113,7 +109,7 @@ namespace nawa {
             };
         protected:
             Source source;
-            std::multimap<std::basic_string<char>, std::basic_string<char>> dataMap;
+            std::multimap<std::string, std::string> dataMap;
         public:
             GPC(const RequestInitContainer &requestInit, Source source);
 
@@ -123,7 +119,7 @@ namespace nawa {
              * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
              * only one of them (usually the first definition) will be returned. For accessing all definitions,
              * please use getVector(). Complexity is logarithmic, so if you want to access a value multiple times,
-             * saving it as a variable is a good idea.
+             * saving it in a variable is a good idea.
              * @param gpcVar Name of the variable.
              * @return Value of the variable. Empty string if not set
              * (or empty - use count() for checking whether the variable is set).
@@ -142,13 +138,13 @@ namespace nawa {
              * @param gpcVar Name of the variables.
              * @return Number of occurrences.
              */
-            [[nodiscard]] unsigned long count(const std::string &gpcVar) const;
+            [[nodiscard]] size_t count(const std::string &gpcVar) const;
 
             /**
              * Get a reference to the GET, POST, or COOKIE multimap.
              * @return Reference to the multimap.
              */
-            std::multimap<std::string, std::string> &getMultimap();
+            [[nodiscard]] std::multimap<std::string, std::string> const &getMultimap() const;
 
             /**
              * Get constant begin iterator to the multimap containing all GET, POST, or COOKIE data.
@@ -163,11 +159,10 @@ namespace nawa {
             [[nodiscard]] std::multimap<std::string, std::string>::const_iterator end() const;
 
             /**
-             * Shortcut to check for the existence of GET/POST/COOKIE values. Does not take files uploaded via POST
-             * into account and does not check the request method.
-             * @return
+             * Shortcut to check for the existence of GET/POST/COOKIE values (including files in the case of POST).
+             * @return True if GET/POST/COOKIE values are available.
              */
-            explicit operator bool() const;
+            explicit virtual operator bool() const;
         };
 
         /**
@@ -176,11 +171,17 @@ namespace nawa {
         class Post : public GPC {
             std::string contentType;
             RawPostCallbackFunction rawPostCallback;
-            FileVectorCallbackFunction fileVectorCallback;
+            std::multimap<std::string, File> fileMap;
         public:
             explicit Post(const RequestInitContainer &requestInit);
 
             ~Post() override = default;
+
+            /**
+             * Shortcut to check for the existence of POST values (including files).
+             * @return True if POST values are available.
+             */
+            explicit operator bool() const override;
 
             /**
              * Get the raw POST data (availability may depend on the raw_access setting in the config).
@@ -195,11 +196,41 @@ namespace nawa {
             [[nodiscard]] std::string getContentType() const;
 
             /**
+             * Check whether files have been uploaded via POST.
+             * @return True if files have been uploaded via POST.
+             */
+            [[nodiscard]] bool hasFiles() const;
+
+            /**
+             * Get a file submitted via POST. If the query contains more than one POST file of the same name,
+             * only one of them (usually the first definition) will be returned. For accessing all definitions,
+             * please use getFileVector(). Complexity is logarithmic, so if you want to access a value multiple times,
+             * saving it in a variable is a good idea.
+             * @param postVar Name of the variable.
+             * @return Value of the variable. Empty string if not set
+             * (use countFiles() for checking whether the variable is set).
+             */
+            [[nodiscard]] File getFile(const std::string &postVar) const;
+
+            /**
              * Get all POST files with the given name.
              * @param postVar Name of the files.
              * @return Vector of files. Empty if no file with the given name exists.
              */
             [[nodiscard]] std::vector<File> getFileVector(const std::string &postVar) const;
+
+            /**
+             * Get the number of submitted POST files with the given name.
+             * @param gpcVar Name of the file.
+             * @return Number of occurrences.
+             */
+            [[nodiscard]] size_t countFiles(const std::string &postVar) const;
+
+            /**
+             * Get a reference to the POST file multimap.
+             * @return Reference to the multimap.
+             */
+            [[nodiscard]] std::multimap<std::string, File> const &getFileMultimap() const;
         };
 
         const Request::Env env; /**< The Env object you should use to access environment variables. */

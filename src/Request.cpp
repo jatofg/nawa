@@ -74,11 +74,11 @@ vector<string> Request::GPC::getVector(const string &gpcVar) const {
     return ret;
 }
 
-unsigned long Request::GPC::count(const string &gpcVar) const {
+size_t Request::GPC::count(const string &gpcVar) const {
     return dataMap.count(gpcVar);
 }
 
-multimap<string, string> &Request::GPC::getMultimap() {
+multimap<string, string> const &Request::GPC::getMultimap() const {
     return dataMap;
 }
 
@@ -101,16 +101,43 @@ Request::Request(const RequestInitContainer &initContainer)
 Request::Post::Post(const RequestInitContainer &requestInit) : GPC(requestInit, GPC::Source::POST),
                                                                contentType(requestInit.postContentType),
                                                                rawPostCallback(requestInit.rawPostCallback),
-                                                               fileVectorCallback(requestInit.fileVectorCallback) {}
+                                                               fileMap(requestInit.postFiles) {}
+
+Request::Post::operator bool() const {
+    return !(dataMap.empty() && fileMap.empty());
+}
 
 string Request::Post::getRaw() const {
     return rawPostCallback();
 }
 
-vector<File> Request::Post::getFileVector(const string &postVar) const {
-    return fileVectorCallback(postVar);
-}
-
 string Request::Post::getContentType() const {
     return contentType;
+}
+
+bool Request::Post::hasFiles() const {
+    return !fileMap.empty();
+}
+
+File Request::Post::getFile(const string &postVar) const {
+    auto e = fileMap.find(postVar);
+    if (e != fileMap.end()) return e->second;
+    return File();
+}
+
+vector<File> Request::Post::getFileVector(const string &postVar) const {
+    vector<File> ret;
+    auto e = fileMap.equal_range(postVar);
+    for (auto it = e.first; it != e.second; ++it) {
+        ret.push_back(it->second);
+    }
+    return ret;
+}
+
+size_t Request::Post::countFiles(const string &postVar) const {
+    return fileMap.count(postVar);
+}
+
+std::multimap<std::string, File> const &Request::Post::getFileMultimap() const {
+    return fileMap;
 }

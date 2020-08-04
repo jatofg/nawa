@@ -12,7 +12,7 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-**v0.5 is here!** Apart from various bug fixes, it uses an entirely 
+**v0.5 is here!** Apart from various improvements, it uses an entirely 
 new, modular request handler which paves the way for planned new features 
 (direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
 request handling functions) and additionally allows to use NAWA as a library. 

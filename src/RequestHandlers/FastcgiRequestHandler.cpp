@@ -175,24 +175,20 @@ bool FastcgippRequestAdapter::response() {
         requestInit.postVars = renv.posts;
         requestInit.cookieVars = renv.cookies;
         requestInit.postContentType = renv.contentType;
+
+        // POST files
+        for (auto const &[k, fcgiFile]: renv.files) {
+            File f;
+            f.filename = fcgiFile.filename;
+            f.size = fcgiFile.size;
+            f.contentType = fcgiFile.contentType;
+            f.dataPtr = fcgiFile.data;
+            requestInit.postFiles.insert({k, f});
+        }
     }
 
     requestInit.rawPostCallback = [this]() {
         return rawPost;
-    };
-
-    requestInit.fileVectorCallback = [this](const string &postVar) {
-        vector<File> ret;
-        auto e = environment().files.equal_range(postVar);
-        for (auto it = e.first; it != e.second; ++it) {
-            File f;
-            f.filename = it->second.filename;
-            f.size = it->second.size;
-            f.contentType = it->second.contentType;
-            f.dataPtr = it->second.data;
-            ret.push_back(f);
-        }
-        return ret;
     };
 
     ConnectionInitContainer connectionInit;
