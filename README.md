@@ -44,7 +44,7 @@ You want to learn more?
 [Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html) 
 
 If you don't like the IoC-style approach, you can also use NAWA as a library. 
-[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.5/docs/aslibrary.html)
+[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.5/docs/aslibrarymanual.html)
 
 ### Warning!
 
