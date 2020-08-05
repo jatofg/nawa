@@ -104,6 +104,10 @@ int handleRequest(Connection &connection) {
         connection.response << "</ul>";
     }
 
+    if (connection.request.post.getRaw()) {
+        connection.response << "<p>Raw POST data:</p><pre>" << *connection.request.post.getRaw() << "</pre>";
+    }
+
     connection.response << R"(<p>Some POST form:</p><form name="testform" method="post" action="?" enctype="multipart/form-data">)"
                         << R"(<p>Field one (1): <input type="text" name="one"></p>)"
                         << R"(<p>Field one (2): <input type="text" name="one"></p>)"

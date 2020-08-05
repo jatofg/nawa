@@ -29,9 +29,6 @@
 #include <nawa/File.h>
 
 namespace nawa {
-    using RawPostCallbackFunction = std::function<std::string()>;
-    using FileVectorCallbackFunction = std::function<std::vector<File>(const std::string &)>;
-
     /**
      * Internal container filled by the RequestHandler with prerequisites for creating Connection and Request objects.
      */
@@ -54,11 +51,12 @@ namespace nawa {
         std::string postContentType; /**< The HTTP POST content type. */
         std::multimap<std::string, File> postFiles; /**< Files submitted via POST. */
         /**
-         * A function which returns a std::string containing the raw POST data. Raw data does not have to be available
-         * when the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
-         * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`.
+         * A shared_ptr to a string which contains the raw POST data. Raw data does not have to be available
+         * if the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
+         * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`. In this case,
+         * the shared_ptr should not contain an object.
          */
-        RawPostCallbackFunction rawPostCallback; // TODO maybe everything should just be provided as it is and split here?
+        std::shared_ptr<std::string> rawPost; // TODO maybe everything should just be provided as it is and split here?
     };
 
     /**
@@ -170,7 +168,7 @@ namespace nawa {
          */
         class Post : public GPC {
             std::string contentType;
-            RawPostCallbackFunction rawPostCallback;
+            std::shared_ptr<std::string> rawPost;
             std::multimap<std::string, File> fileMap;
         public:
             explicit Post(const RequestInitContainer &requestInit);
@@ -185,9 +183,10 @@ namespace nawa {
 
             /**
              * Get the raw POST data (availability may depend on the raw_access setting in the config).
-             * @return Reference to a string containing the raw POST data if available, otherwise the string is empty.
+             * @return Shared pointer to a string containing the raw POST data if available, otherwise the
+             * shared_ptr does not contain an object.
              */
-            [[nodiscard]] std::string getRaw() const;
+            [[nodiscard]] std::shared_ptr<std::string> getRaw() const;
 
             /**
              * Get the POST content type as submitted by the browser

@@ -120,10 +120,13 @@ POST is not limited to key-value pairs, the browser might also send files,
 or something completely else. You can access the content type (as a string) 
 via `connection.request.post.getContentType()`.
 
-When files have been submitted (content type `multipart/form-data`), 
-you can access them through `connection.request.post.getFileVector()` 
-(see `nawa::Request::Post::getFileVector()`). The return value is a 
-vector of `nawa::Request::File` elements, have a look at the documentation 
+If files have been submitted (content type `multipart/form-data`), 
+you can access them through `connection.request.post.getFile("key")` 
+(see `nawa::Request::Post::getFile()`). For multiple files with the same name, 
+`nawa::Request::Post::getFileVector()` can be used, or the full multimap can 
+be accessed via `nawa::Request::Post::getFileMultimap()`.
+
+Files are represented as `nawa::File` objects, have a look at the documentation 
 of that class to see how to retrieve the file and its meta data.
 
 To access the raw POST data as a string, you can use  
@@ -134,6 +137,9 @@ contain standard content types (key-value pairs or files). You can,
 however, set it to `always`, but keep in mind that this leads to a higher 
 memory consumption (as the POST data is always copied). If you don't need 
 this feature at all, consider setting it to `never`.
+
+For an example on advanced POST features such as file handling, have a look 
+at `tests/gpctest.cpp`.
 
 ### Setting cookies
 

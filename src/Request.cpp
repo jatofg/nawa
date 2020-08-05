@@ -100,15 +100,15 @@ Request::Request(const RequestInitContainer &initContainer)
 
 Request::Post::Post(const RequestInitContainer &requestInit) : GPC(requestInit, GPC::Source::POST),
                                                                contentType(requestInit.postContentType),
-                                                               rawPostCallback(requestInit.rawPostCallback),
+                                                               rawPost(requestInit.rawPost),
                                                                fileMap(requestInit.postFiles) {}
 
 Request::Post::operator bool() const {
     return !(dataMap.empty() && fileMap.empty());
 }
 
-string Request::Post::getRaw() const {
-    return rawPostCallback();
+shared_ptr<string> Request::Post::getRaw() const {
+    return rawPost;
 }
 
 string Request::Post::getContentType() const {

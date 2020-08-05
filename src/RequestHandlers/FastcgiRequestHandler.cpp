@@ -54,7 +54,7 @@ struct FastcgippArgumentContainer {
 };
 
 class FastcgippRequestAdapter : public Fastcgipp::Request<char> {
-    string rawPost;
+    shared_ptr<string> rawPost;
 public:
     /**
      * Request handling happens through a child class of Fastcgipp::Request. All necessary objects from outside that
@@ -170,10 +170,11 @@ bool FastcgippRequestAdapter::response() {
         // set acceptLanguages
         requestInit.acceptLanguages = renv.acceptLanguages;
 
-        // GET, POST, COOKIE
+        // GET, POST, COOKIE vars, raw POST, POST content type
         requestInit.getVars = renv.gets;
         requestInit.postVars = renv.posts;
         requestInit.cookieVars = renv.cookies;
+        requestInit.rawPost = rawPost;
         requestInit.postContentType = renv.contentType;
 
         // POST files
@@ -185,11 +186,8 @@ bool FastcgippRequestAdapter::response() {
             f.dataPtr = fcgiFile.data;
             requestInit.postFiles.insert({k, f});
         }
-    }
 
-    requestInit.rawPostCallback = [this]() {
-        return rawPost;
-    };
+    }
 
     ConnectionInitContainer connectionInit;
     connectionInit.requestInit = move(requestInit);
@@ -210,14 +208,15 @@ bool FastcgippRequestAdapter::inProcessor() {
     auto argc = any_cast<FastcgippArgumentContainer>(m_externalObject);
     auto postContentType = environment().contentType;
 
-    if (argc.rawPostAccess == RawPostAccess::NEVER || (argc.rawPostAccess == RawPostAccess::NONSTANDARD &&
-                                                       (postContentType == "multipart/form-data" ||
-                                                        postContentType == "application/x-www-form-urlencoded"))) {
+    if (postContentType.empty() || argc.rawPostAccess == RawPostAccess::NEVER ||
+        (argc.rawPostAccess == RawPostAccess::NONSTANDARD &&
+         (postContentType == "multipart/form-data" ||
+          postContentType == "application/x-www-form-urlencoded"))) {
         return false;
     }
 
     auto postBuffer = environment().postBuffer();
-    rawPost = std::string(postBuffer.data(), postBuffer.size());
+    rawPost = make_shared<string>(postBuffer.data(), postBuffer.size());
     return false;
 }
 
