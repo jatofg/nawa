@@ -12,14 +12,13 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-- 2020-07-18: Version is now v0.3 due to the move from `nawa::Any` to 
-`std::any`. C++17 is now required. The v0.2 tag points to the latest version 
-compatible with C++14.
-- 2019-11-23: Version is now v0.2 after a lot of API-breaking changes
-- 2019-11-22: [Sessions](https://www.tobiasflaig.eu/nawa/docs/sessionsmanual.html), 
-[Environment](https://www.tobiasflaig.eu/nawa/docs/environmentmanual.html), 
-and [Filters](https://www.tobiasflaig.eu/nawa/docs/filtersmanual.html) 
-manuals are now complete
+**v0.5 is here!** Apart from various improvements, it uses an entirely 
+new, modular request handler which paves the way for planned new features 
+(direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
+request handling functions) and additionally allows to use NAWA as a library. 
+Building and development is now easier, as the FastCGI 
+library does not need to be built separately anymore, and its headers are not required 
+anymore for app development. CMake 3.13 is now required.
 
 ## Example
 
@@ -42,19 +41,23 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction in the manual.](https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html) 
+
+If you don't like the IoC-style approach, you can also use NAWA as a library. 
+[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.5/docs/aslibrarymanual.html)
 
 ### Warning!
 
-This project is still in an early state (version 0.3!). It might, of 
-course, still contain serious bugs. Use it on your own risk. Using the 
-Docker container (or a VM) is recommended.
+This project is still in an early state (version 0.5!). It might, of 
+course, still contain bugs. Use it at your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
 might reach a higher version number at some point :)
 
 Also, the ABI and API can still change at any time, making 
-modifications to your apps (or, at least, recompilation) necessary.
+modifications to your apps (or, at least, recompilation) necessary. When such 
+changes happen, the version number will be increased, and nawarun will refuse to 
+load apps compiled against an older version.
 
 ## Features (selection)
 
@@ -91,8 +94,8 @@ application, and
 - A shared object file containing the application itself.
 
 You can find an introduction containing a simple "Hello World!" 
-NAWA app here:<br>
-https://www.tobiasflaig.eu/nawa/docs/gettingstarted.html
+NAWA app here: 
+[Getting started.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html)
 
 The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
@@ -113,7 +116,7 @@ For automatically starting an app on boot, use `systemctl enable`.
 You can also use the Docker images available in the GitHub Package 
 Registry. As they are built automatically, they should always be 
 up to date. See the [packages](https://github.com/jatofg/nawa/packages) 
-section to learn how to install them, and [the docs](https://www.tobiasflaig.eu/nawa/docs/usingdocker.html) 
+section to learn how to install them, and [the docs](https://www.tobiasflaig.eu/nawa/0.5/docs/usingdocker.html) 
 for using and building them.
 
 To install them, you need a GitHub account and access 
@@ -123,11 +126,12 @@ the package page to pull the image.
 
 ## Building
 
-NAWA has been tested on Linux only so far, but it might also run on BSD derivates and macOS. 
+NAWA has been tested on Linux only so far, but it might also run on BSD derivates 
+and macOS. 
 Windows is not supported and will never be.
 
 **Please note:** All commands in the following instructions should be 
-run as an unprivileged user. Commands that must run as root are 
+run as an unprivileged user. Commands which must run as root are 
 prepended with `sudo`.
 
 ### Requirements
@@ -135,7 +139,6 @@ prepended with `sudo`.
 The requirements marked with * are also required for running nawa, the 
 others for building only.
 
-- libfastcgi++* (lite) (see next subsection)
 - libssl-dev >= 1.1.1 (OpenSSL* is probably already present on your 
 system)
 - libboost-dev >= 1.65.1.0
@@ -146,29 +149,7 @@ Git, CMake, gcc, and other basic tools for building software
 are required, too.
 
 For building the docs, doxygen must be installed. However, you can also 
-[access the docs online](https://www.tobiasflaig.eu/nawa/docs/).
-
-### Clone, build, and install fastcgi++
-
-Run the following commands to build, run, and install fastcgi++ lite 
-(which is an optimized version of the fastcgi++ library by eddic). The 
-original library will work, too, with a few caveats (such as an 
-inconsistent logging style).
-
-`git clone https://github.com/jatofg/fastcgipp.git fastcgipp`
-
-`mkdir fastcgipp/build`
-
-`cd fastcgipp/build`
-
-`cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
-
-`make`
-
-Note: If you want to build the fastcgi++ docs, too, run 
-`make doc` now.
-
-`sudo make install`
+[access the docs online](https://www.tobiasflaig.eu/nawa/0.5/docs/).
 
 ### Clone, build, and install NAWA
 
@@ -186,14 +167,22 @@ First, create a directory for the build files:
 
 `cd build`
 
-Then, build NAWA:
+Create the build configuration:
 
 `cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
+
+**Note: If you want to build the tests as well, pass the `-DBuildTests=ON` argument 
+to cmake. If you want to use NAWA as a library, pass `-DBuildSharedLib=ON`.** 
+You can disable building the examples and docs using the arguments 
+`-DBuildExamples=OFF` resp. `-DBuildDocs=OFF`.
+
+Build nawarun (and tests, the shared library, examples, docs, depending on your 
+cmake arguments):
 
 `make`
 
 And last, install it to the target directories so that the apps 
-can find it:
+can find it (this will also install the headers needed for app development):
 
 `sudo make install`
 
@@ -203,11 +192,12 @@ In the build directory, run:
 
 `sudo xargs rm < install_manifest.txt`
 
+Uninstalling before installing a new version is recommended to avoid ancient 
+relics remaining on your system.
+
 ## Binary packages
 
-Binary packages for Debian and Ubuntu might be provided in the future, 
-as soon as this project reaches a more stable state. Currently, there 
-are not even releases available.
+Binary packages are not available yet, just build it yourself :)
 
 ## Third-party licenses
 

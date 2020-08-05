@@ -27,16 +27,17 @@
 #include <iomanip>
 #include <nawa/SmtpMailer.h>
 #include <nawa/Application.h>
-#include <nawa/UserException.h>
- 
+#include <nawa/Exception.h>
+#include <nawa/Encoding.h>
+
 using namespace nawa;
 using namespace std;
 
-int init(AppInit& appInit) {
+int init(AppInit &appInit) {
     return 0;
 }
 
-int handleRequest(Connection& connection) {
+int handleRequest(Connection &connection) {
     connection.setHeader("content-type", "text/plain; charset=utf-8");
 
     connection.response << "SMTP time: ";
@@ -44,11 +45,11 @@ int handleRequest(Connection& connection) {
     tm ltime;
     localtime_r(&currentTime, &ltime);
     connection.response << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
-    
+
     // The replacement rules to apply
-    ReplacementRules replacementRules;
-    replacementRules.insert({"Test", "T€st"});
-    replacementRules.insert({"email", "émail"});
+    auto replacementRules = make_shared<ReplacementRules>();
+    replacementRules->insert({"Test", "T€st"});
+    replacementRules->insert({"email", "émail"});
 
     EmailAddress from("John Doe", "johndoe@example.com");
     EmailAddress to("The Admin", "theadmin@example.com");
@@ -59,7 +60,8 @@ int handleRequest(Connection& connection) {
     SimpleEmail email1;
     email1.headers["From"] = from.get();
     email1.headers["To"] = to.get();
-    email1.headers["Subject"] = "Test mail";
+    email1.headers["Content-Type"] = "text/plain; charset=utf-8";
+    email1.headers["Subject"] = Encoding::makeEncodedWord("Test mail");
     email1.text = "Test email 'm€ssage' =@#$%^&*()===";
     connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
 
@@ -108,21 +110,22 @@ int handleRequest(Connection& connection) {
     connection.response << email2.getRaw(replacementRules);
 
     // if GET sendit=yes, then send it via SMTP localhost
-    if(connection.request.get["sendit"] == "yes") {
+    if (connection.request.get["sendit"] == "yes") {
 
         connection.response << "\r\n";
 
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
         SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
-                true, "test@example.com", "12345");
+                        true, "test@example.com", "12345");
+        smtp.enqueue(make_shared<SimpleEmail>(email1), to, make_shared<EmailAddress>(from), replacementRules);
         smtp.enqueue(make_shared<MimeEmail>(email2), to, make_shared<EmailAddress>(from), replacementRules);
 
         try {
             smtp.processQueue();
             connection.response << "Mail sent successfully!";
         }
-        catch(const UserException &e) {
-            connection.response << "Error sending mail: " << e.what();
+        catch (const Exception &e) {
+            connection.response << "Error sending mail: " << e.getDebugMessage();
         }
 
     }

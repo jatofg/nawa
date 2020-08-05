@@ -39,7 +39,8 @@ namespace nawa {
          * be binary (20 bytes).
          * @return SHA-1 hash of input.
          */
-        std::string sha1(const std::string& input, bool hex = true);
+        std::string sha1(const std::string &input, bool hex = true);
+
         /**
          * Get SHA-224 hash of a string.
          * @param input String to hash.
@@ -48,6 +49,7 @@ namespace nawa {
          * @return Hash of input.
          */
         std::string sha224(const std::string &input, bool hex = true);
+
         /**
          * Get SHA-256 hash of a string.
          * @param input String to hash.
@@ -56,6 +58,7 @@ namespace nawa {
          * @return Hash of input.
          */
         std::string sha256(const std::string &input, bool hex = true);
+
         /**
          * Get SHA-384 hash of a string.
          * @param input String to hash.
@@ -64,6 +67,7 @@ namespace nawa {
          * @return Hash of input.
          */
         std::string sha384(const std::string &input, bool hex = true);
+
         /**
          * Get SHA-512 hash of a string.
          * @param input String to hash.
@@ -72,6 +76,7 @@ namespace nawa {
          * @return Hash of input.
          */
         std::string sha512(const std::string &input, bool hex = true);
+
         /**
          * Get MD5 hash of a string.
          * @param input String to hash.
@@ -80,10 +85,11 @@ namespace nawa {
          * @return Hash of input.
          */
         std::string md5(const std::string &input, bool hex = true);
+
         /**
          * Create a (hopefully) secure password hash using a hash algorithm (bcrypt by default). \n
          * This function returns one-way hashes with pseudo-random salts. Use passwordVerify to validate a password.\n
-         * May throw a UserException on failure, the error codes are defined by the underlying hashing engine, but
+         * May throw a nawa::Exception on failure, the error codes are defined by the underlying hashing engine, but
          * should not be lower than 10.
          * Argon2 hashing might be added later, probably in a separate function.
          * @param password The password to hash.
@@ -92,13 +98,14 @@ namespace nawa {
          * you wish to customize hashing properties (such as using your own salt or changing the work factor).
          * @return Hash of the password (in case of bcrypt: 60 characters).
          */
-        std::string passwordHash(const std::string& password,
-                const Engines::HashingEngine &hashingEngine = Engines::BcryptHashingEngine());
+        std::string passwordHash(const std::string &password,
+                                 const Engines::HashingEngine &hashingEngine = Engines::BcryptHashingEngine());
+
         /**
          * Validate a password with a matching hashing engine (determined by a HashTypeTable). The underlying function
          * of the hashing engine should be designed in a way that prevents timing attacks (given that the compiler did
          * no bad optimizations).\n
-         * May throw a UserException on failure. Error codes: 1 (empty input hash), 2 (no hashing engine able to
+         * May throw a nawa::Exception on failure. Error codes: 1 (empty input hash), 2 (no hashing engine able to
          * verify the given hash could be determined by the HashTypeTable).
          * @param password Password (user input) to be verified.
          * @param hash Hash (e.g., from a database) to verify the user password against.
@@ -107,8 +114,8 @@ namespace nawa {
          * with NAWA.
          * @return True if the password matches, false otherwise.
          */
-        bool passwordVerify(const std::string& password, const std::string& hash,
-                const Engines::HashTypeTable &hashTypeTable = Engines::DefaultHashTypeTable());
+        bool passwordVerify(const std::string &password, const std::string &hash,
+                            const Engines::HashTypeTable &hashTypeTable = Engines::DefaultHashTypeTable());
     };
 }
 

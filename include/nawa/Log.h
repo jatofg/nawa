@@ -40,14 +40,19 @@ namespace nawa {
          * Construct a Log object with the default app name nawa (can be changed later).
          */
         Log() noexcept;
+
         /**
          * Construct a Log object with a custom app name (can be changed later).
-         * @param appname_
+         * @param appname The app name, appears in brackets in the log.
          */
-        explicit Log(std::string appname_) noexcept;
-        Log(const Log& other) noexcept;
-        Log& operator=(const Log& other) noexcept;
+        explicit Log(std::string appname) noexcept;
+
+        Log(const Log &other) noexcept;
+
+        Log &operator=(const Log &other) noexcept;
+
         virtual ~Log();
+
         /**
          * Change the output stream to the specified one. This change will be permanent until every active Log
          * object has been destructed. If the output stream is locked, this function will have no effect, and throw
@@ -57,10 +62,11 @@ namespace nawa {
          * the logger in a multi-threaded environment.
          * @param os Pointer to the output stream. Make sure that this stream will be available until NAWA terminates.
          */
-        static void setStream(std::ostream* os) noexcept;
+        static void setStream(std::ostream *os) noexcept;
+
         // TODO does std::ofstream file opening really throw exceptions or is there sth that has to be changed?
         /**
-         * Change the output to append to the specified log file. Will throw a UserException with error code 1 if
+         * Change the output to append to the specified log file. Will throw a nawa::Exception with error code 1 if
          * the requested file cannot be opened for writing. This change will be permanent until every active Log
          * object has been destructed. If the output stream is locked, this function will have no effect, and throw
          * no exception (make sure to check isLocked() first).
@@ -70,6 +76,7 @@ namespace nawa {
          * @param filename Path to the log file.
          */
         static void setOutfile(const std::string &filename);
+
         /**
          * Lock the output stream. It will not be possible to change the output stream of the logger anymore as long as
          * there is at least one active Log object. If the output stream is already locked, this will have no effect.
@@ -77,22 +84,26 @@ namespace nawa {
          * objects, as setting the output stream/file is not thread-safe.
          */
         static void lockStream() noexcept;
+
         /**
          * Check whether the output stream is locked.
          * @return True if locked, false if not.
          */
         static bool isLocked() noexcept;
+
         /**
          * Set the app name to use in debugging output. Defaults to nawa, but can be changed in order to use this
          * logging class inside of NAWA apps.
          * @param appname The app name, which will be include in the log in brackets.
          */
         void setAppname(std::string appname) noexcept;
+
         /**
          * Write a message to the log.
          * @param msg The message.
          */
         void write(const std::string &msg);
+
         /**
          * Write a message to the log.
          * @param msg The message.

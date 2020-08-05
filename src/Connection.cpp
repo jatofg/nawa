@@ -22,107 +22,145 @@
  */
 
 #include <algorithm>
-#include <iomanip>
-#include <locale>
 #include <regex>
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <nawa/Utils.h>
 #include <nawa/Connection.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
+
+using namespace nawa;
+using namespace std;
 
 namespace {
-    const std::unordered_map<unsigned int, std::string> httpStatusCodes = {
-            {200, "OK"}, {201, "Created"}, {202, "Accepted"}, {203, "Non-Authoritative Information"},
-            {204, "No Content"}, {205, "Reset Content"}, {206, "Partial Content"}, {207, "Multi-Status"},
-            {208, "Already Reported"}, {226, "IM Used"},
-            {300, "Multiple Choices"}, {301, "Moved Permanently"}, {302, "Found"}, {303, "See Other"},
-            {304, "Not Modified"}, {305, "Use Proxy"}, {307, "Temporary Redirect"}, {308, "Permanent Redirect"},
-            {400, "Bad Request"}, {401, "Unauthorized"}, {402, "Payment Required"}, {403, "Forbidden"},
-            {404, "Not Found"}, {405, "Method Not Allowed"}, {406, "Not Acceptable"},
-            {407, "Proxy Authentication Required"}, {408, "Request Timeout"}, {409, "Conflict"}, {410, "Gone"},
-            {411, "Length Required"}, {412, "Precondition Failed"}, {413, "Payload Too Large"}, {414, "URI Too Long"},
-            {415, "Unsupported Media Type"}, {416, "Range Not Satisfiable"}, {417, "Expectation Failed"},
-            {418, "I'm a teapot"}, {421, "Misdirected Request"}, {422, "Unprocessable Entity"}, {423, "Locked"},
-            {424, "Failed Dependency"}, {426, "Upgrade Required"}, {428, "Precondition Required"},
-            {429, "Too Many Requests"}, {431, "Request Header Fields Too Large"}, {451, "Unavailable For Legal Reasons"},
-            {500, "Internal Server Error"}, {501, "Not Implemented"}, {502, "Bad Gateway"}, {503, "Service Unavailable"},
-            {504, "Gateway Timeout"}, {505, "HTTP Version Not Supported"}, {506, "Variant Also Negotiates"},
-            {507, "Insufficient Storage"}, {508, "Loop Detected"}, {510, "Not Extended"},
+    const unordered_map<unsigned int, string> httpStatusCodes = {
+            {200, "OK"},
+            {201, "Created"},
+            {202, "Accepted"},
+            {203, "Non-Authoritative Information"},
+            {204, "No Content"},
+            {205, "Reset Content"},
+            {206, "Partial Content"},
+            {207, "Multi-Status"},
+            {208, "Already Reported"},
+            {226, "IM Used"},
+            {300, "Multiple Choices"},
+            {301, "Moved Permanently"},
+            {302, "Found"},
+            {303, "See Other"},
+            {304, "Not Modified"},
+            {305, "Use Proxy"},
+            {307, "Temporary Redirect"},
+            {308, "Permanent Redirect"},
+            {400, "Bad Request"},
+            {401, "Unauthorized"},
+            {402, "Payment Required"},
+            {403, "Forbidden"},
+            {404, "Not Found"},
+            {405, "Method Not Allowed"},
+            {406, "Not Acceptable"},
+            {407, "Proxy Authentication Required"},
+            {408, "Request Timeout"},
+            {409, "Conflict"},
+            {410, "Gone"},
+            {411, "Length Required"},
+            {412, "Precondition Failed"},
+            {413, "Payload Too Large"},
+            {414, "URI Too Long"},
+            {415, "Unsupported Media Type"},
+            {416, "Range Not Satisfiable"},
+            {417, "Expectation Failed"},
+            {418, "I'm a teapot"},
+            {421, "Misdirected Request"},
+            {422, "Unprocessable Entity"},
+            {423, "Locked"},
+            {424, "Failed Dependency"},
+            {426, "Upgrade Required"},
+            {428, "Precondition Required"},
+            {429, "Too Many Requests"},
+            {431, "Request Header Fields Too Large"},
+            {451, "Unavailable For Legal Reasons"},
+            {500, "Internal Server Error"},
+            {501, "Not Implemented"},
+            {502, "Bad Gateway"},
+            {503, "Service Unavailable"},
+            {504, "Gateway Timeout"},
+            {505, "HTTP Version Not Supported"},
+            {506, "Variant Also Negotiates"},
+            {507, "Insufficient Storage"},
+            {508, "Loop Detected"},
+            {510, "Not Extended"},
             {511, "Network Authentication Required"}
     };
 }
 
-void nawa::Connection::setBody(std::string content) {
-    bodyString = std::move(content);
+void Connection::setBody(string content) {
+    bodyString = move(content);
     clearStream();
 }
 
 void
-nawa::Connection::sendFile(const std::string &path, const std::string &contentType, bool forceDownload,
-                          const std::string &downloadFilename, bool checkIfModifiedSince) {
+Connection::sendFile(const string &path, const string &contentType, bool forceDownload,
+                           const string &downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
-    std::ifstream f(path, std::ifstream::binary);
+    ifstream f(path, ifstream::binary);
 
     // throw exception if file cannot be opened
-    if(!f) {
-        throw nawa::UserException("nawa::Connection::sendFile", 1, "Cannot open file for reading");
+    if (!f) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Cannot open file for reading");
     }
 
     // get time of last modification
     struct stat fileStat;
     time_t lastModified = 0;
-    if(stat(path.c_str(), &fileStat) == 0) {
+    if (stat(path.c_str(), &fileStat) == 0) {
         lastModified = fileStat.st_mtim.tv_sec;
     }
 
     // check if-modified if requested
     // TODO make ifModifiedSince available without converting it back and forth (universal? or not before v2?)
     // TODO implement other cache control headers, such as pragma, expires, ...
-    if(checkIfModifiedSince && std::stoul(request.env["ifModifiedSince"]) >= lastModified) {
+    if (checkIfModifiedSince && stoul(request.env["ifModifiedSince"]) >= lastModified) {
         setStatus(304);
-        setBody(std::string());
+        setBody(string());
         return;
     }
 
     // set content-type header
-    if(!contentType.empty()) {
+    if (!contentType.empty()) {
         setHeader("content-type", contentType);
-    }
-    else {
+    } else {
         // use the function from utils.h to guess the content type
-        setHeader("content-type", nawa::content_type_by_extension(nawa::get_file_extension(path)));
+        setHeader("content-type", content_type_by_extension(get_file_extension(path)));
     }
 
     // set the content-disposition header
-    if(forceDownload) {
-        if(!downloadFilename.empty()) {
-            std::stringstream hval;
+    if (forceDownload) {
+        if (!downloadFilename.empty()) {
+            stringstream hval;
             hval << "attachment; filename=\"" << downloadFilename << '"';
             setHeader("content-disposition", hval.str());
-        }
-        else {
+        } else {
             setHeader("content-disposition", "attachment");
         }
-    }
-    else if(!downloadFilename.empty()) {
-        std::stringstream hval;
+    } else if (!downloadFilename.empty()) {
+        stringstream hval;
         hval << "inline; filename=\"" << downloadFilename << '"';
         setHeader("content-disposition", hval.str());
     }
 
     // set the content-length header
     // get file size
-    f.seekg(0, std::ios::end);
+    f.seekg(0, ios::end);
     long fs = f.tellg();
     f.seekg(0);
-    setHeader("content-length", std::to_string(fs));
+    setHeader("content-length", to_string(fs));
 
     // set the last-modified header (if possible)
-    if(lastModified > 0) {
-        setHeader("last-modified", nawa::make_http_time(lastModified));
+    if (lastModified > 0) {
+        setHeader("last-modified", make_http_time(lastModified));
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
@@ -134,66 +172,65 @@ nawa::Connection::sendFile(const std::string &path, const std::string &contentTy
     clearStream();
 }
 
-void nawa::Connection::setHeader(std::string key, std::string value) {
+void Connection::setHeader(string key, string value) {
     // convert to lowercase
     // TODO check for correctness, maybe using regex (or waste of cpu time?)
-    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-    headers[key] = std::move(value);
+    transform(key.begin(), key.end(), key.begin(), ::tolower);
+    headers[key] = move(value);
 }
 
-void nawa::Connection::unsetHeader(std::string key) {
+void Connection::unsetHeader(string key) {
     // convert to lowercase
-    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers.erase(key);
 }
 
-std::string nawa::Connection::getRaw() {
+string Connection::getRaw() {
     mergeStream();
-    std::stringstream raw;
+    stringstream raw;
 
     // include headers and cookies, but only when flushing for the first time
-    if(!isFlushed) {
+    if (!isFlushed) {
         // Add headers to the raw HTTP source
-        for(auto const &e: headers) {
+        for (auto const &e: headers) {
             raw << e.first << ": " << e.second << "\r\n";
         }
         // include cookies
-        for(auto const &e: cookies) {
+        for (auto const &e: cookies) {
             raw << "Set-Cookie: " << e.first << "=" << e.second.content;
             // Domain option
-            const std::string& domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
-            if(!domain.empty()) {
+            const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
+            if (!domain.empty()) {
                 raw << "; Domain=" << domain;
             }
             // Path option
-            const std::string& path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
-            if(!path.empty()) {
+            const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
+            if (!path.empty()) {
                 raw << "; Path=" << path;
             }
             // Expires option
             time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
-            if(expiry > 0) {
-                raw << "; Expires=" << nawa::make_http_time(expiry);
+            if (expiry > 0) {
+                raw << "; Expires=" << make_http_time(expiry);
             }
             // Max-Age option
             unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
-            if(maxAge > 0) {
+            if (maxAge > 0) {
                 raw << "; Max-Age=" << maxAge;
             }
             // Secure option
-            if(e.second.secure || cookiePolicy.secure) {
+            if (e.second.secure || cookiePolicy.secure) {
                 raw << "; Secure";
             }
             // HttpOnly option
-            if(e.second.httpOnly || cookiePolicy.httpOnly) {
+            if (e.second.httpOnly || cookiePolicy.httpOnly) {
                 raw << "; HttpOnly";
             }
             // SameSite option
             uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
-            if(sameSite == 1) {
+            if (sameSite == 1) {
                 raw << "; SameSite=lax";
-            }
-            else if(sameSite > 1) {
+            } else if (sameSite > 1) {
                 raw << "; SameSite=strict";
             }
             raw << "\r\n";
@@ -206,61 +243,65 @@ std::string nawa::Connection::getRaw() {
     return raw.str();
 }
 
-void nawa::Connection::mergeStream() {
+void Connection::mergeStream() {
     bodyString += response.str();
     clearStream();
 }
 
-void nawa::Connection::clearStream() {
-    response.str(std::string());
+void Connection::clearStream() {
+    response.str(string());
     response.clear();
 }
 
-nawa::Connection::Connection(Request& request, Config& config) : request(request), config(config), session(*this) {
+Connection::Connection(const ConnectionInitContainer &connectionInit)
+        : flushCallback(connectionInit.flushCallback),
+          request(connectionInit.requestInit),
+          config(connectionInit.config),
+          session(*this) {
     headers["content-type"] = "text/html; charset=utf-8";
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
-    if(config[{"session", "autostart"}] == "on") {
+    if (config[{"session", "autostart"}] == "on") {
         session.start();
     }
 }
 
-void nawa::Connection::setCookie(const std::string &key, nawa::Cookie cookie) {
+void Connection::setCookie(const string &key, Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
-    std::regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
-    std::regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
-    if(!std::regex_match(key, matchKey) || !std::regex_match(cookie.content, matchContent)) {
-        throw UserException("nawa::Connection::setCookie", 1, "Invalid characters in key or value");
+    regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
+    regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
+    if (!regex_match(key, matchKey) || !regex_match(cookie.content, matchContent)) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
-    cookies[key] = std::move(cookie);
+    cookies[key] = move(cookie);
 }
 
-void nawa::Connection::setCookie(const std::string &key, std::string cookieContent) {
-    setCookie(key, nawa::Cookie(std::move(cookieContent)));
+void Connection::setCookie(const string &key, string cookieContent) {
+    setCookie(key, Cookie(move(cookieContent)));
 }
 
-void nawa::Connection::unsetCookie(const std::string &key) {
+void Connection::unsetCookie(const string &key) {
     cookies.erase(key);
 }
 
-void nawa::Connection::flushResponse() {
-    // access RequestHandler through Request::Env, which declares Connection as a friend
-    request.env.requestHandler.flush(*this);
+void Connection::flushResponse() {
+    // use callback to flush response
+    flushCallback(getRaw());
     // now that headers and cookies have been sent to the client, make sure they are not included anymore
     isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
     setBody("");
 }
 
-void nawa::Connection::setStatus(unsigned int status) {
-    std::stringstream hval;
+void Connection::setStatus(unsigned int status) {
+    stringstream hval;
     hval << status;
-    if(httpStatusCodes.count(status) == 1) {
+    if (httpStatusCodes.count(status) == 1) {
         hval << " " << httpStatusCodes.at(status);
     }
     headers["status"] = hval.str();
 }
 
-void nawa::Connection::setCookiePolicy(Cookie policy) {
-    cookiePolicy = std::move(policy);
+void Connection::setCookiePolicy(Cookie policy) {
+    cookiePolicy = move(policy);
 }

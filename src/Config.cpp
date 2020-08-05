@@ -22,50 +22,66 @@
  */
 
 #include <nawa/Config.h>
-#include <nawa/SysException.h>
+#include <nawa/Exception.h>
 #include "../libs/inih/ini.h"
 
-nawa::Config::Config(std::string iniFile) {
-    read(std::move(iniFile));
+using namespace nawa;
+using namespace std;
+
+Config::Config(const string &iniFile) {
+    read(iniFile);
 }
 
-nawa::Config &nawa::Config::operator=(const nawa::Config &other) {
-    if(this != &other) {
+Config &Config::operator=(const Config &other) {
+    if (this != &other) {
         values = other.values;
     }
     return *this;
 }
 
-void nawa::Config::read(const std::string &iniFile) {
-    auto valueHandler = [](void* obj, const char* section, const char* name, const char* value) -> int {
-        auto _this = (nawa::Config*) obj;
-        std::pair<std::string, std::string> keyToInsert (section, name);
-        std::pair<std::pair<std::string, std::string>, std::string> pairToInsert (keyToInsert, value);
+void Config::read(const string &iniFile) {
+    auto valueHandler = [](void *obj, const char *section, const char *name, const char *value) -> int {
+        auto _this = (Config *) obj;
+        pair<string, string> keyToInsert(section, name);
+        pair<pair<string, string>, string> pairToInsert(keyToInsert, value);
         _this->values.insert(pairToInsert);
         return 1;
     };
-    if(ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
-        throw nawa::SysException(__FILE__, __LINE__, "Could not read config file.");
+    if (ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Could not read config file.");
     }
 }
 
-bool nawa::Config::isSet(const std::pair<std::string, std::string> &key) const {
+bool Config::isSet(const pair<string, string> &key) const {
     return (values.count(key) == 1);
 }
 
-std::string nawa::Config::operator[](const std::pair<std::string, std::string>& key) const {
-    if(values.count(key) == 1) {
+string Config::operator[](const pair<string, string> &key) const {
+    if (values.count(key) == 1) {
         return values.at(key);
-    }
-    else {
-        return std::string();
+    } else {
+        return string();
     }
 }
 
-void nawa::Config::set(std::pair<std::string, std::string> key, std::string value) {
-    values[std::move(key)] = std::move(value);
+// doxygen bug requires std:: here
+void Config::set(std::pair<string, string> key, std::string value) {
+    values[move(key)] = move(value);
 }
 
-void nawa::Config::set(std::string section, std::string key, std::string value) {
-    set(std::pair<std::string, std::string> (std::move(section), std::move(key)), std::move(value));
+void Config::set(string section, string key, string value) {
+    set(pair<string, string>(move(section), move(key)), move(value));
+}
+
+Config::Config(const Config &other) {
+    values = other.values;
+}
+
+Config::Config(Config &&other) noexcept: values(move(other.values)) {}
+
+Config &Config::operator=(Config &&other) noexcept {
+    if (this != &other) {
+        values = move(other.values);
+    }
+    return *this;
 }

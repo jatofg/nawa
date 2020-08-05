@@ -29,21 +29,23 @@
 using namespace nawa;
 using namespace std;
 
-int init(nawa::AppInit& appInit) {
+int init(nawa::AppInit &appInit) {
 
     // enable access filtering
     appInit.accessFilters.filtersEnabled = true;
 
     // apply a forward filter for images
     ForwardFilter forwardFilter;
-    forwardFilter.pathFilter = {{"test", "images"}, {"test2", "images"}};
+    forwardFilter.pathFilter = {{"test",  "images"},
+                                {"test2", "images"}};
     forwardFilter.extensionFilter = {"png", "jpg", "svg"};
     forwardFilter.basePath = "/home/tobias/Pictures";
     appInit.accessFilters.forwardFilters.push_back(forwardFilter);
 
     // send 404 error for non-image files in /test{2}/images
     BlockFilter blockFilter;
-    blockFilter.pathFilter = {{"test", "images"}, {"test2", "images"}};
+    blockFilter.pathFilter = {{"test",  "images"},
+                              {"test2", "images"}};
     blockFilter.extensionFilter = {"png", "jpg", "svg"};
     blockFilter.invertExtensionFilter = true;
     blockFilter.status = 404;
@@ -83,18 +85,24 @@ int handleRequest(Connection &connection) {
     string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
 
     connection.response << "<!DOCTYPE html>\n"
-                  "<html><head><title>Test</title></head><body>"
-                  "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
-                  "<p>Client IP: " << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
-                  "<p>Request URI: (" << connection.request.env.getRequestPath().size() << " elements): "
-                  << connection.request.env["requestUri"] << "</p>"
-                  "<p>HTTPS status: " << connection.request.env["https"] << "</p>"
-                  "<p>SERVER_NAME: " << connection.request.env["serverName"] << "</p>"
-                  "<p>Server software: " << connection.request.env["serverSoftware"] << "</p>"
-                  "<p>Base URL: " << connection.request.env["baseUrl"] << "</p>"
-                  "<p>Full URL with QS: " << connection.request.env["fullUrlWithQS"] << "</p>"
-                  "<p>Full URL without QS: " << connection.request.env["fullUrlWithoutQS"] << "</p>"
-                  ;
+                           "<html><head><title>Test</title></head><body>"
+                           "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
+                                                                                                     "<p>Client IP: "
+                        << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
+                                                                                            "<p>Request URI: ("
+                        << connection.request.env.getRequestPath().size() << " elements): "
+                        << connection.request.env["requestUri"] << "</p>"
+                                                                   "<p>HTTPS status: "
+                        << connection.request.env["https"] << "</p>"
+                                                              "<p>SERVER_NAME: " << connection.request.env["serverName"]
+                        << "</p>"
+                           "<p>Server software: " << connection.request.env["serverSoftware"] << "</p>"
+                                                                                                 "<p>Base URL: "
+                        << connection.request.env["baseUrl"] << "</p>"
+                                                                "<p>Full URL with QS: "
+                        << connection.request.env["fullUrlWithQS"] << "</p>"
+                                                                      "<p>Full URL without QS: "
+                        << connection.request.env["fullUrlWithoutQS"] << "</p>";
 
     // test privileges
     auto currentUid = getuid();
@@ -105,39 +113,38 @@ int handleRequest(Connection &connection) {
     connection.response << "<p>Privileges: uid = " << currentUid << "; gid = " << currentGid << "; euid = "
                         << currentEUid << "; egid = " << currentEGid << "</p>";
     vector<gid_t> currentGL(groupCount, 0);
-    if(getgroups(groupCount, &currentGL[0]) >= 0) {
+    if (getgroups(groupCount, &currentGL[0]) >= 0) {
         connection.response << "<p>Current groups: ";
-        for(auto const &e: currentGL) {
+        for (auto const &e: currentGL) {
             connection.response << e << ", ";
         }
         connection.response << "</p>";
     }
 
     // alternative: connection.session["test"].isSet()
-    if(connection.session.isSet("test")) {
-        connection.response << "<p>Session available! Value: " << any_cast<string>(connection.session["test"]) << "</p>";
+    if (connection.session.isSet("test")) {
+        connection.response << "<p>Session available! Value: " << any_cast<string>(connection.session["test"])
+                            << "</p>";
         connection.session.invalidate();
         connection.session.start();
         connection.session.set("test", string("and even more blah"));
-        
-    }
-    else {
+
+    } else {
         connection.session.set("test", "blah blah blah");
         connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 
     string encodedDecoded = Encoding::htmlDecode(encoded);
-    if(decoded == encodedDecoded) {
+    if (decoded == encodedDecoded) {
         connection.response << "<p>yay!</p>";
-    }
-    else {
-        connection.response << "<p>" << Encoding::htmlEncode(encodedDecoded) <<"</p>";
+    } else {
+        connection.response << "<p>" << Encoding::htmlEncode(encodedDecoded) << "</p>";
     }
 
     connection.flushResponse();
 
     connection.response << "<p>Hello World 2!</p>"
-                  "</body></html>";
+                           "</body></html>";
 
     return 0;
 }

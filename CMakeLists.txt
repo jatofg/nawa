@@ -1,16 +1,17 @@
-cmake_minimum_required(VERSION 3.7)
-project(nawa VERSION 0.3)
+cmake_minimum_required(VERSION 3.13)
+project(nawa VERSION 0.5)
 
 set(CMAKE_CXX_STANDARD 17)
 
 # version
 set(NAWA_VERSION_MAJOR 0)
-set(NAWA_VERSION_MINOR 3)
+set(NAWA_VERSION_MINOR 5)
 
 # build options
 option(BuildTests "Build tests" OFF)
 option(BuildExamples "Build examples" ON)
 option(BuildDocs "Build docs" ON)
+option(BuildSharedLib "Build shared library" OFF)
 
 # only unix-based OS are supported
 if(NOT UNIX)
@@ -21,36 +22,51 @@ endif()
 configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
         ${PROJECT_BINARY_DIR}/include/nawa/Application.h)
 
-# ... SysException.h Types/Compound.h Connection.cpp ...
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
+target_compile_options(bcrypt PUBLIC -fPIC)
 
-add_executable(nawarun
+# dependencies
+include(FetchContent)
+FetchContent_Declare(
+        fastcgilite
+        GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
+        GIT_TAG v3.1.6
+)
+
+# if Debian would ship cmake 3.14 instead of 3.13, we could just do the following
+#FetchContent_MakeAvailable(fastcgilite)
+FetchContent_GetProperties(fastcgilite)
+if(NOT fastcgilite_POPULATED)
+    FetchContent_Populate(fastcgilite)
+    add_subdirectory(${fastcgilite_SOURCE_DIR} ${fastcgilite_BINARY_DIR})
+endif()
+
+set(NAWA_FILES
         include/nawa/Request.h
-        include/nawa/RequestHandler.h
-        include/nawa/SysException.h
         include/nawa/Connection.h
         include/nawa/Encoding.h
         include/nawa/Utils.h
         include/nawa/Session.h
         include/nawa/Config.h
         include/nawa/Crypto.h
-        include/nawa/UserException.h
+        include/nawa/Exception.h
         include/nawa/Cookie.h
         include/nawa/Log.h
         include/nawa/AccessFilterList.h
         include/nawa/AppInit.h
         include/nawa/SmtpMailer.h
         include/nawa/Email.h
+        include/nawa/File.h
         include/nawa/Engines/HashingEngine.h
         include/nawa/Engines/Argon2HashingEngine.h
         include/nawa/Engines/BcryptHashingEngine.h
         include/nawa/Engines/HashTypeTable.h
         include/nawa/Engines/DefaultHashTypeTable.h
+        include/nawa/RequestHandlers/RequestHandler.h
+        include/nawa/RequestHandlers/FastcgiRequestHandler.h
 
-        src/main.cpp
         src/Request.cpp
-        src/RequestHandler.cpp
         src/Connection.cpp
         src/Encoding.cpp
         src/Utils.cpp
@@ -63,6 +79,8 @@ add_executable(nawarun
         src/Engines/Argon2HashingEngine.cpp
         src/Engines/BcryptHashingEngine.cpp
         src/Engines/DefaultHashTypeTable.cpp
+        src/RequestHandlers/RequestHandler.cpp
+        src/RequestHandlers/FastcgiRequestHandler.cpp
 
         libs/inih/ini.h
         libs/inih/ini.c
@@ -70,11 +88,29 @@ add_executable(nawarun
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
-target_link_libraries(nawarun -ldl -lfastcgipp -lcrypto -lcurl -largon2 bcrypt)
+add_executable(nawarun src/main.cpp ${NAWA_FILES})
+
+target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
+
+target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
+target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
+
+if(BuildSharedLib)
+    add_library(nawa SHARED ${NAWA_FILES})
+    target_link_libraries(nawa -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
+    target_include_directories(nawa PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
+endif()
 
 if(BuildTests)
     add_library(assertions SHARED
@@ -104,6 +140,13 @@ if(BuildTests)
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    add_library(gpctest SHARED
+            tests/gpctest.cpp)
+    target_include_directories(gpctest PUBLIC
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 endif()
 
 if(BuildExamples)
@@ -127,10 +170,19 @@ if(BuildExamples)
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    if(BuildSharedLib)
+        add_executable(aslibrary examples/aslibrary.cpp)
+        target_link_libraries(aslibrary nawa)
+        target_include_directories(aslibrary PUBLIC
+                $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
+#set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
+#set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 # install targets, components should be checked again w.r.t. packaging
 include(GNUInstallDirs)
@@ -149,6 +201,11 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/nawa/Application.h"
 if(EXISTS /etc/systemd/system)
     install(FILES "${PROJECT_SOURCE_DIR}/systemd/nawa@.service"
             DESTINATION /etc/systemd/system
+            COMPONENT Runtime)
+endif()
+if(BuildSharedLib)
+    install(TARGETS nawa
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT Runtime)
 endif()
 

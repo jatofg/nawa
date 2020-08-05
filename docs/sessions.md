@@ -66,7 +66,7 @@ use a cast to save the correct type.
 ### Accessing variables
 
 To access a session variable with a certain key, use the `[]` operator. 
-It will return an object of the type `std::any`. Using this object, 
+It will return an object of type `std::any`. Using this object, 
 you can retrieve the original stored object by using `std::any_cast`:
 
 ```cpp
@@ -95,5 +95,5 @@ session along with its data, see `nawa::Session::invalidate()`.
 
 ## Learn more
 
-Read the docs of the `nawa::Session` and `nawa::Any` classes and 
+Read the docs of `nawa::Session` and 
 have a look at the `tests/sessiontest.cpp` to see a working example.

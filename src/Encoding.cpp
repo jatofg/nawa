@@ -32,8 +32,11 @@
 #include <nawa/Utils.h>
 #include "../libs/base64/base64.h"
 
+using namespace nawa;
+using namespace std;
+
 namespace {
-    const std::unordered_map<char32_t, std::u32string> htmlEntities =
+    const unordered_map<char32_t, u32string> htmlEntities =
             {{U'\u00C1',U"&Aacute;"},{U'\u00E1',U"&aacute;"},{U'\u0102',U"&Abreve;"},{U'\u0103',U"&abreve;"},
              {U'\u223E',U"&ac;"},{U'\u223F',U"&acd;"},{U'\u223E',U""},{U'\u00C2',U"&Acirc;"},
              {U'\u00E2',U"&acirc;"},{U'\u00B4',U"&acute;"},{U'\u0410',U"&Acy;"},{U'\u0430',U"&acy;"},
@@ -450,72 +453,72 @@ namespace {
              {U'\U0001d56b',U"&zopf;"},{U'\U0001d4b5',U"&Zscr;"},{U'\U0001d4cf',U"&zscr;"},
              {U'\u200D',U"&zwj;"},{U'\u200C',U"&zwnj;"}};
 
-    const std::unordered_map<char32_t, std::pair<char32_t, std::u32string>> htmlLookaheads =
-            {{U'\u223E',std::make_pair(U'\u0333', U"&acE;")},{U'\u003D',std::make_pair(U'\u20E5', U"&bne;")},
-             {U'\u2261',std::make_pair(U'\u20E5', U"&bnequiv;")},
-             {U'\u2229',std::make_pair(U'\uFE00', U"&caps;")},
-             {U'\u222A',std::make_pair(U'\uFE00', U"&cups;")},
-             //{U'\u0066',std::make_pair(U'\u006A', U"&fjlig;")},
-             {U'\u22DB',std::make_pair(U'\uFE00', U"&gesl;")},
-             {U'\u2269',std::make_pair(U'\uFE00', U"&gvertneqq;")},
-             {U'\u2AAD',std::make_pair(U'\uFE00', U"&lates;")},
-             {U'\u22DA',std::make_pair(U'\uFE00', U"&lesg;")},
-             {U'\u2268',std::make_pair(U'\uFE00', U"&lvertneqq;")},
-             {U'\u2220',std::make_pair(U'\u20D2', U"&nang;")},
-             {U'\u2A70',std::make_pair(U'\u0338', U"&napE;")},
-             {U'\u224B',std::make_pair(U'\u0338', U"&napid;")},
-             {U'\u224E',std::make_pair(U'\u0338', U"&nbump;")},
-             {U'\u224F',std::make_pair(U'\u0338', U"&nbumpe;")},
-             {U'\u2A6D',std::make_pair(U'\u0338', U"&ncongdot;")},
-             {U'\u2250',std::make_pair(U'\u0338', U"&nedot;")},
-             {U'\u2242',std::make_pair(U'\u0338', U"&nesim;")},
-             {U'\u2267',std::make_pair(U'\u0338', U"&ngE;")},
-             {U'\u2A7E',std::make_pair(U'\u0338', U"&ngeqslant;")},
-             {U'\u22D9',std::make_pair(U'\u0338', U"&nGg;")},{U'\u226B',std::make_pair(U'\u20D2', U"&nGt;")},
-             {U'\u226B',std::make_pair(U'\u0338', U"&nGtv;")},{U'\u2266',std::make_pair(U'\u0338', U"&nlE;")},
-             {U'\u2A7D',std::make_pair(U'\u0338', U"&nleqslant;")},
-             {U'\u22D8',std::make_pair(U'\u0338', U"&nLl;")},{U'\u226A',std::make_pair(U'\u20D2', U"&nLt;")},
-             {U'\u226A',std::make_pair(U'\u0338', U"&nLtv;")},
-             {U'\u22F5',std::make_pair(U'\u0338', U"&notindot;")},
-             {U'\u22F9',std::make_pair(U'\u0338', U"&notinE;")},
-             {U'\u29CF',std::make_pair(U'\u0338', U"&NotLeftTriangleBar;")},
-             {U'\u2AA2',std::make_pair(U'\u0338', U"&NotNestedGreaterGreater;")},
-             {U'\u2AA1',std::make_pair(U'\u0338', U"&NotNestedLessLess;")},
-             {U'\u2AAF',std::make_pair(U'\u0338', U"&NotPrecedesEqual;")},
-             {U'\u29D0',std::make_pair(U'\u0338', U"&NotRightTriangleBar;")},
-             {U'\u228F',std::make_pair(U'\u0338', U"&NotSquareSubset;")},
-             {U'\u2290',std::make_pair(U'\u0338', U"&NotSquareSuperset;")},
-             {U'\u2282',std::make_pair(U'\u20D2', U"&NotSubset;")},
-             {U'\u2AB0',std::make_pair(U'\u0338', U"&NotSucceedsEqual;")},
-             {U'\u227F',std::make_pair(U'\u0338', U"&NotSucceedsTilde;")},
-             {U'\u2283',std::make_pair(U'\u20D2', U"&NotSuperset;")},
-             {U'\u2AFD',std::make_pair(U'\u20E5', U"&nparsl;")},
-             {U'\u2202',std::make_pair(U'\u0338', U"&npart;")},
-             {U'\u2933',std::make_pair(U'\u0338', U"&nrarrc;")},
-             {U'\u219D',std::make_pair(U'\u0338', U"&nrarrw;")},
-             {U'\u2AC5',std::make_pair(U'\u0338', U"&nsubE;")},
-             {U'\u2AC6',std::make_pair(U'\u0338', U"&nsupE;")},
-             {U'\u224D',std::make_pair(U'\u20D2', U"&nvap;")},
-             {U'\u2265',std::make_pair(U'\u20D2', U"&nvge;")},
-             {U'\u003E',std::make_pair(U'\u20D2', U"&nvgt;")},
-             {U'\u2264',std::make_pair(U'\u20D2', U"&nvle;")},
-             {U'\u003C',std::make_pair(U'\u20D2', U"&nvlt;")},
-             {U'\u22B4',std::make_pair(U'\u20D2', U"&nvltrie;")},
-             {U'\u22B5',std::make_pair(U'\u20D2', U"&nvrtrie;")},
-             {U'\u223C',std::make_pair(U'\u20D2', U"&nvsim;")},
-             {U'\u223D',std::make_pair(U'\u0331', U"&race;")},
-             {U'\u2AAC',std::make_pair(U'\uFE00', U"&smtes;")},
-             {U'\u2293',std::make_pair(U'\uFE00', U"&sqcaps;")},
-             {U'\u2294',std::make_pair(U'\uFE00', U"&sqcups;")},
-             {U'\u205F',std::make_pair(U'\u200A', U"&ThickSpace;")},
-             {U'\u228A',std::make_pair(U'\uFE00', U"&varsubsetneq;")},
-             {U'\u2ACB',std::make_pair(U'\uFE00', U"&varsubsetneqq;")},
-             {U'\u228B',std::make_pair(U'\uFE00', U"&varsupsetneq;")},
-             {U'\u2ACC',std::make_pair(U'\uFE00', U"&varsupsetneqq;")}};
+    const unordered_map<char32_t, pair<char32_t, u32string>> htmlLookaheads =
+            {{U'\u223E',make_pair(U'\u0333', U"&acE;")},{U'\u003D',make_pair(U'\u20E5', U"&bne;")},
+             {U'\u2261',make_pair(U'\u20E5', U"&bnequiv;")},
+             {U'\u2229',make_pair(U'\uFE00', U"&caps;")},
+             {U'\u222A',make_pair(U'\uFE00', U"&cups;")},
+             //{U'\u0066',make_pair(U'\u006A', U"&fjlig;")},
+             {U'\u22DB',make_pair(U'\uFE00', U"&gesl;")},
+             {U'\u2269',make_pair(U'\uFE00', U"&gvertneqq;")},
+             {U'\u2AAD',make_pair(U'\uFE00', U"&lates;")},
+             {U'\u22DA',make_pair(U'\uFE00', U"&lesg;")},
+             {U'\u2268',make_pair(U'\uFE00', U"&lvertneqq;")},
+             {U'\u2220',make_pair(U'\u20D2', U"&nang;")},
+             {U'\u2A70',make_pair(U'\u0338', U"&napE;")},
+             {U'\u224B',make_pair(U'\u0338', U"&napid;")},
+             {U'\u224E',make_pair(U'\u0338', U"&nbump;")},
+             {U'\u224F',make_pair(U'\u0338', U"&nbumpe;")},
+             {U'\u2A6D',make_pair(U'\u0338', U"&ncongdot;")},
+             {U'\u2250',make_pair(U'\u0338', U"&nedot;")},
+             {U'\u2242',make_pair(U'\u0338', U"&nesim;")},
+             {U'\u2267',make_pair(U'\u0338', U"&ngE;")},
+             {U'\u2A7E',make_pair(U'\u0338', U"&ngeqslant;")},
+             {U'\u22D9',make_pair(U'\u0338', U"&nGg;")},{U'\u226B',make_pair(U'\u20D2', U"&nGt;")},
+             {U'\u226B',make_pair(U'\u0338', U"&nGtv;")},{U'\u2266',make_pair(U'\u0338', U"&nlE;")},
+             {U'\u2A7D',make_pair(U'\u0338', U"&nleqslant;")},
+             {U'\u22D8',make_pair(U'\u0338', U"&nLl;")},{U'\u226A',make_pair(U'\u20D2', U"&nLt;")},
+             {U'\u226A',make_pair(U'\u0338', U"&nLtv;")},
+             {U'\u22F5',make_pair(U'\u0338', U"&notindot;")},
+             {U'\u22F9',make_pair(U'\u0338', U"&notinE;")},
+             {U'\u29CF',make_pair(U'\u0338', U"&NotLeftTriangleBar;")},
+             {U'\u2AA2',make_pair(U'\u0338', U"&NotNestedGreaterGreater;")},
+             {U'\u2AA1',make_pair(U'\u0338', U"&NotNestedLessLess;")},
+             {U'\u2AAF',make_pair(U'\u0338', U"&NotPrecedesEqual;")},
+             {U'\u29D0',make_pair(U'\u0338', U"&NotRightTriangleBar;")},
+             {U'\u228F',make_pair(U'\u0338', U"&NotSquareSubset;")},
+             {U'\u2290',make_pair(U'\u0338', U"&NotSquareSuperset;")},
+             {U'\u2282',make_pair(U'\u20D2', U"&NotSubset;")},
+             {U'\u2AB0',make_pair(U'\u0338', U"&NotSucceedsEqual;")},
+             {U'\u227F',make_pair(U'\u0338', U"&NotSucceedsTilde;")},
+             {U'\u2283',make_pair(U'\u20D2', U"&NotSuperset;")},
+             {U'\u2AFD',make_pair(U'\u20E5', U"&nparsl;")},
+             {U'\u2202',make_pair(U'\u0338', U"&npart;")},
+             {U'\u2933',make_pair(U'\u0338', U"&nrarrc;")},
+             {U'\u219D',make_pair(U'\u0338', U"&nrarrw;")},
+             {U'\u2AC5',make_pair(U'\u0338', U"&nsubE;")},
+             {U'\u2AC6',make_pair(U'\u0338', U"&nsupE;")},
+             {U'\u224D',make_pair(U'\u20D2', U"&nvap;")},
+             {U'\u2265',make_pair(U'\u20D2', U"&nvge;")},
+             {U'\u003E',make_pair(U'\u20D2', U"&nvgt;")},
+             {U'\u2264',make_pair(U'\u20D2', U"&nvle;")},
+             {U'\u003C',make_pair(U'\u20D2', U"&nvlt;")},
+             {U'\u22B4',make_pair(U'\u20D2', U"&nvltrie;")},
+             {U'\u22B5',make_pair(U'\u20D2', U"&nvrtrie;")},
+             {U'\u223C',make_pair(U'\u20D2', U"&nvsim;")},
+             {U'\u223D',make_pair(U'\u0331', U"&race;")},
+             {U'\u2AAC',make_pair(U'\uFE00', U"&smtes;")},
+             {U'\u2293',make_pair(U'\uFE00', U"&sqcaps;")},
+             {U'\u2294',make_pair(U'\uFE00', U"&sqcups;")},
+             {U'\u205F',make_pair(U'\u200A', U"&ThickSpace;")},
+             {U'\u228A',make_pair(U'\uFE00', U"&varsubsetneq;")},
+             {U'\u2ACB',make_pair(U'\uFE00', U"&varsubsetneqq;")},
+             {U'\u228B',make_pair(U'\uFE00', U"&varsupsetneq;")},
+             {U'\u2ACC',make_pair(U'\uFE00', U"&varsupsetneqq;")}};
 
-    std::unordered_map<std::u32string, std::pair<char32_t, char32_t>> htmlDecodeTable;
+    unordered_map<u32string, pair<char32_t, char32_t>> htmlDecodeTable;
 
-    const std::unordered_set<char> urlUnreserved =
+    const unordered_set<char> urlUnreserved =
             {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
              'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
              'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4',
@@ -523,74 +526,68 @@ namespace {
 
     void initializeHtmlDecodeTable() {
         // add entities
-        for(auto &e: htmlEntities) {
+        for (auto &e: htmlEntities) {
             // if string is empty, we need to look at htmlLookahead
-            if(!e.second.empty()) {
-                htmlDecodeTable.insert(std::make_pair(e.second, std::make_pair(e.first, U'\0')));
-            }
-            else if(htmlLookaheads.count(e.first) == 1) {
+            if (!e.second.empty()) {
+                htmlDecodeTable.insert(make_pair(e.second, make_pair(e.first, U'\0')));
+            } else if (htmlLookaheads.count(e.first) == 1) {
                 auto const &lookahead = htmlLookaheads.at(e.first);
                 char32_t secondChar = lookahead.first;
-                htmlDecodeTable.insert(std::make_pair(lookahead.second, std::make_pair(e.first, secondChar)));
+                htmlDecodeTable.insert(make_pair(lookahead.second, make_pair(e.first, secondChar)));
             }
         }
         // &fjlig; is a strange entity that represents just the characters fj
         // for that reason, it is not included (or commented out) in the entity tables
-        htmlDecodeTable.insert(std::make_pair(U"&fjlig;", std::make_pair(U'\u0066', U'\u006A')));
+        htmlDecodeTable.insert(make_pair(U"&fjlig;", make_pair(U'\u0066', U'\u006A')));
     }
 
 }
 
-std::string nawa::Encoding::htmlEncode(std::string input, bool encodeAll) {
-    if(!encodeAll) {
+string Encoding::htmlEncode(string input, bool encodeAll) {
+    if (!encodeAll) {
         boost::replace_all(input, "&", "&amp;");
         boost::replace_all(input, "\"", "&quot;");
         boost::replace_all(input, "<", "&lt;");
         boost::replace_all(input, ">", "&gt;");
-    }
-    else {
+    } else {
         // convert to utf32 to iterate through the characters
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
-        std::u32string uinput = cv.from_bytes(input);
-        std::basic_stringstream<char32_t> uoutputs;
+        wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
+        u32string uinput = cv.from_bytes(input);
+        basic_stringstream<char32_t> uoutputs;
         char32_t lookahead = '\0';
-        for(char32_t c: uinput) {
-            if(lookahead != '\0') {
+        for (char32_t c: uinput) {
+            if (lookahead != '\0') {
                 // if we have a lookahead, check the htmlLookahead map if there is an entity for that
                 // (there should always be one, if the map is correct)
-                if(htmlLookaheads.count(lookahead) != 1) {
+                if (htmlLookaheads.count(lookahead) != 1) {
                     uoutputs << lookahead;
                     lookahead = '\0';
-                }
-                else {
+                } else {
                     // check whether the current char matches the second char for the entity
-                    auto& currentLA = htmlLookaheads.at(lookahead);
-                    if(currentLA.first == c) {
+                    auto &currentLA = htmlLookaheads.at(lookahead);
+                    if (currentLA.first == c) {
                         uoutputs << currentLA.second;
                         lookahead = '\0';
                         continue;
-                    }
-                    else {
+                    } else {
                         uoutputs << lookahead;
                         lookahead = '\0';
                     }
                 }
             }
-            if(htmlEntities.count(c) == 1) {
-                if(htmlEntities.at(c).empty()) {
+            if (htmlEntities.count(c) == 1) {
+                if (htmlEntities.at(c).empty()) {
                     // empty entity string means that entity stands for 2 characters
                     lookahead = c;
-                }
-                else {
+                } else {
                     uoutputs << htmlEntities.at(c);
                 }
-            }
-            else {
+            } else {
                 uoutputs << c;
             }
         }
         // if lookahead is not \0, the last char has been (falsely) identified as lookahead
-        if(lookahead != '\0') {
+        if (lookahead != '\0') {
             uoutputs << lookahead;
         }
         input = cv.to_bytes(uoutputs.str());
@@ -598,24 +595,23 @@ std::string nawa::Encoding::htmlEncode(std::string input, bool encodeAll) {
     return input;
 }
 
-std::string nawa::Encoding::htmlDecode(std::string input) {
+string Encoding::htmlDecode(string input) {
 
-    if(htmlDecodeTable.empty()) initializeHtmlDecodeTable();
+    if (htmlDecodeTable.empty()) initializeHtmlDecodeTable();
 
-    std::regex matchEntity(R"(&[A-Za-z0-9]{1,25}?;)");
+    regex matchEntity(R"(&[A-Za-z0-9]{1,25}?;)");
 
     // callback function
-    auto replaceEntity = [](const std::vector<std::string>& matches) -> std::string {
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
+    auto replaceEntity = [](const vector<string> &matches) -> string {
+        wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
         auto entity32 = cv.from_bytes(matches.at(0));
-        if(htmlDecodeTable.count(entity32) != 1) {
+        if (htmlDecodeTable.count(entity32) != 1) {
             return matches.at(0);
-        }
-        else {
-            std::basic_stringstream<char32_t> ret;
+        } else {
+            basic_stringstream<char32_t> ret;
             ret << htmlDecodeTable.at(entity32).first;
             auto secondChar = htmlDecodeTable.at(entity32).second;
-            if(secondChar != '\0') {
+            if (secondChar != '\0') {
                 ret << secondChar;
             }
             return cv.to_bytes(ret.str());
@@ -626,25 +622,24 @@ std::string nawa::Encoding::htmlDecode(std::string input) {
     regex_replace_callback(input, matchEntity, replaceEntity);
 
     // unicode replacement
-    std::regex matchUnicode(R"(&#(x([A-Fa-f0-9]{1,5})|([0-9]{1,6}));)");
-    auto replaceUnicode = [](const std::vector<std::string>& matches) -> std::string {
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cv;
+    regex matchUnicode(R"(&#(x([A-Fa-f0-9]{1,5})|([0-9]{1,6}));)");
+    auto replaceUnicode = [](const vector<string> &matches) -> string {
+        wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
         // first alternative: decimal
         char32_t c;
-        if(matches.size() < 3) {
+        if (matches.size() < 3) {
             return "";
         }
-        if(matches.size() > 3 && !matches.at(3).empty()) {
-            c = (char32_t) std::stoul(matches.at(3));
+        if (matches.size() > 3 && !matches.at(3).empty()) {
+            c = (char32_t) stoul(matches.at(3));
         }
-        // second alternative: hex
-        else if(!matches.at(2).empty()) {
-            c = (char32_t) std::stoul(matches.at(2), nullptr, 16);
-        }
-        else {
+            // second alternative: hex
+        else if (!matches.at(2).empty()) {
+            c = (char32_t) stoul(matches.at(2), nullptr, 16);
+        } else {
             return "";
         }
-        std::u32string outs(1, c);
+        u32string outs(1, c);
         return cv.to_bytes(outs);
     };
     regex_replace_callback(input, matchUnicode, replaceUnicode);
@@ -652,18 +647,17 @@ std::string nawa::Encoding::htmlDecode(std::string input) {
     return input;
 }
 
-std::string nawa::Encoding::urlEncode(const std::string& input) {
-    std::stringstream out;
+string Encoding::urlEncode(const string &input) {
+    stringstream out;
 
     // check if character is valid, unreserved URL character, otherwise apply url encoding
-    for(char c: input) {
-        if(urlUnreserved.count(c) == 1) {
+    for (char c: input) {
+        if (urlUnreserved.count(c) == 1) {
             out << c;
-        }
-        else {
-            std::ios init(nullptr);
+        } else {
+            ios init(nullptr);
             init.copyfmt(out);
-            out << '%' << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)c;
+            out << '%' << uppercase << hex << setw(2) << setfill('0') << (int) (unsigned char) c;
             out.copyfmt(init);
         }
     }
@@ -671,13 +665,13 @@ std::string nawa::Encoding::urlEncode(const std::string& input) {
     return out.str();
 }
 
-std::string nawa::Encoding::urlDecode(std::string input) {
+string Encoding::urlDecode(string input) {
     // match url codes by regex
-    std::regex matchCode(R"(%([0-9A-F]{2}))");
+    regex matchCode(R"(%([0-9A-F]{2}))");
 
     // replacement function
-    auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
-        return std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
+    auto replaceCode = [](const vector<string> &matches) -> string {
+        return string(1, (char) stoul(matches.at(1), nullptr, 16));
     };
 
     regex_replace_callback(input, matchCode, replaceCode);
@@ -685,67 +679,65 @@ std::string nawa::Encoding::urlDecode(std::string input) {
     return input;
 }
 
-bool nawa::Encoding::isBase64(const std::string &input, bool allowWhitespaces) {
-    std::regex rgx;
-    if(allowWhitespaces) {
+bool Encoding::isBase64(const string &input, bool allowWhitespaces) {
+    regex rgx;
+    if (allowWhitespaces) {
         rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
-    }
-    else {
+    } else {
         rgx.assign(R"([A-Za-z0-9\+/]+={0,2})");
     }
-    return std::regex_match(input, rgx);
+    return regex_match(input, rgx);
 }
 
-std::string nawa::Encoding::base64Encode(const std::string &input, size_t breakAfter, const std::string &breakSequence) {
-    return base64_encode(reinterpret_cast<const unsigned char*>(input.c_str()), input.length(), breakAfter, breakSequence);
+string
+Encoding::base64Encode(const string &input, size_t breakAfter, const string &breakSequence) {
+    return base64_encode(reinterpret_cast<const unsigned char *>(input.c_str()), input.length(), breakAfter,
+                         breakSequence);
 }
 
-std::string nawa::Encoding::base64Decode(const std::string &input) {
+string Encoding::base64Decode(const string &input) {
     return base64_decode(input);
 }
 
-std::string nawa::Encoding::quotedPrintableEncode(const std::string &input, const std::string &lineEnding,
-        bool replaceCrlf, bool qEncoding) {
-    std::stringstream ret;
+string Encoding::quotedPrintableEncode(const string &input, const string &lineEnding,
+                                       bool replaceCrlf, bool qEncoding) {
+    stringstream ret;
     int lineCount = 0;
-    for(const char c: input) {
+    for (const char c: input) {
         // TODO do not replace =09 (tabulator)? spaces at the end of a line (shoud be encoded =20)?
         if (c >= 32 && c <= 126 && c != 61 && !(qEncoding && (c == 32 || c == 63 || c == 95))) {
-            if(!qEncoding && lineCount >= 75) {
+            if (!qEncoding && lineCount >= 75) {
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
             ret << c;
             ++lineCount;
-        }
-        else if(!replaceCrlf && (c == 10 || c == 13)) {
+        } else if (!replaceCrlf && (c == 10 || c == 13)) {
             ret << c;
             lineCount = 0;
-        }
-        else if(qEncoding && c == 32) {
+        } else if (qEncoding && c == 32) {
             // space character represented by '_' in Q-encoding
             ret << '_';
             ++lineCount;
-        }
-        else {
-            if(!qEncoding && lineCount >= 73) {
+        } else {
+            if (!qEncoding && lineCount >= 73) {
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
-            ret << "=" << nawa::to_uppercase(nawa::hex_dump(std::string(1, c)));
+            ret << "=" << to_uppercase(hex_dump(string(1, c)));
             lineCount += 3;
         }
     }
     return ret.str();
 }
 
-std::string nawa::Encoding::quotedPrintableDecode(std::string input) {
-    std::regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
+string Encoding::quotedPrintableDecode(string input) {
+    regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function
-    auto replaceCode = [](const std::vector<std::string>& matches) -> std::string {
+    auto replaceCode = [](const vector<string> &matches) -> string {
         return (matches.at(1) == "\r\n" || matches.at(1) == "\n")
-            ? std::string() : std::string(1, (char) std::stoul(matches.at(1), nullptr, 16));
+               ? string() : string(1, (char) stoul(matches.at(1), nullptr, 16));
     };
 
     regex_replace_callback(input, matchCode, replaceCode);
@@ -753,14 +745,17 @@ std::string nawa::Encoding::quotedPrintableDecode(std::string input) {
     return input;
 }
 
-std::string nawa::Encoding::makeEncodedWord(const std::string &input, bool base64) {
-    std::stringstream ret;
+string Encoding::makeEncodedWord(const string &input, bool base64, bool onlyIfNecessary) {
+    stringstream ret;
     ret << "=?utf-8?";
-    if(base64) {
-        ret << "?B?" << base64Encode(input);
-    }
-    else {
-        ret << "?Q?" << quotedPrintableEncode(input, "", true, true);
+    if (base64) {
+        ret << "B?" << base64Encode(input);
+    } else {
+        auto qpEncoded = quotedPrintableEncode(input, "", true, true);
+        if (onlyIfNecessary && qpEncoded == string_replace(input, {{" ", "_"}})) {
+            return input;
+        }
+        ret << "Q?" << qpEncoded;
     }
     ret << "?=";
     return ret.str();

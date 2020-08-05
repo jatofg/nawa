@@ -24,6 +24,7 @@
 #ifndef NAWA_SESSION_H
 #define NAWA_SESSION_H
 
+#include <utility>
 #include <vector>
 #include <mutex>
 #include <unordered_map>
@@ -47,23 +48,19 @@ namespace nawa {
          * Construct an empty SessionData object without a source IP.
          */
         SessionData() : expires(0) {}
+
         /**
          * Construct an empty SessionData object with a source IP.
          * @param sIP IP address of the session initiator.
          */
-        explicit SessionData(const std::string& sIP) : expires(0), sourceIP(sIP) {}
+        explicit SessionData(std::string sIP) : expires(0), sourceIP(std::move(sIP)) {}
     };
 
     /**
      * Class for managing sessions and getting and setting connection-independent session data.
      */
     class Session {
-        static std::mutex gLock; /**< Lock for data. */
-        /**
-         * Map containing (pointers to) the session data for all sessions. The key is the session ID string.
-         */
-        static std::unordered_map<std::string, std::shared_ptr<SessionData>> data;
-        nawa::Connection& connection; /**< Reference to the Connection object in order to access objects. */
+        nawa::Connection &connection; /**< Reference to the Connection object in order to access objects. */
         /**
          * Pointer to the session data struct for the current session, if established.
          * Can be used to check whether a session is established by checking shared_ptr::use_count()
@@ -72,30 +69,22 @@ namespace nawa {
         std::shared_ptr<SessionData> currentData;
         std::string currentID; /**< The current session ID. */
         std::string cookieName; /**< Name of the session cookie, as determined by start(). */
-        /**
-         * Generate a random, 40 chars session ID.
-         * @return The session ID.
-         */
-        std::string generateID();
-        /**
-         * Garbage collection by removing every expired session from the data map.
-         * Would be best if run async and in fixed intervals (or with 0.xx chance on certain session actions -> see php)
-         */
-        static void collectGarbage();
+
         /**
          * Reset the data map to delete all session data. This function is not thread-safe and should be used only
-         * on NAWA termination.
+         * on termination, if at all. May be removed soon.
          */
-        static void destroy();
-        // RequestHandler should be able to call destroy()
-        friend class RequestHandler;
+        [[maybe_unused]] static void destroy();
+
     public:
         /**
          * Construct a new Session object. This will just store the Connection reference in the object.
          * @param connection Reference to the current Connection (for getting and setting cookies).
          */
-        explicit Session(Connection& connection);
+        explicit Session(Connection &connection);
+
         virtual ~Session() = default;
+
         /**
          * Start the session (load existing session basing on a cookie sent by the client or create a new one).
          * This will send a session cookie to the client. The properties/attributes of the session cookie are determined
@@ -128,53 +117,60 @@ namespace nawa {
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).
          */
         void start(nawa::Cookie properties = Cookie());
+
         /**
          * Check whether a session is currently active (has been started).
          * @return True if session is established, false otherwise.
          */
-        bool established() const;
+        [[nodiscard]] bool established() const;
+
         /**
-         * Check whether there exists a stored Any for the given key. Please note that the behavior of this
-         * function might differ from `[key].isSet()` - while this function will also return true if the key has been
-         * set to an empty Any, the latter one only returns true if the Any contains an object.
+         * Check whether there exists a stored value for the given key. Please note that the behavior of this
+         * function might differ from `[key].has_value()` - while this function will also return true if the key has
+         * been set to an empty std::any, the latter one only returns true if the std::any contains an object.
          * @param key Key to check.
-         * @return True if a value exists for this key, false otherwise. Always false if no session established.
+         * @return True if a value exists for this key, false otherwise. Always false if no session is active.
          */
-        bool isSet(std::string key) const;
+        [[nodiscard]] bool isSet(const std::string &key) const;
+
         /**
-         * Get the value at the given key (as a Any object). To actually receive the stored object, use
-         * the `.get<T>()` function of the Any (e.g., `conn.session["test"].get<std::string>()`). You will have to
-         * explicitly state the type of the stored object as a template argument in order to receive it
+         * Get the value at the given key (as a std::any object). To actually receive the stored object, use
+         * `std::any_cast` (example: `std::any_cast<std::string>(conn.session["test"])`). You will have to
+         * explicitly state the type of the stored object as a template argument of `std::any_cast`
          * (as C++ is statically typed).
          * @param key Key to get value for.
-         * @return Value at key. If no value exists for that key or no session established, an empty Any will be
-         * returned.
+         * @return Value at key. If no value exists for that key or no session established, a std::any without value
+         * will be returned.
          */
-        std::any operator[](std::string key) const;
+        std::any operator[](const std::string &key) const;
+
         /**
-         * Set key to a Any value. Throws a UserException with error code 1 if no session has been established.
+         * Set key to a value of type std::any. Throws a nawa::Exception with error code 1 if no session has been
+         * established.
          * @param key Key to set.
          * @param value Value to set the key to.
          */
         void set(std::string key, const std::any &value);
+
         /**
          * Set key to a string value. This function exists for convenience and makes sure that you do not save a
          * const char* (c-style string) into a session (a terrible idea, as such a pointer would not be available
          * anymore on the next request and therefore cause a segmentation fault). For std::string values, the next
          * specialization (arbitrary type) will be used. The c-style string will be wrapped into a std::string, which
          * will be wrapped into a Any value. As this function internally calls
-         * set(std::string, Any), a UserException with error code 1 will be thrown if no session has been
+         * set(std::string, Any), a nawa::Exception with error code 1 will be thrown if no session has been
          * established.
          * @param key Key to set.
          * @param value C-string that will be used as the value (will be stored as a std::string!).
          */
-        void set(std::string key, const char* value) {
+        void set(std::string key, const char *value) {
             set(std::move(key), std::make_any<std::string>(value));
         }
+
         /**
          * Set key to a variable of an arbitrary type. This function exists just for convenience and will create a
          * new std::any from the value type and call set(std::string, std::any), and will therefore throw a
-         * UserException with error code 1 if no session has been established. As you need to explicitly state the
+         * nawa::Exception with error code 1 if no session has been established. As you need to explicitly state the
          * type when receiving the value later on, explicitly constructing the desired type might make your code
          * more readable and less error-prone (if the value is directly constructed and not given as a variable).
          * @tparam T Type of the value. Can usually be deducted automatically by the compiler.
@@ -182,15 +178,17 @@ namespace nawa {
          * @param value Value to set the key to.
          */
         template<typename T>
-        void set(std::string key, const T& value) {
+        void set(std::string key, const T &value) {
             set(std::move(key), std::any(value));
         }
+
         /**
-         * Remove the session variable with the given key. Throws a UserException with error code 1 if no session has
+         * Remove the session variable with the given key. Throws a nawa::Exception with error code 1 if no session has
          * been established.
          * @param key Key to remove.
          */
-        void unset(const std::string& key);
+        void unset(const std::string &key);
+
         /**
          * Terminate and delete the currently existing session along with its data and dequeue the session cookie.
          * This function will do nothing if no session is currently active. After invalidating the current session,

@@ -26,42 +26,43 @@
 #include <sstream>
 #include <regex>
 #include <random>
-#include <nawa/UserException.h>
-#include <fstream>
 #include <nawa/Encoding.h>
 #include <nawa/Utils.h>
+
+using namespace nawa;
+using namespace std;
 
 namespace {
     /**
      * Generate a random MIME boundary.
      * @return The boundary string.
      */
-    std::string genBoundary() {
-        std::stringstream ret;
+    string genBoundary() {
+        stringstream ret;
         ret << "----=_";
 
         // Use MD5 sum of a random integer
-        std::random_device rd;
-        ret << nawa::Crypto::md5(std::to_string(rd()));
+        random_device rd;
+        ret << Crypto::md5(to_string(rd()));
 
         return ret.str();
     }
 
-    std::string multipartTypeToString(const nawa::MimeEmail::MimePartList::MultipartType &multipartType) {
-        switch(multipartType) {
-            case nawa::MimeEmail::MimePartList::MultipartType::MIXED:
+    string multipartTypeToString(const MimeEmail::MimePartList::MultipartType &multipartType) {
+        switch (multipartType) {
+            case MimeEmail::MimePartList::MultipartType::MIXED:
                 return "mixed";
-            case nawa::MimeEmail::MimePartList::MultipartType::DIGEST:
+            case MimeEmail::MimePartList::MultipartType::DIGEST:
                 return "digest";
-            case nawa::MimeEmail::MimePartList::MultipartType::ALTERNATIVE:
+            case MimeEmail::MimePartList::MultipartType::ALTERNATIVE:
                 return "alternative";
-            case nawa::MimeEmail::MimePartList::MultipartType::RELATED:
+            case MimeEmail::MimePartList::MultipartType::RELATED:
                 return "related";
-            case nawa::MimeEmail::MimePartList::MultipartType::REPORT:
+            case MimeEmail::MimePartList::MultipartType::REPORT:
                 return "report";
-            case nawa::MimeEmail::MimePartList::MultipartType::SIGNED:
+            case MimeEmail::MimePartList::MultipartType::SIGNED:
                 return "signed";
-            case nawa::MimeEmail::MimePartList::MultipartType::ENCRYPTED:
+            case MimeEmail::MimePartList::MultipartType::ENCRYPTED:
                 return "encrypted";
         }
         return "";
@@ -72,53 +73,53 @@ namespace {
      * @param mimePartList The MimePartList object representing the MIME parts to be converted.
      * @return Tuple containing the boundary string (for inclusion in the header) and the MIME parts as a string.
      */
-    std::string mergeMimePartList(const nawa::MimeEmail::MimePartList &mimePartList, const std::string& boundary,
-            const nawa::ReplacementRules& replacementRules) {
-        std::stringstream ret;
+    string mergeMimePartList(const MimeEmail::MimePartList &mimePartList, const string &boundary,
+                                  const shared_ptr<ReplacementRules> &replacementRules) {
+        stringstream ret;
 
         // iterate through the list
-        for(auto const &part: mimePartList.mimeParts) {
+        for (auto const &part: mimePartList.mimeParts) {
             ret << "--" << boundary << "\r\n";
             // if the current part is a MIME part with content
-            if(part.mimePart) {
+            if (part.mimePart) {
                 const auto &mimePart = *(part.mimePart);
                 ret << "Content-Type: " << mimePart.contentType << "\r\n";
-                if(!mimePart.contentDisposition.empty()) {
+                if (!mimePart.contentDisposition.empty()) {
                     ret << "Content-Disposition: " << mimePart.contentDisposition << "\r\n";
                 }
-                for(const auto &e: mimePart.partHeaders) {
+                for (const auto &e: mimePart.partHeaders) {
                     ret << e.first << ": " << e.second << "\r\n";
                 }
 
                 // apply the replacement rules (only if necessary) and the selected encoding afterwards
-                switch(mimePart.applyEncoding) {
-                    case nawa::MimeEmail::MimePart::BASE64:
+                switch (mimePart.applyEncoding) {
+                    case MimeEmail::MimePart::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
-                        ret << nawa::Encoding::base64Encode(
-                                (mimePart.allowReplacements && !replacementRules.empty())
-                                ? nawa::string_replace(mimePart.data, replacementRules) : mimePart.data,
+                        ret << Encoding::base64Encode(
+                                (mimePart.allowReplacements && replacementRules)
+                                ? string_replace(mimePart.data, *replacementRules) : mimePart.data,
                                 76, "\r\n");
                         break;
-                    case nawa::MimeEmail::MimePart::QUOTED_PRINTABLE:
+                    case MimeEmail::MimePart::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-                        ret << nawa::Encoding::quotedPrintableEncode(
-                                (mimePart.allowReplacements && !replacementRules.empty())
-                                ? nawa::string_replace(mimePart.data, replacementRules) : mimePart.data
-                                );
+                        ret << Encoding::quotedPrintableEncode(
+                                (mimePart.allowReplacements && replacementRules)
+                                ? string_replace(mimePart.data, *replacementRules) : mimePart.data
+                        );
                         break;
-                    case nawa::MimeEmail::MimePart::NONE:
-                        ret << "\r\n" << ((mimePart.allowReplacements && !replacementRules.empty())
-                        ? nawa::string_replace(mimePart.data, replacementRules) : mimePart.data);
+                    case MimeEmail::MimePart::NONE:
+                        ret << "\r\n" << ((mimePart.allowReplacements && replacementRules)
+                                          ? string_replace(mimePart.data, *replacementRules) : mimePart.data);
                         break;
                 }
 
                 ret << "\r\n\r\n";
 
             }
-            // if the current part is another list with MIME parts (nested)
-            else if(part.mimePartList) {
+                // if the current part is another list with MIME parts (nested)
+            else if (part.mimePartList) {
                 ret << "Content-Type: multipart/" << multipartTypeToString(part.mimePartList->multipartType);
-                std::string partBoundary = genBoundary();
+                string partBoundary = genBoundary();
                 ret << "; boundary=\"" << partBoundary << "\"\r\n\r\n";
                 ret << mergeMimePartList(*part.mimePartList, partBoundary, replacementRules) << "\r\n\r\n";
             }
@@ -129,72 +130,72 @@ namespace {
     }
 }
 
-std::string nawa::EmailAddress::get(bool includeName) const {
-    std::stringstream ret;
-    if(includeName) {
+string EmailAddress::get(bool includeName) const {
+    stringstream ret;
+    if (includeName) {
         ret << name << " ";
     }
     ret << '<' << address << '>';
     return ret.str();
 }
 
-bool nawa::EmailAddress::isValid() const {
-    std::regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", std::regex::icase);
-    return std::regex_match(address, emCheck);
+bool EmailAddress::isValid() const {
+    regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", regex::icase);
+    return regex_match(address, emCheck);
 }
 
-std::string nawa::SimpleEmail::getRaw(const ReplacementRules &replacementRules) const {
-    std::stringstream ret;
+string SimpleEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules) const {
+    stringstream ret;
 
-    for(auto const &e: headers) {
-        if(quotedPrintableEncode && e.first == "Content-Transfer-Encoding")
+    for (auto const &e: headers) {
+        if (e.first == "MIME-Version" || (quotedPrintableEncode && e.first == "Content-Transfer-Encoding"))
             continue;
         ret << e.first << ": " << e.second << "\r\n";
     }
 
-    if(quotedPrintableEncode) {
+    ret << "MIME-Version: 1.0\r\n";
+    if (quotedPrintableEncode) {
         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
         ret << Encoding::quotedPrintableEncode(
-                replacementRules.empty() ? text : string_replace(text, replacementRules)
-                );
-    }
-    else {
-        ret << "\r\n" << (replacementRules.empty() ? text : string_replace(text, replacementRules));
+                replacementRules ? string_replace(text, *replacementRules) : text
+        );
+    } else {
+        ret << "\r\n" << (replacementRules ? string_replace(text, *replacementRules) : text);
     }
 
     return ret.str();
 }
 
-nawa::MimeEmail::MimePartOrList::MimePartOrList(const nawa::MimeEmail::MimePartOrList &other) {
+MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePartOrList &other) {
     operator=(other);
 }
 
-nawa::MimeEmail::MimePartOrList::MimePartOrList(const nawa::MimeEmail::MimePart &_mimePart) {
+MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePart &_mimePart) {
     operator=(_mimePart);
 }
 
-nawa::MimeEmail::MimePartOrList::MimePartOrList(const nawa::MimeEmail::MimePartList &_mimePartList) {
+MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePartList &_mimePartList) {
     operator=(_mimePartList);
 }
 
-nawa::MimeEmail::MimePartOrList &nawa::MimeEmail::MimePartOrList::operator=(const nawa::MimeEmail::MimePartOrList &other) {
-    if(&other == this) {
+MimeEmail::MimePartOrList &
+MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePartOrList &other) {
+    if (&other == this) {
         return *this;
     }
-    if(other.mimePart) {
-        if(!mimePart) {
-            mimePart = std::make_unique<MimePart>();
+    if (other.mimePart) {
+        if (!mimePart) {
+            mimePart = make_unique<MimePart>();
         }
-        if(mimePartList) {
+        if (mimePartList) {
             mimePartList.reset(nullptr);
         }
         *mimePart = *(other.mimePart);
-    }
-    else if(other.mimePartList) {
-        if(!mimePartList) {
-            mimePartList = std::make_unique<MimePartList>();
+    } else if (other.mimePartList) {
+        if (!mimePartList) {
+            mimePartList = make_unique<MimePartList>();
         }
-        if(mimePart) {
+        if (mimePart) {
             mimePart.reset(nullptr);
         }
         *mimePartList = *(other.mimePartList);
@@ -202,36 +203,37 @@ nawa::MimeEmail::MimePartOrList &nawa::MimeEmail::MimePartOrList::operator=(cons
     return *this;
 }
 
-nawa::MimeEmail::MimePartOrList &nawa::MimeEmail::MimePartOrList::operator=(const nawa::MimeEmail::MimePart &_mimePart) {
-    if(!mimePart) {
-        mimePart = std::make_unique<MimePart>();
+MimeEmail::MimePartOrList &
+MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePart &_mimePart) {
+    if (!mimePart) {
+        mimePart = make_unique<MimePart>();
     }
-    if(mimePartList) {
+    if (mimePartList) {
         mimePartList.reset(nullptr);
     }
     *mimePart = _mimePart;
     return *this;
 }
 
-nawa::MimeEmail::MimePartOrList &
-nawa::MimeEmail::MimePartOrList::operator=(const nawa::MimeEmail::MimePartList &_mimePartList) {
-    if(!mimePartList) {
-        mimePartList = std::make_unique<MimePartList>();
+MimeEmail::MimePartOrList &
+MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePartList &_mimePartList) {
+    if (!mimePartList) {
+        mimePartList = make_unique<MimePartList>();
     }
-    if(mimePart) {
+    if (mimePart) {
         mimePart.reset(nullptr);
     }
     *mimePartList = _mimePartList;
     return *this;
 }
 
-std::string nawa::MimeEmail::getRaw(const ReplacementRules &replacementRules) const {
-    std::stringstream ret;
-    for(auto const &e: headers) {
-        if(e.first == "MIME-Version" || e.first == "Content-Type") continue;
+string MimeEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules) const {
+    stringstream ret;
+    for (auto const &e: headers) {
+        if (e.first == "MIME-Version" || e.first == "Content-Type") continue;
         ret << e.first << ": " << e.second << "\r\n";
     }
-    std::string boundary = genBoundary();
+    string boundary = genBoundary();
     ret << "MIME-Version: 1.0\r\nContent-Type: multipart/" << multipartTypeToString(mimePartList.multipartType);
     ret << "; boundary=\"" << boundary;
     ret << "\"\r\n\r\nThis is a multi-part message in MIME format\r\n\r\n";

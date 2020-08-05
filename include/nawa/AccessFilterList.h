@@ -92,7 +92,7 @@ namespace nawa {
     /**
      * Defines a request blocking filter.
      */
-    struct BlockFilter: public AccessFilter {
+    struct BlockFilter : public AccessFilter {
         /**
          * The HTTP status that will be sent to the client if the request is blocked.
          */
@@ -112,7 +112,7 @@ namespace nawa {
      * </LocationMatch>
      * \endcode
      */
-    struct AuthFilter: public AccessFilter {
+    struct AuthFilter : public AccessFilter {
         /**
          * The authentication function. It will be called with the provided user name as first parameter and the
          * provided user password as the second parameter. Access will be granted if the authentication function
@@ -142,7 +142,7 @@ namespace nawa {
      * Filter to bypass the NAWA app for certain requests and directly forward files to the client. This is especially
      * useful for media files, e.g. images, as well as CSS stylesheets.
      */
-    struct ForwardFilter: public AccessFilter {
+    struct ForwardFilter : public AccessFilter {
         /**
          * The path under which the file will be looked up (should be an absolute OS path to the files
          * starting with a '/' and *not* ending with a '/', e.g., "/var/www/website1").
@@ -155,7 +155,9 @@ namespace nawa {
          * - PATH: The request path will be added to the base path (e.g., the file mentioned above would be looked up
          * in basepath."/dir1/dir2/file.ext".
          */
-        enum BasePathExtension {BY_FILENAME, BY_PATH} basePathExtension = BY_FILENAME;
+        enum BasePathExtension {
+            BY_FILENAME, BY_PATH
+        } basePathExtension = BY_FILENAME;
     };
 
     /**

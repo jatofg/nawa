@@ -25,13 +25,16 @@
 #include <nawa/Engines/BcryptHashingEngine.h>
 #include <nawa/Engines/Argon2HashingEngine.h>
 
-std::shared_ptr<nawa::Engines::HashingEngine> nawa::Engines::DefaultHashTypeTable::getEngine(std::string hash) const {
+using namespace nawa;
+using namespace std;
+
+shared_ptr<Engines::HashingEngine> Engines::DefaultHashTypeTable::getEngine(string hash) const {
     auto hid = hash.substr(0, 4);
-    if(hid == "$2a$" || hid == "$2b$" || hid == "$2x$" || hid == "$2y$") {
-        return std::shared_ptr<nawa::Engines::HashingEngine>(new nawa::Engines::BcryptHashingEngine());
+    if (hid == "$2a$" || hid == "$2b$" || hid == "$2x$" || hid == "$2y$") {
+        return shared_ptr<Engines::HashingEngine>(new Engines::BcryptHashingEngine());
+    } else if (hash.substr(0, 10) == "$argon2id$" || hash.substr(0, 9) == "$argon2i$" ||
+               hash.substr(0, 9) == "$argon2d$") {
+        return shared_ptr<Engines::HashingEngine>(new Engines::Argon2HashingEngine());
     }
-    else if(hash.substr(0, 10) == "$argon2id$" || hash.substr(0, 9) == "$argon2i$" || hash.substr(0, 9) == "$argon2d$") {
-        return std::shared_ptr<nawa::Engines::HashingEngine>(new nawa::Engines::Argon2HashingEngine());
-    }
-    return std::shared_ptr<nawa::Engines::HashingEngine>();
+    return shared_ptr<Engines::HashingEngine>();
 }

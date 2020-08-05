@@ -52,52 +52,65 @@ namespace nawa {
             std::shared_ptr<const Email> email;
             std::shared_ptr<const EmailAddress> from;
             std::vector<EmailAddress> recipients;
-            std::unique_ptr<ReplacementRules> replacementRules;
+            std::shared_ptr<ReplacementRules> replacementRules;
         };
 
         std::string serverDomain;
         unsigned int serverPort;
-        TlsMode tlsMode;
-        bool verifyTlsCert;
+        TlsMode serverTlsMode;
+        bool verifyServerTlsCert;
         std::string authUsername;
         std::string authPassword;
+        long connectionTimeout;
         std::vector<QueueElem> queue;
     public:
 
         /**
          * Construct an SmtpMailer object and optionally set the connection and authentication properties. Constructing
          * the object will not establish a connection to the SMTP server yet.
-         * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * @param serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
-         * @param _serverPort Port of the SMTP server.
-         * @param _tlsMode How TLS should be used, see TlsMode struct.
-         * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
+         * @param serverPort Port of the SMTP server.
+         * @param serverTlsMode How TLS should be used, see TlsMode struct.
+         * @param verifyServerTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
-         * @param _authUsername Username for authentication.
-         * @param _authPassword Password for authentication.
+         * @param authUsername Username for authentication.
+         * @param authPassword Password for authentication.
+         * @param connectionTimeout Timeout for SMTP connection attempts in milliseconds.
          */
-        explicit SmtpMailer(std::string _serverDomain = "localhost", unsigned int _serverPort = 25,
-                TlsMode _tlsMode = TlsMode::NONE, bool _verifyTlsCert = true, std::string _authUsername = "",
-                std::string _authPassword = "");
+        explicit SmtpMailer(std::string serverDomain = "localhost", unsigned int serverPort = 25,
+                            TlsMode serverTlsMode = TlsMode::NONE, bool verifyServerTlsCert = true,
+                            std::string authUsername = "",
+                            std::string authPassword = "", long connectionTimeout = 10000);
+
         /**
          * Set the connection properties. This will not establish a connection to the SMTP server yet.
-         * @param _serverDomain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
+         * @param domain Domain name or IP address of the SMTP server to use. IPv6 addresses have to be enclosed
          * in brackets. This value will be used to assemble the SMTP(S) URL and will not be checked for validity.
-         * @param _serverPort Port of the SMTP server.
-         * @param _tlsMode How TLS should be used, see TlsMode struct.
-         * @param _verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
+         * @param port Port of the SMTP server.
+         * @param tlsMode How TLS should be used, see TlsMode struct.
+         * @param verifyTlsCert Whether to verify the validity of the SMTP server's TLS certificate, if TLS is used
          * (highly recommended).
          */
-        void setServer(std::string _serverDomain, unsigned int _serverPort = 25, TlsMode _tlsMode = TlsMode::NONE,
-                bool _verifyTlsCert = true);
+        void setServer(std::string domain, unsigned int port = 25, TlsMode tlsMode = TlsMode::NONE,
+                       bool verifyTlsCert = true);
+
         /**
          * Set the authentication parameters for the SMTP connection.
-         * @param _authUsername Username for authentication.
-         * @param _authPassword Password for authentication.
+         * @param username Username for authentication.
+         * @param password Password for authentication.
          */
-        void setAuth(std::string _authUsername, std::string _authPassword);
+        void setAuth(std::string username, std::string password);
+
+        /**
+         * Set the timeout for SMTP connection attempts.
+         * @param timeout Timeout for SMTP connection attempts in milliseconds.
+         */
+        void setConnectionTimeout(long timeout);
+
         // TODO send emails async?
         // TODO signing and encryption?
+
         /**
          * Add an email to the sending queue. The email will be sent upon calling processQueue().
          * @param email The Email object representing the email to be enqueued. This function will expect a shared_ptr
@@ -119,11 +132,12 @@ namespace nawa {
          * this function will set the "From" header from this address in case it doesn't exist in the email yet.
          * @param replacementRules An optional set of replacement rules. It is a map with a string as key (the text
          * to be replaced) and another string as value (the text to replace it with). This set is saved and evaluated
-         * for each recipient individually, so this is a relatively memory-efficient way to personalize emails. If
-         * the rule set is empty, it will neither be saved along with the email nor evaluated.
+         * for each recipient individually, so this is a relatively memory-efficient way to personalize emails.
          */
         void enqueue(std::shared_ptr<Email> email, EmailAddress to,
-                std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+                     std::shared_ptr<EmailAddress> from,
+                     std::shared_ptr<ReplacementRules> replacementRules = std::shared_ptr<ReplacementRules>());
+
         /**
          * This function will enqueue an email for a list of recipients. This improves efficiency, but it doesn't
          * allow the application of replacement rules for each recipient individually. Replacement rules can still be
@@ -137,14 +151,18 @@ namespace nawa {
          * to the email once and do not offer personalization to individual recipients.
          */
         void bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
-                std::shared_ptr<EmailAddress> from, ReplacementRules replacementRules = ReplacementRules());
+                         std::shared_ptr<EmailAddress> from,
+                         std::shared_ptr<ReplacementRules> replacementRules = std::shared_ptr<ReplacementRules>());
+
         /**
          * Clear the email queue.
          */
         void clearQueue();
+
         /**
          * Process the queue, i.e., establish an SMTP connection and send all emails in the queue. This function will
-         * not modify the queue. In case of errors, a UserException with error code 1 will be thrown.
+         * not modify (and therefore not clear) the queue. In case of errors, a nawa::Exception with error code 1 will
+         * be thrown.
          */
         void processQueue() const;
     };

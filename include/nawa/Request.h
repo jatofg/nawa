@@ -25,85 +25,76 @@
 #define NAWA_NAWAREQUEST_H
 
 #include <string>
-#include <fastcgi++/request.hpp>
-#include <nawa/RequestHandler.h>
+#include <nawa/Config.h>
+#include <nawa/File.h>
 
 namespace nawa {
+    /**
+     * Internal container filled by the RequestHandler with prerequisites for creating Connection and Request objects.
+     */
+    struct RequestInitContainer {
+        /**
+         * Environment variables, see \ref environmentmanual
+         */
+        std::unordered_map<std::string, std::string> environment; // TODO use a <std::any> vector instead?
+        /**
+         * Vector containing languages accepted by the browser.
+         */
+        std::vector<std::string> acceptLanguages; // TODO improve this, should be part of environment
+        std::multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
+        /**
+         * The HTTP POST vars, only if it is in standard format (content type `multipart/form-data` or
+         * `application/x-www-form-urlencoded`). Files are excluded and handled separately by fileVectorCallback.
+         */
+        std::multimap<std::string, std::string> postVars;
+        std::multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
+        std::string postContentType; /**< The HTTP POST content type. */
+        std::multimap<std::string, File> postFiles; /**< Files submitted via POST. */
+        /**
+         * A shared_ptr to a string which contains the raw POST data. Raw data does not have to be available
+         * if the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
+         * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`. In this case,
+         * the shared_ptr should not contain an object.
+         */
+        std::shared_ptr<std::string> rawPost; // TODO maybe everything should just be provided as it is and split here?
+    };
+
     /**
      * Represents request objects.
      */
     class Request {
     public:
-
-        /**
-         * Container for POST-submitted files. This class cannot currently be used for storing files not provided
-         * by libfastcgipp, however, this is scheduled to change with v1.
-         */
-        class File {
-        public:
-            /**
-             * Constructs the object from a libfastcgipp File container.
-             * @param file libfastcgipp File container
-             */
-            explicit File(const Fastcgipp::Http::File<char>& file);
-            std::string filename; /**< Original file name (submitted by sender) */
-            std::string contentType; /**< Content-Type string */
-            size_t size; /**< File size in bytes */
-            const std::unique_ptr<char[]>& dataPtrRef; /**< Reference to a unique_ptr to the first byte of the memory area */
-            /**
-             * Copy the file into a std::string
-             * @return std::string containing the whole file
-             */
-            std::string copyFile();
-            /**
-             * Write the file to disk.
-             * @param path File name and path where to write the file.
-             * @return true on success, false on failure
-             */
-            bool writeFile(const std::string& path);
-        };
-
         /**
          * Accessor for environment variables.
          */
         class Env {
-        protected:
-            RequestHandler& requestHandler;
         public:
-            explicit Env(RequestHandler& request) : requestHandler(request) {}
+            explicit Env(const RequestInitContainer &initContainer);
+
             /**
              * Get an environment variable. For a list of environment variables, see \ref environmentmanual
              * @param envVar Name of the environment variable.
              * @return Content of the environment variable. Empty string if not set.
              */
-            std::string operator [](const std::string& envVar) const;
+            std::string operator[](const std::string &envVar) const;
+
             /**
              * Receive the languages accepted by the client (from HTTP Header).
              * @return Vector of strings containing the accepted languages. Empty if not set.
              */
             std::vector<std::string> getAcceptLanguages() const;
+
             /**
              * Request path. Use ["requestUri"] to access it as a string.
              * @return Vector of strings containing the elements of the path.
              */
             std::vector<std::string> getRequestPath() const;
-            /**
-             * Get the server address as a libfastcgipp Address object. Use ["serverAddress"] to access it as a string.
-             * @return The Address object.
-             * @deprecated
-             */
-            Fastcgipp::Address getServerAddr() const;
-            /**
-             * Get the remote address as a libfastcgipp Address object. Use ["remoteAddress"] to access it as a string.
-             * @return  The Address object.
-             * @deprecated
-             */
-            Fastcgipp::Address getRemoteAddr() const;
 
-            // mark Connection as a friend so it can access RequestHandler through Env
-            // TODO find another solution as this looks a bit like a dirty hack?
-            friend Connection;
+        private:
+            std::unordered_map<std::string, std::string> environment; // TODO use a <std::any> vector instead?
+            std::vector<std::string> acceptLanguages; // TODO improve this, should be part of environment
         };
+
         /**
          * Accessor for GET, POST, and COOKIE variables.
          */
@@ -115,84 +106,139 @@ namespace nawa {
                 COOKIE
             };
         protected:
-            RequestHandler& requestHandler;
             Source source;
-            std::multimap<std::basic_string<char>, std::basic_string<char>> data;
+            std::multimap<std::string, std::string> dataMap;
         public:
-            GPC(RequestHandler& request, Source source);
+            GPC(const RequestInitContainer &requestInit, Source source);
+
             virtual ~GPC() = default;
+
             /**
              * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
              * only one of them (usually the first definition) will be returned. For accessing all definitions,
              * please use getVector(). Complexity is logarithmic, so if you want to access a value multiple times,
-             * saving it as a variable is a good idea.
+             * saving it in a variable is a good idea.
              * @param gpcVar Name of the variable.
              * @return Value of the variable. Empty string if not set
              * (or empty - use count() for checking whether the variable is set).
              */
-            std::string operator [](const std::string& gpcVar) const;
+            std::string operator[](const std::string &gpcVar) const;
+
             /**
              * Get all GET, POST, or COOKIE variables with the given name.
              * @param gpcVar Name of the variables.
              * @return Vector of values. Empty if not set.
              */
-            std::vector<std::string> getVector(const std::string& gpcVar) const;
+            [[nodiscard]] std::vector<std::string> getVector(const std::string &gpcVar) const;
+
             /**
              * Get the number of submitted GET, POST, or COOKIE variables with the given name.
              * @param gpcVar Name of the variables.
              * @return Number of occurrences.
              */
-            unsigned long count(const std::string& gpcVar) const;
+            [[nodiscard]] size_t count(const std::string &gpcVar) const;
+
             /**
              * Get a reference to the GET, POST, or COOKIE multimap.
              * @return Reference to the multimap.
              */
-            std::multimap<std::string, std::string>& getMultimap();
+            [[nodiscard]] std::multimap<std::string, std::string> const &getMultimap() const;
+
             /**
              * Get constant begin iterator to the multimap containing all GET, POST, or COOKIE data.
              * @return Iterator to the first element of the multimap.
              */
-            std::multimap<std::string, std::string>::const_iterator begin() const;
+            [[nodiscard]] std::multimap<std::string, std::string>::const_iterator begin() const;
+
             /**
              * Get constant end iterator to the multimap containing all GET, POST, or COOKIE data.
              * @return Iterator to the end of the multimap.
              */
-            std::multimap<std::string, std::string>::const_iterator end() const;
+            [[nodiscard]] std::multimap<std::string, std::string>::const_iterator end() const;
+
+            /**
+             * Shortcut to check for the existence of GET/POST/COOKIE values (including files in the case of POST).
+             * @return True if GET/POST/COOKIE values are available.
+             */
+            explicit virtual operator bool() const;
         };
+
         /**
          * Specialized accessor for POST that also allows accessing files (and in future, maybe, the raw POST data).
          */
-        class Post: public GPC {
+        class Post : public GPC {
+            std::string contentType;
+            std::shared_ptr<std::string> rawPost;
+            std::multimap<std::string, File> fileMap;
         public:
-            explicit Post(RequestHandler& request);
+            explicit Post(const RequestInitContainer &requestInit);
+
             ~Post() override = default;
+
             /**
-             * Get the raw POST data (availability depends on the raw_access setting in the config).
-             * @return Reference to a string containing the raw POST data if available, otherwise the string is empty.
+             * Shortcut to check for the existence of POST values (including files).
+             * @return True if POST values are available.
              */
-            std::string& getRaw() const;
+            explicit operator bool() const override;
+
+            /**
+             * Get the raw POST data (availability may depend on the raw_access setting in the config).
+             * @return Shared pointer to a string containing the raw POST data if available, otherwise the
+             * shared_ptr does not contain an object.
+             */
+            [[nodiscard]] std::shared_ptr<std::string> getRaw() const;
+
             /**
              * Get the POST content type as submitted by the browser
              * @return String containing the POST content type
              */
-            std::string getContentType() const;
+            [[nodiscard]] std::string getContentType() const;
+
+            /**
+             * Check whether files have been uploaded via POST.
+             * @return True if files have been uploaded via POST.
+             */
+            [[nodiscard]] bool hasFiles() const;
+
+            /**
+             * Get a file submitted via POST. If the query contains more than one POST file of the same name,
+             * only one of them (usually the first definition) will be returned. For accessing all definitions,
+             * please use getFileVector(). Complexity is logarithmic, so if you want to access a value multiple times,
+             * saving it in a variable is a good idea.
+             * @param postVar Name of the variable.
+             * @return Value of the variable. Empty string if not set
+             * (use countFiles() for checking whether the variable is set).
+             */
+            [[nodiscard]] File getFile(const std::string &postVar) const;
+
             /**
              * Get all POST files with the given name.
              * @param postVar Name of the files.
              * @return Vector of files. Empty if no file with the given name exists.
              */
-            std::vector<Request::File> getFileVector(const std::string& postVar) const;
+            [[nodiscard]] std::vector<File> getFileVector(const std::string &postVar) const;
+
+            /**
+             * Get the number of submitted POST files with the given name.
+             * @param postVar Name of the file.
+             * @return Number of occurrences.
+             */
+            [[nodiscard]] size_t countFiles(const std::string &postVar) const;
+
+            /**
+             * Get a reference to the POST file multimap.
+             * @return Reference to the multimap.
+             */
+            [[nodiscard]] std::multimap<std::string, File> const &getFileMultimap() const;
         };
 
         const Request::Env env; /**< The Env object you should use to access environment variables. */
         const Request::GPC get; /**< The GPC object you should use to access GET variables. */
         const Request::Post post; /**< The Post object you should use to access POST variables. */
         const Request::GPC cookie; /**< The GPC object you should use to access COOKIE variables. */
-        explicit Request(RequestHandler& request);
+        explicit Request(const RequestInitContainer &initContainer);
     };
 }
-
-
 
 
 #endif //NAWA_NAWAREQUEST_H

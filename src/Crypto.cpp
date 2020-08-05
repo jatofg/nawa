@@ -23,98 +23,100 @@
 
 #include <nawa/Crypto.h>
 #include <nawa/Utils.h>
-#include <nawa/UserException.h>
+#include <nawa/Exception.h>
 #include <openssl/sha.h>
 #include <openssl/md5.h>
-#include "../libs/libbcrypt/bcrypt.h"
 
-std::string nawa::Crypto::sha1(const std::string &input, bool hex) {
-    auto sha1Base = (const unsigned char*) input.c_str();
+using namespace nawa;
+using namespace std;
+
+std::string Crypto::sha1(const std::string &input, bool hex) {
+    auto sha1Base = (const unsigned char *) input.c_str();
     unsigned char sha1Hash[SHA_DIGEST_LENGTH];
     size_t sha1Size = input.size();
     SHA1(sha1Base, sha1Size, sha1Hash);
-    std::string ret((char*) sha1Hash, SHA_DIGEST_LENGTH);
-    if(hex) {
+    std::string ret((char *) sha1Hash, SHA_DIGEST_LENGTH);
+    if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string nawa::Crypto::sha224(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char*) input.c_str();
+std::string Crypto::sha224(const std::string &input, bool hex) {
+    auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA224_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA224(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char*) sha2Hash, SHA224_DIGEST_LENGTH);
-    if(hex) {
+    std::string ret((char *) sha2Hash, SHA224_DIGEST_LENGTH);
+    if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string nawa::Crypto::sha256(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char*) input.c_str();
+std::string Crypto::sha256(const std::string &input, bool hex) {
+    auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA256_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA256(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char*) sha2Hash, SHA256_DIGEST_LENGTH);
-    if(hex) {
+    std::string ret((char *) sha2Hash, SHA256_DIGEST_LENGTH);
+    if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string nawa::Crypto::sha384(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char*) input.c_str();
+std::string Crypto::sha384(const std::string &input, bool hex) {
+    auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA384_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA384(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char*) sha2Hash, SHA384_DIGEST_LENGTH);
-    if(hex) {
+    std::string ret((char *) sha2Hash, SHA384_DIGEST_LENGTH);
+    if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string nawa::Crypto::sha512(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char*) input.c_str();
+std::string Crypto::sha512(const std::string &input, bool hex) {
+    auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA512_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA512(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char*) sha2Hash, SHA512_DIGEST_LENGTH);
-    if(hex) {
+    std::string ret((char *) sha2Hash, SHA512_DIGEST_LENGTH);
+    if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string nawa::Crypto::md5(const std::string &input, bool hex) {
-    auto md5Base = (const unsigned char*) input.c_str();
+std::string Crypto::md5(const std::string &input, bool hex) {
+    auto md5Base = (const unsigned char *) input.c_str();
     unsigned char md5Hash[MD5_DIGEST_LENGTH];
     size_t md5Size = input.size();
     MD5(md5Base, md5Size, md5Hash);
-    std::string ret((char*) md5Hash, MD5_DIGEST_LENGTH);
-    if(hex) {
+    std::string ret((char *) md5Hash, MD5_DIGEST_LENGTH);
+    if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string nawa::Crypto::passwordHash(const std::string &password, const Engines::HashingEngine &hashingEngine) {
+std::string Crypto::passwordHash(const std::string &password, const Engines::HashingEngine &hashingEngine) {
     // use the provided HashingEngine for generation
     return hashingEngine.generateHash(password);
 }
 
-bool nawa::Crypto::passwordVerify(const std::string &password, const std::string &hash,
-        const Engines::HashTypeTable &hashTypeTable) {
-    if(hash.empty()) {
-        throw UserException("nawa::Crypto::passwordVerify", 1, "Cannot verify an empty hash");
+bool Crypto::passwordVerify(const std::string &password, const std::string &hash,
+                            const Engines::HashTypeTable &hashTypeTable) {
+    if (hash.empty()) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Cannot verify an empty hash");
     }
 
     auto verifyer = hashTypeTable.getEngine(hash);
-    if(verifyer.use_count() == 0) {
-        throw UserException("nawa::Crypto::passwordVerify", 2,
-                "Could not determine a HashingEngine that is able to verify the given hash");
+    if (verifyer.use_count() == 0) {
+        throw Exception(__PRETTY_FUNCTION__, 2,
+                        "Could not determine a HashingEngine that is able to verify the given hash");
     }
 
     return verifyer->verifyHash(password, hash);
