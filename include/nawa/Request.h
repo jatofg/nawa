@@ -220,7 +220,7 @@ namespace nawa {
 
             /**
              * Get the number of submitted POST files with the given name.
-             * @param gpcVar Name of the file.
+             * @param postVar Name of the file.
              * @return Number of occurrences.
              */
             [[nodiscard]] size_t countFiles(const std::string &postVar) const;
