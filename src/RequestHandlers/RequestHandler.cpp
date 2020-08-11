@@ -255,7 +255,7 @@ void RequestHandler::setAppRequestHandler(HandleRequestFunction fn) noexcept {
 }
 
 void RequestHandler::setAccessFilters(AccessFilterList accessFilterList) noexcept {
-    accessFilters = move(accessFilterList);
+    accessFilters = make_unique<AccessFilterList>(move(accessFilterList));
 }
 
 void RequestHandler::setConfig(Config config_) noexcept {
@@ -265,7 +265,7 @@ void RequestHandler::setConfig(Config config_) noexcept {
 void RequestHandler::handleRequest(Connection &connection) {
     // test filters and run app if no filter was triggered
     // TODO maybe do something with return value in future
-    if (!applyFilters(connection, accessFilters)) {
+    if (!accessFilters || !applyFilters(connection, *accessFilters)) {
         handleRequestFunction(connection);
     }
 }
@@ -274,3 +274,5 @@ std::unique_ptr<RequestHandler>
 RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency) {
     return make_unique<FastcgiRequestHandler>(move(handleRequestFunction), move(config), concurrency);
 }
+
+RequestHandler::~RequestHandler() = default;

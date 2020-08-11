@@ -247,6 +247,9 @@ int main(int argc, char** argv) {
 
     requestHandlerPtr->join();
 
+    // the request handler has to be destroyed before unloading the app (using dlclose)
+    requestHandlerPtr.reset(nullptr);
+
     // if segfaults occur during shutdown in certain situations, it might be necessary to call Session::destroy.
 
     dlclose(appOpen);

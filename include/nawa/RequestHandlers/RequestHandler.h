@@ -35,11 +35,11 @@ namespace nawa {
 
     class RequestHandler {
         HandleRequestFunction handleRequestFunction;
+        std::unique_ptr<AccessFilterList> accessFilters;
     protected:
         Config config;
-        AccessFilterList accessFilters;
     public:
-        virtual ~RequestHandler() = default;
+        virtual ~RequestHandler();
 
         /**
          * Create a new request handler object according to the config. May throw a nawa::Exception on failure (passed on
