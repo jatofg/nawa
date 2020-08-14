@@ -33,6 +33,11 @@ using namespace nawa;
 using namespace std;
 
 namespace {
+    struct DestructionDetector {
+        bool destructed = false;
+        ~DestructionDetector() { destructed = true; }
+    } destructionDetector;
+
     bool locked = false; /**< If true, the stream and outfile cannot be changed anymore. */
     ostream *out; /**< Stream to send the logging output to. */
     ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
@@ -79,13 +84,18 @@ Log &Log::operator=(const Log &other) noexcept {
 }
 
 Log::~Log() {
-    --instanceCount;
-    if (instanceCount == 0) {
+    if (!destructionDetector.destructed) {
+        --instanceCount;
+        if (instanceCount == 0) {
+            if (logFile.is_open()) {
+                logFile.close();
+            }
+            locked = false;
+        }
+    } else {
         if (logFile.is_open()) {
             logFile.close();
         }
-        locked = false;
-        hostnameStr.reset(nullptr);
     }
 }
 
