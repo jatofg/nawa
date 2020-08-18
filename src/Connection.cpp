@@ -120,8 +120,6 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     }
 
     // check if-modified if requested
-    // TODO make ifModifiedSince available without converting it back and forth (universal? or not before v2?)
-    // TODO implement other cache control headers, such as pragma, expires, ...
     if (checkIfModifiedSince && stoul(request.env["ifModifiedSince"]) >= lastModified) {
         setStatus(304);
         setBody(string());
@@ -174,7 +172,6 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
 
 void Connection::setHeader(string key, string value) {
     // convert to lowercase
-    // TODO check for correctness, maybe using regex (or waste of cpu time?)
     transform(key.begin(), key.end(), key.begin(), ::tolower);
     headers[key] = move(value);
 }

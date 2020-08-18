@@ -64,7 +64,6 @@ namespace nawa {
          */
         static void setStream(std::ostream *os) noexcept;
 
-        // TODO does std::ofstream file opening really throw exceptions or is there sth that has to be changed?
         /**
          * Change the output to append to the specified log file. Will throw a nawa::Exception with error code 1 if
          * the requested file cannot be opened for writing. This change will be permanent until every active Log

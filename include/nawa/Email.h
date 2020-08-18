@@ -102,8 +102,6 @@ namespace nawa {
          */
         std::unordered_map<std::string, std::string> headers;
 
-        // TODO offer encoded-word in headers like subject to make it easier
-
         /**
          * This method shall generate the raw source of the email (including headers).
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
@@ -280,8 +278,6 @@ namespace nawa {
          * @return Raw source of the email.
          */
         std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const override;
-        // TODO add extra functions, e.g., for adding an attachment or easily creating alternative text and html
-        //   parts (attachments read from a file, can use util function get_file_contents)
     };
 
 }

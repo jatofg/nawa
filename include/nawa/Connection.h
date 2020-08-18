@@ -177,7 +177,4 @@ namespace nawa {
     };
 }
 
-// TODO add stream modifiers if needed (or remove the stream modifiers altogether and advise to use .body)
-//  - it is actually impossible to implement everything, e.g. integers, floats, ... -> better let the stream handle this
-
 #endif //NAWA_RESPONSE_H

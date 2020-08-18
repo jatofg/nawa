@@ -85,15 +85,12 @@ Session::Session(Connection &connection) : connection(connection) {
 
 void Session::start(Cookie properties) {
 
-    // TODO check everything really carefully for possible race conditions
-
     // if session already started, do not start it again
     if (established()) return;
 
     // get name of session cookie from config
     cookieName = connection.config[{"session", "cookie_name"}];
     if (cookieName.empty()) {
-        // TODO change?
         cookieName = "SESSION";
     }
 
@@ -202,7 +199,6 @@ void Session::start(Cookie properties) {
     }
     random_device rd;
     if (rd() % divisor == 0) {
-        // TODO make this async somehow
         collectGarbage();
     }
 }

@@ -31,10 +31,6 @@
 
 namespace nawa {
 
-    // TODO auth filters requesting the credentials on every request do not make sense
-    //  --> possibly http auth should better be implemented somewhere else?
-    //  (however, forwarded requests cannot be authenticated then)
-
     /**
      * Defines a filter on the request path. Path filtering will be done first, then extension filtering, then regex
      * filtering. In order to match, all enabled conditions must match (AND connector, use multiple filters for OR).

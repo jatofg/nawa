@@ -264,7 +264,6 @@ void RequestHandler::setConfig(Config config_) noexcept {
 
 void RequestHandler::handleRequest(Connection &connection) {
     // test filters and run app if no filter was triggered
-    // TODO maybe do something with return value in future
     if (!accessFilters || !applyFilters(connection, *accessFilters)) {
         handleRequestFunction(connection);
     }

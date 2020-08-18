@@ -44,7 +44,6 @@ namespace {
     void* appOpen = nullptr;
 
     // use this for logging
-    // TODO enable logging to log file through config
     Log LOG;
 
     // Types of functions that need to be accessed from NAWA applications
@@ -249,8 +248,6 @@ int main(int argc, char** argv) {
 
     // the request handler has to be destroyed before unloading the app (using dlclose)
     requestHandlerPtr.reset(nullptr);
-
-    // if segfaults occur during shutdown in certain situations, it might be necessary to call Session::destroy.
 
     dlclose(appOpen);
     exit(0);

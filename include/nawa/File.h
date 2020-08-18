@@ -36,8 +36,6 @@ namespace nawa {
         std::string filename; /**< Original file name (submitted by sender) */
         std::string contentType; /**< Content-Type string */
         size_t size; /**< File size in bytes */
-        // TODO there must be a better solution wrt memory management
-        //      (e.g., adapting fastcgipp-lite, making data a shared_ptr)
         std::shared_ptr<char[]> dataPtr; /**< Pointer to the first byte of the memory area */
 
         /**

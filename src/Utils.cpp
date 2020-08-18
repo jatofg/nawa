@@ -339,7 +339,6 @@ string nawa::generate_error_page(unsigned int httpStatus) {
             errorStr = "Service Unavailable";
             explanation = "This service is currently unavailable. Please try again later.";
             break;
-            // TODO maybe add others
         default:
             errorStr = "Unknown Error";
     }

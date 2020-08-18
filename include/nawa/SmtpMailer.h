@@ -108,9 +108,6 @@ namespace nawa {
          */
         void setConnectionTimeout(long timeout);
 
-        // TODO send emails async?
-        // TODO signing and encryption?
-
         /**
          * Add an email to the sending queue. The email will be sent upon calling processQueue().
          * @param email The Email object representing the email to be enqueued. This function will expect a shared_ptr

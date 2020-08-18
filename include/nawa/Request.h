@@ -36,11 +36,11 @@ namespace nawa {
         /**
          * Environment variables, see \ref environmentmanual
          */
-        std::unordered_map<std::string, std::string> environment; // TODO use a <std::any> vector instead?
+        std::unordered_map<std::string, std::string> environment;
         /**
          * Vector containing languages accepted by the browser.
          */
-        std::vector<std::string> acceptLanguages; // TODO improve this, should be part of environment
+        std::vector<std::string> acceptLanguages;
         std::multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
         /**
          * The HTTP POST vars, only if it is in standard format (content type `multipart/form-data` or
@@ -56,7 +56,7 @@ namespace nawa {
          * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`. In this case,
          * the shared_ptr should not contain an object.
          */
-        std::shared_ptr<std::string> rawPost; // TODO maybe everything should just be provided as it is and split here?
+        std::shared_ptr<std::string> rawPost;
     };
 
     /**
@@ -91,8 +91,8 @@ namespace nawa {
             std::vector<std::string> getRequestPath() const;
 
         private:
-            std::unordered_map<std::string, std::string> environment; // TODO use a <std::any> vector instead?
-            std::vector<std::string> acceptLanguages; // TODO improve this, should be part of environment
+            std::unordered_map<std::string, std::string> environment;
+            std::vector<std::string> acceptLanguages;
         };
 
         /**
