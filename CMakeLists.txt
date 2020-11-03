@@ -33,6 +33,11 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
         GIT_TAG v3.1.6
 )
+FetchContent_Declare(
+        cppnetlib
+        GIT_REPOSITORY https://github.com/cpp-netlib/cpp-netlib.git
+        GIT_TAG cpp-netlib-0.13.0-final
+)
 
 # if Debian would ship cmake 3.14 instead of 3.13, we could just do the following
 #FetchContent_MakeAvailable(fastcgilite)
@@ -40,6 +45,11 @@ FetchContent_GetProperties(fastcgilite)
 if(NOT fastcgilite_POPULATED)
     FetchContent_Populate(fastcgilite)
     add_subdirectory(${fastcgilite_SOURCE_DIR} ${fastcgilite_BINARY_DIR})
+endif()
+FetchContent_GetProperties(cppnetlib)
+if(NOT cppnetlib_POPULATED)
+    FetchContent_Populate(cppnetlib)
+    add_subdirectory(${cppnetlib_SOURCE_DIR} ${cppnetlib_BINARY_DIR})
 endif()
 
 set(NAWA_FILES
@@ -65,6 +75,7 @@ set(NAWA_FILES
         include/nawa/Engines/DefaultHashTypeTable.h
         include/nawa/RequestHandlers/RequestHandler.h
         include/nawa/RequestHandlers/FastcgiRequestHandler.h
+        include/nawa/RequestHandlers/HttpRequestHandler.h
 
         src/Request.cpp
         src/Connection.cpp
@@ -81,6 +92,7 @@ set(NAWA_FILES
         src/Engines/DefaultHashTypeTable.cpp
         src/RequestHandlers/RequestHandler.cpp
         src/RequestHandlers/FastcgiRequestHandler.cpp
+        src/RequestHandlers/HttpRequestHandler.cpp
 
         libs/inih/ini.h
         libs/inih/ini.c
@@ -90,13 +102,14 @@ set(NAWA_FILES
 
 add_executable(nawarun src/main.cpp ${NAWA_FILES})
 
-target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
+target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite cppnetlib)
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
+        $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
 
 target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
 target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
@@ -109,7 +122,8 @@ if(BuildSharedLib)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>)
+            $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
 endif()
 
 if(BuildTests)
