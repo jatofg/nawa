@@ -36,7 +36,7 @@ FetchContent_Declare(
 FetchContent_Declare(
         cppnetlib
         GIT_REPOSITORY https://github.com/cpp-netlib/cpp-netlib.git
-        GIT_TAG cpp-netlib-0.13.0-final
+        GIT_TAG 31d304cdf52b485f465ada433d8905171b61cbff
 )
 
 # if Debian would ship cmake 3.14 instead of 3.13, we could just do the following
@@ -49,8 +49,11 @@ endif()
 FetchContent_GetProperties(cppnetlib)
 if(NOT cppnetlib_POPULATED)
     FetchContent_Populate(cppnetlib)
-    add_subdirectory(${cppnetlib_SOURCE_DIR} ${cppnetlib_BINARY_DIR})
+    set(CPP-NETLIB_BUILD_TESTS OFF CACHE INTERNAL "")
+    set(CPP-NETLIB_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+    add_subdirectory(${cppnetlib_SOURCE_DIR} ${cppnetlib_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
+set(NETLIB_LIBRARIES cppnetlib-client-connections cppnetlib-server-parsers cppnetlib-uri)
 
 set(NAWA_FILES
         include/nawa/Request.h
@@ -102,7 +105,7 @@ set(NAWA_FILES
 
 add_executable(nawarun src/main.cpp ${NAWA_FILES})
 
-target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite cppnetlib)
+target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 -lboost_system bcrypt fastcgilite ${NETLIB_LIBRARIES})
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -116,7 +119,7 @@ target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
 
 if(BuildSharedLib)
     add_library(nawa SHARED ${NAWA_FILES})
-    target_link_libraries(nawa -ldl -lcrypto -lcurl -largon2 bcrypt fastcgilite)
+    target_link_libraries(nawa -ldl -lcrypto -lcurl -largon2 -lboost_system bcrypt fastcgilite ${NETLIB_LIBRARIES})
     target_include_directories(nawa PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
