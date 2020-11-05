@@ -57,7 +57,7 @@ HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFuncti
     httpHandler->handler = make_unique<HttpHandler>();
     HttpServer::options httpServerOptions(*httpHandler->handler);
     // TODO set options (host, port, ...) from config
-    httpHandler->server = make_unique<HttpServer>(httpServerOptions);
+    httpHandler->server = make_unique<HttpServer>(httpServerOptions.port("8080"));
 
     try {
         httpHandler->server->listen();

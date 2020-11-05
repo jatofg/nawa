@@ -28,6 +28,7 @@
 #include <nawa/Exception.h>
 #include <nawa/RequestHandlers/RequestHandler.h>
 #include <nawa/RequestHandlers/FastcgiRequestHandler.h>
+#include <nawa/RequestHandlers/HttpRequestHandler.h>
 
 using namespace nawa;
 using namespace std;
@@ -271,6 +272,9 @@ void RequestHandler::handleRequest(Connection &connection) {
 
 std::unique_ptr<RequestHandler>
 RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency) {
+    if (config[{"system", "request_handler"}] == "http") {
+        return make_unique<HttpRequestHandler>(move(handleRequestFunction), move(config), concurrency);
+    }
     return make_unique<FastcgiRequestHandler>(move(handleRequestFunction), move(config), concurrency);
 }
 
