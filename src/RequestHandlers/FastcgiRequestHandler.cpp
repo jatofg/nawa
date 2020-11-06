@@ -193,8 +193,20 @@ bool FastcgippRequestAdapter::response() {
     connectionInit.requestInit = move(requestInit);
     connectionInit.config = argc.config;
 
-    connectionInit.flushCallback = [this](const string &raw) {
-        dump(raw.c_str(), raw.size());
+    connectionInit.flushCallback = [this](const unordered_multimap<string, string> &headers, const string &body,
+                                          bool flushedBefore) {
+        stringstream raw;
+        // include headers and cookies, but only when flushing for the first time
+        if (!flushedBefore) {
+            // Add headers, incl. cookies, to the raw HTTP source
+            for (auto const &e: headers) {
+                raw << e.first << ": " << e.second << "\r\n";
+            }
+            raw << "\r\n";
+        }
+        raw << body;
+
+        dump(body.c_str(), body.size());
     };
 
     Connection connection(connectionInit);

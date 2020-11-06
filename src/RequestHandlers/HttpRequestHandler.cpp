@@ -49,8 +49,9 @@ struct HttpHandler {
         connectionInit.requestInit = move(requestInit);
         connectionInit.config = config;
 
-        connectionInit.flushCallback = [&httpConn](const string &raw) {
-            httpConn->write(raw);
+        connectionInit.flushCallback = [&httpConn](const unordered_multimap<string, string> &headers, const string &body,
+                                                   bool flushedBefore) {
+            httpConn->write(body);
         };
 
         Connection connection(connectionInit);

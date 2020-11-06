@@ -182,55 +182,71 @@ void Connection::unsetHeader(string key) {
     headers.erase(key);
 }
 
-string Connection::getRaw() {
+unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) const {
+    unordered_multimap<string, string> ret;
+    for (auto const &e: headers) {
+        ret.insert({e.first, e.second});
+    }
+
+    // include cookies if desired
+    if (includeCookies) for (auto const &e: cookies) {
+        stringstream headerVal;
+        headerVal << e.first << "=" << e.second.content;
+        // Domain option
+        const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
+        if (!domain.empty()) {
+            headerVal << "; Domain=" << domain;
+        }
+        // Path option
+        const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
+        if (!path.empty()) {
+            headerVal << "; Path=" << path;
+        }
+        // Expires option
+        time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
+        if (expiry > 0) {
+            headerVal << "; Expires=" << make_http_time(expiry);
+        }
+        // Max-Age option
+        unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
+        if (maxAge > 0) {
+            headerVal << "; Max-Age=" << maxAge;
+        }
+        // Secure option
+        if (e.second.secure || cookiePolicy.secure) {
+            headerVal << "; Secure";
+        }
+        // HttpOnly option
+        if (e.second.httpOnly || cookiePolicy.httpOnly) {
+            headerVal << "; HttpOnly";
+        }
+        // SameSite option
+        uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
+        if (sameSite == 1) {
+            headerVal << "; SameSite=lax";
+        } else if (sameSite > 1) {
+            headerVal << "; SameSite=strict";
+        }
+        ret.insert({"set-cookie", headerVal.str()});
+    }
+
+    return ret;
+}
+
+string Connection::getBody() {
+    mergeStream();
+    return bodyString;
+}
+
+string Connection::getRawHttp() {
     mergeStream();
     stringstream raw;
 
     // include headers and cookies, but only when flushing for the first time
     if (!isFlushed) {
-        // Add headers to the raw HTTP source
-        for (auto const &e: headers) {
+        // Add headers, incl. cookies, to the raw HTTP source
+        for (auto const &e: getHeaders(true)) {
             raw << e.first << ": " << e.second << "\r\n";
-        }
-        // include cookies
-        for (auto const &e: cookies) {
-            raw << "Set-Cookie: " << e.first << "=" << e.second.content;
-            // Domain option
-            const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
-            if (!domain.empty()) {
-                raw << "; Domain=" << domain;
-            }
-            // Path option
-            const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
-            if (!path.empty()) {
-                raw << "; Path=" << path;
-            }
-            // Expires option
-            time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
-            if (expiry > 0) {
-                raw << "; Expires=" << make_http_time(expiry);
-            }
-            // Max-Age option
-            unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
-            if (maxAge > 0) {
-                raw << "; Max-Age=" << maxAge;
-            }
-            // Secure option
-            if (e.second.secure || cookiePolicy.secure) {
-                raw << "; Secure";
-            }
-            // HttpOnly option
-            if (e.second.httpOnly || cookiePolicy.httpOnly) {
-                raw << "; HttpOnly";
-            }
-            // SameSite option
-            uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
-            if (sameSite == 1) {
-                raw << "; SameSite=lax";
-            } else if (sameSite > 1) {
-                raw << "; SameSite=strict";
-            }
-            raw << "\r\n";
         }
         raw << "\r\n";
     }
@@ -283,8 +299,8 @@ void Connection::unsetCookie(const string &key) {
 
 void Connection::flushResponse() {
     // use callback to flush response
-    flushCallback(getRaw());
-    // now that headers and cookies have been sent to the client, make sure they are not included anymore
+    flushCallback(getHeaders(true), getBody(), isFlushed);
+    // response has been flushed now
     isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
     setBody("");
@@ -302,3 +318,4 @@ void Connection::setStatus(unsigned int status) {
 void Connection::setCookiePolicy(Cookie policy) {
     cookiePolicy = move(policy);
 }
+

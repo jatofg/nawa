@@ -130,7 +130,7 @@ Files are represented as `nawa::File` objects, have a look at the documentation
 of that class to see how to retrieve the file and its meta data.
 
 To access the raw POST data as a string, you can use  
-`connection.request.post.getRaw()` depending on the config value 
+`connection.request.post.getRawHttp()` depending on the config value 
 `raw_access` in the `[post]` section. By default, the value is 
 `nonstandard`, meaning you can access the raw data only if it doesn't 
 contain standard content types (key-value pairs or files). You can, 

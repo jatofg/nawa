@@ -32,10 +32,20 @@
 #include <nawa/Session.h>
 
 namespace nawa {
-    using FlushCallbackFunction = std::function<void(const std::string &)>;
+    using FlushCallbackFunction = std::function<void(const std::unordered_multimap<std::string, std::string> &,
+                                                     const std::string &, bool)>;
 
     struct ConnectionInitContainer {
-        FlushCallbackFunction flushCallback; /**< Callback function that flushes the response to the user. */
+        /**
+         * Callback function with 3 parameters:
+         * - the multimap of response headers
+         * - the response body
+         * - a boolean value: true if the response has been flushed before, false otherwise
+         *
+         * and flushes the response
+         * to the user.
+         */
+        FlushCallbackFunction flushCallback;
         Config config; /**< The NAWA config. */
         RequestInitContainer requestInit; /**< The RequestInitContainer containing necessary request data. */
     };
@@ -47,8 +57,8 @@ namespace nawa {
         std::string bodyString;
         std::unordered_map<std::string, std::string> headers;
         std::unordered_map<std::string, Cookie> cookies;
-        bool isFlushed = false;
         Cookie cookiePolicy;
+        bool isFlushed = false;
         FlushCallbackFunction flushCallback;
 
         void clearStream();
@@ -162,10 +172,23 @@ namespace nawa {
         void setCookiePolicy(Cookie policy);
 
         /**
+         * Get a map of all response headers.
+         * @param includeCookies Also include set-cookie headers for the cookies.
+         * @return A map of all headers.
+         */
+        std::unordered_multimap<std::string, std::string> getHeaders(bool includeCookies = true) const;
+
+        /**
+         * Get the response body.
+         * @return The response body.
+         */
+        std::string getBody();
+
+        /**
          * Get the raw HTTP source of the request. This function is intended to be used primarily by NAWA itself.
          * @return A string containing the raw HTTP source (containing headers, incl. cookies, and the body)
          */
-        std::string getRaw();
+        std::string getRawHttp();
 
         /**
          * Flush the Response object, i.e., send headers and body to the client and reset it.
