@@ -185,12 +185,6 @@ namespace nawa {
         std::string getBody();
 
         /**
-         * Get the raw HTTP source of the request. This function is intended to be used primarily by NAWA itself.
-         * @return A string containing the raw HTTP source (containing headers, incl. cookies, and the body)
-         */
-        std::string getRawHttp();
-
-        /**
          * Flush the Response object, i.e., send headers and body to the client and reset it.
          * Please note that you cannot set cookies and headers anymore after flushing.
          * Attempts to do so will be silently ignored.\n

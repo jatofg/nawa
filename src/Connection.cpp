@@ -238,24 +238,6 @@ string Connection::getBody() {
     return bodyString;
 }
 
-string Connection::getRawHttp() {
-    mergeStream();
-    stringstream raw;
-
-    // include headers and cookies, but only when flushing for the first time
-    if (!isFlushed) {
-        // Add headers, incl. cookies, to the raw HTTP source
-        for (auto const &e: getHeaders(true)) {
-            raw << e.first << ": " << e.second << "\r\n";
-        }
-        raw << "\r\n";
-    }
-
-    // And of course, add the body
-    raw << bodyString;
-    return raw.str();
-}
-
 void Connection::mergeStream() {
     bodyString += response.str();
     clearStream();
