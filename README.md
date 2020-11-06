@@ -12,6 +12,26 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
+**New features in v0.6 (experimental)**
+A brand-new HTTP request handler can open up a development web server, allowing you 
+to test your app directly in your browser without setting up a local web server and 
+communicating via FastCGI.
+
+Current limitations:
+* The nawa shared library target does not link yet (blocker for merge into main)
+* Environment and GPC are not available yet when using the HTTP request handler, 
+  not even the request path (blocker for merge into main)
+* Enforced termination does not work when using the HTTP request handler
+* Possibly a lot more issues with the HTTP request handler
+* Most things are still untested (also a blocker)
+
+**Further Roadmap**
+* v0.7: Hot swapping of apps, multiple request handling functions
+* TBD
+* v1.0: A lot more testing, automated unit and integration tests, 
+  packaging (e.g., with CPack), more and better manuals
+* v2: Reimplementation of FastCGI request handling
+
 **v0.5 is here!** Apart from various improvements, it uses an entirely 
 new, modular request handler which paves the way for planned new features 
 (direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
@@ -136,17 +156,21 @@ prepended with `sudo`.
 
 ### Requirements
 
-The requirements marked with * are also required for running nawa, the 
-others for building only.
+**For running NAWA apps via nawarun / applications using libnawa:**
 
-- libssl-dev >= 1.1.1 (OpenSSL* is probably already present on your 
-system)
-- libboost-dev >= 1.65.1.0
-- libcurl4*, libcurl4-openssl-dev >= 7.58.0
-- libargon2*, libargon2-0-dev >= 0~20161029-1.1
+* OpenSSL >= 1.1.1
+* libcurl4 >= 7.58.0
+* libargon2 >= 0~20161029-1.1
 
-Git, CMake, gcc, and other basic tools for building software 
-are required, too.
+**For building (additionally):**
+
+* libssl development files >= 1.1.1
+* libboost development files >= 1.65.1.0
+* libcurl4 development files >= 7.58.0
+* libargon2 development files >= 0~20161029-1.1
+* git
+* cmake >= 3.13
+* gcc-c++/g++ or clang compiler with C++17 support
 
 For building the docs, doxygen must be installed. However, you can also 
 [access the docs online](https://www.tobiasflaig.eu/nawa/0.5/docs/).
