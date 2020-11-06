@@ -281,7 +281,7 @@ void Connection::unsetCookie(const string &key) {
 
 void Connection::flushResponse() {
     // use callback to flush response
-    flushCallback(getHeaders(true), getBody(), isFlushed);
+    flushCallback(responseStatus, getHeaders(true), getBody(), isFlushed);
     // response has been flushed now
     isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
@@ -289,6 +289,7 @@ void Connection::flushResponse() {
 }
 
 void Connection::setStatus(unsigned int status) {
+    responseStatus = status;
     stringstream hval;
     hval << status;
     if (httpStatusCodes.count(status) == 1) {
@@ -299,5 +300,9 @@ void Connection::setStatus(unsigned int status) {
 
 void Connection::setCookiePolicy(Cookie policy) {
     cookiePolicy = move(policy);
+}
+
+unsigned int Connection::getStatus() const {
+    return responseStatus;
 }
 

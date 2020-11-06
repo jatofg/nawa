@@ -40,8 +40,6 @@ struct HttpHandler {
         // TODO use read / create read callback to read headers (and hopefully environment?)
         //      - outsource parsing POST, use POST parsing in fastcgi handler too, then?
         //      - for environment, headers: the request object should have some interesting members
-        // TODO use request handling function for returning result
-        // TODO handle the fact that this library sets headers and status itself (splitting or modification?)
 
         // TODO fill
         RequestInitContainer requestInit;
@@ -49,8 +47,14 @@ struct HttpHandler {
         connectionInit.requestInit = move(requestInit);
         connectionInit.config = config;
 
-        connectionInit.flushCallback = [&httpConn](const unordered_multimap<string, string> &headers, const string &body,
+        connectionInit.flushCallback = [&httpConn](unsigned int status, const unordered_multimap<string, string> &headers, const string &body,
                                                    bool flushedBefore) {
+            if (!flushedBefore) {
+                auto headers1 = headers;
+                headers1.erase("status");
+                httpConn->set_status(HttpServer::connection::status_t(status));
+                httpConn->set_headers(headers1);
+            }
             httpConn->write(body);
         };
 

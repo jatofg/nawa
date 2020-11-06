@@ -32,13 +32,17 @@
 #include <nawa/Session.h>
 
 namespace nawa {
-    using FlushCallbackFunction = std::function<void(const std::unordered_multimap<std::string, std::string> &,
+    using FlushCallbackFunction = std::function<void(unsigned int status,
+                                                     const std::unordered_multimap<std::string, std::string> &,
                                                      const std::string &, bool)>;
 
     struct ConnectionInitContainer {
         /**
-         * Callback function with 3 parameters:
-         * - the multimap of response headers
+         * Callback function with 4 parameters:
+         * - the HTTP response status as an unsigned integer
+         * - the multimap of response headers (please note that a string with the HTTP response status, along with a
+         *   descriptive string, may be provided as a "status" header -- this header should not be sent to the
+         *   user, at least not as an HTTP header)
          * - the response body
          * - a boolean value: true if the response has been flushed before, false otherwise
          *
@@ -55,6 +59,7 @@ namespace nawa {
      */
     class Connection {
         std::string bodyString;
+        unsigned int responseStatus;
         std::unordered_map<std::string, std::string> headers;
         std::unordered_map<std::string, Cookie> cookies;
         Cookie cookiePolicy;
@@ -170,6 +175,12 @@ namespace nawa {
          * @param policy Cookie object containing the default attributes.
          */
         void setCookiePolicy(Cookie policy);
+
+        /**
+         * Get the HTTP response status.
+         * @return The HTTP response status.
+         */
+        unsigned int getStatus() const;
 
         /**
          * Get a map of all response headers.
