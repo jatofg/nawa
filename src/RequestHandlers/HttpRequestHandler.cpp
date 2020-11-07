@@ -41,8 +41,15 @@ struct HttpHandler {
         //      - outsource parsing POST, use POST parsing in fastcgi handler too, then?
         //      - for environment, headers: the request object should have some interesting members
 
-        // TODO fill
+        // TODO parse headers (not in the RH)
         RequestInitContainer requestInit;
+        requestInit.environment = {
+                {"host",               source(request)},
+                {"requestUri",         request.destination},
+                {"remotePort",         to_string(request.source_port)},
+                {"requestMethod",      request.method},
+        };
+
         ConnectionInitContainer connectionInit;
         connectionInit.requestInit = move(requestInit);
         connectionInit.config = config;
