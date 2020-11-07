@@ -102,7 +102,7 @@ void Connection::setBody(string content) {
 
 void
 Connection::sendFile(const string &path, const string &contentType, bool forceDownload,
-                           const string &downloadFilename, bool checkIfModifiedSince) {
+                     const string &downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
     ifstream f(path, ifstream::binary);
@@ -173,7 +173,13 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
 void Connection::setHeader(string key, string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    headers[key] = move(value);
+    headers[key] = {move(value)};
+}
+
+void Connection::addHeader(string key, string value) {
+    // convert to lowercase
+    transform(key.begin(), key.end(), key.begin(), ::tolower);
+    headers[key].push_back(move(value));
 }
 
 void Connection::unsetHeader(string key) {
@@ -184,51 +190,54 @@ void Connection::unsetHeader(string key) {
 
 unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) const {
     unordered_multimap<string, string> ret;
-    for (auto const &e: headers) {
-        ret.insert({e.first, e.second});
+    for (auto const &[key, values]: headers) {
+        for (auto const &value: values) {
+            ret.insert({key, value});
+        }
     }
 
     // include cookies if desired
-    if (includeCookies) for (auto const &e: cookies) {
-        stringstream headerVal;
-        headerVal << e.first << "=" << e.second.content;
-        // Domain option
-        const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
-        if (!domain.empty()) {
-            headerVal << "; Domain=" << domain;
+    if (includeCookies)
+        for (auto const &e: cookies) {
+            stringstream headerVal;
+            headerVal << e.first << "=" << e.second.content;
+            // Domain option
+            const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
+            if (!domain.empty()) {
+                headerVal << "; Domain=" << domain;
+            }
+            // Path option
+            const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
+            if (!path.empty()) {
+                headerVal << "; Path=" << path;
+            }
+            // Expires option
+            time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
+            if (expiry > 0) {
+                headerVal << "; Expires=" << make_http_time(expiry);
+            }
+            // Max-Age option
+            unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
+            if (maxAge > 0) {
+                headerVal << "; Max-Age=" << maxAge;
+            }
+            // Secure option
+            if (e.second.secure || cookiePolicy.secure) {
+                headerVal << "; Secure";
+            }
+            // HttpOnly option
+            if (e.second.httpOnly || cookiePolicy.httpOnly) {
+                headerVal << "; HttpOnly";
+            }
+            // SameSite option
+            uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
+            if (sameSite == 1) {
+                headerVal << "; SameSite=lax";
+            } else if (sameSite > 1) {
+                headerVal << "; SameSite=strict";
+            }
+            ret.insert({"set-cookie", headerVal.str()});
         }
-        // Path option
-        const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
-        if (!path.empty()) {
-            headerVal << "; Path=" << path;
-        }
-        // Expires option
-        time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
-        if (expiry > 0) {
-            headerVal << "; Expires=" << make_http_time(expiry);
-        }
-        // Max-Age option
-        unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
-        if (maxAge > 0) {
-            headerVal << "; Max-Age=" << maxAge;
-        }
-        // Secure option
-        if (e.second.secure || cookiePolicy.secure) {
-            headerVal << "; Secure";
-        }
-        // HttpOnly option
-        if (e.second.httpOnly || cookiePolicy.httpOnly) {
-            headerVal << "; HttpOnly";
-        }
-        // SameSite option
-        uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
-        if (sameSite == 1) {
-            headerVal << "; SameSite=lax";
-        } else if (sameSite > 1) {
-            headerVal << "; SameSite=strict";
-        }
-        ret.insert({"set-cookie", headerVal.str()});
-    }
 
     return ret;
 }
@@ -253,7 +262,7 @@ Connection::Connection(const ConnectionInitContainer &connectionInit)
           request(connectionInit.requestInit),
           config(connectionInit.config),
           session(*this) {
-    headers["content-type"] = "text/html; charset=utf-8";
+    headers["content-type"] = {"text/html; charset=utf-8"};
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
     if (config[{"session", "autostart"}] == "on") {
@@ -281,7 +290,8 @@ void Connection::unsetCookie(const string &key) {
 
 void Connection::flushResponse() {
     // use callback to flush response
-    flushCallback(responseStatus, getHeaders(true), getBody(), isFlushed);
+    flushCallback(FlushCallbackContainer{.status=responseStatus, .headers=getHeaders(true),
+            .body=getBody(), .flushedBefore=isFlushed});
     // response has been flushed now
     isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
@@ -290,12 +300,6 @@ void Connection::flushResponse() {
 
 void Connection::setStatus(unsigned int status) {
     responseStatus = status;
-    stringstream hval;
-    hval << status;
-    if (httpStatusCodes.count(status) == 1) {
-        hval << " " << httpStatusCodes.at(status);
-    }
-    headers["status"] = hval.str();
 }
 
 void Connection::setCookiePolicy(Cookie policy) {
@@ -306,3 +310,25 @@ unsigned int Connection::getStatus() const {
     return responseStatus;
 }
 
+std::string FlushCallbackContainer::getStatusString() const {
+    stringstream hval;
+    hval << status;
+    if (httpStatusCodes.count(status) == 1) {
+        hval << " " << httpStatusCodes.at(status);
+    }
+    return hval.str();
+}
+
+std::string FlushCallbackContainer::getFullHttp() const {
+    stringstream raw;
+    // include headers and cookies, but only when flushing for the first time
+    if (!flushedBefore) {
+        // Add headers, incl. cookies, to the raw HTTP source
+        for (auto const &e: headers) {
+            raw << e.first << ": " << e.second << "\r\n";
+        }
+        raw << "\r\n";
+    }
+    raw << body;
+    return raw.str();
+}

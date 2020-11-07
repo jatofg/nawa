@@ -32,22 +32,35 @@
 #include <nawa/Session.h>
 
 namespace nawa {
-    using FlushCallbackFunction = std::function<void(unsigned int status,
-                                                     const std::unordered_multimap<std::string, std::string> &,
-                                                     const std::string &, bool)>;
+
+    /**
+     * Container passed to the FlushCallbackFunction.
+     */
+    struct FlushCallbackContainer {
+        unsigned int status; /**< The HTTP response status as an unsigned integer. */
+        std::unordered_multimap<std::string, std::string> headers; /**< The multimap of response headers. */
+        std::string body; /**< The response body. */
+        bool flushedBefore; /**< True if the response has been flushed before, false otherwise. */
+
+        /**
+         * Get a textual representation of the HTTP status (such as "200 OK").
+         * @return Textual representation of the HTTP status.
+         */
+        std::string getStatusString() const;
+
+        /**
+         * Generate a full raw HTTP source, including headers when flushing for the first time
+         * (but without HTTP status).
+         * @return The HTTP source.
+         */
+        std::string getFullHttp() const;
+    };
+
+    using FlushCallbackFunction = std::function<void(FlushCallbackContainer)>;
 
     struct ConnectionInitContainer {
         /**
-         * Callback function with 4 parameters:
-         * - the HTTP response status as an unsigned integer
-         * - the multimap of response headers (please note that a string with the HTTP response status, along with a
-         *   descriptive string, may be provided as a "status" header -- this header should not be sent to the
-         *   user, at least not as an HTTP header)
-         * - the response body
-         * - a boolean value: true if the response has been flushed before, false otherwise
-         *
-         * and flushes the response
-         * to the user.
+         * Callback function which takes a `nawa::FlushCallbackContainer` and flushes the response to the user.
          */
         FlushCallbackFunction flushCallback;
         Config config; /**< The NAWA config. */
@@ -59,8 +72,8 @@ namespace nawa {
      */
     class Connection {
         std::string bodyString;
-        unsigned int responseStatus;
-        std::unordered_map<std::string, std::string> headers;
+        unsigned int responseStatus = 200;
+        std::unordered_map<std::string, std::vector<std::string>> headers;
         std::unordered_map<std::string, Cookie> cookies;
         Cookie cookiePolicy;
         bool isFlushed = false;
@@ -95,25 +108,6 @@ namespace nawa {
         void setBody(std::string content);
 
         /**
-         * Send a file from disk to the client. This will automatically set the content-type, content-length, and
-         * last-modified headers and replace the existing HTTP response body (if any) with the contents of the file.
-         * You are responsible to check request headers (such as accepts and if-modified-since). If the file cannot
-         * be read, a nawa::Exception with error code 1 will be thrown.
-         * @param path Path to the file, including the file name of course (better use absolute paths).
-         * @param contentType The content-type string (such as image/png). If left empty, NAWA will try to guess the
-         * content type itself (this will only work for a few common file types), and use "application/octet-stream"
-         * if that fails. Content type guessing is done solely based on the file extension.
-         * @param forceDownload Ask the browser to download the file by sending "content-disposition: attachment".
-         * @param downloadFilename Preferred filename for saving the file on the disk of the client. If this parameter
-         * is set, and forceDownload is set to false, a "content-disposition: inline" header will be sent.
-         * @param checkIfModifiedSince Check the if-modified-since header, if sent by the client, and compare it to
-         * the modification date of the file. Prepare a not-modified response and clear the body if the file has not
-         * been modified. Using this parameter only makes sense if the client requested exactly this file, of course.
-         */
-        void sendFile(const std::string &path, const std::string &contentType = "", bool forceDownload = false,
-                      const std::string &downloadFilename = "", bool checkIfModifiedSince = false);
-
-        /**
          * Set the HTTP status code. It will be passed to the web server without checking for validity. For known
          * status codes, the textual description will be appended.
          * @param status The HTTP status code to pass to the web server.
@@ -121,7 +115,7 @@ namespace nawa {
         void setStatus(unsigned int status);
 
         /**
-         * Set an HTTP header or overwrite an existing one with the same key (keys are case-insensitive and will be
+         * Set an HTTP header or overwrite all existing ones with the same key (keys are case-insensitive and will be
          * converted to lowercase). Please note that the content-type header will be automatically set to
          * "text/html; charset=utf-8", but can be overwritten, of course. There will be no checking or validation,
          * please make sure that the content of the header is valid (value valid for key, no newlines, ...)
@@ -131,10 +125,18 @@ namespace nawa {
         void setHeader(std::string key, std::string value);
 
         /**
-         * Unset the HTTP header with the specified key if it exists (otherwise do nothing). Please note that you can
+         * Add an HTTP header with the given key (case-insensitive, see notes for setHeader). If headers with the
+         * given key have already been set, they will not be overwritten.
+         * @param key Key of the HTTP header (case-insensitive).
+         * @param value Value of the HTTP header.
+         */
+        void addHeader(std::string key, std::string value);
+
+        /**
+         * Unset all HTTP headers with the specified key if it exists (otherwise do nothing). Please note that you can
          * only unset headers that were previously set in NAWA (including content-type), not those that are set by,
          * for example, the web server.
-         * @param key Key of the HTTP header (case-insensitive).
+         * @param key Key of the HTTP header(s) (case-insensitive).
          */
         void unsetHeader(std::string key);
 
@@ -177,6 +179,31 @@ namespace nawa {
         void setCookiePolicy(Cookie policy);
 
         /**
+         * Send a file from disk to the client. This will automatically set the content-type, content-length, and
+         * last-modified headers and replace the existing HTTP response body (if any) with the contents of the file.
+         * You are responsible to check request headers (such as accepts and if-modified-since). If the file cannot
+         * be read, a nawa::Exception with error code 1 will be thrown.
+         * @param path Path to the file, including the file name of course (better use absolute paths).
+         * @param contentType The content-type string (such as image/png). If left empty, NAWA will try to guess the
+         * content type itself (this will only work for a few common file types), and use "application/octet-stream"
+         * if that fails. Content type guessing is done solely based on the file extension.
+         * @param forceDownload Ask the browser to download the file by sending "content-disposition: attachment".
+         * @param downloadFilename Preferred filename for saving the file on the disk of the client. If this parameter
+         * is set, and forceDownload is set to false, a "content-disposition: inline" header will be sent.
+         * @param checkIfModifiedSince Check the if-modified-since header, if sent by the client, and compare it to
+         * the modification date of the file. Prepare a not-modified response and clear the body if the file has not
+         * been modified. Using this parameter only makes sense if the client requested exactly this file, of course.
+         */
+        void sendFile(const std::string &path, const std::string &contentType = "", bool forceDownload = false,
+                      const std::string &downloadFilename = "", bool checkIfModifiedSince = false);
+
+        /**
+         * Get the response body.
+         * @return The response body.
+         */
+        std::string getBody();
+
+        /**
          * Get the HTTP response status.
          * @return The HTTP response status.
          */
@@ -188,12 +215,6 @@ namespace nawa {
          * @return A map of all headers.
          */
         std::unordered_multimap<std::string, std::string> getHeaders(bool includeCookies = true) const;
-
-        /**
-         * Get the response body.
-         * @return The response body.
-         */
-        std::string getBody();
 
         /**
          * Flush the Response object, i.e., send headers and body to the client and reset it.

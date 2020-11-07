@@ -47,15 +47,12 @@ struct HttpHandler {
         connectionInit.requestInit = move(requestInit);
         connectionInit.config = config;
 
-        connectionInit.flushCallback = [&httpConn](unsigned int status, const unordered_multimap<string, string> &headers, const string &body,
-                                                   bool flushedBefore) {
-            if (!flushedBefore) {
-                auto headers1 = headers;
-                headers1.erase("status");
-                httpConn->set_status(HttpServer::connection::status_t(status));
-                httpConn->set_headers(headers1);
+        connectionInit.flushCallback = [&httpConn](FlushCallbackContainer flushInfo) {
+            if (!flushInfo.flushedBefore) {
+                httpConn->set_status(HttpServer::connection::status_t(flushInfo.status));
+                httpConn->set_headers(flushInfo.headers);
             }
-            httpConn->write(body);
+            httpConn->write(flushInfo.body);
         };
 
         Connection connection(connectionInit);

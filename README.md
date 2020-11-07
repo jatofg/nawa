@@ -19,10 +19,11 @@ communicating via FastCGI.
 
 Current limitations:
 * The nawa shared library target does not link yet (blocker for merge into main)
-* Environment and GPC are not available yet when using the HTTP request handler, 
+* Environment and GPC are not available yet when using the HTTP RH, 
   not even the request path (blocker for merge into main)
-* Enforced termination does not work when using the HTTP request handler
-* Possibly a lot more issues with the HTTP request handler
+* Enforced termination does not work, other termination issues (HTTP RH)
+* Some HTTP status codes might be unsupported (HTTP RH)
+* Possibly a lot more issues with the HTTP RH
 * Most things are still untested (also a blocker)
 
 **Further Roadmap**
