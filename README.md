@@ -27,10 +27,10 @@ Current limitations:
 * Most things are still untested (blocker)
 
 **Further Roadmap**
-* v0.7: Hot swapping of apps, multiple request handling functions
+* v0.7: Hot swapping of apps, multiple request handling functions, better logging
 * TBD
 * v1.0: A lot more testing, automated unit and integration tests, 
-  packaging (e.g., with CPack), more and better manuals
+  packaging (e.g., with CPack), more and better manuals, static library and linking
 * v2: Reimplementation of FastCGI request handling
 
 **v0.5 is here!** Apart from various improvements, it uses an entirely 

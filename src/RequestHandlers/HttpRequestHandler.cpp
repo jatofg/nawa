@@ -42,9 +42,10 @@ struct HttpHandler {
         //      - for environment, headers: the request object should have some interesting members
 
         // TODO parse headers (not in the RH)
+        // TODO source(request) gives not only IP, but also port => should be changed
         RequestInitContainer requestInit;
         requestInit.environment = {
-                {"host",               source(request)},
+                {"host",               request.source},
                 {"requestUri",         request.destination},
                 {"remotePort",         to_string(request.source_port)},
                 {"requestMethod",      request.method},
