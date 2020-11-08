@@ -45,19 +45,19 @@ struct HttpHandler {
         RequestInitContainer requestInit;
         string serverPort = config[{"http", "port"}];
         requestInit.environment = {
-                {"remoteAddress",      request.source.substr(0, request.source.find_first_of(':'))},
-                {"requestUri",         request.destination},
-                {"remotePort",         to_string(request.source_port)},
-                {"requestMethod",      request.method},
-                {"serverAddress",      config[{"http", "listen"}]},
-                {"serverPort",         serverPort},
-                {"serverSoftware",     "NAWA Development Web Server"},
+                {"remoteAddress",  request.source.substr(0, request.source.find_first_of(':'))},
+                {"requestUri",     request.destination},
+                {"remotePort",     to_string(request.source_port)},
+                {"requestMethod",  request.method},
+                {"serverAddress",  config[{"http", "listen"}]},
+                {"serverPort",     serverPort},
+                {"serverSoftware", "NAWA Development Web Server"},
         };
 
         // evaluate request headers
         // TODO accept languages (split), split acceptContentTypes?, acceptCharsets (where to find?)
         //      - consistent names for other elements in req handlers?
-        for (auto const& h: request.headers) {
+        for (auto const &h: request.headers) {
             if (h.name == "Host") {
                 requestInit.environment["host"] = h.value.substr(0, h.value.find_first_of(':'));
             } else if (h.name == "User-Agent") {
@@ -90,7 +90,9 @@ struct HttpHandler {
             requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
         }
 
-        // TODO GET, POST, COOKIE
+        requestInit.getVars = split_query_string(request.destination);
+
+        // TODO POST, COOKIE
 
         ConnectionInitContainer connectionInit;
         connectionInit.requestInit = move(requestInit);

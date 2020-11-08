@@ -167,6 +167,13 @@ namespace nawa {
      * @return String with replacements applied.
      */
     std::string string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns);
+
+    /**
+     * Generate a GET key => value multimap out of a query string (the ?k1=v1&k2=v2... part of a URL).
+     * @param queryString Query string or URL containing a query string.
+     * @return Key => value map containing the GET variables.
+     */
+    std::multimap<std::string, std::string> split_query_string(const std::string &queryString);
 }
 
 #endif //NAWA_UTILS_H

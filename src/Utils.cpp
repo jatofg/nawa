@@ -499,3 +499,22 @@ string nawa::string_replace(string input, const unordered_map<string, string> &p
     }
     return input;
 }
+
+multimap<string, string> nawa::split_query_string(const string &queryString) {
+    string qs;
+    size_t qmrkPos = queryString.find_first_of('?');
+    multimap<string, string> ret;
+    if (qmrkPos != string::npos && queryString.length() > qmrkPos) {
+        qs = queryString.substr(qmrkPos+1);
+    } else if (qmrkPos == string::npos) {
+        qs = queryString;
+    }
+    auto pairs = split_string(qs, '&', true);
+    for (auto const &p: pairs) {
+        size_t eqPos = p.find_first_of('=');
+        string k = p.substr(0, eqPos);
+        string v = (eqPos < p.length()-1) ? p.substr(eqPos+1) : "";
+        ret.insert({k, v});
+    }
+    return ret;
+}

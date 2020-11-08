@@ -19,7 +19,7 @@ communicating via FastCGI.
 
 Current limitations:
 * The nawa shared library target does not link yet (blocker for merge into main)
-* GPC values are not available yet (HTTP RH, blocker)
+* Post and Cookie values are not available yet (HTTP RH, blocker)
 * Segfault on session initialization in some cases? (HTTP RH, blocker)
 * Enforced termination does not work, other termination issues (HTTP RH)
 * Some HTTP status codes might be unsupported (HTTP RH)
