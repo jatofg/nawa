@@ -9,8 +9,8 @@ COPY docker/nawa/config.ini /opt/nawasrc/
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		ca-certificates git libssl1.1 libcurl4 libargon2-1 \
-		libssl-dev libboost-dev libcurl4-openssl-dev libargon2-0-dev \
+		ca-certificates git libssl1.1 libcurl4 libargon2-1 libboost-system1.67.0 libboost-thread1.67.0 \
+		libssl-dev libboost-dev libboost-system1.67-dev libboost-thread1.67-dev libcurl4-openssl-dev libargon2-0-dev \
 		unzip g++ libc6-dev make cmake; \
 	mkdir /opt/nawasrc/build; \
 	cd /opt/nawasrc/build; \
@@ -26,7 +26,7 @@ RUN set -eux; \
 	cd /; \
 	rm -R /opt/nawasrc; \
 	apt-get -y remove \
-		git libssl-dev libboost-dev libcurl4-openssl-dev libargon2-0-dev \
+		git libssl-dev libboost-dev libboost-system1.67-dev libboost-thread1.67-dev libcurl4-openssl-dev libargon2-0-dev \
 		unzip g++ libc6-dev make cmake; \
 	apt-get -y autoremove; \
 	apt-get clean;
