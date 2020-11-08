@@ -21,10 +21,11 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/RequestHandlers/HttpRequestHandler.h>
-#include <nawa/Exception.h>
-#include <boost/network/protocol/http/server.hpp>
 #include <nawa/Connection.h>
+#include <nawa/Exception.h>
+#include <nawa/Utils.h>
+#include <nawa/RequestHandlers/HttpRequestHandler.h>
+#include <boost/network/protocol/http/server.hpp>
 
 using namespace nawa;
 using namespace std;
@@ -37,19 +38,59 @@ struct HttpHandler {
     Config config;
 
     void operator()(HttpServer::request const &request, HttpServer::connection_ptr httpConn) {
-        // TODO use read / create read callback to read headers (and hopefully environment?)
-        //      - outsource parsing POST, use POST parsing in fastcgi handler too, then?
+        //   TODO outsource parsing POST, use POST parsing in fastcgi handler too, then?
         //      - for environment, headers: the request object should have some interesting members
 
         // TODO parse headers (not in the RH)
-        // TODO source(request) gives not only IP, but also port => should be changed
         RequestInitContainer requestInit;
+        string serverPort = config[{"http", "port"}];
         requestInit.environment = {
-                {"host",               request.source},
+                {"remoteAddress",      request.source.substr(0, request.source.find_first_of(':'))},
                 {"requestUri",         request.destination},
                 {"remotePort",         to_string(request.source_port)},
                 {"requestMethod",      request.method},
+                {"serverAddress",      config[{"http", "listen"}]},
+                {"serverPort",         serverPort},
+                {"serverSoftware",     "NAWA Development Web Server"},
         };
+
+        // evaluate request headers
+        // TODO accept languages (split), split acceptContentTypes?, acceptCharsets (where to find?)
+        //      - consistent names for other elements in req handlers?
+        for (auto const& h: request.headers) {
+            if (h.name == "Host") {
+                requestInit.environment["host"] = h.value.substr(0, h.value.find_first_of(':'));
+            } else if (h.name == "User-Agent") {
+                requestInit.environment["userAgent"] = h.value;
+            } else if (h.name == "Accept") {
+                requestInit.environment["acceptContentTypes"] = h.value;
+            } else if (requestInit.environment.count(to_lowercase(h.name)) == 0) {
+                requestInit.environment[to_lowercase(h.name)] = h.value;
+            }
+        }
+
+        {
+            // the base URL is the URL without the request URI, e.g., https://www.example.com
+            std::stringstream baseUrl;
+
+            // change following section if HTTPS should ever be implemented (copy from fastcgi)
+            baseUrl << "http://" << requestInit.environment["host"];
+            if (serverPort != "80") {
+                baseUrl << ":" << serverPort;
+            }
+
+            auto baseUrlStr = baseUrl.str();
+            requestInit.environment["baseUrl"] = baseUrlStr;
+
+            // fullUrlWithQS is the full URL, e.g., https://www.example.com/test?a=b&c=d
+            requestInit.environment["fullUrlWithQS"] = baseUrlStr + request.destination;
+
+            // fullUrlWithoutQS is the full URL without query string, e.g., https://www.example.com/test
+            baseUrl << request.destination.substr(0, request.destination.find_first_of('?'));
+            requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
+        }
+
+        // TODO GET, POST, COOKIE
 
         ConnectionInitContainer connectionInit;
         connectionInit.requestInit = move(requestInit);
