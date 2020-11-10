@@ -26,6 +26,7 @@
 #include <nawa/Utils.h>
 #include <nawa/RequestHandlers/HttpRequestHandler.h>
 #include <boost/network/protocol/http/server.hpp>
+#include <nawa/Log.h>
 
 using namespace nawa;
 using namespace std;
@@ -33,11 +34,69 @@ namespace http = boost::network::http;
 struct HttpHandler;
 using HttpServer = http::server<HttpHandler>;
 
+namespace {
+    Log LOG;
+}
+
+struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsumingHttpHandler> {
+    RequestHandler *requestHandler = nullptr;
+    ConnectionInitContainer connectionInit;
+    ssize_t maxPostSize;
+    size_t expectedSize;
+    string postBody;
+
+    InputConsumingHttpHandler(RequestHandler *requestHandler, ConnectionInitContainer connectionInit,
+                              ssize_t maxPostSize, size_t expectedSize)
+            : requestHandler(requestHandler), connectionInit(move(connectionInit)), maxPostSize(maxPostSize),
+              expectedSize(expectedSize) {}
+
+    void operator()(HttpServer::connection::input_range input, boost::system::error_code ec,
+                    size_t bytesTransferred, HttpServer::connection_ptr httpConn) {
+        // TODO error handling?
+        if (ec == boost::asio::error::eof) {
+            LOG("Request could not be handled (EOF in netlib).");
+            httpConn->write(generate_error_page(500));
+            return;
+        }
+
+        // too large?
+        // TODO also check header in advance, before even starting to read
+        if (postBody.size() + bytesTransferred > maxPostSize) {
+            // TODO headers & status have to be set as well when sending a 500 => create an extra function!
+            httpConn->write(generate_error_page(500));
+            return;
+        }
+
+        // fill POST body
+        postBody.insert(postBody.end(), boost::begin(input), boost::end(input));
+
+        // check whether even more data has to be read
+        if (postBody.size() < expectedSize) {
+            auto self = this->shared_from_this();
+            httpConn->read([self](HttpServer::connection::input_range input,
+                                  boost::system::error_code ec, std::size_t bytes_transferred,
+                                  HttpServer::connection_ptr httpConn) {
+                (*self)(input, ec, bytes_transferred, httpConn);
+            });
+            return;
+        }
+
+        // TODO insert POST/files into connectionInit => requires parsing!
+
+        // finally handle the request
+        Connection connection(connectionInit);
+        requestHandler->handleRequest(connection);
+        connection.flushResponse();
+
+    }
+};
+
 struct HttpHandler {
     RequestHandler *requestHandler = nullptr;
     Config config;
 
     void operator()(HttpServer::request const &request, HttpServer::connection_ptr httpConn) {
+
         //   TODO outsource parsing POST, use POST parsing in fastcgi handler too, then?
         //      - for environment, headers: the request object should have some interesting members
 
@@ -98,13 +157,36 @@ struct HttpHandler {
         connectionInit.requestInit = move(requestInit);
         connectionInit.config = config;
 
-        connectionInit.flushCallback = [&httpConn](FlushCallbackContainer flushInfo) {
+        connectionInit.flushCallback = [httpConn](FlushCallbackContainer flushInfo) {
             if (!flushInfo.flushedBefore) {
                 httpConn->set_status(HttpServer::connection::status_t(flushInfo.status));
                 httpConn->set_headers(flushInfo.headers);
             }
             httpConn->write(flushInfo.body);
         };
+
+        // is there POST data to be handled?
+        if (request.method == "POST" && connectionInit.requestInit.environment.count("content-length")) {
+            try {
+                auto contentLength = stoul(connectionInit.requestInit.environment.at("content-length"));
+                ssize_t maxPostSize = stol(config[{"post", "max_size"}]) * 1024;
+
+                if (contentLength > maxPostSize) {
+                    httpConn->write(generate_error_page(500));
+                    return;
+                }
+
+                auto inputConsumingHandler = make_shared<InputConsumingHttpHandler>(requestHandler,
+                                                                                    move(connectionInit), maxPostSize,
+                                                                                    contentLength);
+                httpConn->read([inputConsumingHandler](HttpServer::connection::input_range input,
+                                                       boost::system::error_code ec, size_t bytesTransferred,
+                                                       HttpServer::connection_ptr httpConn) {
+                    (*inputConsumingHandler)(input, ec, bytesTransferred, httpConn);
+                });
+            } catch (const invalid_argument &) {} catch (const out_of_range &) {}
+            return;
+        }
 
         Connection connection(connectionInit);
         requestHandler->handleRequest(connection);
@@ -124,6 +206,8 @@ HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFuncti
                                        int concurrency) {
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config_));
+
+    LOG.setAppname("HttpRequestHandler");
 
     httpHandler = make_unique<HttpHandlerAdapter>();
     httpHandler->handler = make_unique<HttpHandler>();
