@@ -71,6 +71,7 @@ set(NAWA_FILES
         include/nawa/SmtpMailer.h
         include/nawa/Email.h
         include/nawa/File.h
+        include/nawa/MimeMultipart.h
         include/nawa/Engines/HashingEngine.h
         include/nawa/Engines/Argon2HashingEngine.h
         include/nawa/Engines/BcryptHashingEngine.h
@@ -90,6 +91,7 @@ set(NAWA_FILES
         src/Log.cpp
         src/Email.cpp
         src/SmtpMailer.cpp
+        src/MimeMultipart.cpp
         src/Engines/Argon2HashingEngine.cpp
         src/Engines/BcryptHashingEngine.cpp
         src/Engines/DefaultHashTypeTable.cpp

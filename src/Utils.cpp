@@ -26,6 +26,7 @@
 #include <nawa/Utils.h>
 #include <fstream>
 #include <nawa/Exception.h>
+#include <nawa/Encoding.h>
 
 using namespace nawa;
 using namespace std;
@@ -513,7 +514,7 @@ multimap<string, string> nawa::split_query_string(const string &queryString) {
     for (auto const &p: pairs) {
         size_t eqPos = p.find_first_of('=');
         string k = p.substr(0, eqPos);
-        string v = (eqPos < p.length()-1) ? p.substr(eqPos+1) : "";
+        string v = (eqPos < p.length()-1) ? Encoding::urlDecode(p.substr(eqPos+1)) : "";
         ret.insert({k, v});
     }
     return ret;
