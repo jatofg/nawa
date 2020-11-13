@@ -24,6 +24,8 @@
 #include <nawa/MimeMultipart.h>
 #include <regex>
 #include <nawa/Exception.h>
+#include <boost/algorithm/string.hpp>
+#include <nawa/Utils.h>
 
 using namespace nawa;
 using namespace std;
@@ -40,31 +42,59 @@ void MimeMultipart::parse(string contentType, string content) {
     }
     string boundary = "--";
     boundary += boundaryMatch[1];
+    size_t boundaryLen = boundary.length();
+
+    // filter out carriage returns
+    boost::erase_all(content, "\r");
 
     // parse content
     while (!content.empty()) {
 
         // check for boundary
-        if (content.substr(0, boundary.length()) != boundary) {
+        if (content.length() < boundaryLen + 2 || content.substr(0, boundaryLen) != boundary) {
             throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
         }
-        content = content.substr(boundary.length());
-        string nextChars = content.substr(0, 2);
+        content = content.substr(boundaryLen);
 
         // if followed by --, this is the end
-        if (nextChars == "--") {
+        if (content.substr(0, 2) == "--") {
             break;
         }
-        // \r\n should follow
-        if (nextChars != "\r\n") {
+
+        // newline must follow, and content must still have at least 1 (\n) + 1 (hdrs) + 1 (\n) + boundaryLen + 2 chars
+        if (content.length() < boundaryLen + 4 || content[0] != '\n') {
             throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
         }
-        content = content.substr(2);
-
-        // now, we expect headers
+        content = content.substr(1);
 
         // find next boundary
         size_t nextBoundaryPos = content.find_first_of(boundary);
+        if (nextBoundaryPos == string::npos) {
+            throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
+        }
+
+        // headers section goes until the next \n\n or, alternatively, the next boundary
+        size_t headersEndPos = content.find_first_of("\n\n");
+        if (headersEndPos > nextBoundaryPos) {
+            headersEndPos = nextBoundaryPos;
+        }
+        if (headersEndPos < 2) {
+            throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
+        }
+
+        Part currentPart;
+        currentPart.headers = parse_headers(content.substr(0, headersEndPos - 1));
+        // TODO contentType from content-type header
+        // TODO partName, file name from content-disposition header
+
+        // is there a part content in between? (headersEndPos + "\n\n" + content + "\n")
+        if (nextBoundaryPos > headersEndPos + 4) {
+            currentPart.content = content.substr(headersEndPos + 2, nextBoundaryPos - 1);
+        }
+
+        parts_.push_back(currentPart);
+        content = content.substr(nextBoundaryPos);
+
     }
 
     contentType_ = move(contentType);

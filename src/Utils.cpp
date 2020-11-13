@@ -532,7 +532,7 @@ unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
         if (line.length() < colonPos + 2) {
             continue;
         }
-        auto key = line.substr(0, colonPos);
+        auto key = to_lowercase(line.substr(0, colonPos));
         auto val = line.substr(colonPos + 1);
         ret[key] = val;
     }

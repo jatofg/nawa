@@ -178,7 +178,7 @@ namespace nawa {
     /**
      * Parse a block of headers into a map.
      * @param rawHeaders The raw block of headers.
-     * @return Map with key => value mapping.
+     * @return Map with key => value mapping (keys will be transformed to lowercase).
      */
     std::unordered_map<std::string, std::string> parse_headers(std::string rawHeaders);
 
