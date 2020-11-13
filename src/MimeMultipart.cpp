@@ -28,18 +28,44 @@
 using namespace nawa;
 using namespace std;
 
-MimeMultipart::MimeMultipart(string contentType, const string &content) {
-    parse(move(contentType), content);
+MimeMultipart::MimeMultipart(string contentType, string content) {
+    parse(move(contentType), move(content));
 }
 
-void MimeMultipart::parse(string contentType, const string &content) {
+void MimeMultipart::parse(string contentType, string content) {
     regex findBoundary(R"X(boundary="?([A-Za-z0-9'()+_,\-.\/:=? ]+)"?)X");
     smatch boundaryMatch;
     if (!regex_search(contentType, boundaryMatch, findBoundary) || boundaryMatch.size() != 2) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Could not find boundary in content type.");
     }
-    string boundary = boundaryMatch[1];
-    // now parse the content...
+    string boundary = "--";
+    boundary += boundaryMatch[1];
+
+    // parse content
+    while (!content.empty()) {
+
+        // check for boundary
+        if (content.substr(0, boundary.length()) != boundary) {
+            throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
+        }
+        content = content.substr(boundary.length());
+        string nextChars = content.substr(0, 2);
+
+        // if followed by --, this is the end
+        if (nextChars == "--") {
+            break;
+        }
+        // \r\n should follow
+        if (nextChars != "\r\n") {
+            throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
+        }
+        content = content.substr(2);
+
+        // now, we expect headers
+
+        // find next boundary
+        size_t nextBoundaryPos = content.find_first_of(boundary);
+    }
 
     contentType_ = move(contentType);
 }

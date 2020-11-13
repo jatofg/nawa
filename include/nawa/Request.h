@@ -41,15 +41,15 @@ namespace nawa {
          * Vector containing languages accepted by the browser.
          */
         std::vector<std::string> acceptLanguages;
-        std::multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
+        std::unordered_multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
         /**
          * The HTTP POST vars, only if it is in standard format (content type `multipart/form-data` or
          * `application/x-www-form-urlencoded`). Files are excluded and handled separately by fileVectorCallback.
          */
-        std::multimap<std::string, std::string> postVars;
-        std::multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
+        std::unordered_multimap<std::string, std::string> postVars;
+        std::unordered_multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
         std::string postContentType; /**< The HTTP POST content type. */
-        std::multimap<std::string, File> postFiles; /**< Files submitted via POST. */
+        std::unordered_multimap<std::string, File> postFiles; /**< Files submitted via POST. */
         /**
          * A shared_ptr to a string which contains the raw POST data. Raw data does not have to be available
          * if the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
@@ -107,7 +107,7 @@ namespace nawa {
             };
         protected:
             Source source;
-            std::multimap<std::string, std::string> dataMap;
+            std::unordered_multimap<std::string, std::string> dataMap;
         public:
             GPC(const RequestInitContainer &requestInit, Source source);
 
@@ -142,19 +142,19 @@ namespace nawa {
              * Get a reference to the GET, POST, or COOKIE multimap.
              * @return Reference to the multimap.
              */
-            [[nodiscard]] std::multimap<std::string, std::string> const &getMultimap() const;
+            [[nodiscard]] std::unordered_multimap<std::string, std::string> const &getMultimap() const;
 
             /**
              * Get constant begin iterator to the multimap containing all GET, POST, or COOKIE data.
              * @return Iterator to the first element of the multimap.
              */
-            [[nodiscard]] std::multimap<std::string, std::string>::const_iterator begin() const;
+            [[nodiscard]] std::unordered_multimap<std::string, std::string>::const_iterator begin() const;
 
             /**
              * Get constant end iterator to the multimap containing all GET, POST, or COOKIE data.
              * @return Iterator to the end of the multimap.
              */
-            [[nodiscard]] std::multimap<std::string, std::string>::const_iterator end() const;
+            [[nodiscard]] std::unordered_multimap<std::string, std::string>::const_iterator end() const;
 
             /**
              * Shortcut to check for the existence of GET/POST/COOKIE values (including files in the case of POST).
@@ -169,7 +169,7 @@ namespace nawa {
         class Post : public GPC {
             std::string contentType;
             std::shared_ptr<std::string> rawPost;
-            std::multimap<std::string, File> fileMap;
+            std::unordered_multimap<std::string, File> fileMap;
         public:
             explicit Post(const RequestInitContainer &requestInit);
 
@@ -229,7 +229,7 @@ namespace nawa {
              * Get a reference to the POST file multimap.
              * @return Reference to the multimap.
              */
-            [[nodiscard]] std::multimap<std::string, File> const &getFileMultimap() const;
+            [[nodiscard]] std::unordered_multimap<std::string, File> const &getFileMultimap() const;
         };
 
         const Request::Env env; /**< The Env object you should use to access environment variables. */

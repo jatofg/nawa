@@ -173,7 +173,32 @@ namespace nawa {
      * @param queryString Query string or URL containing a query string.
      * @return Key => value map containing the GET variables.
      */
-    std::multimap<std::string, std::string> split_query_string(const std::string &queryString);
+    std::unordered_multimap<std::string, std::string> split_query_string(const std::string &queryString);
+
+    /**
+     * Parse a block of headers into a map.
+     * @param rawHeaders The raw block of headers.
+     * @return Map with key => value mapping.
+     */
+    std::unordered_map<std::string, std::string> parse_headers(std::string rawHeaders);
+
+    /**
+     * Convert any iterable map to an unordered_map.
+     * @tparam KeyType Key type (automatically deduced).
+     * @tparam ValueType Value type (automatically deduced).
+     * @tparam MapType Input map type (automatically deduced).
+     * @tparam Args Further template arguments of map type (automatically deduced).
+     * @param inputMap The input map to convert.
+     * @return An unordered_map with the input map's content.
+     */
+    template<typename KeyType, typename ValueType, template<typename, typename, typename...> class MapType, typename... Args>
+    std::unordered_multimap<KeyType, ValueType> to_unordered_multimap(MapType<KeyType, ValueType, Args...> inputMap) {
+        std::unordered_multimap<KeyType, ValueType> ret;
+        for (auto const &[k, v]: inputMap) {
+            ret.insert({k, v});
+        }
+        return ret;
+    }
 }
 
 #endif //NAWA_UTILS_H

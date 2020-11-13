@@ -78,15 +78,15 @@ size_t Request::GPC::count(const string &gpcVar) const {
     return dataMap.count(gpcVar);
 }
 
-multimap<string, string> const &Request::GPC::getMultimap() const {
+unordered_multimap<string, string> const &Request::GPC::getMultimap() const {
     return dataMap;
 }
 
-multimap<string, string>::const_iterator Request::GPC::begin() const {
+unordered_multimap<string, string>::const_iterator Request::GPC::begin() const {
     return dataMap.begin();
 }
 
-multimap<string, string>::const_iterator Request::GPC::end() const {
+unordered_multimap<string, string>::const_iterator Request::GPC::end() const {
     return dataMap.end();
 }
 
@@ -138,6 +138,6 @@ size_t Request::Post::countFiles(const string &postVar) const {
     return fileMap.count(postVar);
 }
 
-std::multimap<std::string, File> const &Request::Post::getFileMultimap() const {
+std::unordered_multimap<std::string, File> const &Request::Post::getFileMultimap() const {
     return fileMap;
 }

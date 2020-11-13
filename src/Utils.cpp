@@ -27,6 +27,7 @@
 #include <fstream>
 #include <nawa/Exception.h>
 #include <nawa/Encoding.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace nawa;
 using namespace std;
@@ -501,12 +502,12 @@ string nawa::string_replace(string input, const unordered_map<string, string> &p
     return input;
 }
 
-multimap<string, string> nawa::split_query_string(const string &queryString) {
+unordered_multimap<string, string> nawa::split_query_string(const string &queryString) {
     string qs;
     size_t qmrkPos = queryString.find_first_of('?');
-    multimap<string, string> ret;
+    unordered_multimap<string, string> ret;
     if (qmrkPos != string::npos && queryString.length() > qmrkPos) {
-        qs = queryString.substr(qmrkPos+1);
+        qs = queryString.substr(qmrkPos + 1);
     } else if (qmrkPos == string::npos) {
         qs = queryString;
     }
@@ -514,8 +515,26 @@ multimap<string, string> nawa::split_query_string(const string &queryString) {
     for (auto const &p: pairs) {
         size_t eqPos = p.find_first_of('=');
         string k = p.substr(0, eqPos);
-        string v = (eqPos < p.length()-1) ? Encoding::urlDecode(p.substr(eqPos+1)) : "";
+        string v = (eqPos < p.length() - 1) ? Encoding::urlDecode(p.substr(eqPos + 1)) : "";
         ret.insert({k, v});
+    }
+    return ret;
+}
+
+unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
+    unordered_map<string, string> ret;
+    // filter out carriage returns
+    boost::erase_all(rawHeaders, "\r");
+    // split
+    auto lines = split_string(rawHeaders, '\n', true);
+    for (auto const &line: lines) {
+        auto colonPos = line.find_first_of(':');
+        if (line.length() < colonPos + 2) {
+            continue;
+        }
+        auto key = line.substr(0, colonPos);
+        auto val = line.substr(colonPos + 1);
+        ret[key] = val;
     }
     return ret;
 }

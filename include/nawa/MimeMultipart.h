@@ -36,12 +36,15 @@ namespace nawa {
      * currently does NOT support nested MIME parts.
      */
     class MimeMultipart {
-        struct SinglePart {
+        struct Part {
+            std::string partName;
+            std::string fileName;
+            std::string contentType;
             std::unordered_map<std::string, std::string> headers;
             std::string content;
         };
         std::string contentType_;
-        std::vector<SinglePart> parts_;
+        std::vector<Part> parts_;
 
     public:
         /**
@@ -50,20 +53,22 @@ namespace nawa {
         MimeMultipart() = default;
 
         /**
-         * Construct a MimeMultipart container and parse content. Throws a nawa::Exception with error code 1 in case
-         * of a parsing error.
+         * Construct a MimeMultipart container and parse content. Throws a nawa::Exception in case
+         * of a parsing error (see parse() for details).
          * @param contentType Content type of the data in content, including the boundary.
          * @param content A MIME multipart source according to RFC 2046.
          */
-        MimeMultipart(std::string contentType, const std::string &content);
+        MimeMultipart(std::string contentType, std::string content);
 
         /**
          * Parse content into the MimeMultipart container. Clears the existing content before. Throws a nawa::Exception
-         * with error code 1 in case of a parsing error.
+         * in case of a parsing error. Error codes:
+         * - 1: Could not find boundary in content type.
+         * - 2: Malformed MIME payload.
          * @param contentType Content type of the data in content, including the boundary.
          * @param content A MIME multipart source according to RFC 2046.
          */
-        void parse(std::string contentType, const std::string &content);
+        void parse(std::string contentType, std::string content);
 
         /**
          * Clear the existing content in the container.

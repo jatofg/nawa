@@ -171,9 +171,9 @@ bool FastcgippRequestAdapter::response() {
         requestInit.acceptLanguages = renv.acceptLanguages;
 
         // GET, POST, COOKIE vars, raw POST, POST content type
-        requestInit.getVars = renv.gets;
-        requestInit.postVars = renv.posts;
-        requestInit.cookieVars = renv.cookies;
+        requestInit.getVars = to_unordered_multimap(renv.gets);
+        requestInit.postVars = to_unordered_multimap(renv.posts);
+        requestInit.cookieVars = to_unordered_multimap(renv.cookies);
         requestInit.rawPost = rawPost;
         requestInit.postContentType = renv.contentType;
 
