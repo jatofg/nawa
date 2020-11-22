@@ -534,7 +534,27 @@ unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
         }
         auto key = to_lowercase(line.substr(0, colonPos));
         auto val = line.substr(colonPos + 1);
+        boost::trim_left(val);
         ret[key] = val;
+    }
+    return ret;
+}
+
+unordered_multimap<std::string, std::string> nawa::parse_cookies(const string &rawCookies) {
+    unordered_multimap<std::string, std::string> ret;
+    // split by ;
+    auto cookies = split_string(rawCookies, ';', true);
+    for (auto c: cookies) {
+        // remove whitespaces
+        boost::trim(c);
+        // key and value
+        auto eqPos = c.find_first_of('=');
+        if (c.length() < eqPos + 2) {
+            continue;
+        }
+        auto key = c.substr(0, eqPos);
+        auto val = c.substr(eqPos + 1);
+        ret.insert({key, val});
     }
     return ret;
 }

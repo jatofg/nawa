@@ -183,6 +183,13 @@ namespace nawa {
     std::unordered_map<std::string, std::string> parse_headers(std::string rawHeaders);
 
     /**
+     * Parse cookies sent by the browser.
+     * @param rawCookies The content of the "Cookie" header.
+     * @return A multimap of the cookies.
+     */
+     std::unordered_multimap<std::string, std::string> parse_cookies(const std::string &rawCookies);
+
+    /**
      * Convert any iterable map to an unordered_map.
      * @tparam KeyType Key type (automatically deduced).
      * @tparam ValueType Value type (automatically deduced).

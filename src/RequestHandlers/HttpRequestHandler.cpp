@@ -27,6 +27,7 @@
 #include <nawa/RequestHandlers/HttpRequestHandler.h>
 #include <boost/network/protocol/http/server.hpp>
 #include <nawa/Log.h>
+#include <nawa/MimeMultipart.h>
 
 using namespace nawa;
 using namespace std;
@@ -36,6 +37,15 @@ using HttpServer = http::server<HttpHandler>;
 
 namespace {
     Log LOG;
+
+    /**
+     * Stores the raw post access level, as read from the config file.
+     */
+    enum class RawPostAccess {
+        NEVER,
+        NONSTANDARD,
+        ALWAYS
+    };
 }
 
 struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsumingHttpHandler> {
@@ -44,11 +54,12 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
     ssize_t maxPostSize;
     size_t expectedSize;
     string postBody;
+    RawPostAccess rawPostAccess;
 
     InputConsumingHttpHandler(RequestHandler *requestHandler, ConnectionInitContainer connectionInit,
-                              ssize_t maxPostSize, size_t expectedSize)
+                              ssize_t maxPostSize, size_t expectedSize, RawPostAccess rawPostAccess)
             : requestHandler(requestHandler), connectionInit(move(connectionInit)), maxPostSize(maxPostSize),
-              expectedSize(expectedSize) {}
+              expectedSize(expectedSize), rawPostAccess(rawPostAccess) {}
 
     void operator()(HttpServer::connection::input_range input, boost::system::error_code ec,
                     size_t bytesTransferred, HttpServer::connection_ptr httpConn) {
@@ -60,7 +71,6 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         }
 
         // too large?
-        // TODO also check header in advance, before even starting to read
         if (postBody.size() + bytesTransferred > maxPostSize) {
             // TODO headers & status have to be set as well when sending a 500 => create an extra function!
             httpConn->write(generate_error_page(500));
@@ -81,7 +91,40 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
             return;
         }
 
-        // TODO insert POST/files into connectionInit => requires parsing!
+        string const multipartContentType = "multipart/form-data";
+        string const plainTextContentType = "text/plain";
+        auto postContentType = to_lowercase(connectionInit.requestInit.environment["content-type"]);
+        auto &requestInit = connectionInit.requestInit;
+
+        if (rawPostAccess == RawPostAccess::ALWAYS) {
+            requestInit.rawPost = make_shared<string>(postBody);
+        }
+
+        if (postContentType == "application/x-www-form-urlencoded") {
+            requestInit.postContentType = postContentType;
+            requestInit.postVars = split_query_string(postBody);
+        } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
+            MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
+            for (auto const &p: postData.parts_) {
+                // find out whether the part is a file
+                if (!p.fileName.empty() || (!p.contentType.empty() &&
+                                            p.contentType.substr(0, plainTextContentType.length()) !=
+                                            plainTextContentType)) {
+                    File pf;
+                    pf.contentType = p.contentType;
+                    pf.filename = p.fileName;
+                    pf.size = p.content.size();
+                    // TODO better solution can be used when shifting fcgi handler to use MimeMultipart
+                    pf.dataPtr = shared_ptr<char[]>(new char[pf.size]);
+                    memcpy(pf.dataPtr.get(), p.content.c_str(), pf.size);
+                    requestInit.postFiles.insert({p.partName, move(pf)});
+                } else {
+                    requestInit.postVars.insert({p.partName, p.content});
+                }
+            }
+        } else if (rawPostAccess == RawPostAccess::NONSTANDARD) {
+            requestInit.rawPost = make_shared<string>(move(postBody));
+        }
 
         // finally handle the request
         Connection connection(connectionInit);
@@ -98,9 +141,7 @@ struct HttpHandler {
     void operator()(HttpServer::request const &request, HttpServer::connection_ptr httpConn) {
 
         //   TODO outsource parsing POST, use POST parsing in fastcgi handler too, then?
-        //      - for environment, headers: the request object should have some interesting members
 
-        // TODO parse headers (not in the RH)
         RequestInitContainer requestInit;
         string serverPort = config[{"http", "port"}];
         requestInit.environment = {
@@ -149,9 +190,10 @@ struct HttpHandler {
             requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
         }
 
-        requestInit.getVars = split_query_string(request.destination);
-
-        // TODO POST, COOKIE
+        if (request.destination.find_first_of('?') != string::npos) {
+            requestInit.getVars = split_query_string(request.destination);
+        }
+        requestInit.cookieVars = parse_cookies(requestInit.environment["cookie"]);
 
         ConnectionInitContainer connectionInit;
         connectionInit.requestInit = move(requestInit);
@@ -168,6 +210,11 @@ struct HttpHandler {
         // is there POST data to be handled?
         if (request.method == "POST" && connectionInit.requestInit.environment.count("content-length")) {
             try {
+                std::string rawPostStr = config[{"post", "raw_access"}];
+                auto rawPostAccess = (rawPostStr == "never")
+                                     ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
+                                                                                        : RawPostAccess::NONSTANDARD);
+
                 auto contentLength = stoul(connectionInit.requestInit.environment.at("content-length"));
                 ssize_t maxPostSize = stol(config[{"post", "max_size"}]) * 1024;
 
@@ -178,7 +225,7 @@ struct HttpHandler {
 
                 auto inputConsumingHandler = make_shared<InputConsumingHttpHandler>(requestHandler,
                                                                                     move(connectionInit), maxPostSize,
-                                                                                    contentLength);
+                                                                                    contentLength, rawPostAccess);
                 httpConn->read([inputConsumingHandler](HttpServer::connection::input_range input,
                                                        boost::system::error_code ec, size_t bytesTransferred,
                                                        HttpServer::connection_ptr httpConn) {

@@ -234,7 +234,7 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config_));
 
-    std::string rawPostStr = config[{"post", "raw_access"}];
+    string rawPostStr = config[{"post", "raw_access"}];
     auto rawPostAccess = (rawPostStr == "never")
                          ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
                                                                             : RawPostAccess::NONSTANDARD);

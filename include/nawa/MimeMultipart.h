@@ -35,7 +35,7 @@ namespace nawa {
      * creating) is supported, but it could be extended in future to create MIME for emails as well. The implementation
      * currently does NOT support nested MIME parts.
      */
-    class MimeMultipart {
+    struct MimeMultipart {
         struct Part {
             std::string partName;
             std::string fileName;
@@ -46,7 +46,6 @@ namespace nawa {
         std::string contentType_;
         std::vector<Part> parts_;
 
-    public:
         /**
          * Construct an empty MimeMultipart container.
          */
@@ -58,7 +57,7 @@ namespace nawa {
          * @param contentType Content type of the data in content, including the boundary.
          * @param content A MIME multipart source according to RFC 2046.
          */
-        MimeMultipart(std::string contentType, std::string content);
+        MimeMultipart(const std::string &contentType, std::string content);
 
         /**
          * Parse content into the MimeMultipart container. Clears the existing content before. Throws a nawa::Exception
@@ -68,7 +67,7 @@ namespace nawa {
          * @param contentType Content type of the data in content, including the boundary.
          * @param content A MIME multipart source according to RFC 2046.
          */
-        void parse(std::string contentType, std::string content);
+        void parse(const std::string &contentType, std::string content);
 
         /**
          * Clear the existing content in the container.

@@ -30,11 +30,11 @@
 using namespace nawa;
 using namespace std;
 
-MimeMultipart::MimeMultipart(string contentType, string content) {
-    parse(move(contentType), move(content));
+MimeMultipart::MimeMultipart(const string &contentType, string content) {
+    parse(contentType, move(content));
 }
 
-void MimeMultipart::parse(string contentType, string content) {
+void MimeMultipart::parse(const string &contentType, string content) {
     regex findBoundary(R"X(boundary="?([A-Za-z0-9'()+_,\-.\/:=? ]+)"?)X");
     smatch boundaryMatch;
     if (!regex_search(contentType, boundaryMatch, findBoundary) || boundaryMatch.size() != 2) {
@@ -46,6 +46,15 @@ void MimeMultipart::parse(string contentType, string content) {
 
     // filter out carriage returns
     boost::erase_all(content, "\r");
+
+    regex matchPartAndFileName(R"X((;| )name="?([^"]+)"?(; ?filename="?([^"]+)"?)?)X");
+    auto extractPartAndFileName = [&](const string &contentDisposition) -> pair<string, string> {
+        smatch sm;
+        if (!regex_search(contentDisposition, sm, matchPartAndFileName) || sm.size() < 3) {
+            return make_pair(string(), string());
+        }
+        return make_pair(sm[2], sm.size() >= 5 ? sm[4] : string());
+    };
 
     // parse content
     while (!content.empty()) {
@@ -68,13 +77,13 @@ void MimeMultipart::parse(string contentType, string content) {
         content = content.substr(1);
 
         // find next boundary
-        size_t nextBoundaryPos = content.find_first_of(boundary);
+        size_t nextBoundaryPos = content.find(boundary);
         if (nextBoundaryPos == string::npos) {
             throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
         }
 
         // headers section goes until the next \n\n or, alternatively, the next boundary
-        size_t headersEndPos = content.find_first_of("\n\n");
+        size_t headersEndPos = content.find("\n\n");
         if (headersEndPos > nextBoundaryPos) {
             headersEndPos = nextBoundaryPos;
         }
@@ -83,13 +92,17 @@ void MimeMultipart::parse(string contentType, string content) {
         }
 
         Part currentPart;
-        currentPart.headers = parse_headers(content.substr(0, headersEndPos - 1));
-        // TODO contentType from content-type header
-        // TODO partName, file name from content-disposition header
+        currentPart.headers = parse_headers(content.substr(0, headersEndPos));
+        currentPart.contentType = currentPart.headers.count("content-type") ? currentPart.headers.at("content-type")
+                                                                            : "";
+        if (currentPart.headers.count("content-disposition")) {
+            tie(currentPart.partName, currentPart.fileName) = extractPartAndFileName(
+                    currentPart.headers.at("content-disposition"));
+        }
 
         // is there a part content in between? (headersEndPos + "\n\n" + content + "\n")
         if (nextBoundaryPos > headersEndPos + 4) {
-            currentPart.content = content.substr(headersEndPos + 2, nextBoundaryPos - 1);
+            currentPart.content = content.substr(headersEndPos + 2, nextBoundaryPos - 1 - (headersEndPos + 2));
         }
 
         parts_.push_back(currentPart);
@@ -97,9 +110,10 @@ void MimeMultipart::parse(string contentType, string content) {
 
     }
 
-    contentType_ = move(contentType);
+    contentType_ = contentType.substr(0, contentType.find_first_of(';'));
 }
 
 void MimeMultipart::clear() {
-
+    contentType_.clear();
+    parts_.clear();
 }

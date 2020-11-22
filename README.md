@@ -19,13 +19,12 @@ communicating via FastCGI.
 
 Current limitations:
 * The nawa shared library target does not link yet (blocker for merge into main)
-* Post and Cookie values are not available yet (HTTP RH, blocker)
-* Segfault on session initialization in some cases? (HTTP RH, blocker)
-* Enforced termination does not work, other termination issues (HTTP RH)
+* POST files do not work properly yet (HTTP RH)
+* Enforced termination does not work (HTTP RH)
 * Some HTTP status codes might be unsupported (HTTP RH)
 * Flushes may be out of order (HTTP RH)
-* Possibly a lot more issues with the HTTP RH
-* Most things are still untested (blocker)
+* Possibly some more issues with the HTTP RH
+* Many things are still untested (blocker)
 
 **Further Roadmap**
 * v0.7: Hot swapping of apps, multiple request handling functions, better logging
