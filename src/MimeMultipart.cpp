@@ -44,9 +44,6 @@ void MimeMultipart::parse(const string &contentType, string content) {
     boundary += boundaryMatch[1];
     size_t boundaryLen = boundary.length();
 
-    // filter out carriage returns
-    boost::erase_all(content, "\r");
-
     regex matchPartAndFileName(R"X((;| )name="?([^"]+)"?(; ?filename="?([^"]+)"?)?)X");
     auto extractPartAndFileName = [&](const string &contentDisposition) -> pair<string, string> {
         smatch sm;
@@ -70,11 +67,11 @@ void MimeMultipart::parse(const string &contentType, string content) {
             break;
         }
 
-        // newline must follow, and content must still have at least 1 (\n) + 1 (hdrs) + 1 (\n) + boundaryLen + 2 chars
-        if (content.length() < boundaryLen + 4 || content[0] != '\n') {
+        // newline must follow, and content must still have at least 2 (\r\n) + 1 (hdrs) + 2 (\r\n) + boundaryLen + 2 chars
+        if (content.length() < boundaryLen + 6 || content.substr(0, 2) != "\r\n") {
             throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
         }
-        content = content.substr(1);
+        content = content.substr(2);
 
         // find next boundary
         size_t nextBoundaryPos = content.find(boundary);
@@ -82,12 +79,12 @@ void MimeMultipart::parse(const string &contentType, string content) {
             throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
         }
 
-        // headers section goes until the next \n\n or, alternatively, the next boundary
-        size_t headersEndPos = content.find("\n\n");
+        // headers section goes until the next \r\n\r\n or, alternatively, the next boundary
+        size_t headersEndPos = content.find("\r\n\r\n");
         if (headersEndPos > nextBoundaryPos) {
             headersEndPos = nextBoundaryPos;
         }
-        if (headersEndPos < 2) {
+        if (headersEndPos < 4) {
             throw Exception(__PRETTY_FUNCTION__, 2, "Malformed MIME payload.");
         }
 
@@ -100,9 +97,9 @@ void MimeMultipart::parse(const string &contentType, string content) {
                     currentPart.headers.at("content-disposition"));
         }
 
-        // is there a part content in between? (headersEndPos + "\n\n" + content + "\n")
-        if (nextBoundaryPos > headersEndPos + 4) {
-            currentPart.content = content.substr(headersEndPos + 2, nextBoundaryPos - 1 - (headersEndPos + 2));
+        // is there a part content in between? (headersEndPos + "\r\n\r\n" + content + "\r\n")
+        if (nextBoundaryPos > headersEndPos + 7) {
+            currentPart.content = content.substr(headersEndPos + 4, nextBoundaryPos - 2 - (headersEndPos + 4));
         }
 
         parts_.push_back(currentPart);

@@ -17,14 +17,13 @@ A brand-new HTTP request handler can open up a development web server, allowing 
 to test your app directly in your browser without setting up a local web server and 
 communicating via FastCGI.
 
-Current limitations:
+Current (known) limitations:
 * The nawa shared library target does not link yet (blocker for merge into main)
-* POST files do not work properly yet (HTTP RH)
-* Enforced termination does not work (HTTP RH)
+* Enforced termination is unsupported (HTTP RH)
 * Some HTTP status codes might be unsupported (HTTP RH)
 * Flushes may be out of order (HTTP RH)
-* Possibly some more issues with the HTTP RH
-* Many things are still untested (blocker)
+* Environment information is incomplete and naming partly inconsistent (HTTP RH)
+* Some things are still untested (blocker)
 
 **Further Roadmap**
 * v0.7: Hot swapping of apps, multiple request handling functions, better logging
