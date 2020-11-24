@@ -46,6 +46,12 @@ namespace {
         NONSTANDARD,
         ALWAYS
     };
+
+    auto sendServerError = [](HttpServer::connection_ptr &httpConn) {
+        httpConn->set_status(HttpServer::connection::internal_server_error);
+        httpConn->set_headers(unordered_multimap<string, string>({{"content-type", "text/html; charset=utf-8"}}));
+        httpConn->write(generate_error_page(500));
+    };
 }
 
 struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsumingHttpHandler> {
@@ -66,14 +72,13 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         // TODO error handling?
         if (ec == boost::asio::error::eof) {
             LOG("Request could not be handled (EOF in netlib).");
-            httpConn->write(generate_error_page(500));
+            sendServerError(httpConn);
             return;
         }
 
         // too large?
         if (postBody.size() + bytesTransferred > maxPostSize) {
-            // TODO headers & status have to be set as well when sending a 500 => create an extra function!
-            httpConn->write(generate_error_page(500));
+            sendServerError(httpConn);
             return;
         }
 
@@ -219,7 +224,7 @@ struct HttpHandler {
                 ssize_t maxPostSize = stol(config[{"post", "max_size"}]) * 1024;
 
                 if (contentLength > maxPostSize) {
-                    httpConn->write(generate_error_page(500));
+                    sendServerError(httpConn);
                     return;
                 }
 
