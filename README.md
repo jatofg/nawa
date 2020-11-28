@@ -18,7 +18,6 @@ to test your app directly in your browser without setting up a local web server 
 communicating via FastCGI.
 
 Current (known) limitations:
-* The nawa shared library target does not link yet (blocker for merge into main)
 * Enforced termination is unsupported (HTTP RH)
 * Some HTTP status codes might be unsupported (HTTP RH)
 * Flushes may be out of order (HTTP RH)
