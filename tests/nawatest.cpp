@@ -88,21 +88,22 @@ int handleRequest(Connection &connection) {
                            "<html><head><title>Test</title></head><body>"
                            "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
                                                                                                      "<p>Client IP: "
-                        << Encoding::htmlEncode(connection.request.env["remoteAddress"]) << "</p>"
-                                                                                            "<p>Request URI: ("
+                        << Encoding::htmlEncode(connection.request.env["REMOTE_ADDRESS"]) << "</p>"
+                                                                                             "<p>Request URI: ("
                         << connection.request.env.getRequestPath().size() << " elements): "
-                        << connection.request.env["requestUri"] << "</p>"
-                                                                   "<p>HTTPS status: "
-                        << connection.request.env["https"] << "</p>"
-                                                              "<p>SERVER_NAME: " << connection.request.env["serverName"]
+                        << connection.request.env["REQUEST_URI"] << "</p>"
+                                                                    "<p>HTTPS status: "
+                        << connection.request.env["HTTPS"] << "</p>"
+                                                              "<p>SERVER_NAME: "
+                        << connection.request.env["SERVER_NAME"]
                         << "</p>"
-                           "<p>Server software: " << connection.request.env["serverSoftware"] << "</p>"
-                                                                                                 "<p>Base URL: "
-                        << connection.request.env["baseUrl"] << "</p>"
-                                                                "<p>Full URL with QS: "
-                        << connection.request.env["fullUrlWithQS"] << "</p>"
-                                                                      "<p>Full URL without QS: "
-                        << connection.request.env["fullUrlWithoutQS"] << "</p>";
+                           "<p>Server software: " << connection.request.env["SERVER_SOFTWARE"] << "</p>"
+                                                                                                  "<p>Base URL: "
+                        << connection.request.env["BASE_URL"] << "</p>"
+                                                                 "<p>Full URL with QS: "
+                        << connection.request.env["FULL_URL_WITH_QS"] << "</p>"
+                                                                         "<p>Full URL without QS: "
+                        << connection.request.env["FULL_URL_WITHOUT_QS"] << "</p>";
 
     // test privileges
     auto currentUid = getuid();

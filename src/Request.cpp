@@ -39,7 +39,7 @@ vector<string> Request::Env::getAcceptLanguages() const {
 }
 
 vector<string> Request::Env::getRequestPath() const {
-    return split_path(operator[]("requestUri"));
+    return split_path(operator[]("REQUEST_URI"));
 }
 
 Request::Env::Env(const RequestInitContainer &initContainer) : environment(initContainer.environment),

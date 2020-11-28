@@ -16,19 +16,21 @@ We will first have a look at the config file. You can find an example in
 the `config.ini` file in the top level of the repo.
 
 The `[fastcgi]` section specifies how the app should communicate with the 
-web server. Currently, this is always done using using the FastCGI 
-protocol. We recommend that you always use a UNIX socket, if possible. 
-Set `mode` to `unix` and specify a path where the socket should be 
-created in the `path` option. The socket will be created by NAWA, just 
-make sure that:
+web server. In production environments, this should be done using the 
+FastCGI protocol (however, NAWA can also open up a development web server, 
+will be explained later). We recommend that you always use a UNIX socket, 
+if possible. Set `mode` to `unix` and specify a path where the socket 
+should be created in the `path` option. The socket will be created by 
+NAWA, just make sure that:
+
 - the path exists,
 - the user starting the app has both write and read permissions on the 
-file (if the app is started by root and downgrades its permissions 
-according to the relevant options in the `privileges` section, this 
-doesn't matter, as the socket connection is established before the 
-privilege downgrade happens), and
+  file (if the app is started by root and downgrades its permissions 
+  according to the relevant options in the `privileges` section, this 
+  doesn't matter, as the socket connection is established before the 
+  privilege downgrade happens), and
 - the web server has both read and write permissions on the socket 
-file, too.
+  file, too.
 
 In case this doesn't work for you, you can use a TCP socket. If the 
 machine you're running the app on is connected to the Internet without 
@@ -37,6 +39,17 @@ an accordingly configured firewall, you should set the `listen` IP to
 to the TCP socket. Use another interface on your own risk, there is no 
 authentication whatsoever.
 
+If you want to use the integrated development web server, you can 
+configure it in the `[http]` section. We recommend that you only change 
+the port, if desired, and leave the other settings as they are (the 
+development web server should not be exposed to a public network or the 
+internet). NAWA will then open a server on the port you've chosen 
+(8080 by default), which can be accessed only from the local machine 
+for safety reasons. If you want to make your app publicly available, 
+please use the FastCGI request handler. Please also note that you have 
+to change the `request_handler` setting in the `[system]` section to 
+`http` in order to use the development web server instead of FastCGI.
+
 In the next section, `[privileges]`, specify the system user and group 
 your app should run at. NAWA will downgrade its privileges and continue 
 running as the specified user and group after connecting to the socket. 
@@ -44,12 +57,15 @@ This will only work if the app is started as root. If you are not
 starting the app as root, make sure the starting user has all necessary 
 permissions to create the socket.
 
-In the `[system]` section, you can specify the number of threads used 
+In the `[system]` section, you can configure the request handler. 
+If you want to use the integrated development web server instead of 
+FastCGI (for testing purposes only), you can set `request_handler = http`.
+You can also specify the number of threads used 
 for request handling. The default values, `concurrency = hardware` 
 and `threads = 1.0`, will make NAWA determine the number of threads 
 according to your hardware's parallelism capabilities. If this doesn't 
 lead to the expected result on your system, you can use 
-`concurrency = fixed` to specify a fixed number of threads.
+`concurrency = fixed` to specify a fixed number of threads. 
 
 The `[application]` section contains the path to the shared object file. 
 Make sure the path points to your application file. We will see later 
@@ -138,9 +154,13 @@ Now, compile your app and insert the correct path into your
 
 ## Configuring the web server
 
-Of course, you'll also have to configure your web server to connect to 
-the FastCGI socket and make your new website accessible in your browser. 
-How this works differs depending on the server you use. In Apache2, 
+If you use the integrated development web server (HTTP request handler), 
+you can skip this section, as NAWA will automatically start a web server 
+for you.
+
+If you're using FastCGI, you'll also have to configure your web server to 
+connect to the FastCGI socket and make your new website accessible in your 
+browser. How this works differs depending on the server you use. In Apache2, 
 you'll have to enable the `proxy_fcgi` module by running
 
 `a2enmod proxy_fcgi`

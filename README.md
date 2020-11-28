@@ -24,11 +24,18 @@ Current (known) limitations:
 * Environment information is incomplete and naming partly inconsistent (HTTP RH)
 * Some things are still untested (blocker)
 
-**Further Roadmap**
-* v0.7: Hot swapping of apps, multiple request handling functions, better logging
-* TBD
-* v1.0: A lot more testing, automated unit and integration tests, 
-  packaging (e.g., with CPack), more and better manuals, static library and linking
+**Attention!** All environment variables have been renamed in v0.6. Please make 
+sure to adapt your apps properly 
+(see [Environment Docs](https://www.tobiasflaig.eu/nawa/0.6/docs/environmentmanual.html)).
+
+**Further Roadmap (preliminary)**
+* v0.7: Hot swapping of apps, multiple request handling functions, better logging, 
+  automated unit tests
+* v0.8: Using MimeMultipart for email and FCGI RH, better file upload handling
+* ...
+* v1.0: A lot more testing, automated integration tests, 
+  packaging, more and better manuals, static library and linking
+* ...
 * v2: Reimplementation of FastCGI request handling
 
 **v0.5 is here!** Apart from various improvements, it uses an entirely 
@@ -60,10 +67,10 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.6/docs/gettingstarted.html) 
 
 If you don't like the IoC-style approach, you can also use NAWA as a library. 
-[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.5/docs/aslibrarymanual.html)
+[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.6/docs/aslibrarymanual.html)
 
 ### Warning!
 
@@ -114,7 +121,7 @@ application, and
 
 You can find an introduction containing a simple "Hello World!" 
 NAWA app here: 
-[Getting started.](https://www.tobiasflaig.eu/nawa/0.5/docs/gettingstarted.html)
+[Getting started.](https://www.tobiasflaig.eu/nawa/0.6/docs/gettingstarted.html)
 
 The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
@@ -159,7 +166,7 @@ prepended with `sudo`.
 * gcc-c++/g++ or clang compiler with C++17 support
 
 For building the docs, doxygen must be installed. However, you can also 
-[access the docs online](https://www.tobiasflaig.eu/nawa/0.5/docs/).
+[access the docs online](https://www.tobiasflaig.eu/nawa/0.6/docs/).
 
 ### Clone, build, and install NAWA
 

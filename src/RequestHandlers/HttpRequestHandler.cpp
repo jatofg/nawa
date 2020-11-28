@@ -128,7 +128,7 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
                         requestInit.postVars.insert({p.partName, p.content});
                     }
                 }
-            } catch(Exception const &) {}
+            } catch (Exception const &) {}
         } else if (rawPostAccess == RawPostAccess::NONSTANDARD) {
             requestInit.rawPost = make_shared<string>(move(postBody));
         }
@@ -150,26 +150,20 @@ struct HttpHandler {
         RequestInitContainer requestInit;
         string serverPort = config[{"http", "port"}];
         requestInit.environment = {
-                {"remoteAddress",  request.source.substr(0, request.source.find_first_of(':'))},
-                {"requestUri",     request.destination},
-                {"remotePort",     to_string(request.source_port)},
-                {"requestMethod",  request.method},
-                {"serverAddress",  config[{"http", "listen"}]},
-                {"serverPort",     serverPort},
-                {"serverSoftware", "NAWA Development Web Server"},
+                {"REMOTE_ADDRESS",  request.source.substr(0, request.source.find_first_of(':'))},
+                {"REQUEST_URI",     request.destination},
+                {"REMOTE_PORT",     to_string(request.source_port)},
+                {"REQUEST_METHOD",  request.method},
+                {"SERVER_ADDRESS",  config[{"http", "listen"}]},
+                {"SERVER_PORT",     serverPort},
+                {"SERVER_SOFTWARE", "NAWA Development Web Server"},
         };
 
         // evaluate request headers
         // TODO accept languages (split), split acceptContentTypes?, acceptCharsets (where to find?)
         //      - consistent names for other elements in req handlers?
         for (auto const &h: request.headers) {
-            if (h.name == "Host") {
-                requestInit.environment["host"] = h.value.substr(0, h.value.find_first_of(':'));
-            } else if (h.name == "User-Agent") {
-                requestInit.environment["userAgent"] = h.value;
-            } else if (h.name == "Accept") {
-                requestInit.environment["acceptContentTypes"] = h.value;
-            } else if (requestInit.environment.count(to_lowercase(h.name)) == 0) {
+            if (requestInit.environment.count(to_lowercase(h.name)) == 0) {
                 requestInit.environment[to_lowercase(h.name)] = h.value;
             }
         }
@@ -180,19 +174,16 @@ struct HttpHandler {
 
             // change following section if HTTPS should ever be implemented (copy from fastcgi)
             baseUrl << "http://" << requestInit.environment["host"];
-            if (serverPort != "80") {
-                baseUrl << ":" << serverPort;
-            }
 
             auto baseUrlStr = baseUrl.str();
-            requestInit.environment["baseUrl"] = baseUrlStr;
+            requestInit.environment["BASE_URL"] = baseUrlStr;
 
             // fullUrlWithQS is the full URL, e.g., https://www.example.com/test?a=b&c=d
-            requestInit.environment["fullUrlWithQS"] = baseUrlStr + request.destination;
+            requestInit.environment["FULL_URL_WITH_QS"] = baseUrlStr + request.destination;
 
             // fullUrlWithoutQS is the full URL without query string, e.g., https://www.example.com/test
             baseUrl << request.destination.substr(0, request.destination.find_first_of('?'));
-            requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
+            requestInit.environment["FULL_URL_WITHOUT_QS"] = baseUrl.str();
         }
 
         if (request.destination.find_first_of('?') != string::npos) {

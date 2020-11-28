@@ -1,6 +1,10 @@
 Using Docker {#usingdocker}
 ===
 
+**Please note that the Docker images are currently mostly untested
+and only used as a CI. They might not even work anymore. Feel free 
+to report bugs on GitHub if you use them.**
+
 Docker images are built automatically by GitHub and are available 
 [here](https://github.com/jatofg/nawa/packages).
 

@@ -84,25 +84,25 @@ bool FastcgippRequestAdapter::response() {
     {
         auto const &renv = environment();
         requestInit.environment = {
-                {"host",               renv.host},
-                {"userAgent",          renv.userAgent},
-                {"acceptContentTypes", renv.acceptContentTypes},
-                {"acceptCharsets",     renv.acceptCharsets},
-                {"authorization",      renv.authorization},
-                {"referer",            renv.referer},
-                {"contentType",        renv.contentType},
-                {"root",               renv.root},
-                {"scriptName",         renv.scriptName},
-                {"requestUri",         renv.requestUri},
-                {"serverPort",         to_string(renv.serverPort)},
-                {"remotePort",         to_string(renv.remotePort)},
-                {"ifModifiedSince",    to_string(renv.ifModifiedSince)},
-                {"https",              renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""},
-                {"serverName",         renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""},
-                {"serverSoftware",     renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""},
+                {"host",              renv.host},
+                {"user-agent",        renv.userAgent},
+                {"accept",            renv.acceptContentTypes},
+                {"accept-charset",    renv.acceptCharsets},
+                {"authorization",     renv.authorization},
+                {"referer",           renv.referer},
+                {"content-type",      renv.contentType},
+                {"ROOT",              renv.root},
+                {"SCRIPT_NAME",       renv.scriptName},
+                {"REQUEST_URI",       renv.requestUri},
+                {"SERVER_PORT",       to_string(renv.serverPort)},
+                {"REMOTE_PORT",       to_string(renv.remotePort)},
+                {"if-modified-since", to_string(renv.ifModifiedSince)},
+                {"HTTPS",             renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""},
+                {"SERVER_NAME",       renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""},
+                {"SERVER_SOFTWARE",   renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""},
         };
 
-        auto &requestMethod = requestInit.environment["requestMethod"];
+        auto &requestMethod = requestInit.environment["REQUEST_METHOD"];
         switch (renv.requestMethod) {
             case Fastcgipp::Http::RequestMethod::ERROR:
                 requestMethod = "ERROR";
@@ -137,8 +137,8 @@ bool FastcgippRequestAdapter::response() {
             stringstream serverAddr, remoteAddr;
             serverAddr << renv.serverAddress;
             remoteAddr << renv.remoteAddress;
-            requestInit.environment["serverAddress"] = serverAddr.str();
-            requestInit.environment["remoteAddress"] = remoteAddr.str();
+            requestInit.environment["SERVER_ADDRESS"] = serverAddr.str();
+            requestInit.environment["REMOTE_ADDRESS"] = remoteAddr.str();
         }
 
         {
@@ -147,18 +147,19 @@ bool FastcgippRequestAdapter::response() {
             auto https = renv.others.count("HTTPS");
             baseUrl << (https ? "https://" : "http://")
                     << renv.host;
-            if ((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
-                baseUrl << ":" << renv.serverPort;
-            }
+            // TODO check wheter this section is needed or port is automatically appended (probably!)
+//            if ((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
+//                baseUrl << ":" << renv.serverPort;
+//            }
             auto baseUrlStr = baseUrl.str();
-            requestInit.environment["baseUrl"] = baseUrlStr;
+            requestInit.environment["BASE_URL"] = baseUrlStr;
 
             // fullUrlWithQS is the full URL, e.g., https://www.example.com/test?a=b&c=d
-            requestInit.environment["fullUrlWithQS"] = baseUrlStr + renv.requestUri;
+            requestInit.environment["FULL_URL_WITH_QS"] = baseUrlStr + renv.requestUri;
 
             // fullUrlWithoutQS is the full URL without query string, e.g., https://www.example.com/test
             baseUrl << renv.requestUri.substr(0, renv.requestUri.find_first_of('?'));
-            requestInit.environment["fullUrlWithoutQS"] = baseUrl.str();
+            requestInit.environment["FULL_URL_WITHOUT_QS"] = baseUrl.str();
         }
 
         for (const auto&[k, v]: renv.others) {

@@ -26,25 +26,23 @@ For an example concerning the usage of the request path, see
 The function `connection.request.env.getAcceptLanguages()` 
 (`nawa::Request::Env::getAcceptLanguages()`) returns a vector containing 
 all languages accepted by the client (as strings in the format used by 
-their web browser). This might be useful for internationalization.
+their web browser). This might be useful for internationalization. 
+**Does not work yet when using the HTTP request handler.**
 
 Other environment variables can be accessed as strings by using the `[]` 
 operator. For example, to access the server hostname, use 
-`connection.request.env["host"]`. In the following section, you'll find 
+`connection.request.env["HOST"]`. In the following section, you'll find 
 the full list of environment variables that can be accessed this way.
 
 ### List of environment variables
 
-- `host`: Server hostname
-- `userAgent`: User agent string (of the client's web browser)
-- `acceptContentTypes`: Content types accepted by the client
-- `acceptCharsets`: Character sets accepted by the client
-- `authorization`: HTTP authorization string
-- `referer`: Referral URL
-- `contentType`: Content type of data from client
-- `root`: HTTP root directory
-- `scriptName`: Filename of script relative to http root
-- `requestMethod`: HTTP request method, one of:
+All of the following environment variables are available in the FastCGI 
+request handler. All except for those marked with (\*) are also available 
+in the HTTP request handler.
+
+- `ROOT`: HTTP root directory (\*)
+- `SCRIPT_NAME`: Filename of script relative to http root (\*)
+- `REQUEST_METHOD`: HTTP request method, one of:
     - ERROR
     - HEAD
     - GET
@@ -54,25 +52,47 @@ the full list of environment variables that can be accessed this way.
     - TRACE
     - OPTIONS
     - CONNECT
-- `requestUri`: The request URI, including query string
-- `serverAddress`: Server IP address
-- `remoteAddress`: Client IP address
-- `serverPort`: Port of the web server
-- `remotePort`: Port used by the client
-- `ifModifiedSince`: Unix timestamp sent by the client (to indicate that 
-a full response is only necessary if the requested content has been 
-modified since this date)
-- `https`: String should be "on" when the page has been accessed through 
-a secure (HTTPS) connection, otherwise undefined (most probably empty).
-- `serverName`: The server's FQDN (fully qualified domain name).
-- `serverSoftware`: The web server software, such as Apache.
-- `baseUrl`: The URL of the current request, starting with `http://` or 
-`https://`, and including the hostname (and port, if necessary), but not 
-the request URI.
-- `fullUrlWithQS`: The full URL of the current request, starting with 
-`http://` or `https://`, including the query string.
-- `fullUrlWithoutQS`: Same as `fullUrlWithQS`, but without the query 
-string.
+- `REQUEST_URI`: The request URI, including query string
+- `SERVER_ADDRESS`: Server IP address
+- `REMOTE_ADDRESS`: Client IP address
+- `SERVER_PORT`: Port of the web server
+- `REMOTE_PORT`: Port used by the client
+- `HTTPS`: String should be "on" when the page has been accessed through 
+  a secure (HTTPS) connection, otherwise undefined (most probably empty).
+- `SERVER_NAME`: The server's FQDN (fully qualified domain name). (\*)
+- `SERVER_SOFTWARE`: The web server software, such as "Apache" or 
+  "NAWA Development Web Server".
+- `BASE_URL`: The URL of the current request, starting with `http://` or 
+  `https://`, and including the hostname (and port, if necessary), but not 
+  the request URI.
+- `FULL_URL_WITH_QS`: The full URL of the current request, starting with 
+  `http://` or `https://`, including the query string.
+- `FULL_URL_WITHOUT_QS`: Same as `FULL_URL_WITH_QS`, but without the query 
+  string.
+
+The following HTTP request headers are available as environment variables 
+when using the FastCGI request handler (the variable keys reflect the original 
+keys of the respective request headers).
+
+- `host`: Requested server hostname
+- `user-agent`: User agent string (of the client's web browser)
+- `accept`: Content types accepted by the client
+- `accept-charset`: Character sets accepted by the client
+- `authorization`: HTTP authorization string
+- `referer`: Referral URL
+- `content-type`: Content type of data from client
+- `if-modified-since`: Unix timestamp sent by the client (to indicate that 
+  a full response is only necessary if the requested content has been 
+  modified since this date)
+
+Other request headers might be available using a FastCGI-specific 
+key (as they are provided by the web server, but lower-cased). This might 
+depend on which web server you use, and how it is configured. If you think 
+other FastCGI request parameters should be normalized, please open a 
+GitHub issue.
+
+When using the HTTP request handler, all request headers are available as 
+environment variables via their lower-cased keys.
 
 ## GET, POST, and COOKIE
 

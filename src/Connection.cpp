@@ -120,7 +120,7 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     }
 
     // check if-modified if requested
-    if (checkIfModifiedSince && stoul(request.env["ifModifiedSince"]) >= lastModified) {
+    if (checkIfModifiedSince && stoul(request.env["if-modified-since"]) >= lastModified) {
         setStatus(304);
         setBody(string());
         return;
