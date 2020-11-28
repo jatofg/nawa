@@ -23,7 +23,6 @@ Current (known) limitations:
 * Some HTTP status codes might be unsupported (HTTP RH)
 * Flushes may be out of order (HTTP RH)
 * Environment information is incomplete and naming partly inconsistent (HTTP RH)
-* Connection might reset when sending error pages (HTTP RH)
 * Some things are still untested (blocker)
 
 **Further Roadmap**

@@ -109,24 +109,26 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
             requestInit.postContentType = postContentType;
             requestInit.postVars = split_query_string(postBody);
         } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
-            MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
-            for (auto const &p: postData.parts_) {
-                // find out whether the part is a file
-                if (!p.fileName.empty() || (!p.contentType.empty() &&
-                                            p.contentType.substr(0, plainTextContentType.length()) !=
-                                            plainTextContentType)) {
-                    File pf;
-                    pf.contentType = p.contentType;
-                    pf.filename = p.fileName;
-                    pf.size = p.content.size();
-                    // TODO better solution can be used when shifting fcgi handler to use MimeMultipart
-                    pf.dataPtr = shared_ptr<char[]>(new char[pf.size]);
-                    memcpy(pf.dataPtr.get(), p.content.c_str(), pf.size);
-                    requestInit.postFiles.insert({p.partName, move(pf)});
-                } else {
-                    requestInit.postVars.insert({p.partName, p.content});
+            try {
+                MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
+                for (auto const &p: postData.parts_) {
+                    // find out whether the part is a file
+                    if (!p.fileName.empty() || (!p.contentType.empty() &&
+                                                p.contentType.substr(0, plainTextContentType.length()) !=
+                                                plainTextContentType)) {
+                        File pf;
+                        pf.contentType = p.contentType;
+                        pf.filename = p.fileName;
+                        pf.size = p.content.size();
+                        // TODO better solution can be used when shifting fcgi handler to use MimeMultipart
+                        pf.dataPtr = shared_ptr<char[]>(new char[pf.size]);
+                        memcpy(pf.dataPtr.get(), p.content.c_str(), pf.size);
+                        requestInit.postFiles.insert({p.partName, move(pf)});
+                    } else {
+                        requestInit.postVars.insert({p.partName, p.content});
+                    }
                 }
-            }
+            } catch(Exception const &) {}
         } else if (rawPostAccess == RawPostAccess::NONSTANDARD) {
             requestInit.rawPost = make_shared<string>(move(postBody));
         }
@@ -144,8 +146,6 @@ struct HttpHandler {
     Config config;
 
     void operator()(HttpServer::request const &request, HttpServer::connection_ptr httpConn) {
-
-        //   TODO outsource parsing POST, use POST parsing in fastcgi handler too, then?
 
         RequestInitContainer requestInit;
         string serverPort = config[{"http", "port"}];
@@ -299,7 +299,7 @@ void HttpRequestHandler::start() {
                             string("An error occurred during start of request handling:") + e.what());
         }
     } else {
-        throw Exception(__PRETTY_FUNCTION__, 2, "FastCGI manager is not available.");
+        throw Exception(__PRETTY_FUNCTION__, 2, "HTTP handler is not available.");
     }
 }
 
