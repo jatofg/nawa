@@ -14,9 +14,9 @@ option(BuildDocs "Build docs" ON)
 option(BuildSharedLib "Build shared library" OFF)
 
 # only unix-based OS are supported
-if(NOT UNIX)
+if (NOT UNIX)
     message(FATAL_ERROR "Unsupported operating system")
-endif()
+endif ()
 
 # configure the file that we need for version checking
 configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
@@ -38,16 +38,28 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/cpp-netlib/cpp-netlib.git
         GIT_TAG 31d304cdf52b485f465ada433d8905171b61cbff
 )
+FetchContent_Declare(
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v2.13.1
+)
 
 # if Debian would ship cmake 3.14 instead of 3.13, we could just do the following
 #FetchContent_MakeAvailable(fastcgilite)
 FetchContent_GetProperties(fastcgilite)
-if(NOT fastcgilite_POPULATED)
+if (NOT fastcgilite_POPULATED)
     FetchContent_Populate(fastcgilite)
     add_subdirectory(${fastcgilite_SOURCE_DIR} ${fastcgilite_BINARY_DIR})
-endif()
+endif ()
+
+FetchContent_GetProperties(Catch2)
+if (NOT catch2_POPULATED)
+    FetchContent_Populate(catch2)
+    add_subdirectory(${catch2_SOURCE_DIR} ${catch2_BINARY_DIR})
+endif ()
+
 FetchContent_GetProperties(cppnetlib)
-if(NOT cppnetlib_POPULATED)
+if (NOT cppnetlib_POPULATED)
     FetchContent_Populate(cppnetlib)
     set(CPP-NETLIB_BUILD_TESTS OFF CACHE INTERNAL "")
     set(CPP-NETLIB_BUILD_EXAMPLES OFF CACHE INTERNAL "")
@@ -55,7 +67,7 @@ if(NOT cppnetlib_POPULATED)
     target_compile_options(cppnetlib-uri PUBLIC -fPIC)
     target_compile_options(cppnetlib-server-parsers PUBLIC -fPIC)
     target_compile_options(cppnetlib-client-connections PUBLIC -fPIC)
-endif()
+endif ()
 set(NETLIB_LIBRARIES cppnetlib-client-connections cppnetlib-server-parsers cppnetlib-uri)
 
 set(NAWA_FILES
@@ -122,7 +134,7 @@ target_include_directories(nawarun PUBLIC
 target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
 target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
 
-if(BuildSharedLib)
+if (BuildSharedLib OR BuildTests)
     add_library(nawa SHARED ${NAWA_FILES})
     target_link_libraries(nawa -ldl -lcrypto -lcurl -largon2 -lboost_system bcrypt fastcgilite ${NETLIB_LIBRARIES})
     target_include_directories(nawa PUBLIC
@@ -132,46 +144,48 @@ if(BuildSharedLib)
             $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
-endif()
+endif ()
 
-if(BuildTests)
-    add_library(assertions SHARED
-            tests/assertions.cpp)
-    target_include_directories(assertions PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+if (BuildTests)
+    add_executable(unittests
+            tests/unit/main.cpp
+            tests/unit/encoding_crypto.cpp
+            tests/unit/utils.cpp)
+    target_link_libraries(unittests nawa Catch2::Catch2)
+    target_include_directories(unittests PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     add_library(nawatest SHARED
-            tests/nawatest.cpp)
+            tests/apps/nawatest.cpp)
     target_include_directories(nawatest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     add_library(sessiontest SHARED
-            tests/sessiontest.cpp)
+            tests/apps/sessiontest.cpp)
     target_include_directories(sessiontest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     add_library(emailtest SHARED
-            tests/emailtest.cpp)
+            tests/apps/emailtest.cpp)
     target_include_directories(emailtest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     add_library(gpctest SHARED
-            tests/gpctest.cpp)
+            tests/apps/gpctest.cpp)
     target_include_directories(gpctest PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-endif()
+endif ()
 
-if(BuildExamples)
+if (BuildExamples)
     add_library(helloworld SHARED
             examples/helloworld.cpp)
     target_include_directories(helloworld PUBLIC
@@ -193,15 +207,15 @@ if(BuildExamples)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-    if(BuildSharedLib)
-        add_executable(aslibrary examples/aslibrary.cpp)
+    if (BuildSharedLib)
+        add_executable(aslibrary examples/aslibrary.cpp tests/unit/encoding_crypto.cpp tests/unit/utils.cpp tests/unit/main.cpp)
         target_link_libraries(aslibrary nawa)
         target_include_directories(aslibrary PUBLIC
                 $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-    endif()
-endif()
+    endif ()
+endif ()
 
 #set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
 #set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
@@ -220,20 +234,20 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/nawa"
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/nawa/Application.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nawa
         COMPONENT Development)
-if(EXISTS /etc/systemd/system)
+if (EXISTS /etc/systemd/system)
     install(FILES "${PROJECT_SOURCE_DIR}/systemd/nawa@.service"
             DESTINATION /etc/systemd/system
             COMPONENT Runtime)
-endif()
-if(BuildSharedLib)
+endif ()
+if (BuildSharedLib)
     install(TARGETS nawa
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT Runtime)
-endif()
+endif ()
 
 # build documentation
 find_package(Doxygen)
-if(DOXYGEN_FOUND AND BuildDocs)
+if (DOXYGEN_FOUND AND BuildDocs)
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in"
             "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" @ONLY)
     add_custom_target(docs
@@ -243,4 +257,4 @@ if(DOXYGEN_FOUND AND BuildDocs)
     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/docs"
             DESTINATION ${CMAKE_INSTALL_DOCDIR}
             OPTIONAL)
-endif()
+endif ()
