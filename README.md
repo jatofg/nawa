@@ -21,8 +21,8 @@ Current (known) limitations:
 * Enforced termination is unsupported (HTTP RH)
 * Some HTTP status codes might be unsupported (HTTP RH)
 * Flushes may be out of order (HTTP RH)
-* Environment information is incomplete and naming partly inconsistent (HTTP RH)
-* Some things are still untested (blocker)
+* Some HTTP headers are missing or wrongly represented in environment (FastCGI RH, blocker)
+* Manual needs to be updated (blocker)
 
 **Attention!** All environment variables have been renamed in v0.6. Please make 
 sure to adapt your apps properly 
