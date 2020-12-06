@@ -208,7 +208,7 @@ if (BuildExamples)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
     if (BuildSharedLib)
-        add_executable(aslibrary examples/aslibrary.cpp tests/unit/encoding_crypto.cpp tests/unit/utils.cpp tests/unit/main.cpp)
+        add_executable(aslibrary examples/aslibrary.cpp)
         target_link_libraries(aslibrary nawa)
         target_include_directories(aslibrary PUBLIC
                 $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
