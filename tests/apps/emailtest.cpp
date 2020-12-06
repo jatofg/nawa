@@ -93,7 +93,11 @@ int handleRequest(Connection &connection) {
     attachmentPart.applyEncoding = MimeEmail::MimePart::BASE64;
     attachmentPart.contentType = "image/png; name=test.png";
     attachmentPart.contentDisposition = "attachment; filename=test.png";
-    attachmentPart.data = get_file_contents("/home/tobias/Pictures/wireguard-loc.png");
+    try {
+        attachmentPart.data = get_file_contents("/home/tobias/Pictures/testimage.png");
+    } catch (Exception const& e) {
+        connection.response << "!!! Specified image file could not be loaded: " << e.getMessage() << " !!!\r\n\r\n";
+    }
 
     // create an alternative-type MIME container for text and html
     MimeEmail::MimePartList textAndHtml;
