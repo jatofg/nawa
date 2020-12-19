@@ -30,7 +30,7 @@ sure to adapt your apps properly
 
 **Further Roadmap (preliminary)**
 * v0.7: Hot swapping of apps, multiple request handling functions, better logging, 
-  automated unit tests
+  more and better automated unit tests
 * v0.8: Using MimeMultipart for email and FCGI RH, better file upload handling
 * ...
 * v1.0: A lot more testing, automated integration tests, 
@@ -153,14 +153,16 @@ prepended with `sudo`.
 
 * OpenSSL >= 1.1.1
 * libcurl4 >= 7.58.0
-* libargon2 >= 0~20161029-1.1
+* libboost-system >= 1.65
+* libboost-thread >= 1.65
+* libargon2 >= 0~20161029-1.1 (only if compiled with Argon2 support)
 
 **For building (additionally):**
 
-* libssl development files >= 1.1.1
-* libboost development files >= 1.65.1.0
+* libssl (OpenSSL) development files >= 1.1.1
+* (lib)boost, (lib)boost-system, (lib)boost-thread development files >= 1.65
 * libcurl4 development files >= 7.58.0
-* libargon2 development files >= 0~20161029-1.1
+* libargon2 development files >= 0~20161029-1.1  (only if compiled with Argon2 support)
 * git
 * cmake >= 3.13
 * gcc-c++/g++ or clang compiler with C++17 support
@@ -188,10 +190,12 @@ Create the build configuration:
 
 `cmake -DCMAKE_BUILD_TYPE=RELEASE ..`
 
-**Note: If you want to build the tests as well, pass the `-DBuildTests=ON` argument 
-to cmake. If you want to use NAWA as a library, pass `-DBuildSharedLib=ON`.** 
-You can disable building the examples and docs using the arguments 
-`-DBuildExamples=OFF` resp. `-DBuildDocs=OFF`.
+**Note: You can pass some arguments to cmake to influence the build configuration:** 
+* Build the tests as well: `-DBuildTests=ON`
+* Build NAWA as shared library: `-DBuildSharedLib=ON`
+* Disable building the examples: `-DBuildExamples=OFF`
+* Disable building docs: `-DBuildDocs=OFF` (disabled automatically if doxygen is not installed)
+* Disable Argon2 support: `-DEnableArgon2=OFF`
 
 Build nawarun (and tests, the shared library, examples, docs, depending on your 
 cmake arguments):

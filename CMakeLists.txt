@@ -12,6 +12,7 @@ option(BuildTests "Build tests" OFF)
 option(BuildExamples "Build examples" ON)
 option(BuildDocs "Build docs" ON)
 option(BuildSharedLib "Build shared library" OFF)
+option(EnableArgon2 "Build with argon2 hashing support" ON)
 
 # only unix-based OS are supported
 if (NOT UNIX)
@@ -88,7 +89,7 @@ set(NAWA_FILES
         include/nawa/File.h
         include/nawa/MimeMultipart.h
         include/nawa/Engines/HashingEngine.h
-        include/nawa/Engines/Argon2HashingEngine.h
+
         include/nawa/Engines/BcryptHashingEngine.h
         include/nawa/Engines/HashTypeTable.h
         include/nawa/Engines/DefaultHashTypeTable.h
@@ -107,9 +108,9 @@ set(NAWA_FILES
         src/Email.cpp
         src/SmtpMailer.cpp
         src/MimeMultipart.cpp
-        src/Engines/Argon2HashingEngine.cpp
+
         src/Engines/BcryptHashingEngine.cpp
-        src/Engines/DefaultHashTypeTable.cpp
+
         src/RequestHandlers/RequestHandler.cpp
         src/RequestHandlers/FastcgiRequestHandler.cpp
         src/RequestHandlers/HttpRequestHandler.cpp
@@ -119,6 +120,16 @@ set(NAWA_FILES
 
         libs/base64/base64.h
         libs/base64/base64.cpp)
+
+if (EnableArgon2)
+    set(NAWA_FILES ${NAWA_FILES}
+            include/nawa/Engines/Argon2HashingEngine.h
+            src/Engines/Argon2HashingEngine.cpp
+            src/Engines/DefaultHashTypeTable.cpp)
+else ()
+    set(NAWA_FILES ${NAWA_FILES}
+            src/Engines/BcryptOnlyHashTypeTable.cpp)
+endif ()
 
 add_executable(nawarun src/main.cpp ${NAWA_FILES})
 
@@ -216,9 +227,6 @@ if (BuildExamples)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
     endif ()
 endif ()
-
-#set(CMAKE_CXX_FLAGS "-Wl,--export-dynamic")
-#set(CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 # install targets, components should be checked again w.r.t. packaging
 include(GNUInstallDirs)
