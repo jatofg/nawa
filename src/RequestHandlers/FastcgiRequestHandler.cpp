@@ -83,92 +83,63 @@ bool FastcgippRequestAdapter::response() {
     // fill environment
     {
         auto const &renv = environment();
-        requestInit.environment = {
-                {"host",              renv.host},
-                {"user-agent",        renv.userAgent},
-                {"accept",            renv.acceptContentTypes},
-                {"accept-charset",    renv.acceptCharsets},
-                {"authorization",     renv.authorization},
-                {"referer",           renv.referer},
-                {"content-type",      renv.contentType},
-                {"ROOT",              renv.root},
-                {"SCRIPT_NAME",       renv.scriptName},
-                {"REQUEST_URI",       renv.requestUri},
-                {"SERVER_PORT",       to_string(renv.serverPort)},
-                {"REMOTE_PORT",       to_string(renv.remotePort)},
-                {"if-modified-since", to_string(renv.ifModifiedSince)},
-                {"HTTPS",             renv.others.count("HTTPS") ? renv.others.at("HTTPS") : ""},
-                {"SERVER_NAME",       renv.others.count("SERVER_NAME") ? renv.others.at("SERVER_NAME") : ""},
-                {"SERVER_SOFTWARE",   renv.others.count("SERVER_SOFTWARE") ? renv.others.at("SERVER_SOFTWARE") : ""},
+        auto renvp = [&](const string &k) {
+            return renv.parameters.count(k) ? renv.parameters.at(k) : string();
         };
-
-        auto &requestMethod = requestInit.environment["REQUEST_METHOD"];
-        switch (renv.requestMethod) {
-            case Fastcgipp::Http::RequestMethod::ERROR:
-                requestMethod = "ERROR";
-                break;
-            case Fastcgipp::Http::RequestMethod::HEAD:
-                requestMethod = "HEAD";
-                break;
-            case Fastcgipp::Http::RequestMethod::GET:
-                requestMethod = "GET";
-                break;
-            case Fastcgipp::Http::RequestMethod::POST:
-                requestMethod = "POST";
-                break;
-            case Fastcgipp::Http::RequestMethod::PUT:
-                requestMethod = "PUT";
-                break;
-            case Fastcgipp::Http::RequestMethod::DELETE:
-                requestMethod = "DELETE";
-                break;
-            case Fastcgipp::Http::RequestMethod::TRACE:
-                requestMethod = "TRACE";
-                break;
-            case Fastcgipp::Http::RequestMethod::OPTIONS:
-                requestMethod = "OPTIONS";
-                break;
-            case Fastcgipp::Http::RequestMethod::CONNECT:
-                requestMethod = "CONNECT";
-                break;
-        }
-
-        {
-            stringstream serverAddr, remoteAddr;
-            serverAddr << renv.serverAddress;
-            remoteAddr << renv.remoteAddress;
-            requestInit.environment["SERVER_ADDRESS"] = serverAddr.str();
-            requestInit.environment["REMOTE_ADDRESS"] = remoteAddr.str();
-        }
+        requestInit.environment = {
+                {"content-type",    renvp("CONTENT_TYPE")},
+                {"DOCUMENT_ROOT",   renvp("DOCUMENT_ROOT")},
+                {"SCRIPT_NAME",     renvp("SCRIPT_NAME")},
+                {"REQUEST_METHOD",  renvp("REQUEST_METHOD")},
+                {"REQUEST_URI",     renvp("REQUEST_URI")},
+                {"SERVER_ADDR",     renvp("SERVER_ADDR")},
+                {"REMOTE_ADDR",     renvp("REMOTE_ADDR")},
+                {"SERVER_PORT",     renvp("SERVER_PORT")},
+                {"REMOTE_PORT",     renvp("REMOTE_PORT")},
+                {"HTTPS",           renvp("HTTPS")},
+                {"SERVER_NAME",     renvp("SERVER_NAME")},
+                {"SERVER_SOFTWARE", renvp("SERVER_SOFTWARE")},
+        };
 
         {
             // the base URL is the URL without the request URI, e.g., https://www.example.com
             std::stringstream baseUrl;
-            auto https = renv.others.count("HTTPS");
+            auto https = renv.parameters.count("HTTPS");
             baseUrl << (https ? "https://" : "http://")
-                    << renv.host;
-            // TODO check wheter this section is needed or port is automatically appended (probably!)
+                    << renvp("HTTP_HOST");
+            // TODO check whether this section is needed or port is automatically appended (probably!)
 //            if ((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
 //                baseUrl << ":" << renv.serverPort;
 //            }
             auto baseUrlStr = baseUrl.str();
             requestInit.environment["BASE_URL"] = baseUrlStr;
+            auto requestUri = requestInit.environment.at("REQUEST_URI");
 
             // fullUrlWithQS is the full URL, e.g., https://www.example.com/test?a=b&c=d
-            requestInit.environment["FULL_URL_WITH_QS"] = baseUrlStr + renv.requestUri;
+            requestInit.environment["FULL_URL_WITH_QS"] = baseUrlStr + requestUri;
 
             // fullUrlWithoutQS is the full URL without query string, e.g., https://www.example.com/test
-            baseUrl << renv.requestUri.substr(0, renv.requestUri.find_first_of('?'));
+            baseUrl << requestUri.substr(0, requestUri.find_first_of('?'));
             requestInit.environment["FULL_URL_WITHOUT_QS"] = baseUrl.str();
         }
 
-        for (const auto&[k, v]: renv.others) {
-            if (requestInit.environment.count(to_lowercase(k)) == 0) {
-                requestInit.environment[to_lowercase(k)] = v;
+        for (const auto&[k, v]: renv.parameters) {
+            string envKey;
+            // parameters starting with HTTP_ are usually HTTP headers
+            // convert them so they should match their original name (lowercase), e.g., HTTP_USER_AGENT => user-agent
+            if (k.substr(0, 5) == "HTTP_") {
+                envKey = string_replace(to_lowercase(k.substr(5)), {{'_', '-'}});
+            } else {
+                // other FastCGI parameters are used as they are
+                envKey = k;
+            }
+            if (requestInit.environment.count(envKey) == 0) {
+                requestInit.environment[envKey] = v;
             }
         }
 
         // set acceptLanguages
+        // TODO replace
         requestInit.acceptLanguages = renv.acceptLanguages;
 
         // GET, POST, COOKIE vars, raw POST, POST content type
@@ -179,6 +150,7 @@ bool FastcgippRequestAdapter::response() {
         requestInit.postContentType = renv.contentType;
 
         // POST files
+        // TODO use MimeMultipart
         for (auto const &[k, fcgiFile]: renv.files) {
             File f;
             f.filename = fcgiFile.filename;

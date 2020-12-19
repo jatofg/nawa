@@ -40,7 +40,7 @@ All of the following environment variables are available in the FastCGI
 request handler. All except for those marked with (\*) are also available 
 in the HTTP request handler.
 
-- `ROOT`: HTTP root directory (\*)
+- `DOCUMENT_ROOT`: HTTP root directory (\*)
 - `SCRIPT_NAME`: Filename of script relative to http root (\*)
 - `REQUEST_METHOD`: HTTP request method, one of:
     - ERROR
@@ -53,8 +53,8 @@ in the HTTP request handler.
     - OPTIONS
     - CONNECT
 - `REQUEST_URI`: The request URI, including query string
-- `SERVER_ADDRESS`: Server IP address
-- `REMOTE_ADDRESS`: Client IP address
+- `SERVER_ADDR`: Server IP address
+- `REMOTE_ADDR`: Client IP address
 - `SERVER_PORT`: Port of the web server
 - `REMOTE_PORT`: Port used by the client
 - `HTTPS`: String should be "on" when the page has been accessed through 
@@ -69,10 +69,9 @@ in the HTTP request handler.
   `http://` or `https://`, including the query string.
 - `FULL_URL_WITHOUT_QS`: Same as `FULL_URL_WITH_QS`, but without the query 
   string.
-
-The following HTTP request headers are available as environment variables 
-when using the FastCGI request handler (the variable keys reflect the original 
-keys of the respective request headers).
+  
+In addition, most (\*\*) HTTP request headers are available as environment 
+variables (with lowercase keys), for example:
 
 - `host`: Requested server hostname
 - `user-agent`: User agent string (of the client's web browser)
@@ -84,15 +83,12 @@ keys of the respective request headers).
 - `if-modified-since`: Unix timestamp sent by the client (to indicate that 
   a full response is only necessary if the requested content has been 
   modified since this date)
-
-Other request headers might be available using a FastCGI-specific 
-key (as they are provided by the web server, but lower-cased). This might 
-depend on which web server you use, and how it is configured. If you think 
-other FastCGI request parameters should be normalized, please open a 
-GitHub issue.
-
-When using the HTTP request handler, all request headers are available as 
-environment variables via their lower-cased keys.
+  
+(\*\*) All request headers when using the HTTP request handler, all which are 
+available as FastCGI parameters with standardized keys (e.g., `HTTP_MY_HEADER` 
+for the header `my-header`) when using the FastCGI request handler. Depending on 
+your web server software, you might need to manually map custom headers to 
+FastCGI parameters. Refer to your web server's docs for instructions.
 
 ## GET, POST, and COOKIE
 

@@ -163,6 +163,14 @@ namespace nawa {
     /**
      * Replace all occurrences of pattern keys by the corresponding pattern values in the input string.
      * @param input String in which the patterns shall be replaced.
+     * @param patterns Map of key characters (to be replaced in the input string) and value characters (the replacements).
+     * @return String with replacements applied.
+     */
+    std::string string_replace(std::string input, const std::unordered_map<char, char> &patterns);
+
+    /**
+     * Replace all occurrences of pattern keys by the corresponding pattern values in the input string.
+     * @param input String in which the patterns shall be replaced.
      * @param patterns Map of key strings (to be replaced in the input string) and value strings (the replacements).
      * @return String with replacements applied.
      */

@@ -15,14 +15,12 @@ the fastcgi++ lite library for efficient request handling.
 **New features in v0.6 (experimental)**
 A brand-new HTTP request handler can open up a development web server, allowing you 
 to test your app directly in your browser without setting up a local web server and 
-communicating via FastCGI.
+communicating via FastCGI. In addition, you can now build NAWA without Argon2 support 
+and the keys of environment variables have been changed to more consistent names.
 
 Current (known) limitations:
-* Enforced termination is unsupported (HTTP RH)
 * Some HTTP status codes might be unsupported (HTTP RH)
 * Flushes may be out of order (HTTP RH)
-* Some HTTP headers are missing or wrongly represented in environment (FastCGI RH, blocker)
-* Manual needs to be updated (blocker)
 
 **Attention!** All environment variables have been renamed in v0.6. Please make 
 sure to adapt your apps properly 
@@ -153,16 +151,16 @@ prepended with `sudo`.
 
 * OpenSSL >= 1.1.1
 * libcurl4 >= 7.58.0
-* libboost-system >= 1.65
-* libboost-thread >= 1.65
-* libargon2 >= 0~20161029-1.1 (only if compiled with Argon2 support)
+* libboost-system >= 1.67
+* libboost-thread >= 1.67
+* libargon2 >= 0~20161029-1.1 (only if built with Argon2 support)
 
 **For building (additionally):**
 
 * libssl (OpenSSL) development files >= 1.1.1
-* (lib)boost, (lib)boost-system, (lib)boost-thread development files >= 1.65
+* (lib)boost, (lib)boost-system, (lib)boost-thread development files >= 1.67
 * libcurl4 development files >= 7.58.0
-* libargon2 development files >= 0~20161029-1.1  (only if compiled with Argon2 support)
+* libargon2 development files >= 0~20161029-1.1  (only if building with Argon2 support)
 * git
 * cmake >= 3.13
 * gcc-c++/g++ or clang compiler with C++17 support

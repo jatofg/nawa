@@ -150,11 +150,11 @@ struct HttpHandler {
         RequestInitContainer requestInit;
         string serverPort = config[{"http", "port"}];
         requestInit.environment = {
-                {"REMOTE_ADDRESS",  request.source.substr(0, request.source.find_first_of(':'))},
+                {"REMOTE_ADDR",  request.source.substr(0, request.source.find_first_of(':'))},
                 {"REQUEST_URI",     request.destination},
                 {"REMOTE_PORT",     to_string(request.source_port)},
                 {"REQUEST_METHOD",  request.method},
-                {"SERVER_ADDRESS",  config[{"http", "listen"}]},
+                {"SERVER_ADDR",  config[{"http", "listen"}]},
                 {"SERVER_PORT",     serverPort},
                 {"SERVER_SOFTWARE", "NAWA Development Web Server"},
         };

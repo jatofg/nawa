@@ -492,11 +492,18 @@ string nawa::get_file_contents(const string &path) {
     return ret;
 }
 
+string nawa::string_replace(string input, const unordered_map<char, char> &patterns) {
+    for (const auto &[key, val]: patterns) {
+        replace(input.begin(), input.end(), key, val);
+    }
+    return input;
+}
+
 string nawa::string_replace(string input, const unordered_map<string, string> &patterns) {
-    for (const auto &pattern: patterns) {
-        for (size_t pos = input.find(pattern.first); pos != string::npos;) {
-            input.replace(pos, pattern.first.length(), pattern.second);
-            pos = input.find(pattern.first, pos + pattern.second.length());
+    for (const auto &[key, val]: patterns) {
+        for (size_t pos = input.find(key); pos != string::npos;) {
+            input.replace(pos, key.length(), val);
+            pos = input.find(key, pos + val.length());
         }
     }
     return input;

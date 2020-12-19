@@ -88,7 +88,7 @@ int handleRequest(Connection &connection) {
                            "<html><head><title>Test</title></head><body>"
                            "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
                                                                                                      "<p>Client IP: "
-                        << Encoding::htmlEncode(connection.request.env["REMOTE_ADDRESS"]) << "</p>"
+                        << Encoding::htmlEncode(connection.request.env["REMOTE_ADDR"]) << "</p>"
                                                                                              "<p>Request URI: ("
                         << connection.request.env.getRequestPath().size() << " elements): "
                         << connection.request.env["REQUEST_URI"] << "</p>"
