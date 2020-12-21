@@ -12,37 +12,21 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-**New features in v0.6 (experimental)**
+**v0.6 is here!**
 A brand-new HTTP request handler can open up a development web server, allowing you 
 to test your app directly in your browser without setting up a local web server and 
 communicating via FastCGI. In addition, you can now build NAWA without Argon2 support 
-and the keys of environment variables have been changed to more consistent names.
+and accessing request headers has become easier and consistent.
 
-Current (known) limitations:
-* Some HTTP status codes might be unsupported (HTTP RH)
-* Flushes may be out of order (HTTP RH)
+Current (known) limitations of the HTTP request handler:
+* Some HTTP status codes might be unsupported
+* Flushes may be out of order
+* `nawa::Request::Env::getAcceptLanguages()` does not work yet (you can access the 
+  HTTP header directly instead)
 
 **Attention!** All environment variables have been renamed in v0.6. Please make 
 sure to adapt your apps properly 
 (see [Environment Docs](https://www.tobiasflaig.eu/nawa/0.6/docs/environmentmanual.html)).
-
-**Further Roadmap (preliminary)**
-* v0.7: Hot swapping of apps, multiple request handling functions, better logging, 
-  more and better automated unit tests
-* v0.8: Using MimeMultipart for email and FCGI RH, better file upload handling
-* ...
-* v1.0: A lot more testing, automated integration tests, 
-  packaging, more and better manuals, static library and linking
-* ...
-* v2: Reimplementation of FastCGI request handling
-
-**v0.5 is here!** Apart from various improvements, it uses an entirely 
-new, modular request handler which paves the way for planned new features 
-(direct use of HTTP instead of FastCGI, hot swapping of apps, multiple 
-request handling functions) and additionally allows to use NAWA as a library. 
-Building and development is now easier, as the FastCGI 
-library does not need to be built separately anymore, and its headers are not required 
-anymore for app development. CMake 3.13 is now required.
 
 ## Example
 
@@ -72,7 +56,7 @@ If you don't like the IoC-style approach, you can also use NAWA as a library.
 
 ### Warning!
 
-This project is still in an early state (version 0.5!). It might, of 
+This project is still in an early state (version 0.6!). It might, of 
 course, still contain bugs. Use it at your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
@@ -222,6 +206,10 @@ Binary packages are not available yet, just build it yourself :)
 
 This project includes the following libraries (in the libs directory) 
 with different (less strict) licenses:
-- base64: see `libs/base64/LICENSE` for details
-- inih: New BSD License, see `libs/inih/LICENSE.txt` for details
-- libbcrypt: CC0, see `libs/libbcrypt/COPYING` for details
+* base64: see `libs/base64/LICENSE` for details
+* inih: New BSD License, see `libs/inih/LICENSE.txt` for details
+* libbcrypt: CC0, see `libs/libbcrypt/COPYING` for details
+
+It automatically downloads the following libraries during build configuration:
+* fastcgilite (also LGPL-licensed)
+* cpp-netlib (Boost Software License)

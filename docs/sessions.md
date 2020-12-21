@@ -96,4 +96,4 @@ session along with its data, see `nawa::Session::invalidate()`.
 ## Learn more
 
 Read the docs of `nawa::Session` and 
-have a look at the `tests/sessiontest.cpp` to see a working example.
+have a look at the `tests/apps/sessiontest.cpp` to see a working example.
