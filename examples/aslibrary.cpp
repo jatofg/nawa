@@ -35,7 +35,8 @@ int main() {
 
     // Load the config from a config.ini file, placed in the directory from where this app is executed.
     // Of course, you could also provide an absolute path or let the user provide the location via a command line argument.
-    // The categories privileges, system, application are irrelevant when using NAWA as a library.
+    // The categories privileges, application, and system (except for the request handler) are irrelevant when using
+    // NAWA as a library.
     Config config;
     try {
         config.read("config.ini");
