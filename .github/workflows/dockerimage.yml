@@ -13,6 +13,6 @@ jobs:
     - name: Save build timestamp
       run: echo "VERSION_TS=$(date +%s)" >> $GITHUB_ENV
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag docker.pkg.github.com/jatofg/nawa/nawa:0.6-${VERSION_TS}
+      run: docker build . --file Dockerfile --tag docker.pkg.github.com/jatofg/nawa/nawa:0.7-${VERSION_TS}
     - name: Publish the Docker image
-      run: docker login docker.pkg.github.com -u jatofg -p ${{ secrets.GITHUB_TOKEN }} && docker push docker.pkg.github.com/jatofg/nawa/nawa:0.6-${VERSION_TS}
+      run: docker login docker.pkg.github.com -u jatofg -p ${{ secrets.GITHUB_TOKEN }} && docker push docker.pkg.github.com/jatofg/nawa/nawa:0.7-${VERSION_TS}

@@ -35,19 +35,22 @@ using namespace std;
 namespace {
     struct DestructionDetector {
         bool destructed = false;
+
         ~DestructionDetector() { destructed = true; }
     } destructionDetector;
 
     bool locked = false; /**< If true, the stream and outfile cannot be changed anymore. */
     ostream *out; /**< Stream to send the logging output to. */
     ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
+    Log::Level outputLevel = Log::Level::INFORMATIONAL; /**< Output log level. */
+    bool extendedFormat = false;
     unique_ptr<string> hostnameStr;
     __pid_t pid = 0;
     atomic_uint instanceCount(0);
     mutex outLock;
 }
 
-Log::Log() noexcept {
+Log::Log() noexcept: defaultLevel(Level::INFORMATIONAL) {
     if (instanceCount == 0) {
         out = &cerr;
 
@@ -66,18 +69,25 @@ Log::Log() noexcept {
     ++instanceCount;
 }
 
-Log::Log(string appname_) noexcept: Log() {
+Log::Log(string appname_, Level level) noexcept: Log() {
     appname = move(appname_);
+    defaultLevel = level;
+}
+
+Log::Log(Level level) noexcept: Log() {
+    defaultLevel = level;
 }
 
 Log::Log(const Log &other) noexcept {
     appname = other.appname;
+    defaultLevel = other.defaultLevel;
     ++instanceCount;
 }
 
 Log &Log::operator=(const Log &other) noexcept {
     if (this != &other) {
         appname = other.appname;
+        defaultLevel = other.defaultLevel;
         ++instanceCount;
     }
     return *this;
@@ -119,6 +129,18 @@ void Log::setOutfile(const string &filename) {
     }
 }
 
+void Log::setOutputLevel(Level level) {
+    if (!locked) {
+        outputLevel = level;
+    }
+}
+
+void Log::setExtendedFormat(bool useExtendedFormat) {
+    if (!locked) {
+        extendedFormat = useExtendedFormat;
+    }
+}
+
 void Log::lockStream() noexcept {
     locked = true;
 }
@@ -131,14 +153,31 @@ void Log::setAppname(string appname_) noexcept {
     appname = move(appname_);
 }
 
-void Log::write(const string &msg) {
-    auto now = time(nullptr);
-
-    lock_guard<mutex> l(outLock);
-    *out << put_time(localtime(&now), "%b %d %H:%M:%S ") << *hostnameStr << ' ' << program_invocation_short_name
-         << '[' << pid << "]: [" << appname << "] " << msg << endl;
+void Log::setDefaultLogLevel(Level level) noexcept {
+    defaultLevel = level;
 }
 
-void Log::operator()(const string &msg) {
-    write(msg);
+void Log::write(const std::string &msg) {
+    write(msg, defaultLevel);
+}
+
+void Log::write(const string &msg, Level level) {
+    if (level <= outputLevel && outputLevel != Level::OFF && level != Level::OFF) {
+        auto now = time(nullptr);
+        lock_guard<mutex> l(outLock);
+        if (extendedFormat) {
+            *out << put_time(localtime(&now), "%b %d %H:%M:%S ") << *hostnameStr << ' '
+                 << program_invocation_short_name << '[' << pid << "]: ";
+        }
+        *out << "[" << appname << "] " << msg << endl;
+        out->flush();
+    }
+}
+
+void Log::operator()(const std::string &msg) {
+    write(msg, defaultLevel);
+}
+
+void Log::operator()(const string &msg, Level level) {
+    write(msg, level);
 }

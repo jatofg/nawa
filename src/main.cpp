@@ -44,7 +44,7 @@ namespace {
     void* appOpen = nullptr;
 
     // use this for logging
-    Log LOG;
+    Log logger;
 
     // Types of functions that need to be accessed from NAWA applications
     using init_t = int(AppInit&); /**< Type for the init() function of NAWA apps. */
@@ -54,7 +54,7 @@ namespace {
 
 // signal handler for SIGINT, SIGTERM, and SIGUSR1
 void shutdown(int signum) {
-    LOG("Terminating on signal " + to_string(signum));
+    NLOG_INFO(logger, "Terminating on signal" << signum)
 
     // terminate worker threads
     if(requestHandlerPtr) {
@@ -64,7 +64,7 @@ void shutdown(int signum) {
         // this normally doesn't work, so try harder
         sleep(10);
         if(requestHandlerPtr && signum != SIGUSR1) {
-            LOG("Enforcing termination now, ignoring pending requests.");
+            NLOG_INFO(logger, "Enforcing termination now, ignoring pending requests.")
             requestHandlerPtr->terminate();
         }
     }
@@ -82,7 +82,7 @@ void* loadAppSymbol(const char* symbolName, const string& error) {
     void* symbol = dlsym(appOpen, symbolName);
     auto dlsymError = dlerror();
     if(dlsymError) {
-        LOG(error + dlsymError);
+        NLOG_ERROR(logger, error << dlsymError)
         exit(1);
     }
     return symbol;
@@ -94,9 +94,6 @@ int main(int argc, char** argv) {
     signal(SIGINT, shutdown);
     signal(SIGTERM, shutdown);
     signal(SIGUSR1, shutdown);
-
-    // set up logging
-    Log::lockStream();
 
     // read config file
     Config config;
@@ -111,9 +108,25 @@ int main(int argc, char** argv) {
         }
     }
     catch(Exception& e) {
-        LOG("Fatal Error: " + e.getMessage());
+        NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         return 1;
     }
+
+    // set up logging
+    auto configuredLogLevel = config[{"logging", "level"}];
+    if (configuredLogLevel == "off") {
+        Log::setOutputLevel(Log::Level::OFF);
+    } else if (configuredLogLevel == "error") {
+        Log::setOutputLevel(Log::Level::ERROR);
+    } else if (configuredLogLevel == "warning") {
+        Log::setOutputLevel(Log::Level::WARNING);
+    } else if (configuredLogLevel == "debug") {
+        Log::setOutputLevel(Log::Level::DEBUG);
+    }
+    if (config[{"logging", "extended"}] == "on") {
+        Log::setExtendedFormat(true);
+    }
+    Log::lockStream();
 
     // prepare privilege downgrade and check for errors (downgrade will happen after socket setup)
     auto initialUID = getuid();
@@ -122,7 +135,7 @@ int main(int argc, char** argv) {
     vector<gid_t> supplementaryGroups;
     if(initialUID == 0) {
         if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
-            LOG("Fatal Error: Username or password not correctly set in config.ini.");
+            NLOG_ERROR(logger, "Fatal Error: Username or password not correctly set in config.ini.")
             return 1;
         }
         string username = config[{"privileges", "user"}];
@@ -132,13 +145,13 @@ int main(int argc, char** argv) {
         privUser = getpwnam(username.c_str());
         privGroup = getgrnam(groupname.c_str());
         if(privUser == nullptr || privGroup == nullptr) {
-            LOG("Fatal Error: Username or groupname invalid");
+            NLOG_ERROR(logger, "Fatal Error: Username or groupname invalid")
             return 1;
         }
         privUID = privUser->pw_uid;
         privGID = privGroup->gr_gid;
         if(privUID == 0 || privGID == 0) {
-            LOG("WARNING: nawarun will be running as user or group root. Security risk!");
+            NLOG_WARNING(logger, "WARNING: nawarun will be running as user or group root. Security risk!")
         }
         else {
             // get supplementary groups for non-root user
@@ -146,23 +159,23 @@ int main(int argc, char** argv) {
             getgrouplist(username.c_str(), privGID, nullptr, &n);
             supplementaryGroups.resize(n, 0);
             if(getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
-                LOG("WARNING: Could not get supplementary groups for user " + username);
+                NLOG_WARNING(logger, "WARNING: Could not get supplementary groups for user " << username)
                 supplementaryGroups = {privGID};
             }
         }
     } else {
-        LOG("WARNING: Not starting as root, cannot set privileges.");
+        NLOG_WARNING(logger, "WARNING: Not starting as root, cannot set privileges.")
     }
 
     // load application init function
     string appPath = config[{"application", "path"}];
     if(appPath.empty()) {
-        LOG("Fatal Error: Application path not set in config file.");
+        NLOG_ERROR(logger, "Fatal Error: Application path not set in config file.")
         return 1;
     }
     appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if(!appOpen) {
-        LOG(string("Fatal Error: Application file could not be loaded: ") + dlerror());
+        NLOG_ERROR(logger, "Fatal Error: Application file could not be loaded: " << dlerror())
         return 1;
     }
 
@@ -176,7 +189,7 @@ int main(int argc, char** argv) {
     auto appNawaVersionMajor = (int*) loadAppSymbol("nawa_version_major", appVersionError);
     auto appNawaVersionMinor = (int*) loadAppSymbol("nawa_version_minor", appVersionError);
     if(*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
-        LOG("Fatal Error: App has been compiled against another version of NAWA.");
+        NLOG_ERROR(logger, "Fatal Error: App has been compiled against another version of NAWA.")
         return 1;
     }
     auto appInit = (init_t *) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
@@ -190,7 +203,7 @@ int main(int argc, char** argv) {
                 ? stod(config[{"system", "threads"}]) : 1.0;
     }
     catch(invalid_argument& e) {
-        LOG("WARNING: Invalid value given for system/concurrency given in the config file.");
+        NLOG_WARNING(logger, "WARNING: Invalid value given for system/concurrency given in the config file.")
         cReal = 1.0;
     }
     if(config[{"system", "concurrency"}] == "hardware") {
@@ -203,18 +216,19 @@ int main(int argc, char** argv) {
     try {
         requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, cInt);
     } catch (const Exception& e) {
-        LOG("Fatal Error: " + e.getMessage());
+        NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
+        NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
     }
 
     // do privilege downgrade
     if(initialUID == 0) {
         if(privUID != 0 && privGID != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
-            LOG("Fatal Error: Could not set supplementary groups.");
+            NLOG_ERROR(logger, "Fatal Error: Could not set supplementary groups.")
             return 1;
         }
         if(setgid(privGID) != 0 || setuid(privUID) != 0) {
-            LOG("Fatal Error: Could not set privileges.");
+            NLOG_ERROR(logger, "Fatal Error: Could not set privileges.")
             return 1;
         }
     }
@@ -226,9 +240,9 @@ int main(int argc, char** argv) {
         appInit1.numThreads = cInt;
         auto initReturn = appInit(appInit1);
 
-        // init function of the app should return 0 on sucess
+        // init function of the app should return 0 on success
         if(initReturn != 0) {
-            LOG("Fatal Error: App init function returned " + to_string(initReturn) + " -- exiting.");
+            NLOG_ERROR(logger, "Fatal Error: App init function returned " << initReturn << " -- exiting.")
             return 1;
         }
 
@@ -241,7 +255,7 @@ int main(int argc, char** argv) {
     try {
         requestHandlerPtr->start();
     } catch (const Exception &e) {
-        LOG("Fatal Error: " + e.getMessage());
+        NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
     }
 
     requestHandlerPtr->join();

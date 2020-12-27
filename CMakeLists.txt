@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(nawa VERSION 0.6)
+project(nawa VERSION 0.7)
 
 set(CMAKE_CXX_STANDARD 17)
 

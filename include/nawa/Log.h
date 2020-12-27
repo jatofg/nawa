@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 namespace nawa {
     /**
@@ -34,18 +35,41 @@ namespace nawa {
      * By default, the logger will write to std::cout.
      */
     class Log {
-        std::string appname; /**< Name of the current app, appears in brackets in the log. */
     public:
         /**
-         * Construct a Log object with the default app name nawa (can be changed later).
+         * Available log levels. OFF disables logging, ERROR is for errors only, WARNING for warnings,
+         * INFORMATIONAL for useful messages such as startup actions, DEBUG for detailed log messages useful for
+         * debugging only.
+         */
+        enum class Level {
+            OFF,
+            ERROR,
+            WARNING,
+            INFORMATIONAL,
+            DEBUG
+        };
+    private:
+        std::string appname; /**< Name of the current app, appears in brackets in the log. */
+        Level defaultLevel; /**< Default log level of this logger object. */
+    public:
+        /**
+         * Construct a logger object with the default app name nawa and default log level STANDARD
+         * (can be changed later).
          */
         Log() noexcept;
 
         /**
-         * Construct a Log object with a custom app name (can be changed later).
+         * Construct a logger object with a custom app name (can be changed later), and a default log level.
          * @param appname The app name, appears in brackets in the log.
+         * @param level Default log level. Defaults to STANDARD. Messages logged as OFF will be silently ignored.
          */
-        explicit Log(std::string appname) noexcept;
+        explicit Log(std::string appname, Level level = Level::INFORMATIONAL) noexcept;
+
+        /**
+         * Construct a logger object with a custom default log level.
+         * @param level Default log level. Messages logged as OFF will be silently ignored.
+         */
+        explicit Log(Level level) noexcept;
 
         Log(const Log &other) noexcept;
 
@@ -77,6 +101,25 @@ namespace nawa {
         static void setOutfile(const std::string &filename);
 
         /**
+         * Set the desired output log level. Only messages with a log level lower or equal the given level will be
+         * written to the output stream. Setting the output level to OFF will completely disable logging. The default
+         * output level is STANDARD. Modifying the output log level does not work while the output stream is locked,
+         * this function will have no effect then, and throw no exception (make sure to check isLocked() first).
+         * @param level Desired output log level.
+         */
+        static void setOutputLevel(Level level);
+
+        /**
+         * Use systemd-style extended log messages in the format
+         *     {date} {time} {hostname} {process}[{PID}]: [{appname}] {message}.
+         * If off, the format is just [{appname}] {message}.
+         * Does not work while the output stream is locked, this function will have no effect then, and throw no
+         * exception (make sure to check isLocked() first).
+         * @param useExtendedFormat Whether to use the extended format. Off by default.
+         */
+        static void setExtendedFormat(bool useExtendedFormat);
+
+        /**
          * Lock the output stream. It will not be possible to change the output stream of the logger anymore as long as
          * there is at least one active Log object. If the output stream is already locked, this will have no effect.
          * This operation is not reversible. Please run this function before multiple threads might construct Log
@@ -98,7 +141,13 @@ namespace nawa {
         void setAppname(std::string appname) noexcept;
 
         /**
-         * Write a message to the log.
+         * Set the default log level for this logger.
+         * @param level Default log level. Messages logged as OFF will be silently ignored.
+         */
+        void setDefaultLogLevel(Level level) noexcept;
+
+        /**
+         * Write a message to the log using the default log level
          * @param msg The message.
          */
         void write(const std::string &msg);
@@ -106,9 +155,29 @@ namespace nawa {
         /**
          * Write a message to the log.
          * @param msg The message.
+         * @param logLevel Log level of this message. Messages logged as OFF will be silently ignored.
+         */
+        void write(const std::string &msg, Level logLevel);
+
+        /**
+         * Write a message to the log using the default log level.
+         * @param msg The message.
          */
         void operator()(const std::string &msg);
+
+        /**
+         * Write a message to the log.
+         * @param msg The message.
+         * @param logLevel Log level of this message. Messages logged as OFF will be silently ignored.
+         */
+        void operator()(const std::string &msg, Level logLevel);
     };
 }
+
+#define NLOG(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str());}
+#define NLOG_ERROR(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::ERROR);}
+#define NLOG_WARNING(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::WARNING);}
+#define NLOG_INFO(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::INFORMATIONAL);}
+#define NLOG_DEBUG(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::DEBUG);}
 
 #endif //NAWA_LOG_H

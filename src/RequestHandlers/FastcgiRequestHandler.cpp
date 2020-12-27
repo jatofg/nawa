@@ -34,7 +34,7 @@ using namespace nawa;
 using namespace std;
 
 namespace {
-    Log LOG;
+    Log logger;
 
     /**
      * Stores the raw post access level, as read from the config file.
@@ -224,7 +224,7 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
                       ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
     }
     catch (std::invalid_argument &e) {
-        LOG("WARNING: Invalid value given for post/max_size given in the config file.");
+        NLOG_WARNING(logger, "WARNING: Invalid value given for post/max_size given in the config file.")
     }
 
     fastcgippManager = std::make_unique<FastcgippManagerAdapter>();
