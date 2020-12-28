@@ -42,7 +42,7 @@ namespace {
     ostream *out; /**< Stream to send the logging output to. */
     ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
     unique_ptr<string> hostnameStr;
-    __pid_t pid = 0;
+    pid_t pid = 0;
     atomic_uint instanceCount(0);
     mutex outLock;
 }
