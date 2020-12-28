@@ -45,7 +45,7 @@ namespace {
     Log::Level outputLevel = Log::Level::INFORMATIONAL; /**< Output log level. */
     bool extendedFormat = false;
     unique_ptr<string> hostnameStr;
-    __pid_t pid = 0;
+    pid_t pid = 0;
     atomic_uint instanceCount(0);
     mutex outLock;
 }
