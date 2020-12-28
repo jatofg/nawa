@@ -216,6 +216,7 @@ int main(int argc, char** argv) {
     try {
         requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, cInt);
     } catch (const Exception& e) {
+        // TODO find out why nothing gets written to stderr here iff nothing has been written to stderr before
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
@@ -256,6 +257,7 @@ int main(int argc, char** argv) {
         requestHandlerPtr->start();
     } catch (const Exception &e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
+        NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
     }
 
     requestHandlerPtr->join();

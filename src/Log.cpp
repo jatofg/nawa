@@ -43,7 +43,7 @@ namespace {
     ostream *out; /**< Stream to send the logging output to. */
     ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
     Log::Level outputLevel = Log::Level::INFORMATIONAL; /**< Output log level. */
-    bool extendedFormat = false;
+    bool extendedFormat = false; /**< Use the extended, systemd-style logging. */
     unique_ptr<string> hostnameStr;
     pid_t pid = 0;
     atomic_uint instanceCount(0);
@@ -169,7 +169,7 @@ void Log::write(const string &msg, Level level) {
             *out << put_time(localtime(&now), "%b %d %H:%M:%S ") << *hostnameStr << ' '
                  << program_invocation_short_name << '[' << pid << "]: ";
         }
-        *out << "[" << appname << "] " << msg << endl;
+        cerr << "[" << appname << "] " << msg << endl;
         out->flush();
     }
 }

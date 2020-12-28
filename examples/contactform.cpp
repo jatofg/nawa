@@ -31,11 +31,13 @@
 using namespace std;
 using namespace nawa;
 
-Log LOG;
+namespace {
+    Log logger;
+}
 
 int init(AppInit &appInit) {
     // set up logging
-    LOG.setAppname("Contact form app");
+    logger.setAppname("Contact form app");
 
     return 0;
 }
@@ -107,7 +109,8 @@ int handleRequest(Connection &connection) {
         }
         catch (const Exception &e) {
             connection.response << "<p>Message could not be sent due to a technical problem :(</p>";
-            LOG("Error sending email:" + e.getMessage());
+            NLOG_ERROR(logger, "Error sending email: " << e.getMessage())
+            NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         }
 
         connection.response << "</body></html>";

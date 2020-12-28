@@ -36,7 +36,7 @@ struct HttpHandler;
 using HttpServer = http::server<HttpHandler>;
 
 namespace {
-    Log LOG;
+    Log logger;
 
     /**
      * Stores the raw post access level, as read from the config file.
@@ -71,7 +71,8 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
                     size_t bytesTransferred, HttpServer::connection_ptr httpConn) {
         // TODO error handling?
         if (ec == boost::asio::error::eof) {
-            LOG("Request could not be handled (EOF in netlib).");
+            NLOG_ERROR(logger, "Request with POST data could not be handled.")
+            NLOG_DEBUG(logger, "Debug info: boost::asio::error::eof in cpp-netlib while processing POST data")
             sendServerError(httpConn);
             return;
         }
@@ -250,7 +251,7 @@ HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFuncti
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config_));
 
-    LOG.setAppname("HttpRequestHandler");
+    logger.setAppname("HttpRequestHandler");
 
     httpHandler = make_unique<HttpHandlerAdapter>();
     httpHandler->handler = make_unique<HttpHandler>();
