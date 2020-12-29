@@ -121,11 +121,22 @@ set(NAWA_FILES
         libs/base64/base64.h
         libs/base64/base64.cpp)
 
+set(NAWA_LINK_LIBRARIES
+        -ldl
+        -lcrypto
+        -lcurl
+        -lboost_system
+        bcrypt
+        fastcgilite
+        ${NETLIB_LIBRARIES})
+
 if (EnableArgon2)
     set(NAWA_FILES ${NAWA_FILES}
             include/nawa/Engines/Argon2HashingEngine.h
             src/Engines/Argon2HashingEngine.cpp
             src/Engines/DefaultHashTypeTable.cpp)
+    set(NAWA_LINK_LIBRARIES ${NAWA_LINK_LIBRARIES}
+            -largon2)
 else ()
     set(NAWA_FILES ${NAWA_FILES}
             src/Engines/BcryptOnlyHashTypeTable.cpp)
@@ -133,7 +144,7 @@ endif ()
 
 add_executable(nawarun src/main.cpp ${NAWA_FILES})
 
-target_link_libraries(nawarun -ldl -lcrypto -lcurl -largon2 -lboost_system bcrypt fastcgilite ${NETLIB_LIBRARIES})
+target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
 target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -147,7 +158,7 @@ target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
 
 if (BuildSharedLib OR BuildTests)
     add_library(nawa SHARED ${NAWA_FILES})
-    target_link_libraries(nawa -ldl -lcrypto -lcurl -largon2 -lboost_system bcrypt fastcgilite ${NETLIB_LIBRARIES})
+    target_link_libraries(nawa ${NAWA_LINK_LIBRARIES})
     target_include_directories(nawa PUBLIC
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
