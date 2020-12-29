@@ -41,35 +41,34 @@ namespace {
 
     // this will make the request handler and loaded app accessible for signal handlers
     unique_ptr<RequestHandler> requestHandlerPtr;
-    void* appOpen = nullptr;
+    void *appOpen = nullptr;
 
     // use this for logging
     Log logger;
 
     // Types of functions that need to be accessed from NAWA applications
-    using init_t = int(AppInit&); /**< Type for the init() function of NAWA apps. */
-    using handleRequest_t = int(Connection&); /**< Type for the handleRequest(Connection) function of NAWA apps. */
+    using init_t = int(AppInit &); /**< Type for the init() function of NAWA apps. */
+    using handleRequest_t = int(Connection &); /**< Type for the handleRequest(Connection) function of NAWA apps. */
 
 }
 
 // signal handler for SIGINT, SIGTERM, and SIGUSR1
 void shutdown(int signum) {
-    NLOG_INFO(logger, "Terminating on signal" << signum)
+    NLOG_INFO(logger, "Terminating on signal " << signum)
 
     // terminate worker threads
-    if(requestHandlerPtr) {
+    if (requestHandlerPtr) {
         // should stop
         requestHandlerPtr->stop();
 
-        // this normally doesn't work, so try harder
+        // if this did not work, try harder after 10 seconds
         sleep(10);
-        if(requestHandlerPtr && signum != SIGUSR1) {
+        if (requestHandlerPtr && signum != SIGUSR1) {
             NLOG_INFO(logger, "Enforcing termination now, ignoring pending requests.")
             requestHandlerPtr->terminate();
         }
-    }
-    else {
-        if(appOpen != nullptr) {
+    } else {
+        if (appOpen != nullptr) {
             // app has been already opened, close it
             dlclose(appOpen);
         }
@@ -78,17 +77,17 @@ void shutdown(int signum) {
 }
 
 // load a symbol from the app .so file
-void* loadAppSymbol(const char* symbolName, const string& error) {
-    void* symbol = dlsym(appOpen, symbolName);
+void *loadAppSymbol(const char *symbolName, const string &error) {
+    void *symbol = dlsym(appOpen, symbolName);
     auto dlsymError = dlerror();
-    if(dlsymError) {
+    if (dlsymError) {
         NLOG_ERROR(logger, error << dlsymError)
         exit(1);
     }
     return symbol;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 
     // set up signal handlers
     signal(SIGINT, shutdown);
@@ -100,14 +99,13 @@ int main(int argc, char** argv) {
     try {
         // nawarun will take the path to the config as an argument
         // if no argument was given, look for a config.ini in the current path
-        if(argc > 1) {
+        if (argc > 1) {
             config.read(argv[1]);
-        }
-        else {
+        } else {
             config.read("config.ini");
         }
     }
-    catch(Exception& e) {
+    catch (Exception &e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         return 1;
     }
@@ -133,32 +131,31 @@ int main(int argc, char** argv) {
     uid_t privUID = -1;
     gid_t privGID = -1;
     vector<gid_t> supplementaryGroups;
-    if(initialUID == 0) {
-        if(!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
+    if (initialUID == 0) {
+        if (!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
             NLOG_ERROR(logger, "Fatal Error: Username or password not correctly set in config.ini.")
             return 1;
         }
         string username = config[{"privileges", "user"}];
         string groupname = config[{"privileges", "group"}];
-        passwd* privUser;
-        group* privGroup;
+        passwd *privUser;
+        group *privGroup;
         privUser = getpwnam(username.c_str());
         privGroup = getgrnam(groupname.c_str());
-        if(privUser == nullptr || privGroup == nullptr) {
+        if (privUser == nullptr || privGroup == nullptr) {
             NLOG_ERROR(logger, "Fatal Error: Username or groupname invalid")
             return 1;
         }
         privUID = privUser->pw_uid;
         privGID = privGroup->gr_gid;
-        if(privUID == 0 || privGID == 0) {
+        if (privUID == 0 || privGID == 0) {
             NLOG_WARNING(logger, "WARNING: nawarun will be running as user or group root. Security risk!")
-        }
-        else {
+        } else {
             // get supplementary groups for non-root user
             int n = 0;
             getgrouplist(username.c_str(), privGID, nullptr, &n);
             supplementaryGroups.resize(n, 0);
-            if(getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
+            if (getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
                 NLOG_WARNING(logger, "WARNING: Could not get supplementary groups for user " << username)
                 supplementaryGroups = {privGID};
             }
@@ -169,12 +166,12 @@ int main(int argc, char** argv) {
 
     // load application init function
     string appPath = config[{"application", "path"}];
-    if(appPath.empty()) {
+    if (appPath.empty()) {
         NLOG_ERROR(logger, "Fatal Error: Application path not set in config file.")
         return 1;
     }
     appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
-    if(!appOpen) {
+    if (!appOpen) {
         NLOG_ERROR(logger, "Fatal Error: Application file could not be loaded: " << dlerror())
         return 1;
     }
@@ -186,9 +183,9 @@ int main(int argc, char** argv) {
     // first load nawa_version_major (defined in Application.h, included in Connection.h)
     // the version the app has been compiled against should match the version of this nawarun
     string appVersionError = "Fatal Error: Could not read nawa version from application: ";
-    auto appNawaVersionMajor = (int*) loadAppSymbol("nawa_version_major", appVersionError);
-    auto appNawaVersionMinor = (int*) loadAppSymbol("nawa_version_minor", appVersionError);
-    if(*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
+    auto appNawaVersionMajor = (int *) loadAppSymbol("nawa_version_major", appVersionError);
+    auto appNawaVersionMinor = (int *) loadAppSymbol("nawa_version_minor", appVersionError);
+    if (*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
         NLOG_ERROR(logger, "Fatal Error: App has been compiled against another version of NAWA.")
         return 1;
     }
@@ -202,11 +199,11 @@ int main(int argc, char** argv) {
         cReal = config.isSet({"system", "threads"})
                 ? stod(config[{"system", "threads"}]) : 1.0;
     }
-    catch(invalid_argument& e) {
+    catch (invalid_argument &e) {
         NLOG_WARNING(logger, "WARNING: Invalid value given for system/concurrency given in the config file.")
         cReal = 1.0;
     }
-    if(config[{"system", "concurrency"}] == "hardware") {
+    if (config[{"system", "concurrency"}] == "hardware") {
         cReal = max(1.0, thread::hardware_concurrency() * cReal);
     }
     auto cInt = static_cast<unsigned int>(cReal);
@@ -215,20 +212,19 @@ int main(int argc, char** argv) {
     // already here to make (socket) preparation possible before privilege downgrade
     try {
         requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, cInt);
-    } catch (const Exception& e) {
-        // TODO find out why nothing gets written to stderr here iff nothing has been written to stderr before
+    } catch (const Exception &e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
     }
 
     // do privilege downgrade
-    if(initialUID == 0) {
-        if(privUID != 0 && privGID != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
+    if (initialUID == 0) {
+        if (privUID != 0 && privGID != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
             NLOG_ERROR(logger, "Fatal Error: Could not set supplementary groups.")
             return 1;
         }
-        if(setgid(privGID) != 0 || setuid(privUID) != 0) {
+        if (setgid(privGID) != 0 || setuid(privUID) != 0) {
             NLOG_ERROR(logger, "Fatal Error: Could not set privileges.")
             return 1;
         }
@@ -242,7 +238,7 @@ int main(int argc, char** argv) {
         auto initReturn = appInit(appInit1);
 
         // init function of the app should return 0 on success
-        if(initReturn != 0) {
+        if (initReturn != 0) {
             NLOG_ERROR(logger, "Fatal Error: App init function returned " << initReturn << " -- exiting.")
             return 1;
         }
