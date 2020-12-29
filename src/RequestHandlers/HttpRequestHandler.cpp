@@ -69,7 +69,6 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
 
     void operator()(HttpServer::connection::input_range input, boost::system::error_code ec,
                     size_t bytesTransferred, HttpServer::connection_ptr httpConn) {
-        // TODO error handling?
         if (ec == boost::asio::error::eof) {
             NLOG_ERROR(logger, "Request with POST data could not be handled.")
             NLOG_DEBUG(logger, "Debug info: boost::asio::error::eof in cpp-netlib while processing POST data")
@@ -302,7 +301,7 @@ void HttpRequestHandler::stop() noexcept {
 }
 
 void HttpRequestHandler::terminate() noexcept {
-    // TODO find a way to terminate
+    // TODO find (implement in fork of cpp-netlib) a way to forcefully terminate
     if (httpHandler && httpHandler->server) {
         httpHandler->server->stop();
     }

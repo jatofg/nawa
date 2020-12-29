@@ -97,10 +97,6 @@ bool FastcgippRequestAdapter::response() {
             auto https = renv.parameters.count("HTTPS");
             baseUrl << (https ? "https://" : "http://")
                     << renvp("HTTP_HOST");
-            // TODO check whether this section is needed or port is automatically appended (probably!)
-//            if ((!https && renv.serverPort != 80) || (https && renv.serverPort != 443)) {
-//                baseUrl << ":" << renv.serverPort;
-//            }
             auto baseUrlStr = baseUrl.str();
             requestInit.environment["BASE_URL"] = baseUrlStr;
             auto requestUri = renvp("REQUEST_URI");
@@ -129,7 +125,7 @@ bool FastcgippRequestAdapter::response() {
         }
 
         // set acceptLanguages
-        // TODO replace
+        // TODO remove in v0.8
         requestInit.acceptLanguages = renv.acceptLanguages;
 
         // GET, POST, COOKIE vars, raw POST, POST content type
