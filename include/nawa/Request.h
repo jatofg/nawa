@@ -79,13 +79,14 @@ namespace nawa {
             std::string operator[](const std::string &envVar) const;
 
             /**
-             * Receive the languages accepted by the client (from HTTP Header).
+             * Receive the languages accepted by the client (from HTTP Header). Works with fastcgi request handler only.
              * @return Vector of strings containing the accepted languages. Empty if not set.
+             * @deprecated Please use ["accept-language"] instead to access the header directly.
              */
             std::vector<std::string> getAcceptLanguages() const;
 
             /**
-             * Request path. Use ["requestUri"] to access it as a string.
+             * Request path. Use ["REQUEST_URI"] to access it as a string.
              * @return Vector of strings containing the elements of the path.
              */
             std::vector<std::string> getRequestPath() const;

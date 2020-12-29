@@ -23,15 +23,9 @@ the elements {"dir1", "dir2", "page"}.
 For an example concerning the usage of the request path, see 
 `examples/multipage.cpp`.
 
-The function `connection.request.env.getAcceptLanguages()` 
-(`nawa::Request::Env::getAcceptLanguages()`) returns a vector containing 
-all languages accepted by the client (as strings in the format used by 
-their web browser). This might be useful for internationalization. 
-**Does not work yet when using the HTTP request handler.**
-
-Other environment variables can be accessed as strings by using the `[]` 
-operator. For example, to access the server hostname, use 
-`connection.request.env["HOST"]`. In the following section, you'll find 
+Other environment variables and request headers can be accessed as strings 
+by using the `[]` operator. For example, to access the server hostname, use 
+`connection.request.env["host"]`. In the following section, you'll find 
 the full list of environment variables that can be accessed this way.
 
 ### List of environment variables
@@ -69,14 +63,21 @@ in the HTTP request handler.
   `http://` or `https://`, including the query string.
 - `FULL_URL_WITHOUT_QS`: Same as `FULL_URL_WITH_QS`, but without the query 
   string.
-  
-In addition, most (\*\*) HTTP request headers are available as environment 
+
+When using the FastCGI request handler, additional FastCGI parameters are 
+accessible using their original key, unless they start with `HTTP_` (then, they 
+are interpreted as HTTP request headers, see next section).
+
+### Availability of request headers
+
+Most HTTP request headers are available as environment 
 variables (with lowercase keys), for example:
 
 - `host`: Requested server hostname
 - `user-agent`: User agent string (of the client's web browser)
 - `accept`: Content types accepted by the client
 - `accept-charset`: Character sets accepted by the client
+- `accept-language`: Content languages preferred and understood by the client.
 - `authorization`: HTTP authorization string
 - `referer`: Referral URL
 - `content-type`: Content type of data from client
@@ -84,9 +85,10 @@ variables (with lowercase keys), for example:
   a full response is only necessary if the requested content has been 
   modified since this date)
   
-(\*\*) All request headers when using the HTTP request handler, all which are 
+All request headers are available when using the HTTP request handler. 
+When using the FastCGI request handler, all request headers which are 
 available as FastCGI parameters with standardized keys (e.g., `HTTP_MY_HEADER` 
-for the header `my-header`) when using the FastCGI request handler. Depending on 
+for the header `my-header`) are accessible this way. Depending on 
 your web server software, you might need to manually map custom headers to 
 FastCGI parameters. Refer to your web server's docs for instructions.
 
@@ -214,12 +216,12 @@ HTTP. To delete the contents of a cookie, set the cookie to an empty string.
 You can also try to set the expiry date to a date in the past, which might 
 delete the cookie in some browsers.
 
-## Setting HTTP status and headers
+## Setting HTTP status and response headers
 
 To set the HTTP status, e.g. to 404 ("Not found"), use  
 `connection.setStatus(uint status)` (`nawa::Connection::setStatus()`).
 
-HTTP headers can be set via `connection.setHeader(string key, string value)` 
+HTTP response headers can be set via `connection.setHeader(string key, string value)` 
 (`nawa::Connection::setHeader()`), and unset via 
 `connection.unsetHeader(string key)` (`nawa::Connection::unsetHeader()`).
 

@@ -89,17 +89,6 @@ bool FastcgippRequestAdapter::response() {
         };
         requestInit.environment = {
                 {"content-type",    renvp("CONTENT_TYPE")},
-                {"DOCUMENT_ROOT",   renvp("DOCUMENT_ROOT")},
-                {"SCRIPT_NAME",     renvp("SCRIPT_NAME")},
-                {"REQUEST_METHOD",  renvp("REQUEST_METHOD")},
-                {"REQUEST_URI",     renvp("REQUEST_URI")},
-                {"SERVER_ADDR",     renvp("SERVER_ADDR")},
-                {"REMOTE_ADDR",     renvp("REMOTE_ADDR")},
-                {"SERVER_PORT",     renvp("SERVER_PORT")},
-                {"REMOTE_PORT",     renvp("REMOTE_PORT")},
-                {"HTTPS",           renvp("HTTPS")},
-                {"SERVER_NAME",     renvp("SERVER_NAME")},
-                {"SERVER_SOFTWARE", renvp("SERVER_SOFTWARE")},
         };
 
         {
@@ -114,7 +103,7 @@ bool FastcgippRequestAdapter::response() {
 //            }
             auto baseUrlStr = baseUrl.str();
             requestInit.environment["BASE_URL"] = baseUrlStr;
-            auto requestUri = requestInit.environment.at("REQUEST_URI");
+            auto requestUri = renvp("REQUEST_URI");
 
             // fullUrlWithQS is the full URL, e.g., https://www.example.com/test?a=b&c=d
             requestInit.environment["FULL_URL_WITH_QS"] = baseUrlStr + requestUri;
