@@ -38,27 +38,22 @@ namespace nawa {
         std::string debugMessage; /**< The full debug message will be stored here. */
     public:
         /**
-         * Construct a UserException with an additional message.
+         * Construct an Exception with an additional message.
          * @param inFunction Function in which the exception occurred.
          * @param errorCode An integral error code identifying the error that caused this exception.
-         * @param message Additional message that will also be a part of what().
+         * @param message Optional message describing the problem (the only thing printed when calling getMessage()).
+         * @param additionalDebugInfo Optional additional info for debugging.
          */
-        Exception(const std::string &inFunction, int errorCode, std::string message) : errorCode(errorCode),
-                                                                                       message(std::move(message)) {
+        Exception(const std::string &inFunction, int errorCode, std::string message_ = "No message provided.",
+                  const std::string &additionalDebugInfo = std::string())
+                : errorCode(errorCode),
+                  message(std::move(message_)) {
             std::stringstream mstream;
             mstream << "[NAWA Exception #" << errorCode << " in " << inFunction << "] " << message;
+            if (!additionalDebugInfo.empty()) {
+                mstream << " [Debug Info:] " << additionalDebugInfo;
+            }
             debugMessage = mstream.str();
-        }
-
-        /**
-         * Construct a UserException without an additional message.
-         * @param inFunction Function in which the exception occurred.
-         * @param errorCode An integral error code identifying the error that caused this exception.
-         */
-        Exception(const std::string &inFunction, int errorCode) : errorCode(errorCode) {
-            std::stringstream mstream;
-            mstream << "[NAWA Exception #" << errorCode << " in " << inFunction << "] No message provided.";
-            message = mstream.str();
         }
 
         /**

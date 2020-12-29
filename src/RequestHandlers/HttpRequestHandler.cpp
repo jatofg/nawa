@@ -150,11 +150,11 @@ struct HttpHandler {
         RequestInitContainer requestInit;
         string serverPort = config[{"http", "port"}];
         requestInit.environment = {
-                {"REMOTE_ADDR",  request.source.substr(0, request.source.find_first_of(':'))},
+                {"REMOTE_ADDR",     request.source.substr(0, request.source.find_first_of(':'))},
                 {"REQUEST_URI",     request.destination},
                 {"REMOTE_PORT",     to_string(request.source_port)},
                 {"REQUEST_METHOD",  request.method},
-                {"SERVER_ADDR",  config[{"http", "listen"}]},
+                {"SERVER_ADDR",     config[{"http", "listen"}]},
                 {"SERVER_PORT",     serverPort},
                 {"SERVER_SOFTWARE", "NAWA Development Web Server"},
         };
@@ -273,7 +273,7 @@ HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFuncti
         httpHandler->server->listen();
     } catch (exception const &e) {
         throw Exception(__PRETTY_FUNCTION__, 1,
-                        string("Could not listen to host/port: ") + e.what());
+                        "Could not listen to host/port.", e.what());
     }
 }
 
@@ -287,7 +287,8 @@ void HttpRequestHandler::start() {
             }
         } catch (exception const &e) {
             throw Exception(__PRETTY_FUNCTION__, 1,
-                            string("An error occurred during start of request handling:") + e.what());
+                            string("An error occurred during start of request handling."),
+                            e.what());
         }
     } else {
         throw Exception(__PRETTY_FUNCTION__, 2, "HTTP handler is not available.");

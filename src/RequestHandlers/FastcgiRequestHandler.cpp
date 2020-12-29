@@ -88,7 +88,7 @@ bool FastcgippRequestAdapter::response() {
             return renv.parameters.count(k) ? renv.parameters.at(k) : string();
         };
         requestInit.environment = {
-                {"content-type",    renvp("CONTENT_TYPE")},
+                {"content-type", renvp("CONTENT_TYPE")},
         };
 
         {
