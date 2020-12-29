@@ -23,6 +23,7 @@
 
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
+#include <fastcgi++/log.hpp>
 #include <nawa/RequestHandlers/RequestHandler.h>
 #include <nawa/RequestHandlers/FastcgiRequestHandler.h>
 #include <nawa/Log.h>
@@ -34,7 +35,7 @@ using namespace nawa;
 using namespace std;
 
 namespace {
-    Log logger;
+    Log logger("fastcgi");
 
     /**
      * Stores the raw post access level, as read from the config file.
@@ -226,6 +227,31 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     catch (std::invalid_argument &e) {
         NLOG_WARNING(logger, "WARNING: Invalid value given for post/max_size given in the config file.")
     }
+
+    // set up fastcgilite logging
+    Fastcgipp::Logging::addHeader = false;
+    Fastcgipp::Logging::logFunction = [&](const std::string &msg, Fastcgipp::Logging::Level level) {
+        Log::Level nawaLevel;
+        switch (level) {
+            case Fastcgipp::Logging::INFO:
+                nawaLevel = Log::Level::INFORMATIONAL;
+                break;
+            case Fastcgipp::Logging::FAIL:
+            case Fastcgipp::Logging::ERROR:
+                nawaLevel = Log::Level::ERROR;
+                break;
+            case Fastcgipp::Logging::WARNING:
+                nawaLevel = Log::Level::WARNING;
+                break;
+            case Fastcgipp::Logging::DEBUG:
+            case Fastcgipp::Logging::DIAG:
+                nawaLevel = Log::Level::DEBUG;
+                break;
+            default:
+                nawaLevel = Log::Level::INFORMATIONAL;
+        }
+        logger.write(msg, nawaLevel);
+    };
 
     fastcgippManager = std::make_unique<FastcgippManagerAdapter>();
     fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, arg.postMax,

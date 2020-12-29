@@ -32,7 +32,7 @@ include(FetchContent)
 FetchContent_Declare(
         fastcgilite
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
-        GIT_TAG v3.9.1
+        GIT_TAG v3.9.2
 )
 FetchContent_Declare(
         cppnetlib
