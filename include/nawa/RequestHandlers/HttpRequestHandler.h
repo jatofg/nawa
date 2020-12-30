@@ -34,10 +34,10 @@ namespace nawa {
         /**
          * Construct a FastcgiRequestHandler object. May throw a nawa::Exception on failure.
          * @param handleRequestFunction The handleRequest function of the app.
-         * @param config_ The config.
+         * @param config The config.
          * @param concurrency Concurrency level (number of worker threads).
          */
-        HttpRequestHandler(HandleRequestFunction handleRequestFunction, Config config_, int concurrency);
+        HttpRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
 
         // explicit destructor with implementation in source file is needed to destruct the unique_ptr
         ~HttpRequestHandler() override;

@@ -34,10 +34,11 @@ namespace nawa {
     using HandleRequestFunction = std::function<int(nawa::Connection &)>;
 
     class RequestHandler {
-        HandleRequestFunction handleRequestFunction;
-        std::unique_ptr<AccessFilterList> accessFilters;
-    protected:
-        Config config;
+        std::shared_mutex configurationMutex_;
+        std::shared_ptr<HandleRequestFunction> handleRequestFunction_;
+        std::shared_ptr<AccessFilterList> accessFilters_;
+    private:
+        std::shared_ptr<Config> config_;
     public:
         virtual ~RequestHandler();
 
@@ -55,22 +56,37 @@ namespace nawa {
         newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
 
         /**
-         * Set the handleRequest function of the app.
+         * Set or replace the handleRequest function of the app (thread-safe, blocking).
          * @param handleRequestFunction The request handling function of the app.
          */
         void setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept;
 
         /**
-         * Set access filters for static request filtering.
-         * @param accessFilterList The access filters.
+         * Set or replace access filters for static request filtering (thread-safe, blocking).
+         * @param accessFilters The access filters.
          */
-        void setAccessFilters(AccessFilterList accessFilterList) noexcept;
+        void setAccessFilters(AccessFilterList accessFilters) noexcept;
 
         /**
-         * Set the config.
+         * Get a pointer for reading the config.
+         * @return Pointer to the config.
+         */
+        [[nodiscard]] std::shared_ptr<Config const> getConfig() const noexcept;
+
+        /**
+         * Set or replace the config (thread-safe, blocking).
          * @param config The config.
          */
         void setConfig(Config config) noexcept;
+
+        /**
+         * Reconfigure the request handler (thread-safe, blocking).
+         * @param handleRequestFunction The request handling function of the app.
+         * @param accessFilters The access filters.
+         * @param config The config.
+         */
+        void reconfigure(std::optional<HandleRequestFunction> handleRequestFunction,
+                         std::optional<AccessFilterList> accessFilters, std::optional<Config> config) noexcept;
 
         /**
          * Start request handling. Must not block and return immediately after request handling has started

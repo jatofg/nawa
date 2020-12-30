@@ -143,18 +143,18 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
 
 struct HttpHandler {
     RequestHandler *requestHandler = nullptr;
-    Config config;
 
     void operator()(HttpServer::request const &request, HttpServer::connection_ptr httpConn) {
+        auto configPtr = requestHandler->getConfig();
 
         RequestInitContainer requestInit;
-        string serverPort = config[{"http", "port"}];
+        string serverPort = (*configPtr)[{"http", "port"}];
         requestInit.environment = {
                 {"REMOTE_ADDR",     request.source.substr(0, request.source.find_first_of(':'))},
                 {"REQUEST_URI",     request.destination},
                 {"REMOTE_PORT",     to_string(request.source_port)},
                 {"REQUEST_METHOD",  request.method},
-                {"SERVER_ADDR",     config[{"http", "listen"}]},
+                {"SERVER_ADDR",     (*configPtr)[{"http", "listen"}]},
                 {"SERVER_PORT",     serverPort},
                 {"SERVER_SOFTWARE", "NAWA Development Web Server"},
         };
@@ -193,7 +193,7 @@ struct HttpHandler {
 
         ConnectionInitContainer connectionInit;
         connectionInit.requestInit = move(requestInit);
-        connectionInit.config = config;
+        connectionInit.config = (*configPtr);
 
         connectionInit.flushCallback = [httpConn](FlushCallbackContainer flushInfo) {
             if (!flushInfo.flushedBefore) {
@@ -206,13 +206,13 @@ struct HttpHandler {
         // is there POST data to be handled?
         if (request.method == "POST" && connectionInit.requestInit.environment.count("content-length")) {
             try {
-                std::string rawPostStr = config[{"post", "raw_access"}];
+                std::string rawPostStr = (*configPtr)[{"post", "raw_access"}];
                 auto rawPostAccess = (rawPostStr == "never")
                                      ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
                                                                                         : RawPostAccess::NONSTANDARD);
 
                 auto contentLength = stoul(connectionInit.requestInit.environment.at("content-length"));
-                ssize_t maxPostSize = stol(config[{"post", "max_size"}]) * 1024;
+                ssize_t maxPostSize = stol((*configPtr)[{"post", "max_size"}]) * 1024;
 
                 if (contentLength > maxPostSize) {
                     sendServerError(httpConn);
@@ -245,23 +245,23 @@ struct nawa::HttpRequestHandler::HttpHandlerAdapter {
     vector<thread> threadPool;
 };
 
-HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFunction, Config config_,
+HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFunction, Config config,
                                        int concurrency) {
     setAppRequestHandler(move(handleRequestFunction));
-    setConfig(move(config_));
+    setConfig(move(config));
+    auto configPtr = getConfig();
 
     logger.setAppname("HttpRequestHandler");
 
     httpHandler = make_unique<HttpHandlerAdapter>();
     httpHandler->handler = make_unique<HttpHandler>();
     httpHandler->handler->requestHandler = this;
-    httpHandler->handler->config = config;
     HttpServer::options httpServerOptions(*httpHandler->handler);
 
     // set options from config
-    string listenAddr = config[{"http", "listen"}].empty() ? "127.0.0.1" : config[{"http", "listen"}];
-    string listenPort = config[{"http", "port"}].empty() ? "8080" : config[{"http", "port"}];
-    bool reuseAddr = (config[{"http", "reuseaddr"}] != "off");
+    string listenAddr = (*configPtr)[{"http", "listen"}].empty() ? "127.0.0.1" : (*configPtr)[{"http", "listen"}];
+    string listenPort = (*configPtr)[{"http", "port"}].empty() ? "8080" : (*configPtr)[{"http", "port"}];
+    bool reuseAddr = (*configPtr)[{"http", "reuseaddr"}] != "off";
     httpHandler->server = make_unique<HttpServer>(
             httpServerOptions.address(listenAddr).port(listenPort).reuse_address(reuseAddr));
 

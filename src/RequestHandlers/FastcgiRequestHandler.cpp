@@ -47,13 +47,6 @@ namespace {
     };
 }
 
-struct FastcgippArgumentContainer {
-    RequestHandler *requestHandler;
-    size_t postMax;
-    Config &config;
-    RawPostAccess rawPostAccess;
-};
-
 class FastcgippRequestAdapter : public Fastcgipp::Request<char> {
     shared_ptr<string> rawPost;
 public:
@@ -79,7 +72,7 @@ public:
 
 bool FastcgippRequestAdapter::response() {
     RequestInitContainer requestInit;
-    auto argc = any_cast<FastcgippArgumentContainer>(m_externalObject);
+    auto requestHandler = any_cast<RequestHandler *>(m_externalObject);
 
     // fill environment
     {
@@ -150,7 +143,7 @@ bool FastcgippRequestAdapter::response() {
 
     ConnectionInitContainer connectionInit;
     connectionInit.requestInit = move(requestInit);
-    connectionInit.config = argc.config;
+    connectionInit.config = *requestHandler->getConfig();
 
     connectionInit.flushCallback = [this](FlushCallbackContainer flushInfo) {
         string response;
@@ -162,20 +155,22 @@ bool FastcgippRequestAdapter::response() {
     };
 
     Connection connection(connectionInit);
-    argc.requestHandler->handleRequest(connection);
+    requestHandler->handleRequest(connection);
     connection.flushResponse();
 
     return true;
 }
 
 bool FastcgippRequestAdapter::inProcessor() {
-    auto argc = any_cast<FastcgippArgumentContainer>(m_externalObject);
+    auto requestHandler = any_cast<RequestHandler *>(m_externalObject);
     auto postContentType = environment().contentType;
+    auto configPtr = requestHandler->getConfig();
 
-    if (postContentType.empty() || argc.rawPostAccess == RawPostAccess::NEVER ||
-        (argc.rawPostAccess == RawPostAccess::NONSTANDARD &&
-         (postContentType == "multipart/form-data" ||
-          postContentType == "application/x-www-form-urlencoded"))) {
+    string rawPostAccess = (*configPtr)[{"post", "raw_access"}];
+    if (postContentType.empty() || rawPostAccess == "never" || (rawPostAccess != "always" &&
+                                                                (postContentType == "multipart/form-data" ||
+                                                                 postContentType ==
+                                                                 "application/x-www-form-urlencoded"))) {
         return false;
     }
 
@@ -189,25 +184,15 @@ struct nawa::FastcgiRequestHandler::FastcgippManagerAdapter {
 };
 
 nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction handleRequestFunction,
-                                                   nawa::Config config_, int concurrency) {
+                                                   nawa::Config config, int concurrency) {
     setAppRequestHandler(move(handleRequestFunction));
-    setConfig(move(config_));
+    setConfig(move(config));
+    auto configPtr = getConfig();
 
-    string rawPostStr = config[{"post", "raw_access"}];
-    auto rawPostAccess = (rawPostStr == "never")
-                         ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
-                                                                            : RawPostAccess::NONSTANDARD);
-
-    FastcgippArgumentContainer arg{
-            .requestHandler=this,
-            .postMax=0,
-            .config=config,
-            .rawPostAccess=rawPostAccess
-    };
-
+    size_t postMax = 0;
     try {
-        arg.postMax = config.isSet({"post", "max_size"})
-                      ? static_cast<size_t>(std::stoul(config[{"post", "max_size"}])) * 1024 : 0;
+        postMax = configPtr->isSet({"post", "max_size"})
+                  ? static_cast<size_t>(std::stoul((*configPtr)[{"post", "max_size"}])) * 1024 : 0;
     }
     catch (std::invalid_argument &e) {
         NLOG_WARNING(logger, "WARNING: Invalid value given for post/max_size given in the config file.")
@@ -239,14 +224,15 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     };
 
     fastcgippManager = std::make_unique<FastcgippManagerAdapter>();
-    fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, arg.postMax,
-                                                                                              arg);
+    // TODO it should be possible to change postMax after fastcgilite manager creation
+    fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, postMax,
+                                                                                              static_cast<RequestHandler *>(this));
 
     // socket handling
-    string mode = config[{"fastcgi", "mode"}];
+    string mode = (*configPtr)[{"fastcgi", "mode"}];
     if (mode == "tcp") {
-        auto fastcgiListen = config[{"fastcgi", "listen"}];
-        auto fastcgiPort = config[{"fastcgi", "port"}];
+        auto fastcgiListen = (*configPtr)[{"fastcgi", "listen"}];
+        auto fastcgiPort = (*configPtr)[{"fastcgi", "port"}];
         if (fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
         const char *fastcgiListenC = fastcgiListen.c_str();
         if (fastcgiListen == "all") fastcgiListenC = nullptr;
@@ -257,7 +243,7 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
         }
     } else if (mode == "unix") {
         uint32_t permissions = 0xffffffffUL;
-        string permStr = config[{"fastcgi", "permissions"}];
+        string permStr = (*configPtr)[{"fastcgi", "permissions"}];
         // convert the value from the config file
         if (!permStr.empty()) {
             const char *psptr = permStr.c_str();
@@ -268,12 +254,12 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
             }
         }
 
-        auto fastcgiSocketPath = config[{"fastcgi", "path"}];
+        auto fastcgiSocketPath = (*configPtr)[{"fastcgi", "path"}];
         if (fastcgiSocketPath.empty()) {
             fastcgiSocketPath = "/etc/nawarun/sock.d/nawarun.sock";
         }
-        auto fastcgiOwner = config[{"fastcgi", "owner"}];
-        auto fastcgiGroup = config[{"fastcgi", "group"}];
+        auto fastcgiOwner = (*configPtr)[{"fastcgi", "owner"}];
+        auto fastcgiGroup = (*configPtr)[{"fastcgi", "group"}];
 
         if (!fastcgippManager->manager->listen(fastcgiSocketPath.c_str(), permissions,
                                                fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
@@ -288,7 +274,7 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
     }
 
     // tell fastcgi to use SO_REUSEADDR if enabled in config
-    if (config[{"fastcgi", "reuseaddr"}] != "off") {
+    if ((*configPtr)[{"fastcgi", "reuseaddr"}] != "off") {
         fastcgippManager->manager->reuseAddress(true);
     }
 }

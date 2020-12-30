@@ -251,22 +251,52 @@ namespace {
     }
 }
 
-void RequestHandler::setAppRequestHandler(HandleRequestFunction fn) noexcept {
-    handleRequestFunction = move(fn);
+void RequestHandler::setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept {
+    unique_lock l(configurationMutex_);
+    handleRequestFunction_ = make_shared<HandleRequestFunction>(move(handleRequestFunction));
 }
 
-void RequestHandler::setAccessFilters(AccessFilterList accessFilterList) noexcept {
-    accessFilters = make_unique<AccessFilterList>(move(accessFilterList));
+void RequestHandler::setAccessFilters(AccessFilterList accessFilters) noexcept {
+    unique_lock l(configurationMutex_);
+    accessFilters_ = make_shared<AccessFilterList>(move(accessFilters));
 }
 
-void RequestHandler::setConfig(Config config_) noexcept {
-    config = move(config_);
+void RequestHandler::setConfig(Config config) noexcept {
+    unique_lock l(configurationMutex_);
+    config_ = make_shared<Config>(move(config));
+}
+
+shared_ptr<Config const> RequestHandler::getConfig() const noexcept {
+    return config_;
+}
+
+void RequestHandler::reconfigure(optional<HandleRequestFunction> handleRequestFunction,
+                                 optional<AccessFilterList> accessFilters,
+                                 optional<Config> config) noexcept {
+    unique_lock l(configurationMutex_);
+    if (handleRequestFunction) {
+        handleRequestFunction_ = make_shared<HandleRequestFunction>(move(*handleRequestFunction));
+    }
+    if (accessFilters) {
+        accessFilters_ = make_shared<AccessFilterList>(move(*accessFilters));
+    }
+    if (config) {
+        config_ = make_shared<Config>(move(*config));
+    }
 }
 
 void RequestHandler::handleRequest(Connection &connection) {
+    shared_ptr<HandleRequestFunction> handleRequestFunction;
+    shared_ptr<AccessFilterList> accessFilters;
+    shared_ptr<Config> config;
+    {
+        shared_lock l(configurationMutex_);
+        handleRequestFunction = handleRequestFunction_;
+        accessFilters = accessFilters_;
+    }
     // test filters and run app if no filter was triggered
     if (!accessFilters || !applyFilters(connection, *accessFilters)) {
-        handleRequestFunction(connection);
+        (*handleRequestFunction)(connection);
     }
 }
 

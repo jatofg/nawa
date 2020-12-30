@@ -20,7 +20,7 @@ In your `int init(AppInit &appInit)` function, you can use the
 Enable static filtering by setting:
 
 ```cpp
-appInit.accessFilters.filtersEnabled = true;
+appInit.accessFilters_.filtersEnabled = true;
 ```
 
 ## Filter conditions
@@ -124,7 +124,7 @@ imageFilter.pathFilter = {{"static", "images"}};
 imageFilter.extensionFilter = {"png"};
 imageFilter.basePath = "/var/www/multipage/images";
 imageFilter.basePathExtension = nawa::ForwardFilter::BY_FILENAME; // could be skipped, default option anyway
-appInit.accessFilters.forwardFilters.push_back(imageFilter); // add the filter to appInit
+appInit.accessFilters_.forwardFilters.push_back(imageFilter); // add the filter to appInit
 ```
 
 To become active, the filter has to be added to the corresponding 
@@ -146,7 +146,7 @@ nawa::BlockFilter blockFilter;
 blockFilter.pathFilter = {{"app"}, {"static"}};
 blockFilter.invert = true;
 blockFilter.status = 404;
-appInit.accessFilters.blockFilters.push_back(blockFilter);
+appInit.accessFilters_.blockFilters.push_back(blockFilter);
 ```
 
 ## Auth filters
@@ -172,7 +172,7 @@ authFilter.authName = "Top secret area!";
 authFilter.authFunction = [](std::string user, std::string password) -> bool {
     return (user == "user" && password == "super_secret");
 };
-appInit.accessFilters.authFilters.push_back(authFilter);
+appInit.accessFilters_.authFilters.push_back(authFilter);
 ```
 
 For a working example with static filters, see `examples/multipage.cpp`.
