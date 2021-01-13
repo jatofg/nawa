@@ -26,6 +26,7 @@
 
 #include <nawa/Config.h>
 #include <nawa/AccessFilterList.h>
+#include <shared_mutex>
 
 namespace nawa {
     // forward declarations
@@ -37,7 +38,6 @@ namespace nawa {
         std::shared_mutex configurationMutex_;
         std::shared_ptr<HandleRequestFunction> handleRequestFunction_;
         std::shared_ptr<AccessFilterList> accessFilters_;
-    private:
         std::shared_ptr<Config> config_;
     public:
         virtual ~RequestHandler();
