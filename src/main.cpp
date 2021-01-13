@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright (C) 2019-2020 Tobias Flaig.
+ * Copyright (C) 2019-2021 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -21,35 +21,34 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdexcept>
-#include <unistd.h>
-#include <pwd.h>
-#include <grp.h>
-#include <dlfcn.h>
+#include <atomic>
 #include <csignal>
-#include <thread>
-#include <nawa/Config.h>
-#include <nawa/Log.h>
+#include <dlfcn.h>
+#include <grp.h>
 #include <nawa/Application.h>
-#include <nawa/RequestHandlers/RequestHandler.h>
+#include <nawa/Config.h>
 #include <nawa/Exception.h>
+#include <nawa/Log.h>
+#include <nawa/RequestHandlers/RequestHandler.h>
+#include <pwd.h>
+#include <stdexcept>
+#include <thread>
+#include <unistd.h>
 
 using namespace nawa;
 using namespace std;
 
 namespace {
-
-    // this will make the request handler and loaded app accessible for signal handlers
     unique_ptr<RequestHandler> requestHandlerPtr;
-    void *appOpen = nullptr;
-
-    // use this for logging
+    string configFile;
+    atomic<bool> readyToReconfigure(false);
+    // TODO track open apps, they could be dlclose-d as soon as their shared_ptr in the RH has been destructed
+    vector<void *> appsOpen;
     Log logger;
 
     // Types of functions that need to be accessed from NAWA applications
     using init_t = int(AppInit &); /**< Type for the init() function of NAWA apps. */
     using handleRequest_t = int(Connection &); /**< Type for the handleRequest(Connection) function of NAWA apps. */
-
 }
 
 // signal handler for SIGINT, SIGTERM, and SIGUSR1
@@ -68,23 +67,127 @@ void shutdown(int signum) {
             requestHandlerPtr->terminate();
         }
     } else {
-        if (appOpen != nullptr) {
-            // app has been already opened, close it
+        for (auto appOpen: appsOpen) {
             dlclose(appOpen);
         }
         exit(0);
     }
 }
 
-// load a symbol from the app .so file
-void *loadAppSymbol(const char *symbolName, const string &error) {
+// load a symbol from an app .so file
+void *loadAppSymbol(void *appOpen, const char *symbolName, const string &error) {
     void *symbol = dlsym(appOpen, symbolName);
     auto dlsymError = dlerror();
     if (dlsymError) {
-        NLOG_ERROR(logger, error << dlsymError)
-        exit(1);
+        throw Exception(__FUNCTION__, 11, error, dlsymError);
     }
     return symbol;
+}
+
+// get the number of threads to use from config
+unsigned int getConcurrency(Config const &config) {
+    double cReal;
+    try {
+        cReal = config.isSet({"system", "threads"})
+                ? stod(config[{"system", "threads"}]) : 1.0;
+    }
+    catch (invalid_argument &e) {
+        NLOG_WARNING(logger, "WARNING: Invalid value given for system/concurrency given in the config file.")
+        cReal = 1.0;
+    }
+    if (config[{"system", "concurrency"}] == "hardware") {
+        cReal = max(1.0, thread::hardware_concurrency() * cReal);
+    }
+    return static_cast<unsigned int>(cReal);
+}
+
+// load the init() and handleRequest() functions of an app
+pair<init_t *, handleRequest_t *> loadAppFunctions(Config const &config) {
+    // load application init function
+    string appPath = config[{"application", "path"}];
+    if (appPath.empty()) {
+        throw Exception(__FUNCTION__, 1, "Application path not set in config file.");
+    }
+    void *appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
+    if (!appOpen) {
+        throw Exception(__FUNCTION__, 2, "Application file could not be loaded.", dlerror());
+    }
+    appsOpen.push_back(appOpen);
+
+    // reset dl errors
+    dlerror();
+
+    // load symbols and check for errors
+    // first load nawa_version_major (defined in Application.h, included in Connection.h)
+    // the version the app has been compiled against should match the version of this nawarun
+    string appVersionError = "Could not read nawa version from application.";
+    auto appNawaVersionMajor = (int *) loadAppSymbol(appOpen, "nawa_version_major", appVersionError);
+    auto appNawaVersionMinor = (int *) loadAppSymbol(appOpen, "nawa_version_minor", appVersionError);
+    if (*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
+        throw Exception(__FUNCTION__, 3, "App has been compiled against another version of NAWA.");
+    }
+    auto appInit = (init_t *) loadAppSymbol(appOpen, "init", "Could not load init function from application.");
+    auto appHandleRequest = (handleRequest_t *) loadAppSymbol(appOpen, "handleRequest",
+                                                              "Could not load handleRequest function from application.");
+    return {appInit, appHandleRequest};
+}
+
+// signal handler for SIGHUP (reload configuration and app)
+void reload(int signum) {
+    if (requestHandlerPtr && readyToReconfigure) {
+        NLOG_INFO(logger, "Reloading config and app on signal" << signum)
+        readyToReconfigure = false;
+
+        Config config;
+        try {
+            config.read(configFile);
+        }
+        catch (Exception const &e) {
+            NLOG_ERROR(logger, "ERROR: Could not reload config: " << e.getMessage())
+            NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
+            NLOG_WARNING(logger, "WARNING: App will not be reloaded as well")
+            readyToReconfigure = true;
+            return;
+        }
+
+        init_t *appInit;
+        handleRequest_t *appHandleRequest;
+        try {
+            tie(appInit, appHandleRequest) = loadAppFunctions(config);
+        } catch (Exception const &e) {
+            NLOG_ERROR(logger, "ERROR: Could not reload app: " << e.getMessage())
+            NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
+            NLOG_WARNING(logger, "WARNING: Configuration will be reloaded anyway")
+
+            // just reload config, not app
+            requestHandlerPtr->reconfigure(nullopt, nullopt, config);
+            readyToReconfigure = true;
+            return;
+        }
+
+        {
+            AppInit appInitStruct;
+            appInitStruct.config = config;
+            appInitStruct.numThreads = getConcurrency(config);
+            auto initReturn = appInit(appInitStruct);
+
+            // init function of the app should return 0 on success, otherwise we will not reload
+            if (initReturn != 0) {
+                NLOG_ERROR(logger,
+                           "ERROR: App init function returned " << initReturn << " -- cancelling reload of app.")
+                NLOG_WARNING(logger, "WARNING: Configuration will be reloaded anyway")
+
+                // just reload config, not app
+                requestHandlerPtr->reconfigure(nullopt, nullopt, config);
+                readyToReconfigure = true;
+                return;
+            }
+
+            // reconfigure everything
+            requestHandlerPtr->reconfigure(appHandleRequest, appInitStruct.accessFilters, appInitStruct.config);
+            readyToReconfigure = true;
+        }
+    }
 }
 
 int main(int argc, char **argv) {
@@ -93,20 +196,23 @@ int main(int argc, char **argv) {
     signal(SIGINT, shutdown);
     signal(SIGTERM, shutdown);
     signal(SIGUSR1, shutdown);
+    signal(SIGHUP, reload);
 
     // read config file
+    // nawarun will take the path to the config as an argument
+    // if no argument was given, look for a config.ini in the current path
+    if (argc > 1) {
+        configFile = argv[1];
+    } else {
+        configFile = "config.ini";
+    }
     Config config;
     try {
-        // nawarun will take the path to the config as an argument
-        // if no argument was given, look for a config.ini in the current path
-        if (argc > 1) {
-            config.read(argv[1]);
-        } else {
-            config.read("config.ini");
-        }
+        config.read(configFile);
     }
     catch (Exception &e) {
-        NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
+        NLOG_ERROR(logger, "Fatal Error: Could not load config: " << e.getMessage())
+        NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
     }
 
@@ -164,54 +270,22 @@ int main(int argc, char **argv) {
         NLOG_WARNING(logger, "WARNING: Not starting as root, cannot set privileges.")
     }
 
-    // load application init function
-    string appPath = config[{"application", "path"}];
-    if (appPath.empty()) {
-        NLOG_ERROR(logger, "Fatal Error: Application path not set in config file.")
-        return 1;
-    }
-    appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
-    if (!appOpen) {
-        NLOG_ERROR(logger, "Fatal Error: Application file could not be loaded: " << dlerror())
-        return 1;
-    }
-
-    // reset dl errors
-    dlerror();
-
-    // load symbols and check for errors
-    // first load nawa_version_major (defined in Application.h, included in Connection.h)
-    // the version the app has been compiled against should match the version of this nawarun
-    string appVersionError = "Fatal Error: Could not read nawa version from application: ";
-    auto appNawaVersionMajor = (int *) loadAppSymbol("nawa_version_major", appVersionError);
-    auto appNawaVersionMinor = (int *) loadAppSymbol("nawa_version_minor", appVersionError);
-    if (*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
-        NLOG_ERROR(logger, "Fatal Error: App has been compiled against another version of NAWA.")
-        return 1;
-    }
-    auto appInit = (init_t *) loadAppSymbol("init", "Fatal Error: Could not load init function from application: ");
-    auto appHandleRequest = (handleRequest_t *) loadAppSymbol("handleRequest",
-                                                              "Fatal Error: Could not load handleRequest function from application: ");
-
-    // concurrency
-    double cReal;
+    // load init and handleRequest symbols from app
+    init_t *appInit;
+    handleRequest_t *appHandleRequest;
     try {
-        cReal = config.isSet({"system", "threads"})
-                ? stod(config[{"system", "threads"}]) : 1.0;
+        tie(appInit, appHandleRequest) = loadAppFunctions(config);
+    } catch (Exception const &e) {
+        NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
+        NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
+        return 1;
     }
-    catch (invalid_argument &e) {
-        NLOG_WARNING(logger, "WARNING: Invalid value given for system/concurrency given in the config file.")
-        cReal = 1.0;
-    }
-    if (config[{"system", "concurrency"}] == "hardware") {
-        cReal = max(1.0, thread::hardware_concurrency() * cReal);
-    }
-    auto cInt = static_cast<unsigned int>(cReal);
 
     // pass config, app function, and concurrency to RequestHandler
     // already here to make (socket) preparation possible before privilege downgrade
+    auto concurrency = getConcurrency(config);
     try {
-        requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, cInt);
+        requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, config, concurrency);
     } catch (const Exception &e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
@@ -232,10 +306,10 @@ int main(int argc, char **argv) {
 
     // before manager starts, init app
     {
-        AppInit appInit1;
-        appInit1.config = config;
-        appInit1.numThreads = cInt;
-        auto initReturn = appInit(appInit1);
+        AppInit appInitStruct;
+        appInitStruct.config = config;
+        appInitStruct.numThreads = concurrency;
+        auto initReturn = appInit(appInitStruct);
 
         // init function of the app should return 0 on success
         if (initReturn != 0) {
@@ -243,14 +317,13 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        // set access filters as defined by init
-        requestHandlerPtr->setAccessFilters(appInit1.accessFilters);
-        // init could have altered the config, take over
-        requestHandlerPtr->setConfig(appInit1.config);
+        // reconfigure request handler using access filters and (potentially altered by app init) config
+        requestHandlerPtr->reconfigure(nullopt, appInitStruct.accessFilters, appInitStruct.config);
     }
 
     try {
         requestHandlerPtr->start();
+        readyToReconfigure = true;
     } catch (const Exception &e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
@@ -261,6 +334,8 @@ int main(int argc, char **argv) {
     // the request handler has to be destroyed before unloading the app (using dlclose)
     requestHandlerPtr.reset(nullptr);
 
-    dlclose(appOpen);
+    for (auto appOpen: appsOpen) {
+        dlclose(appOpen);
+    }
     exit(0);
 }

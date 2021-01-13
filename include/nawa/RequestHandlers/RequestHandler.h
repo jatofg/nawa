@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright (C) 2019-2020 Tobias Flaig.
+ * Copyright (C) 2019-2021 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -58,6 +58,7 @@ namespace nawa {
         /**
          * Set or replace the handleRequest function of the app (thread-safe, blocking).
          * @param handleRequestFunction The request handling function of the app.
+         * @deprecated Might be made private and non-blocking in v0.8 (or later), use reconfigure() instead.
          */
         void setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept;
 
@@ -76,6 +77,7 @@ namespace nawa {
         /**
          * Set or replace the config (thread-safe, blocking).
          * @param config The config.
+         * @deprecated Might be made private and non-blocking in v0.8 (or later), use reconfigure() instead.
          */
         void setConfig(Config config) noexcept;
 
