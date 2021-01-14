@@ -23,3 +23,24 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
+
+/**
+ * TODO missing test cases
+ *      unit:
+ *          - Config
+ *          - Email
+ *          - MimeMultipart
+ *          - Session
+ *          - (Log)
+ *          - possibly even Connection, Request
+ *      integration:
+ *          - (post: sending more than max, files, ...)
+ *          - fastcgi
+ *          - nawarun
+ *          - sessions
+ *          - gpc
+ *          - access filters
+ *          - hot swap
+ *          - concurrency
+ *          - ...
+ */

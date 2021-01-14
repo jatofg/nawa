@@ -270,7 +270,7 @@ nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction h
         }
     } else {
         throw Exception(__PRETTY_FUNCTION__, 3,
-                        "Unknown FastCGI socket mode in config.ini.");
+                        "Unknown FastCGI socket mode in configuration.");
     }
 
     // tell fastcgi to use SO_REUSEADDR if enabled in config

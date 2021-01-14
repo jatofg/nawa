@@ -170,13 +170,26 @@ endif ()
 
 if (BuildTests)
     add_executable(unittests
-            tests/unit/main.cpp
+            tests/main.cpp
             tests/unit/encoding_crypto.cpp
             tests/unit/utils.cpp)
     target_link_libraries(unittests nawa Catch2::Catch2)
     target_include_directories(unittests PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    add_executable(integrationtests
+            tests/main.cpp
+            tests/integration/environment.cpp)
+    target_link_libraries(integrationtests nawa Catch2::Catch2)
+    target_include_directories(integrationtests PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+    include(${catch2_SOURCE_DIR}/contrib/Catch.cmake)
+    enable_testing()
+    catch_discover_tests(unittests)
+    catch_discover_tests(integrationtests)
 
     add_library(nawatest SHARED
             tests/apps/nawatest.cpp)
