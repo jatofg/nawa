@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright (C) 2019-2020 Tobias Flaig.
+ * Copyright (C) 2019-2021 Tobias Flaig.
  *
  * This file is part of nawa.
  *
