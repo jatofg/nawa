@@ -52,6 +52,14 @@ namespace {
         httpConn->set_headers(unordered_multimap<string, string>({{"content-type", "text/html; charset=utf-8"}}));
         httpConn->write(generate_error_page(500));
     };
+
+    inline string getListenAddr(shared_ptr<Config const> const &configPtr) {
+        return (*configPtr)[{"http", "listen"}].empty() ? "127.0.0.1" : (*configPtr)[{"http", "listen"}];
+    }
+
+    inline string getListenPort(shared_ptr<Config const> const &configPtr) {
+        return (*configPtr)[{"http", "port"}].empty() ? "8080" : (*configPtr)[{"http", "port"}];;
+    }
 }
 
 struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsumingHttpHandler> {
@@ -148,14 +156,13 @@ struct HttpHandler {
         auto configPtr = requestHandler->getConfig();
 
         RequestInitContainer requestInit;
-        string serverPort = (*configPtr)[{"http", "port"}];
         requestInit.environment = {
                 {"REMOTE_ADDR",     request.source.substr(0, request.source.find_first_of(':'))},
                 {"REQUEST_URI",     request.destination},
                 {"REMOTE_PORT",     to_string(request.source_port)},
                 {"REQUEST_METHOD",  request.method},
-                {"SERVER_ADDR",     (*configPtr)[{"http", "listen"}]},
-                {"SERVER_PORT",     serverPort},
+                {"SERVER_ADDR",     getListenAddr(configPtr)},
+                {"SERVER_PORT",     getListenPort(configPtr)},
                 {"SERVER_SOFTWARE", "NAWA Development Web Server"},
         };
 
@@ -259,8 +266,8 @@ HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFuncti
     HttpServer::options httpServerOptions(*httpHandler->handler);
 
     // set options from config
-    string listenAddr = (*configPtr)[{"http", "listen"}].empty() ? "127.0.0.1" : (*configPtr)[{"http", "listen"}];
-    string listenPort = (*configPtr)[{"http", "port"}].empty() ? "8080" : (*configPtr)[{"http", "port"}];
+    string listenAddr = getListenAddr(configPtr);
+    string listenPort = getListenPort(configPtr);
     bool reuseAddr = (*configPtr)[{"http", "reuseaddr"}] != "off";
     httpHandler->server = make_unique<HttpServer>(
             httpServerOptions.address(listenAddr).port(listenPort).reuse_address(reuseAddr));
