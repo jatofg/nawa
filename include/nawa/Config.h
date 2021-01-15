@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright (C) 2019-2020 Tobias Flaig.
+ * Copyright (C) 2019-2021 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -47,6 +47,12 @@ namespace nawa {
         explicit Config(const std::string &iniFile);
 
         /**
+         * Construct Config container based on values from an initializer list.
+         * @param init Initializer list containing key-value pairs, wherein the keys are section-key pairs.
+         */
+        Config(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init);
+
+        /**
          * Copy constructor.
          * @param other Object to copy from.
          */
@@ -78,10 +84,18 @@ namespace nawa {
         virtual ~Config() = default;
 
         /**
-         * Read an ini file and add the values to the Config container. Throws a SysException on failure.
+         * Read an ini file and add the values to the Config container. If a key is already set, the element will be
+         * ignored, not overwritten. Throws a SysException on failure.
          * @param iniFile ini file to parse and import values from.
          */
         void read(const std::string &iniFile);
+
+        /**
+         * Insert values from an initializer list. If a key is already set, the element will be ignored, not
+         * overwritten.
+         * @param init Initializer list containing key-value pairs, wherein the keys are section-key pairs.
+         */
+        void insert(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init);
 
         /**
          * Check whether a key exists in this Config container.

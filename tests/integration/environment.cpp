@@ -45,12 +45,14 @@ namespace {
             return true;
         }
 
-        config.set("http", "port", "8089");
-        config.set("http", "reuseaddr", "on");
-        config.set("post", "max_size", "1");
-        config.set("system", "request_handler", "http");
-        config.set("logging", "level", "debug");
-        config.set("logging", "extended", "on");
+        config.insert({
+                              {{"http",    "port"},            "8089"},
+                              {{"http",    "reuseaddr"},       "on"},
+                              {{"post",    "max_size"},        "1"},
+                              {{"system",  "request_handler"}, "http"},
+                              {{"logging", "level"},           "debug"},
+                              {{"logging", "extended"},        "on"},
+                      });
 
         isEnvironmentInitialized = true;
         return true;
@@ -60,7 +62,7 @@ namespace {
 TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     REQUIRE(initializeEnvironmentIfNotYetDone());
 
-    auto handlingFunction = [](Connection& connection) -> int {
+    auto handlingFunction = [](Connection &connection) -> int {
         connection.response << "Hello World!";
         return 0;
     };

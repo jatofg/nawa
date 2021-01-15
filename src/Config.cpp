@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright (C) 2019-2020 Tobias Flaig.
+ * Copyright (C) 2019-2021 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -32,6 +32,10 @@ Config::Config(const string &iniFile) {
     read(iniFile);
 }
 
+Config::Config(initializer_list<pair<pair<string, string>, string>> init) {
+    values.insert(init.begin(), init.end());
+}
+
 Config &Config::operator=(const Config &other) {
     if (this != &other) {
         values = other.values;
@@ -50,6 +54,10 @@ void Config::read(const string &iniFile) {
     if (ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Could not read config file.");
     }
+}
+
+void Config::insert(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init) {
+    values.insert(init.begin(), init.end());
 }
 
 bool Config::isSet(const pair<string, string> &key) const {
