@@ -42,8 +42,6 @@ namespace {
     unique_ptr<RequestHandler> requestHandlerPtr;
     string configFile;
     atomic<bool> readyToReconfigure(false);
-    // TODO track open apps, they could be dlclose-d as soon as their shared_ptr in the RH has been destructed
-    vector<void *> appsOpen;
     Log logger;
 
     // Types of functions that need to be accessed from NAWA applications
@@ -67,9 +65,6 @@ void shutdown(int signum) {
             requestHandlerPtr->terminate();
         }
     } else {
-        for (auto appOpen: appsOpen) {
-            dlclose(appOpen);
-        }
         exit(0);
     }
 }
@@ -82,6 +77,11 @@ void *loadAppSymbol(void *appOpen, const char *symbolName, const string &error) 
         throw Exception(__FUNCTION__, 11, error, dlsymError);
     }
     return symbol;
+}
+
+// free memory of an open app
+void closeApp(void *appOpen) {
+    dlclose(appOpen);
 }
 
 // get the number of threads to use from config
@@ -102,7 +102,8 @@ unsigned int getConcurrency(Config const &config) {
 }
 
 // load the init() and handleRequest() functions of an app
-pair<init_t *, handleRequest_t *> loadAppFunctions(Config const &config) {
+// please note: the init function also becomes unavailable when the HandleRequestFunctionWrapper is destructed
+pair<init_t *, shared_ptr<HandleRequestFunctionWrapper>> loadAppFunctions(Config const &config) {
     // load application init function
     string appPath = config[{"application", "path"}];
     if (appPath.empty()) {
@@ -112,7 +113,6 @@ pair<init_t *, handleRequest_t *> loadAppFunctions(Config const &config) {
     if (!appOpen) {
         throw Exception(__FUNCTION__, 2, "Application file could not be loaded.", dlerror());
     }
-    appsOpen.push_back(appOpen);
 
     // reset dl errors
     dlerror();
@@ -129,7 +129,7 @@ pair<init_t *, handleRequest_t *> loadAppFunctions(Config const &config) {
     auto appInit = (init_t *) loadAppSymbol(appOpen, "init", "Could not load init function from application.");
     auto appHandleRequest = (handleRequest_t *) loadAppSymbol(appOpen, "handleRequest",
                                                               "Could not load handleRequest function from application.");
-    return {appInit, appHandleRequest};
+    return {appInit, make_shared<HandleRequestFunctionWrapper>(appHandleRequest, appOpen, closeApp)};
 }
 
 // signal handler for SIGHUP (reload configuration and app)
@@ -151,7 +151,7 @@ void reload(int signum) {
         }
 
         init_t *appInit;
-        handleRequest_t *appHandleRequest;
+        shared_ptr<HandleRequestFunctionWrapper> appHandleRequest;
         try {
             tie(appInit, appHandleRequest) = loadAppFunctions(config);
         } catch (Exception const &e) {
@@ -272,7 +272,7 @@ int main(int argc, char **argv) {
 
     // load init and handleRequest symbols from app
     init_t *appInit;
-    handleRequest_t *appHandleRequest;
+    shared_ptr<HandleRequestFunctionWrapper> appHandleRequest;
     try {
         tie(appInit, appHandleRequest) = loadAppFunctions(config);
     } catch (Exception const &e) {
@@ -334,8 +334,5 @@ int main(int argc, char **argv) {
     // the request handler has to be destroyed before unloading the app (using dlclose)
     requestHandlerPtr.reset(nullptr);
 
-    for (auto appOpen: appsOpen) {
-        dlclose(appOpen);
-    }
     exit(0);
 }

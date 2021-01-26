@@ -37,7 +37,8 @@ namespace nawa {
          * @param config The config.
          * @param concurrency Concurrency level (number of worker threads).
          */
-        FastcgiRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
+        FastcgiRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction, Config config,
+                              int concurrency);
 
         // explicit destructor with implementation in source file is needed to destruct the unique_ptr
         ~FastcgiRequestHandler() override;

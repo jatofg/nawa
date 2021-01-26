@@ -37,7 +37,8 @@ namespace nawa {
          * @param config The config.
          * @param concurrency Concurrency level (number of worker threads).
          */
-        HttpRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
+        HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction, Config config,
+                           int concurrency);
 
         // explicit destructor with implementation in source file is needed to destruct the unique_ptr
         ~HttpRequestHandler() override;

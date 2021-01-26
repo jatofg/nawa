@@ -251,9 +251,10 @@ namespace {
     }
 }
 
-void RequestHandler::setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept {
+void
+RequestHandler::setAppRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept {
     unique_lock l(configurationMutex_);
-    handleRequestFunction_ = make_shared<HandleRequestFunction>(move(handleRequestFunction));
+    handleRequestFunction_ = move(handleRequestFunction);
 }
 
 void RequestHandler::setAccessFilters(AccessFilterList accessFilters) noexcept {
@@ -270,12 +271,12 @@ shared_ptr<Config const> RequestHandler::getConfig() const noexcept {
     return config_;
 }
 
-void RequestHandler::reconfigure(optional<HandleRequestFunction> handleRequestFunction,
+void RequestHandler::reconfigure(optional<std::shared_ptr<HandleRequestFunctionWrapper>> handleRequestFunction,
                                  optional<AccessFilterList> accessFilters,
                                  optional<Config> config) noexcept {
     unique_lock l(configurationMutex_);
     if (handleRequestFunction) {
-        handleRequestFunction_ = make_shared<HandleRequestFunction>(move(*handleRequestFunction));
+        handleRequestFunction_ = *handleRequestFunction;
     }
     if (accessFilters) {
         accessFilters_ = make_shared<AccessFilterList>(move(*accessFilters));
@@ -286,7 +287,7 @@ void RequestHandler::reconfigure(optional<HandleRequestFunction> handleRequestFu
 }
 
 void RequestHandler::handleRequest(Connection &connection) {
-    shared_ptr<HandleRequestFunction> handleRequestFunction;
+    shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction;
     shared_ptr<AccessFilterList> accessFilters;
     shared_ptr<Config> config;
     {
@@ -301,11 +302,19 @@ void RequestHandler::handleRequest(Connection &connection) {
 }
 
 std::unique_ptr<RequestHandler>
-RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency) {
+RequestHandler::newRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction, Config config,
+                                  int concurrency) {
     if (config[{"system", "request_handler"}] == "http") {
-        return make_unique<HttpRequestHandler>(move(handleRequestFunction), move(config), concurrency);
+        return make_unique<HttpRequestHandler>(handleRequestFunction, move(config), concurrency);
     }
-    return make_unique<FastcgiRequestHandler>(move(handleRequestFunction), move(config), concurrency);
+    return make_unique<FastcgiRequestHandler>(handleRequestFunction, move(config), concurrency);
+}
+
+std::unique_ptr<RequestHandler>
+RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config,
+                                  int concurrency) {
+    return newRequestHandler(make_shared<HandleRequestFunctionWrapper>(move(handleRequestFunction)), move(config),
+                             concurrency);
 }
 
 RequestHandler::~RequestHandler() = default;

@@ -33,14 +33,78 @@ namespace nawa {
     class Connection;
 
     using HandleRequestFunction = std::function<int(nawa::Connection &)>;
+    using DestructionCallbackFunction = std::function<void(void *)>;
+
+    /**
+     * A wrapper structure for a HandleRequestFunction which can store an additional reference pointer and a
+     * callback, which will be called on destruction. This allows nawarun to free memory consumed by an app as
+     * soon as it is not in use anymore (e.g., after being replaced in a hotswap operation).
+     */
+    struct HandleRequestFunctionWrapper {
+        HandleRequestFunction handleRequestFunction; /**< The request handling function. */
+        void *reference; /**< An arbitrary reference pointer which can be used as a hint during destruction. */
+        /**
+         * A function which will be called on destruction of the wrapper object, the reference pointer is passed to
+         * this function as a reference.
+         */
+        DestructionCallbackFunction destructionCallback;
+
+        /**
+         * Construct an empty wrapper object.
+         */
+        HandleRequestFunctionWrapper() : reference(nullptr) {}
+
+        /**
+         * Construct a wrapper for a HandleRequestFunction.
+         * @param handleRequestFunction The request handling function.
+         * @param reference An arbitrary reference pointer which can be used as a hint during destruction.
+         * @param destructionCallback The destruction callback function.
+         */
+        explicit HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction, void *reference = nullptr,
+                                              DestructionCallbackFunction destructionCallback = DestructionCallbackFunction())
+                : handleRequestFunction(move(handleRequestFunction)), reference(reference),
+                  destructionCallback(move(destructionCallback)) {}
+
+        virtual ~HandleRequestFunctionWrapper() {
+            if (destructionCallback) {
+                destructionCallback(reference);
+            }
+        }
+
+        HandleRequestFunctionWrapper(const HandleRequestFunctionWrapper &) = delete;
+
+        HandleRequestFunctionWrapper &operator=(const HandleRequestFunctionWrapper &) = delete;
+
+        /**
+         * Convenience operator which just runs the request handling function.
+         * @param connection The nawa::Connection object (parameter of the request handling function).
+         * @return Return value of the request handling function.
+         */
+        int operator()(nawa::Connection &connection) const { return handleRequestFunction(connection); }
+
+    };
 
     class RequestHandler {
         std::shared_mutex configurationMutex_;
-        std::shared_ptr<HandleRequestFunction> handleRequestFunction_;
+        std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction_;
         std::shared_ptr<AccessFilterList> accessFilters_;
         std::shared_ptr<Config> config_;
     public:
         virtual ~RequestHandler();
+
+        /**
+         * Create a new request handler object according to the config. May throw a nawa::Exception on failure (passed on
+         * from the constructor of the specific request handler). The constructor of a request handler should set up
+         * everything that's necessary already here (as the constructor is the only function of a request handler
+         * which is executed with full privileges).
+         * @param handleRequestFunction A HandleRequestFunctionWrapper containing the handleRequest function of the app.
+         * @param config The config.
+         * @param concurrency Concurrency level (number of worker threads).
+         * @return A unique_ptr to the request handler.
+         */
+        static std::unique_ptr<RequestHandler>
+        newRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction, Config config,
+                          int concurrency);
 
         /**
          * Create a new request handler object according to the config. May throw a nawa::Exception on failure (passed on
@@ -53,14 +117,15 @@ namespace nawa {
          * @return A unique_ptr to the request handler.
          */
         static std::unique_ptr<RequestHandler>
-        newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
+        newRequestHandler(HandleRequestFunction handleRequestFunction, Config config,
+                          int concurrency);
 
         /**
          * Set or replace the handleRequest function of the app (thread-safe, blocking).
          * @param handleRequestFunction The request handling function of the app.
          * @deprecated Might be made private and non-blocking in v0.8 (or later), use reconfigure() instead.
          */
-        void setAppRequestHandler(HandleRequestFunction handleRequestFunction) noexcept;
+        void setAppRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept;
 
         /**
          * Set or replace access filters for static request filtering (thread-safe, blocking).
@@ -87,7 +152,7 @@ namespace nawa {
          * @param accessFilters The access filters.
          * @param config The config.
          */
-        void reconfigure(std::optional<HandleRequestFunction> handleRequestFunction,
+        void reconfigure(std::optional<std::shared_ptr<HandleRequestFunctionWrapper>> handleRequestFunction,
                          std::optional<AccessFilterList> accessFilters, std::optional<Config> config) noexcept;
 
         /**

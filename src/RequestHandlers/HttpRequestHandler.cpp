@@ -252,7 +252,8 @@ struct nawa::HttpRequestHandler::HttpHandlerAdapter {
     vector<thread> threadPool;
 };
 
-HttpRequestHandler::HttpRequestHandler(HandleRequestFunction handleRequestFunction, Config config,
+HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
+                                       Config config,
                                        int concurrency) {
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config));

@@ -183,8 +183,8 @@ struct nawa::FastcgiRequestHandler::FastcgippManagerAdapter {
     std::unique_ptr<Fastcgipp::Manager<FastcgippRequestAdapter>> manager;
 };
 
-nawa::FastcgiRequestHandler::FastcgiRequestHandler(nawa::HandleRequestFunction handleRequestFunction,
-                                                   nawa::Config config, int concurrency) {
+FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
+                                             Config config, int concurrency) {
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config));
     auto configPtr = getConfig();
