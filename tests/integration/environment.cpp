@@ -81,7 +81,7 @@ TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     requestHandler->join();
 }
 
-TEST_CASE("Environment and request headers (HTTP)", "[headers][http]") {
+TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     REQUIRE(initializeEnvironmentIfNotYetDone());
 
     auto handlingFunction = [](Connection &connection) -> int {
@@ -98,6 +98,11 @@ TEST_CASE("Environment and request headers (HTTP)", "[headers][http]") {
         connection.response << connection.request.env["FULL_URL_WITHOUT_QS"] << "\n"; // [10]
         connection.response << connection.request.env["host"] << "\n"; // [11]
         connection.response << connection.request.env["content-type"] << "\n"; // [12]
+
+        // response headers
+        connection.setHeader("x-test-header", "test");
+        connection.setHeader("x-second-test", "test");
+        connection.unsetHeader("x-second-test");
         return 0;
     };
     unique_ptr<RequestHandler> requestHandler;
@@ -123,6 +128,10 @@ TEST_CASE("Environment and request headers (HTTP)", "[headers][http]") {
         REQUIRE(respLines[9] == "http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
         REQUIRE(respLines[10] == "http://127.0.0.1:8089/tp0/tp1/test");
         REQUIRE(respLines[11] == "127.0.0.1:8089");
+
+        REQUIRE(response.headers().count("x-test-header") == 1);
+        REQUIRE(response.headers().equal_range("x-test-header").first->second == "test");
+        REQUIRE(response.headers().count("x-second-test") == 0);
     }
 
     SECTION("POST request") {
@@ -142,6 +151,10 @@ TEST_CASE("Environment and request headers (HTTP)", "[headers][http]") {
         REQUIRE(respLines[9] == "http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
         REQUIRE(respLines[10] == "http://127.0.0.1:8089/tp0/tp1/test");
         REQUIRE(respLines[11] == "127.0.0.1:8089");
+
+        REQUIRE(response.headers().count("x-test-header") == 1);
+        REQUIRE(response.headers().equal_range("x-test-header").first->second == "test");
+        REQUIRE(response.headers().count("x-second-test") == 0);
     }
 
     requestHandler->terminate();
