@@ -95,6 +95,10 @@ int main() {
     // None of these functions will block until termination has completed, only join() will ever block.
     // Tip: Use signal handlers to control request handling.
 
+    // If you want to hot-swap the config, filters, or request handling function, use:
+    // requestHandler->reconfigure(...)
+    // (see docs of nawa::RequestHandler::reconfigure())
+
     // Now, before your main function returns, make sure to block until request handling has terminated:
     requestHandler->join();
 

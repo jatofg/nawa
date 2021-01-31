@@ -185,7 +185,19 @@ the directory where the `config.ini` file is located), run:
 
 `nawarun config.ini`
 
-At last, open your web browser and enjoy!
+Open your web browser and enjoy!
+
+### Reloading the app
+
+You can send a SIGHUP signal to reload the config. Your app will be reloaded 
+as well, allowing you to hot-swap it to a new version without stopping 
+request handling. The new app's init function will run before request handling 
+switches to the new app.
+
+Please note that reloading only works if the config as well as the application 
+file are still accessible after downgrading privileges. The configuration of 
+the request handler (especially the `[fastcgi]`, `[http]`, and `[system]` 
+sections of the config file) cannot be updated without restart.
 
 ### Using systemd
 
@@ -199,6 +211,10 @@ systemd service file. If the path to your config file would be
 To start your service automatically on boot:
 
 `systemctl enable nawa@-path-to-config.ini`
+
+To reload configuration and app (see above):
+
+`systemctl reload nawa@-path-to-config.ini`
 
 Of course, you can use `stop` to stop it, `restart` to restart it, and 
 `disable` to stop automatically starting it on boot.

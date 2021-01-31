@@ -12,21 +12,13 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-**v0.6 is here!**
-A brand-new HTTP request handler can open up a development web server, allowing you 
-to test your app directly in your browser without setting up a local web server and 
-communicating via FastCGI. In addition, you can now build NAWA without Argon2 support 
-and accessing request headers has become easier and consistent.
+**New in v0.7**
 
-Current (known) limitations of the HTTP request handler:
-* Some HTTP status codes might be unsupported
-* Flushes may be out of order
-* `nawa::Request::Env::getAcceptLanguages()` does not work yet (you can access the 
-  HTTP header directly instead)
-
-**Attention!** All environment variables have been renamed in v0.6. Please make 
-sure to adapt your apps properly 
-(see [Environment Docs](https://www.tobiasflaig.eu/nawa/0.6/docs/environmentmanual.html)).
+The configuration can now be reloaded without restarting and apps (and request handling 
+functions) can be hot-swapped. This allows you to update your app without interrupting 
+request handling. Reloading can be done via systemd or by sending a SIGHUP signal to 
+nawarun. If you are using NAWA as a library, take a look at 
+`nawa::RequestHandler::reconfigure()`.
 
 ## Example
 
