@@ -33,9 +33,13 @@ using namespace std;
 
 namespace http = boost::network::http;
 
+Config loadConfig();
+
 namespace {
     bool isEnvironmentInitialized = false;
     Config config;
+    string port;
+    string baseUrl;
 
     /**
      * Initialize test environment if not yet done.
@@ -46,14 +50,17 @@ namespace {
             return true;
         }
 
+        config = loadConfig();
         config.insert({
-                              {{"http",    "port"},            "8089"},
                               {{"http",    "reuseaddr"},       "on"},
                               {{"post",    "max_size"},        "1"},
                               {{"system",  "request_handler"}, "http"},
                               {{"logging", "level"},           "debug"},
                               {{"logging", "extended"},        "on"},
                       });
+
+        port = config[{"http", "port"}].empty() ? "8080" : config[{"http", "port"}];
+        baseUrl = "http://127.0.0.1:" + port;
 
         isEnvironmentInitialized = true;
         return true;
@@ -72,7 +79,7 @@ TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     REQUIRE_NOTHROW(requestHandler->start());
 
     http::client client;
-    http::client::request request("http://127.0.0.1:8089/");
+    http::client::request request(baseUrl);
     http::client::response response;
     REQUIRE_NOTHROW(response = client.get(request));
     REQUIRE(response.body() == "Hello World!");
@@ -120,11 +127,11 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
         REQUIRE(respLines[2] == "/tp0/tp1/test?qse0=v0&qse1=v1");
         REQUIRE(respLines[4] == method);
         REQUIRE(respLines[5] == "127.0.0.1");
-        REQUIRE(respLines[6] == "8089");
-        REQUIRE(respLines[8] == "http://127.0.0.1:8089");
-        REQUIRE(respLines[9] == "http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
-        REQUIRE(respLines[10] == "http://127.0.0.1:8089/tp0/tp1/test");
-        REQUIRE(respLines[11] == "127.0.0.1:8089");
+        REQUIRE(respLines[6] == port);
+        REQUIRE(respLines[8] == baseUrl);
+        REQUIRE(respLines[9] == baseUrl + "/tp0/tp1/test?qse0=v0&qse1=v1");
+        REQUIRE(respLines[10] == baseUrl + "/tp0/tp1/test");
+        REQUIRE(respLines[11] == "127.0.0.1:" + port);
 
         REQUIRE(response.headers().count("x-test-header") == 1);
         REQUIRE(response.headers().equal_range("x-test-header").first->second == "test");
@@ -132,13 +139,13 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     };
 
     SECTION("GET request") {
-        http::client::request request("http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
+        http::client::request request(baseUrl + "/tp0/tp1/test?qse0=v0&qse1=v1");
         REQUIRE_NOTHROW(response = client.get(request));
         checkResponse("GET");
     }
 
     SECTION("POST request") {
-        http::client::request request("http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
+        http::client::request request(baseUrl + "/tp0/tp1/test?qse0=v0&qse1=v1");
         REQUIRE_NOTHROW(response = client.post(request));
         checkResponse("POST");
     }

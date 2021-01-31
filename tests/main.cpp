@@ -22,7 +22,35 @@
  */
 
 #define CATCH_CONFIG_MAIN
+
 #include <catch2/catch.hpp>
+#include <nawa/Config.h>
+#include <nawa/Exception.h>
+
+using namespace nawa;
+using namespace std;
+
+Config loadConfig() {
+    /*
+     * Possible paths for test.ini, order of precedence:
+     * 1. ./test.ini
+     * 2. ../tests/test.ini
+     * 3. ./tests/test.ini
+     */
+    try {
+        return Config("test.ini");
+    } catch (Exception const &e) {}
+
+    try {
+        return Config("../tests/test.ini");
+    } catch (Exception const &e) {}
+
+    try {
+        return Config("tests/test.ini");
+    } catch (Exception const &e) {}
+
+    return Config();
+}
 
 /**
  * TODO missing test cases
