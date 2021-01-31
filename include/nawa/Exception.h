@@ -44,10 +44,10 @@ namespace nawa {
          * @param message Optional message describing the problem (the only thing printed when calling getMessage()).
          * @param additionalDebugInfo Optional additional info for debugging.
          */
-        Exception(const std::string &inFunction, int errorCode, std::string message_ = "No message provided.",
+        Exception(const std::string &inFunction, int errorCode, std::string message = "No message provided.",
                   const std::string &additionalDebugInfo = std::string())
                 : errorCode(errorCode),
-                  message(std::move(message_)) {
+                  message(std::move(message)) {
             std::stringstream mstream;
             mstream << "[NAWA Exception #" << errorCode << " in " << inFunction << "] " << message;
             if (!additionalDebugInfo.empty()) {
