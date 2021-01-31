@@ -41,7 +41,7 @@ namespace nawa {
         Config() = default;
 
         /**
-         * Construct Config container and directly parse an ini file. Throws a SysException on failure.
+         * Construct Config container and directly parse an ini file. Throws an Exception on failure.
          * @param iniFile ini file to parse, values will be added to the Config container.
          */
         explicit Config(const std::string &iniFile);
