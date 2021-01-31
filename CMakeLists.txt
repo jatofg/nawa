@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # version
 set(NAWA_VERSION_MAJOR 0)
-set(NAWA_VERSION_MINOR 6)
+set(NAWA_VERSION_MINOR 7)
 
 # build options
 option(BuildTests "Build tests" OFF)
