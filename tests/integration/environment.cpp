@@ -110,18 +110,15 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     REQUIRE_NOTHROW(requestHandler->start());
 
     http::client client;
+    http::client::response response;
 
-    SECTION("GET request") {
-        http::client::request request("http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
-        http::client::response response;
-        REQUIRE_NOTHROW(response = client.get(request));
+    auto checkResponse = [&](const string &method) {
         auto respLines = split_string(response.body(), '\n');
-
         REQUIRE(respLines.size() == 13);
         REQUIRE(respLines[0] == "3");
         REQUIRE(respLines[1] == "127.0.0.1");
         REQUIRE(respLines[2] == "/tp0/tp1/test?qse0=v0&qse1=v1");
-        REQUIRE(respLines[4] == "GET");
+        REQUIRE(respLines[4] == method);
         REQUIRE(respLines[5] == "127.0.0.1");
         REQUIRE(respLines[6] == "8089");
         REQUIRE(respLines[8] == "http://127.0.0.1:8089");
@@ -132,29 +129,18 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
         REQUIRE(response.headers().count("x-test-header") == 1);
         REQUIRE(response.headers().equal_range("x-test-header").first->second == "test");
         REQUIRE(response.headers().count("x-second-test") == 0);
+    };
+
+    SECTION("GET request") {
+        http::client::request request("http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
+        REQUIRE_NOTHROW(response = client.get(request));
+        checkResponse("GET");
     }
 
     SECTION("POST request") {
         http::client::request request("http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
-        http::client::response response;
         REQUIRE_NOTHROW(response = client.post(request));
-        auto respLines = split_string(response.body(), '\n');
-
-        REQUIRE(respLines.size() == 13);
-        REQUIRE(respLines[0] == "3");
-        REQUIRE(respLines[1] == "127.0.0.1");
-        REQUIRE(respLines[2] == "/tp0/tp1/test?qse0=v0&qse1=v1");
-        REQUIRE(respLines[4] == "POST");
-        REQUIRE(respLines[5] == "127.0.0.1");
-        REQUIRE(respLines[6] == "8089");
-        REQUIRE(respLines[8] == "http://127.0.0.1:8089");
-        REQUIRE(respLines[9] == "http://127.0.0.1:8089/tp0/tp1/test?qse0=v0&qse1=v1");
-        REQUIRE(respLines[10] == "http://127.0.0.1:8089/tp0/tp1/test");
-        REQUIRE(respLines[11] == "127.0.0.1:8089");
-
-        REQUIRE(response.headers().count("x-test-header") == 1);
-        REQUIRE(response.headers().equal_range("x-test-header").first->second == "test");
-        REQUIRE(response.headers().count("x-second-test") == 0);
+        checkResponse("POST");
     }
 
     requestHandler->terminate();
