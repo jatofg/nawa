@@ -41,14 +41,14 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.6/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.7/docs/gettingstarted.html) 
 
 If you don't like the IoC-style approach, you can also use NAWA as a library. 
-[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.6/docs/aslibrarymanual.html)
+[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.7/docs/aslibrarymanual.html)
 
 ### Warning!
 
-This project is still in an early state (version 0.6!). It might, of 
+This project is still in an early state (version 0.7!). It might, of 
 course, still contain bugs. Use it at your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
@@ -95,7 +95,7 @@ application, and
 
 You can find an introduction containing a simple "Hello World!" 
 NAWA app here: 
-[Getting started.](https://www.tobiasflaig.eu/nawa/0.6/docs/gettingstarted.html)
+[Getting started.](https://www.tobiasflaig.eu/nawa/0.7/docs/gettingstarted.html)
 
 The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
@@ -142,7 +142,7 @@ prepended with `sudo`.
 * gcc-c++/g++ or clang compiler with C++17 support
 
 For building the docs, doxygen must be installed. However, you can also 
-[access the docs online](https://www.tobiasflaig.eu/nawa/0.6/docs/).
+[access the docs online](https://www.tobiasflaig.eu/nawa/0.7/docs/).
 
 ### Clone, build, and install NAWA
 
