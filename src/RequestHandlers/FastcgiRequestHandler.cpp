@@ -279,7 +279,10 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
     }
 }
 
-FastcgiRequestHandler::~FastcgiRequestHandler() = default;
+FastcgiRequestHandler::~FastcgiRequestHandler() {
+    terminate();
+    join();
+}
 
 void FastcgiRequestHandler::start() {
     if (fastcgippManager && fastcgippManager->manager) {
@@ -309,5 +312,6 @@ void FastcgiRequestHandler::terminate() noexcept {
 void FastcgiRequestHandler::join() noexcept {
     if (fastcgippManager && fastcgippManager->manager) {
         fastcgippManager->manager->join();
+        fastcgippManager->manager.reset(nullptr);
     }
 }

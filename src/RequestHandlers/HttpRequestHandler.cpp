@@ -285,7 +285,10 @@ HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrap
     }
 }
 
-HttpRequestHandler::~HttpRequestHandler() = default;
+HttpRequestHandler::~HttpRequestHandler() {
+    terminate();
+    join();
+}
 
 void HttpRequestHandler::start() {
     if (httpHandler && httpHandler->server) {
@@ -321,5 +324,6 @@ void HttpRequestHandler::join() noexcept {
         for (auto &t: httpHandler->threadPool) {
             t.join();
         }
+        httpHandler->threadPool.clear();
     }
 }

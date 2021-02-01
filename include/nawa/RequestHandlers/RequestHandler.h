@@ -90,6 +90,9 @@ namespace nawa {
         std::shared_ptr<AccessFilterList> accessFilters_;
         std::shared_ptr<Config> config_;
     public:
+        /**
+         * The overridden virtual destructor must first call terminate(), then join(), or terminate and join directly.
+         */
         virtual ~RequestHandler();
 
         /**
@@ -165,19 +168,20 @@ namespace nawa {
 
         /**
          * Stop request handling after current requests have been served. Must not block and return immediately after
-         * the shutdown has been initiated.
+         * the shutdown has been initiated. Must do nothing if request handling has already stopped.
          */
         virtual void stop() noexcept = 0;
 
         /**
          * Enforce termination of request handling. Must not block and return immediately after the termination of
          * request handling has been initiated (nevertheless, the termination should only take a few milliseconds
-         * after this function has been called).
+         * after this function has been called). Must do nothing if request handling has already stopped.
          */
         virtual void terminate() noexcept = 0;
 
         /**
-         * Block until request handling has terminated. This is the only function that should block.
+         * Block until request handling has terminated. This is the only function that should block. If join has
+         * already been called, this function must return immediately, without throwing exceptions.
          */
         virtual void join() noexcept = 0;
 

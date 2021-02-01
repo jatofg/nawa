@@ -68,7 +68,6 @@ Config loadConfig() {
  *          - sessions
  *          - gpc
  *          - access filters
- *          - hot swap
  *          - concurrency
  *          - ...
  */

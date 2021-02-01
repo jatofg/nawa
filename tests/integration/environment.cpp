@@ -40,6 +40,7 @@ namespace {
     Config config;
     string port;
     string baseUrl;
+    unique_ptr<RequestHandler> httpRequestHandler;
 
     /**
      * Initialize test environment if not yet done.
@@ -62,6 +63,9 @@ namespace {
         port = config[{"http", "port"}].empty() ? "8080" : config[{"http", "port"}];
         baseUrl = "http://127.0.0.1:" + port;
 
+        REQUIRE_NOTHROW(
+                httpRequestHandler = RequestHandler::newRequestHandler([](Connection &) { return 0; }, config, 1));
+
         isEnvironmentInitialized = true;
         return true;
     }
@@ -69,13 +73,15 @@ namespace {
 
 TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     REQUIRE(initializeEnvironmentIfNotYetDone());
+    // GENERATE can be used to run test cases with both HTTP and FCGI request handler
+    auto &requestHandler = httpRequestHandler;
 
     auto handlingFunction = [](Connection &connection) -> int {
         connection.response << "Hello World!";
         return 0;
     };
-    unique_ptr<RequestHandler> requestHandler;
-    REQUIRE_NOTHROW(requestHandler = RequestHandler::newRequestHandler(handlingFunction, config, 1));
+    REQUIRE_NOTHROW(
+            requestHandler->reconfigure(make_shared<HandleRequestFunctionWrapper>(handlingFunction), nullopt, config));
     REQUIRE_NOTHROW(requestHandler->start());
 
     http::client client;
@@ -83,13 +89,11 @@ TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     http::client::response response;
     REQUIRE_NOTHROW(response = client.get(request));
     REQUIRE(response.body() == "Hello World!");
-
-    requestHandler->terminate();
-    requestHandler->join();
 }
 
 TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     REQUIRE(initializeEnvironmentIfNotYetDone());
+    auto &requestHandler = httpRequestHandler;
 
     auto handlingFunction = [](Connection &connection) -> int {
         connection.response << connection.request.env.getRequestPath().size() << "\n"; // [0]
@@ -112,8 +116,8 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
         connection.unsetHeader("x-second-test");
         return 0;
     };
-    unique_ptr<RequestHandler> requestHandler;
-    REQUIRE_NOTHROW(requestHandler = RequestHandler::newRequestHandler(handlingFunction, config, 1));
+    REQUIRE_NOTHROW(
+            requestHandler->reconfigure(make_shared<HandleRequestFunctionWrapper>(handlingFunction), nullopt, config));
     REQUIRE_NOTHROW(requestHandler->start());
 
     http::client client;
@@ -150,8 +154,7 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
         checkResponse("POST");
     }
 
-    requestHandler->terminate();
-    requestHandler->join();
+    // timeout when running all CTest - investigate!
 }
 
 // TODO: POST, GET, files, env vars, ...
