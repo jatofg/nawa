@@ -91,7 +91,7 @@ namespace nawa {
         std::shared_ptr<Config> config_;
     public:
         /**
-         * The overridden virtual destructor must first call terminate(), then join(), or terminate and join directly.
+         * The overridden virtual destructor must terminate request handling and join worker threads, if not yet done.
          */
         virtual ~RequestHandler();
 
@@ -159,29 +159,41 @@ namespace nawa {
                          std::optional<AccessFilterList> accessFilters, std::optional<Config> config) noexcept;
 
         /**
-         * Start request handling. Must not block and return immediately after request handling has started
-         * (in separate threads). May throw a nawa::Exception on failure, but ideally, all actions which could lead to
+         * Start request handling. Must not block and return immediately if request handling is already running.
+         * May throw a nawa::Exception on failure during startup, but ideally, all actions which could lead to
          * errors (or preliminary checks to avoid errors) should be done in the constructor, to avoid unnecessary
-         * initialization steps.
+         * initialization steps. Behavior of calling this function after join() has already been called is undefined,
+         * ideally, it should throw a nawa::Exception (proposed error code: 10). Please not that request handlers
+         * currently do NOT have to support restarting (i.e., calling stop, then start). The default FastCGI and HTTP
+         * request handlers do not support this and will not start request handling once again after stopping.
          */
         virtual void start() = 0;
 
         /**
          * Stop request handling after current requests have been served. Must not block and return immediately after
-         * the shutdown has been initiated. Must do nothing if request handling has already stopped.
+         * the shutdown has been initiated. Must do nothing if request handling has already stopped or even joined.
          */
         virtual void stop() noexcept = 0;
 
         /**
          * Enforce termination of request handling. Must not block and return immediately after the termination of
          * request handling has been initiated (nevertheless, the termination should only take a few milliseconds
-         * after this function has been called). Must do nothing if request handling has already stopped.
+         * after this function has been called). Must do nothing if request handling has already stopped or even
+         * joined.
          */
         virtual void terminate() noexcept = 0;
 
         /**
+         * Restart request handling. Can optionally be supported by request handlers (the default request handlers for
+         * FastCGI and HTTP currently do NOT support this). If unsupported, this function does not have to be
+         * implemented, and will just do nothing.
+         */
+        virtual void restart() noexcept {}
+
+        /**
          * Block until request handling has terminated. This is the only function that should block. If join has
-         * already been called, this function must return immediately, without throwing exceptions.
+         * already been called, this function must return immediately, without throwing exceptions. By joining,
+         * the RequestHandler object becomes defunct and cannot be reused afterwards.
          */
         virtual void join() noexcept = 0;
 

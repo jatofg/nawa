@@ -250,6 +250,8 @@ struct nawa::HttpRequestHandler::HttpHandlerAdapter {
     unique_ptr<HttpServer> server;
     int concurrency = 1;
     vector<thread> threadPool;
+    bool requestHandlingActive = false;
+    bool joined = false;
 };
 
 HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
@@ -286,16 +288,32 @@ HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrap
 }
 
 HttpRequestHandler::~HttpRequestHandler() {
-    terminate();
-    join();
+    if (httpHandler) {
+        if (httpHandler->requestHandlingActive && !httpHandler->joined) {
+            httpHandler->server->stop();
+        }
+        if (!httpHandler->joined) {
+            for (auto &t: httpHandler->threadPool) {
+                t.join();
+            }
+            httpHandler->threadPool.clear();
+        }
+    }
 }
 
 void HttpRequestHandler::start() {
+    if (httpHandler && httpHandler->requestHandlingActive) {
+        return;
+    }
+    if (httpHandler && httpHandler->joined) {
+        throw Exception(__PRETTY_FUNCTION__, 10, "HttpRequestHandler was already joined.");
+    }
     if (httpHandler && httpHandler->server) {
         try {
             for (int i = 0; i < httpHandler->concurrency; ++i) {
                 httpHandler->threadPool.emplace_back([this] { httpHandler->server->run(); });
             }
+            httpHandler->requestHandlingActive = true;
         } catch (exception const &e) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             string("An error occurred during start of request handling."),
@@ -307,23 +325,37 @@ void HttpRequestHandler::start() {
 }
 
 void HttpRequestHandler::stop() noexcept {
-    if (httpHandler && httpHandler->server) {
-        httpHandler->server->stop();
+    if (httpHandler) {
+        if (httpHandler->joined) {
+            return;
+        }
+        if (httpHandler->server) {
+            httpHandler->server->stop();
+        }
     }
 }
 
 void HttpRequestHandler::terminate() noexcept {
     // TODO find (implement in fork of cpp-netlib) a way to forcefully terminate
-    if (httpHandler && httpHandler->server) {
-        httpHandler->server->stop();
+    if (httpHandler) {
+        if (httpHandler->joined) {
+            return;
+        }
+        if (httpHandler->server) {
+            httpHandler->server->stop();
+        }
     }
 }
 
 void HttpRequestHandler::join() noexcept {
     if (httpHandler) {
+        if (httpHandler->joined) {
+            return;
+        }
         for (auto &t: httpHandler->threadPool) {
             t.join();
         }
+        httpHandler->joined = true;
         httpHandler->threadPool.clear();
     }
 }

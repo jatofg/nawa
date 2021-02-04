@@ -181,6 +181,8 @@ bool FastcgippRequestAdapter::inProcessor() {
 
 struct nawa::FastcgiRequestHandler::FastcgippManagerAdapter {
     std::unique_ptr<Fastcgipp::Manager<FastcgippRequestAdapter>> manager;
+    bool requestHandlingActive = false;
+    bool joined = false;
 };
 
 FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
@@ -280,14 +282,28 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
 }
 
 FastcgiRequestHandler::~FastcgiRequestHandler() {
-    terminate();
-    join();
+    if (fastcgippManager) {
+        if (fastcgippManager->requestHandlingActive && !fastcgippManager->joined) {
+            fastcgippManager->manager->terminate();
+        }
+        if (!fastcgippManager->joined) {
+            fastcgippManager->manager->join();
+            fastcgippManager->manager.reset(nullptr);
+        }
+    }
 }
 
 void FastcgiRequestHandler::start() {
+    if (fastcgippManager && fastcgippManager->requestHandlingActive) {
+        return;
+    }
+    if (fastcgippManager && fastcgippManager->joined) {
+        throw Exception(__PRETTY_FUNCTION__, 10, "FastcgiRequestHandler was already joined.");
+    }
     if (fastcgippManager && fastcgippManager->manager) {
         try {
             fastcgippManager->manager->start();
+            fastcgippManager->requestHandlingActive = true;
         } catch (...) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             "An unknown error occurred during start of request handling.");
@@ -298,20 +314,36 @@ void FastcgiRequestHandler::start() {
 }
 
 void FastcgiRequestHandler::stop() noexcept {
-    if (fastcgippManager && fastcgippManager->manager) {
-        fastcgippManager->manager->stop();
+    if (fastcgippManager) {
+        if (fastcgippManager->joined) {
+            return;
+        }
+        if (fastcgippManager->manager) {
+            fastcgippManager->manager->stop();
+        }
     }
 }
 
 void FastcgiRequestHandler::terminate() noexcept {
-    if (fastcgippManager && fastcgippManager->manager) {
-        fastcgippManager->manager->terminate();
+    if (fastcgippManager) {
+        if (fastcgippManager->joined) {
+            return;
+        }
+        if (fastcgippManager->manager) {
+            fastcgippManager->manager->terminate();
+        }
     }
 }
 
 void FastcgiRequestHandler::join() noexcept {
-    if (fastcgippManager && fastcgippManager->manager) {
-        fastcgippManager->manager->join();
-        fastcgippManager->manager.reset(nullptr);
+    if (fastcgippManager) {
+        if (fastcgippManager->joined) {
+            return;
+        }
+        if (fastcgippManager->manager) {
+            fastcgippManager->manager->join();
+            fastcgippManager->joined = true;
+            fastcgippManager->manager.reset(nullptr);
+        }
     }
 }

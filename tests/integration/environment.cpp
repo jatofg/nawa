@@ -153,8 +153,6 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
         REQUIRE_NOTHROW(response = client.post(request));
         checkResponse("POST");
     }
-
-    // timeout when running all CTest - investigate!
 }
 
 // TODO: POST, GET, files, env vars, ...
