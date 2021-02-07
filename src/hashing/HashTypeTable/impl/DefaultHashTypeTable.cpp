@@ -21,9 +21,9 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/Engines/DefaultHashTypeTable.h>
-#include <nawa/Engines/BcryptHashingEngine.h>
-#include <nawa/Engines/Argon2HashingEngine.h>
+#include <nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h>
+#include <nawa/hashing/HashingEngine/impl/Argon2HashingEngine.h>
+#include <nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h>
 
 using namespace nawa;
 using namespace std;

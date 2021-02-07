@@ -21,13 +21,13 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <argon2.h>
 #include <cstring>
+#include <nawa/Exception.h>
+#include <nawa/hashing/HashingEngine/impl/Argon2HashingEngine.h>
+#include <nawa/util/Encoding.h>
 #include <random>
 #include <regex>
-#include <argon2.h>
-#include <nawa/util/Encoding.h>
-#include <nawa/Exception.h>
-#include <nawa/Engines/Argon2HashingEngine.h>
 
 using namespace nawa;
 using namespace std;

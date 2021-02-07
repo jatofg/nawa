@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/util/Utils.h>
 #include <nawa/request/Request.h>
+#include <nawa/util/Utils.h>
 
 using namespace nawa;
 using namespace std;

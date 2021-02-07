@@ -21,12 +21,13 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/email/SmtpMailer.h>
-#include <nawa/util/Utils.h>
 #include <curl/curl.h>
 #include <nawa/Exception.h>
-#include <random>
+#include <nawa/mail/EmailAddress.h>
+#include <nawa/mail/SmtpMailer.h>
 #include <nawa/util/Crypto.h>
+#include <nawa/util/Utils.h>
+#include <random>
 
 using namespace nawa;
 using namespace std;

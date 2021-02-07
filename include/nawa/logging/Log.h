@@ -24,8 +24,8 @@
 #ifndef NAWA_LOG_H
 #define NAWA_LOG_H
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 namespace nawa {

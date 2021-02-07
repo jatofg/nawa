@@ -21,13 +21,13 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iomanip>
-#include <unordered_map>
-#include <nawa/util/Utils.h>
+#include <boost/algorithm/string.hpp>
 #include <fstream>
+#include <iomanip>
 #include <nawa/Exception.h>
 #include <nawa/util/Encoding.h>
-#include <boost/algorithm/string.hpp>
+#include <nawa/util/Utils.h>
+#include <unordered_map>
 
 using namespace nawa;
 using namespace std;

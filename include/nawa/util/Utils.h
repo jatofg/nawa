@@ -24,8 +24,8 @@
 #ifndef NAWA_UTILS_H
 #define NAWA_UTILS_H
 
-#include <string>
 #include <regex>
+#include <string>
 #include <unordered_map>
 
 namespace nawa {

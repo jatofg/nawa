@@ -22,11 +22,12 @@
  */
 
 #include <nawa/Application.h>
-#include <random>
-#include <nawa/email/SmtpMailer.h>
-#include <nawa/util/Encoding.h>
 #include <nawa/Exception.h>
 #include <nawa/logging/Log.h>
+#include <nawa/mail/Email/impl/SimpleEmail.h>
+#include <nawa/mail/SmtpMailer.h>
+#include <nawa/util/Encoding.h>
+#include <random>
 
 using namespace std;
 using namespace nawa;

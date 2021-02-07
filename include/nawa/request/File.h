@@ -24,9 +24,9 @@
 #ifndef NAWA_FILE_H
 #define NAWA_FILE_H
 
-#include <string>
-#include <memory>
 #include <fstream>
+#include <memory>
+#include <string>
 
 namespace nawa {
     /**

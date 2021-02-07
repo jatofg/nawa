@@ -22,8 +22,8 @@
  */
 
 #include <iostream>
-#include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/Exception.h>
+#include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/connection/Connection.h>
 
 using namespace nawa;

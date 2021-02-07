@@ -1,6 +1,6 @@
 /**
  * \file Connection.cpp
- * \brief Implementation of the Connection class.
+ * \brief Implementation of the Connection and FlushCallbackContainer classes.
  */
 
 /*
@@ -22,13 +22,14 @@
  */
 
 #include <algorithm>
-#include <regex>
 #include <fstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <nawa/util/Utils.h>
-#include <nawa/connection/Connection.h>
 #include <nawa/Exception.h>
+#include <nawa/connection/Connection.h>
+#include <nawa/connection/FlushCallbackContainer.h>
+#include <nawa/util/Utils.h>
+#include <regex>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 using namespace nawa;
 using namespace std;

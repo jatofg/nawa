@@ -21,11 +21,11 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <nawa/Exception.h>
 #include <nawa/util/Crypto.h>
 #include <nawa/util/Utils.h>
-#include <nawa/Exception.h>
-#include <openssl/sha.h>
 #include <openssl/md5.h>
+#include <openssl/sha.h>
 
 using namespace nawa;
 using namespace std;

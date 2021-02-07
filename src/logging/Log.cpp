@@ -21,13 +21,13 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iomanip>
-#include <unistd.h>
+#include <atomic>
 #include <climits>
+#include <iomanip>
+#include <mutex>
 #include <nawa/Exception.h>
 #include <nawa/logging/Log.h>
-#include <atomic>
-#include <mutex>
+#include <unistd.h>
 
 using namespace nawa;
 using namespace std;

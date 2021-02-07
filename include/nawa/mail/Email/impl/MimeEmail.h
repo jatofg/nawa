@@ -1,6 +1,6 @@
 /**
- * \file Email.h
- * \brief Types representing email addresses and emails.
+ * \file MimeEmail.h
+ * \brief Structure representing a MIME email.
  */
 
 /*
@@ -21,119 +21,14 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef NAWA_EMAIL_H
-#define NAWA_EMAIL_H
+#ifndef NAWA_MIMEEMAIL_H
+#define NAWA_MIMEEMAIL_H
 
+#include <nawa/mail/Email/Email.h>
 #include <string>
 #include <unordered_map>
-#include <vector>
-#include <memory>
 
 namespace nawa {
-
-    /**
-     * Replacement rules for emails are just a string -> string map. All occurrences of the key string should be
-     * replaced by the value string.
-     */
-    typedef std::unordered_map<std::string, std::string> ReplacementRules;
-
-    /**
-     * Structure containing the name and email address of a recipient or sender. It contains functions for validation
-     * and getting a representation in a standard format that can be used for curl.
-     */
-    struct EmailAddress {
-        std::string name; /**< The name of the sender or recipient. */
-        std::string address; /**< The email address itself. */
-
-        /**
-         * Construct an empty EmailAddress object.
-         */
-        EmailAddress() = default;
-
-        /**
-         * Construct an EmailAddress object and initialize it with an email address.
-         * @param _address Email address.
-         */
-        explicit EmailAddress(std::string _address) {
-            address = std::move(_address);
-        }
-
-        /**
-         * Construct an EmailAddress object and initialize it with a recipient (or sender) name and email address.
-         * @param _name Name.
-         * @param _address Email address.
-         */
-        EmailAddress(std::string _name, std::string _address) {
-            name = std::move(_name);
-            address = std::move(_address);
-        }
-
-        /**
-         * Get the email address in a standard representation, i.e., `<john.doe\@example.com>` without name, or
-         * `John Doe <john.doe\@example.com>` with name included.
-         * @param includeName Include the name in the representation.
-         * @return String representation.
-         */
-        [[nodiscard]] std::string get(bool includeName = true) const;
-
-        /**
-         * Perform a very basic, regex-based validity check on the saved email address. This will only check that it
-         * contains an \@ symbol and only valid characters before and after it, so if this function returns true,
-         * that does not necessarily mean the email address is valid. To really validate an email address, you should
-         * send a confirmation email to it.
-         * @return True if the email address could be valid, false if it is definitely not valid.
-         */
-        [[nodiscard]] bool isValid() const;
-    };
-
-    /**
-     * Base structure for emails. To create an email, use the SimpleEmail or MimeEmail class.
-     */
-    struct Email {
-        /**
-         * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
-         * automatically by the mail function if not specified in this map. Other fields that should be considered
-         * are: To, Subject, Cc, Content-Type (will be set automatically by MimeEmail). This map is designed to
-         * be accessed by the mail function in order to complete it, if necessary. The toRaw() method might as well
-         * include other headers.
-         *
-         * The email function is not obliged to (and should not) do any escaping in the headers. The application
-         * creating the email is responsible for ensuring their validity.
-         */
-        std::unordered_map<std::string, std::string> headers;
-
-        /**
-         * This method shall generate the raw source of the email (including headers).
-         * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
-         * @return Raw source of the email.
-         */
-        virtual std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const = 0;
-    };
-
-    /**
-     * Structure representing a basic email (just headers and payload, excluding the envelope). Please remember to
-     * also set the headers in the headers map of the base class Email.
-     */
-    struct SimpleEmail : public Email {
-        /**
-         * The text part of the email.
-         */
-        std::string text;
-
-        /**
-         * Whether to apply quoted-printable encoding to the content of the email (recommended). This will also take
-         * care of the line lengths and set the header Content-Transfer-Encoding.
-         */
-        bool quotedPrintableEncode = true;
-
-        /**
-         * Get the raw source of the email.
-         * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
-         * @return Raw source of the email.
-         */
-        std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const override;
-    };
-
     /**
      * Structure representing a MIME email (headers and MIME parts, excluding the envelope).
      */
@@ -279,7 +174,6 @@ namespace nawa {
          */
         std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const override;
     };
-
 }
 
-#endif //NAWA_EMAIL_H
+#endif //NAWA_MIMEEMAIL_H

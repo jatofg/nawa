@@ -24,37 +24,13 @@
 #ifndef NAWA_SESSION_H
 #define NAWA_SESSION_H
 
-#include <utility>
-#include <vector>
-#include <mutex>
-#include <unordered_map>
 #include <any>
 #include <memory>
 #include <nawa/connection/Cookie.h>
+#include <nawa/session/SessionData.h>
 
 namespace nawa {
     class Connection;
-
-    /**
-     * SessionData objects contain all data of one session.
-     */
-    struct SessionData {
-        std::mutex dLock; /**< Lock for data. */
-        std::mutex eLock; /**< Lock for expires.  */
-        std::unordered_map<std::string, std::any> data; /**< Map containing all values of this session. */
-        time_t expires; /**< Time when this session expires. */
-        const std::string sourceIP; /**< IP address of the session initiator, for optional IP checking. */
-        /**
-         * Construct an empty SessionData object without a source IP.
-         */
-        SessionData() : expires(0) {}
-
-        /**
-         * Construct an empty SessionData object with a source IP.
-         * @param sIP IP address of the session initiator.
-         */
-        explicit SessionData(std::string sIP) : expires(0), sourceIP(std::move(sIP)) {}
-    };
 
     /**
      * Class for managing sessions and getting and setting connection-independent session data.

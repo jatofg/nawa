@@ -27,8 +27,8 @@
 #define NAWA_VERSION_MAJOR @NAWA_VERSION_MAJOR@
 #define NAWA_VERSION_MINOR @NAWA_VERSION_MINOR@
 
-#include <nawa/connection/Connection.h>
 #include <nawa/AppInit.h>
+#include <nawa/connection/Connection.h>
 
 extern "C" const int nawa_version_major = NAWA_VERSION_MAJOR;
 extern "C" const int nawa_version_minor = NAWA_VERSION_MINOR;

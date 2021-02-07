@@ -72,54 +72,65 @@ endif ()
 set(NETLIB_LIBRARIES cppnetlib-client-connections cppnetlib-server-parsers cppnetlib-uri)
 
 set(NAWA_FILES
-        include/nawa/request/Request.h
-        include/nawa/connection/Connection.h
-        include/nawa/util/Encoding.h
-        include/nawa/util/Utils.h
-        include/nawa/session/Session.h
-        include/nawa/config/Config.h
-        include/nawa/util/Crypto.h
-        include/nawa/Exception.h
-        include/nawa/connection/Cookie.h
-        include/nawa/logging/Log.h
-        include/nawa/filter/AccessFilterList.h
         include/nawa/AppInit.h
-        include/nawa/email/SmtpMailer.h
-        include/nawa/email/Email.h
-        include/nawa/request/File.h
-        include/nawa/util/MimeMultipart.h
-        include/nawa/hashing/HashingEngine/HashingEngine.h
-
-        include/nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h
-        include/nawa/hashing/HashTypeTable/HashTypeTable.h
-        include/nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h
+        include/nawa/Exception.h
+        include/nawa/RequestHandler/HandleRequestFunction.h
         include/nawa/RequestHandler/RequestHandler.h
         include/nawa/RequestHandler/impl/FastcgiRequestHandler.h
         include/nawa/RequestHandler/impl/HttpRequestHandler.h
+        include/nawa/config/Config.h
+        include/nawa/connection/Connection.h
+        include/nawa/connection/ConnectionInitContainer.h
+        include/nawa/connection/Cookie.h
+        include/nawa/connection/FlushCallbackContainer.h
+        include/nawa/filter/AccessFilter/impl/AuthFilter.h
+        include/nawa/filter/AccessFilter/impl/BlockFilter.h
+        include/nawa/filter/AccessFilter/impl/ForwardFilter.h
+        include/nawa/filter/AccessFilter/AccessFilter.h
+        include/nawa/filter/AccessFilterList.h
+        include/nawa/hashing/HashTypeTable/HashTypeTable.h
+        include/nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h
+        include/nawa/hashing/HashingEngine/HashingEngine.h
+        include/nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h
+        include/nawa/logging/Log.h
+        include/nawa/mail/Email/impl/MimeEmail.h
+        include/nawa/mail/Email/impl/SimpleEmail.h
+        include/nawa/mail/Email/Email.h
+        include/nawa/mail/EmailAddress.h
+        include/nawa/mail/SmtpMailer.h
+        include/nawa/request/File.h
+        include/nawa/request/Request.h
+        include/nawa/request/RequestInitContainer.h
+        include/nawa/session/Session.h
+        include/nawa/session/SessionData.h
+        include/nawa/util/Crypto.h
+        include/nawa/util/Encoding.h
+        include/nawa/util/MimeMultipart.h
+        include/nawa/util/Utils.h
 
-        src/request/Request.cpp
-        src/connection/Connection.cpp
-        src/util/Encoding.cpp
-        src/util/Utils.cpp
-        src/session/Session.cpp
-        src/config/Config.cpp
-        src/util/Crypto.cpp
-        src/logging/Log.cpp
-        src/email/Email.cpp
-        src/email/SmtpMailer.cpp
-        src/util/MimeMultipart.cpp
-
-        src/hashing/HashingEngine/impl/BcryptHashingEngine.cpp
+        libs/base64/base64.cpp
+        libs/base64/base64.h
+        libs/inih/ini.c
+        libs/inih/ini.h
 
         src/RequestHandler/RequestHandler.cpp
         src/RequestHandler/impl/FastcgiRequestHandler.cpp
         src/RequestHandler/impl/HttpRequestHandler.cpp
-
-        libs/inih/ini.h
-        libs/inih/ini.c
-
-        libs/base64/base64.h
-        libs/base64/base64.cpp)
+        src/config/Config.cpp
+        src/connection/Connection.cpp
+        src/hashing/HashingEngine/impl/BcryptHashingEngine.cpp
+        src/logging/Log.cpp
+        src/mail/Email/impl/MimeEmail.cpp
+        src/mail/Email/impl/SimpleEmail.cpp
+        src/mail/EmailAddress.cpp
+        src/mail/SmtpMailer.cpp
+        src/request/Request.cpp
+        src/session/Session.cpp
+        src/util/Crypto.cpp
+        src/util/Encoding.cpp
+        src/util/MimeMultipart.cpp
+        src/util/Utils.cpp
+        )
 
 set(NAWA_LINK_LIBRARIES
         -ldl

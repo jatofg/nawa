@@ -21,14 +21,14 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/connection/Connection.h>
-#include <nawa/util/Utils.h>
-#include <nawa/session/Session.h>
-#include <nawa/util/Encoding.h>
 #include <nawa/Exception.h>
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/RequestHandler/impl/FastcgiRequestHandler.h>
 #include <nawa/RequestHandler/impl/HttpRequestHandler.h>
+#include <nawa/connection/Connection.h>
+#include <nawa/session/Session.h>
+#include <nawa/util/Encoding.h>
+#include <nawa/util/Utils.h>
 
 using namespace nawa;
 using namespace std;
@@ -302,8 +302,8 @@ void RequestHandler::handleRequest(Connection &connection) {
 }
 
 std::unique_ptr<RequestHandler>
-RequestHandler::newRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction, Config config,
-                                  int concurrency) {
+RequestHandler::newRequestHandler(const std::shared_ptr<HandleRequestFunctionWrapper> &handleRequestFunction,
+                                  Config config, int concurrency) {
     if (config[{"system", "request_handler"}] == "http") {
         return make_unique<HttpRequestHandler>(handleRequestFunction, move(config), concurrency);
     }

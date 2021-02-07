@@ -24,41 +24,12 @@
 #ifndef NAWA_NAWAREQUEST_H
 #define NAWA_NAWAREQUEST_H
 
-#include <string>
 #include <nawa/config/Config.h>
 #include <nawa/request/File.h>
+#include <nawa/request/RequestInitContainer.h>
+#include <string>
 
 namespace nawa {
-    /**
-     * Internal container filled by the RequestHandler with prerequisites for creating Connection and Request objects.
-     */
-    struct RequestInitContainer {
-        /**
-         * Environment variables, see \ref environmentmanual
-         */
-        std::unordered_map<std::string, std::string> environment;
-        /**
-         * Vector containing languages accepted by the browser.
-         */
-        std::vector<std::string> acceptLanguages;
-        std::unordered_multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
-        /**
-         * The HTTP POST vars, only if it is in standard format (content type `multipart/form-data` or
-         * `application/x-www-form-urlencoded`). Files are excluded and handled separately by fileVectorCallback.
-         */
-        std::unordered_multimap<std::string, std::string> postVars;
-        std::unordered_multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
-        std::string postContentType; /**< The HTTP POST content type. */
-        std::unordered_multimap<std::string, File> postFiles; /**< Files submitted via POST. */
-        /**
-         * A shared_ptr to a string which contains the raw POST data. Raw data does not have to be available
-         * if the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
-         * POST content type is neither `multipart/form-data` nor `application/x-www-form-urlencoded`. In this case,
-         * the shared_ptr should not contain an object.
-         */
-        std::shared_ptr<std::string> rawPost;
-    };
-
     /**
      * Represents request objects.
      */

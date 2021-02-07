@@ -1,6 +1,6 @@
 /**
- * \file BcryptOnlyHashTypeTable.cpp
- * \brief Implementation of the DefaultHashTypeTable class without Argon2.
+ * \file BlockFilter.h
+ * \brief Structure defining a request blocking filter.
  */
 
 /*
@@ -21,16 +21,21 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h>
-#include <nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h>
+#ifndef NAWA_BLOCKFILTER_H
+#define NAWA_BLOCKFILTER_H
 
-using namespace nawa;
-using namespace std;
+#include <nawa/filter/AccessFilter/AccessFilter.h>
 
-shared_ptr<Engines::HashingEngine> Engines::DefaultHashTypeTable::getEngine(string hash) const {
-    auto hid = hash.substr(0, 4);
-    if (hid == "$2a$" || hid == "$2b$" || hid == "$2x$" || hid == "$2y$") {
-        return shared_ptr<Engines::HashingEngine>(new Engines::BcryptHashingEngine());
-    }
-    return shared_ptr<Engines::HashingEngine>();
+namespace nawa {
+    /**
+     * Defines a request blocking filter.
+     */
+    struct BlockFilter : public AccessFilter {
+        /**
+         * The HTTP status that will be sent to the client if the request is blocked.
+         */
+        unsigned int status = 404;
+    };
 }
+
+#endif //NAWA_BLOCKFILTER_H

@@ -24,8 +24,9 @@
 #ifndef NAWA_SMTPMAILER_H
 #define NAWA_SMTPMAILER_H
 
+#include <nawa/mail/EmailAddress.h>
+#include <nawa/mail/Email/Email.h>
 #include <string>
-#include <nawa/email/Email.h>
 
 namespace nawa {
     class SmtpMailer {

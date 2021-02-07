@@ -21,10 +21,10 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/Application.h>
 #include <iostream>
-#include <nawa/util/Encoding.h>
+#include <nawa/Application.h>
 #include <nawa/session/Session.h>
+#include <nawa/util/Encoding.h>
 
 using namespace nawa;
 using namespace std;

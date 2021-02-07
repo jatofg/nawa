@@ -24,6 +24,7 @@
 #ifndef NAWA_APPINIT_H
 #define NAWA_APPINIT_H
 
+#include <nawa/config/Config.h>
 #include <nawa/filter/AccessFilterList.h>
 
 namespace nawa {

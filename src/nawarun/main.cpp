@@ -26,10 +26,10 @@
 #include <dlfcn.h>
 #include <grp.h>
 #include <nawa/Application.h>
-#include <nawa/config/Config.h>
 #include <nawa/Exception.h>
-#include <nawa/logging/Log.h>
 #include <nawa/RequestHandler/RequestHandler.h>
+#include <nawa/config/Config.h>
+#include <nawa/logging/Log.h>
 #include <pwd.h>
 #include <stdexcept>
 #include <thread>

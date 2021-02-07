@@ -24,49 +24,16 @@
 #ifndef NAWA_RESPONSE_H
 #define NAWA_RESPONSE_H
 
-#include <string>
-#include <unordered_map>
-#include <sstream>
+#include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/connection/Cookie.h>
+#include <nawa/connection/FlushCallbackContainer.h>
 #include <nawa/request/Request.h>
 #include <nawa/session/Session.h>
+#include <sstream>
+#include <string>
+#include <unordered_map>
 
 namespace nawa {
-
-    /**
-     * Container passed to the FlushCallbackFunction.
-     */
-    struct FlushCallbackContainer {
-        unsigned int status; /**< The HTTP response status as an unsigned integer. */
-        std::unordered_multimap<std::string, std::string> headers; /**< The multimap of response headers. */
-        std::string body; /**< The response body. */
-        bool flushedBefore; /**< True if the response has been flushed before, false otherwise. */
-
-        /**
-         * Get a textual representation of the HTTP status (such as "200 OK").
-         * @return Textual representation of the HTTP status.
-         */
-        std::string getStatusString() const;
-
-        /**
-         * Generate a full raw HTTP source, including headers when flushing for the first time
-         * (but without HTTP status).
-         * @return The HTTP source.
-         */
-        std::string getFullHttp() const;
-    };
-
-    using FlushCallbackFunction = std::function<void(FlushCallbackContainer)>;
-
-    struct ConnectionInitContainer {
-        /**
-         * Callback function which takes a `nawa::FlushCallbackContainer` and flushes the response to the user.
-         */
-        FlushCallbackFunction flushCallback;
-        Config config; /**< The NAWA config. */
-        RequestInitContainer requestInit; /**< The RequestInitContainer containing necessary request data. */
-    };
-
     /**
      * Response object to be passed back to NAWA and accessor to the request.
      */

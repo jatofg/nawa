@@ -22,10 +22,10 @@
  */
 
 #include <catch2/catch.hpp>
-#include <nawa/util/Encoding.h>
+#include <nawa/hashing/HashingEngine/impl/Argon2HashingEngine.h>
 #include <nawa/util/Crypto.h>
+#include <nawa/util/Encoding.h>
 #include <sstream>
-#include <nawa/Engines/Argon2HashingEngine.h>
 
 using namespace nawa;
 using namespace std;

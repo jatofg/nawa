@@ -21,9 +21,9 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/config/Config.h>
-#include <nawa/Exception.h>
 #include "../../libs/inih/ini.h"
+#include <nawa/Exception.h>
+#include <nawa/config/Config.h>
 
 using namespace nawa;
 using namespace std;

@@ -24,8 +24,8 @@
 #ifndef NAWA_EXCEPTION_H
 #define NAWA_EXCEPTION_H
 
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace nawa {
 

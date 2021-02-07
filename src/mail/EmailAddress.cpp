@@ -1,6 +1,6 @@
 /**
- * \file BcryptOnlyHashTypeTable.cpp
- * \brief Implementation of the DefaultHashTypeTable class without Argon2.
+ * \file EmailAddress.cpp.c
+ * \brief EmailAddress.cpp.c
  */
 
 /*
@@ -21,16 +21,23 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h>
-#include <nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h>
+#include <nawa/mail/EmailAddress.h>
+#include <sstream>
+#include <regex>
 
 using namespace nawa;
 using namespace std;
 
-shared_ptr<Engines::HashingEngine> Engines::DefaultHashTypeTable::getEngine(string hash) const {
-    auto hid = hash.substr(0, 4);
-    if (hid == "$2a$" || hid == "$2b$" || hid == "$2x$" || hid == "$2y$") {
-        return shared_ptr<Engines::HashingEngine>(new Engines::BcryptHashingEngine());
+string EmailAddress::get(bool includeName) const {
+    stringstream ret;
+    if (includeName) {
+        ret << name << " ";
     }
-    return shared_ptr<Engines::HashingEngine>();
+    ret << '<' << address << '>';
+    return ret.str();
+}
+
+bool EmailAddress::isValid() const {
+    regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", regex::icase);
+    return regex_match(address, emCheck);
 }

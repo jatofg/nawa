@@ -21,10 +21,10 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/Engines/BcryptHashingEngine.h>
-#include <nawa/Exception.h>
-#include <cstring>
 #include "../../../../libs/libbcrypt/bcrypt.h"
+#include <cstring>
+#include <nawa/Exception.h>
+#include <nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h>
 
 using namespace nawa;
 using namespace std;

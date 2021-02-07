@@ -24,8 +24,8 @@
 #ifndef NAWA_COOKIE_H
 #define NAWA_COOKIE_H
 
-#include <string>
 #include <ctime>
+#include <string>
 
 namespace nawa {
     /**

@@ -22,8 +22,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <random>
 #include <nawa/Application.h>
+#include <random>
 
 using namespace nawa;
 using namespace std;

@@ -1,6 +1,6 @@
 /**
- * \file Email.cpp
- * \brief Implementation of methods in email-related structs in the Nawa::Types namespace.
+ * \file MimeEmail.cpp.c
+ * \brief MimeEmail.cpp.c
  */
 
 /*
@@ -21,13 +21,12 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/email/Email.h>
+#include <nawa/mail/Email/impl/MimeEmail.h>
 #include <nawa/util/Crypto.h>
-#include <sstream>
-#include <regex>
-#include <random>
 #include <nawa/util/Encoding.h>
 #include <nawa/util/Utils.h>
+#include <random>
+#include <sstream>
 
 using namespace nawa;
 using namespace std;
@@ -74,7 +73,7 @@ namespace {
      * @return Tuple containing the boundary string (for inclusion in the header) and the MIME parts as a string.
      */
     string mergeMimePartList(const MimeEmail::MimePartList &mimePartList, const string &boundary,
-                                  const shared_ptr<ReplacementRules> &replacementRules) {
+                             const shared_ptr<ReplacementRules> &replacementRules) {
         stringstream ret;
 
         // iterate through the list
@@ -128,42 +127,6 @@ namespace {
         ret << "--" << boundary << "--";
         return ret.str();
     }
-}
-
-string EmailAddress::get(bool includeName) const {
-    stringstream ret;
-    if (includeName) {
-        ret << name << " ";
-    }
-    ret << '<' << address << '>';
-    return ret.str();
-}
-
-bool EmailAddress::isValid() const {
-    regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", regex::icase);
-    return regex_match(address, emCheck);
-}
-
-string SimpleEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules) const {
-    stringstream ret;
-
-    for (auto const &e: headers) {
-        if (e.first == "MIME-Version" || (quotedPrintableEncode && e.first == "Content-Transfer-Encoding"))
-            continue;
-        ret << e.first << ": " << e.second << "\r\n";
-    }
-
-    ret << "MIME-Version: 1.0\r\n";
-    if (quotedPrintableEncode) {
-        ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-        ret << Encoding::quotedPrintableEncode(
-                replacementRules ? string_replace(text, *replacementRules) : text
-        );
-    } else {
-        ret << "\r\n" << (replacementRules ? string_replace(text, *replacementRules) : text);
-    }
-
-    return ret.str();
 }
 
 MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePartOrList &other) {

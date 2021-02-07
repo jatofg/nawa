@@ -24,9 +24,9 @@
 #ifndef NAWA_CONFIG_H
 #define NAWA_CONFIG_H
 
+#include <boost/functional/hash.hpp>
 #include <unordered_map>
 #include <utility>
-#include <boost/functional/hash.hpp>
 
 namespace nawa {
     /**
