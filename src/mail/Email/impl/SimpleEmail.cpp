@@ -1,6 +1,6 @@
 /**
- * \file SimpleEmail.cpp.c
- * \brief SimpleEmail.cpp.c
+ * \file SimpleEmail.cpp
+ * \brief Implementation of the SimpleEmail class.
  */
 
 /*

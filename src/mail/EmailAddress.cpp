@@ -1,6 +1,6 @@
 /**
- * \file EmailAddress.cpp.c
- * \brief EmailAddress.cpp.c
+ * \file EmailAddress.cpp
+ * \brief Implementation of the EmailAddress class.
  */
 
 /*

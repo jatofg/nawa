@@ -1,6 +1,6 @@
 /**
- * \file MimeEmail.cpp.c
- * \brief MimeEmail.cpp.c
+ * \file MimeEmail.cpp
+ * \brief Implementation of the MimeEmail class.
  */
 
 /*
