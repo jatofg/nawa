@@ -23,10 +23,10 @@
 
 #include <boost/network/protocol/http/client.hpp>
 #include <catch2/catch.hpp>
-#include <nawa/Connection.h>
+#include <nawa/connection/Connection.h>
 #include <nawa/Exception.h>
-#include <nawa/Utils.h>
-#include <nawa/RequestHandlers/RequestHandler.h>
+#include <nawa/util/Utils.h>
+#include <nawa/RequestHandler/RequestHandler.h>
 
 using namespace nawa;
 using namespace std;

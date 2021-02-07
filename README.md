@@ -20,6 +20,9 @@ request handling. Reloading can be done via systemd or by sending a SIGHUP signa
 nawarun. If you are using NAWA as a library, take a look at 
 `nawa::RequestHandler::reconfigure()`.
 
+Please note that the project has been extensively restructured, therefore it might be 
+necessary to correct the includes of existing apps.
+
 ## Example
 
 The following example is the complete C++ source code of a NAWA app that 

@@ -22,9 +22,9 @@
  */
 
 #include <iostream>
-#include <nawa/RequestHandlers/RequestHandler.h>
+#include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/Exception.h>
-#include <nawa/Connection.h>
+#include <nawa/connection/Connection.h>
 
 using namespace nawa;
 using namespace std;

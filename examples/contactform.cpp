@@ -23,10 +23,10 @@
 
 #include <nawa/Application.h>
 #include <random>
-#include <nawa/SmtpMailer.h>
-#include <nawa/Encoding.h>
+#include <nawa/email/SmtpMailer.h>
+#include <nawa/util/Encoding.h>
 #include <nawa/Exception.h>
-#include <nawa/Log.h>
+#include <nawa/logging/Log.h>
 
 using namespace std;
 using namespace nawa;

@@ -22,7 +22,7 @@
  */
 
 #include <nawa/Application.h>
-#include <nawa/Encoding.h>
+#include <nawa/util/Encoding.h>
 
 using namespace nawa;
 using namespace std;

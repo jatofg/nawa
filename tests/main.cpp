@@ -24,7 +24,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <nawa/Config.h>
+#include <nawa/config/Config.h>
 #include <nawa/Exception.h>
 
 using namespace nawa;

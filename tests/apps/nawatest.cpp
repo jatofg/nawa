@@ -23,8 +23,8 @@
 
 #include <nawa/Application.h>
 #include <iostream>
-#include <nawa/Encoding.h>
-#include <nawa/Session.h>
+#include <nawa/util/Encoding.h>
+#include <nawa/session/Session.h>
 
 using namespace nawa;
 using namespace std;

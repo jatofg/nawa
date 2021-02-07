@@ -21,14 +21,14 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/Email.h>
-#include <nawa/Utils.h>
+#include <nawa/email/Email.h>
+#include <nawa/util/Utils.h>
 #include <ctime>
 #include <iomanip>
-#include <nawa/SmtpMailer.h>
+#include <nawa/email/SmtpMailer.h>
 #include <nawa/Application.h>
 #include <nawa/Exception.h>
-#include <nawa/Encoding.h>
+#include <nawa/util/Encoding.h>
 
 using namespace nawa;
 using namespace std;

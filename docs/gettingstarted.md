@@ -89,7 +89,7 @@ probably be created automatically by your IDE.
 
 For the start, you just need to include a single header file:
 
-```{.cpp}
+```cpp
 #include <nawa/Application.h>
 ```
 
@@ -116,7 +116,7 @@ thread-safe data structures :)
 As we just want to create a simple, first example app, we'll ignore this 
 function for now and just let this function return 0:
 
-```{.cpp}
+```cpp
 int init(nawa::AppInit &appInit) {
     return 0;
 }
@@ -133,7 +133,7 @@ We'll deal later with the powerful `Connection` object, as for now,
 our goal is just to send a simple, but effective "Hello World!" to 
 the browser. Let's go:
 
-```{.cpp}
+```cpp
 int handleRequest(nawa::Connection &connection) {
     connection.response << "Hello World!";
     return 0;

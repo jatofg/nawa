@@ -22,8 +22,8 @@
  */
 
 #include <catch2/catch.hpp>
-#include <nawa/Encoding.h>
-#include <nawa/Crypto.h>
+#include <nawa/util/Encoding.h>
+#include <nawa/util/Crypto.h>
 #include <sstream>
 #include <nawa/Engines/Argon2HashingEngine.h>
 

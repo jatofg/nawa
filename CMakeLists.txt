@@ -72,48 +72,48 @@ endif ()
 set(NETLIB_LIBRARIES cppnetlib-client-connections cppnetlib-server-parsers cppnetlib-uri)
 
 set(NAWA_FILES
-        include/nawa/Request.h
-        include/nawa/Connection.h
-        include/nawa/Encoding.h
-        include/nawa/Utils.h
-        include/nawa/Session.h
-        include/nawa/Config.h
-        include/nawa/Crypto.h
+        include/nawa/request/Request.h
+        include/nawa/connection/Connection.h
+        include/nawa/util/Encoding.h
+        include/nawa/util/Utils.h
+        include/nawa/session/Session.h
+        include/nawa/config/Config.h
+        include/nawa/util/Crypto.h
         include/nawa/Exception.h
-        include/nawa/Cookie.h
-        include/nawa/Log.h
-        include/nawa/AccessFilterList.h
+        include/nawa/connection/Cookie.h
+        include/nawa/logging/Log.h
+        include/nawa/filter/AccessFilterList.h
         include/nawa/AppInit.h
-        include/nawa/SmtpMailer.h
-        include/nawa/Email.h
-        include/nawa/File.h
-        include/nawa/MimeMultipart.h
-        include/nawa/Engines/HashingEngine.h
+        include/nawa/email/SmtpMailer.h
+        include/nawa/email/Email.h
+        include/nawa/request/File.h
+        include/nawa/util/MimeMultipart.h
+        include/nawa/hashing/HashingEngine/HashingEngine.h
 
-        include/nawa/Engines/BcryptHashingEngine.h
-        include/nawa/Engines/HashTypeTable.h
-        include/nawa/Engines/DefaultHashTypeTable.h
-        include/nawa/RequestHandlers/RequestHandler.h
-        include/nawa/RequestHandlers/FastcgiRequestHandler.h
-        include/nawa/RequestHandlers/HttpRequestHandler.h
+        include/nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h
+        include/nawa/hashing/HashTypeTable/HashTypeTable.h
+        include/nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h
+        include/nawa/RequestHandler/RequestHandler.h
+        include/nawa/RequestHandler/impl/FastcgiRequestHandler.h
+        include/nawa/RequestHandler/impl/HttpRequestHandler.h
 
-        src/Request.cpp
-        src/Connection.cpp
-        src/Encoding.cpp
-        src/Utils.cpp
-        src/Session.cpp
-        src/Config.cpp
-        src/Crypto.cpp
-        src/Log.cpp
-        src/Email.cpp
-        src/SmtpMailer.cpp
-        src/MimeMultipart.cpp
+        src/request/Request.cpp
+        src/connection/Connection.cpp
+        src/util/Encoding.cpp
+        src/util/Utils.cpp
+        src/session/Session.cpp
+        src/config/Config.cpp
+        src/util/Crypto.cpp
+        src/logging/Log.cpp
+        src/email/Email.cpp
+        src/email/SmtpMailer.cpp
+        src/util/MimeMultipart.cpp
 
-        src/Engines/BcryptHashingEngine.cpp
+        src/hashing/HashingEngine/impl/BcryptHashingEngine.cpp
 
-        src/RequestHandlers/RequestHandler.cpp
-        src/RequestHandlers/FastcgiRequestHandler.cpp
-        src/RequestHandlers/HttpRequestHandler.cpp
+        src/RequestHandler/RequestHandler.cpp
+        src/RequestHandler/impl/FastcgiRequestHandler.cpp
+        src/RequestHandler/impl/HttpRequestHandler.cpp
 
         libs/inih/ini.h
         libs/inih/ini.c
@@ -132,17 +132,17 @@ set(NAWA_LINK_LIBRARIES
 
 if (EnableArgon2)
     set(NAWA_FILES ${NAWA_FILES}
-            include/nawa/Engines/Argon2HashingEngine.h
-            src/Engines/Argon2HashingEngine.cpp
-            src/Engines/DefaultHashTypeTable.cpp)
+            include/nawa/hashing/HashingEngine/impl/Argon2HashingEngine.h
+            src/hashing/HashingEngine/impl/Argon2HashingEngine.cpp
+            src/hashing/HashTypeTable/impl/DefaultHashTypeTable.cpp)
     set(NAWA_LINK_LIBRARIES ${NAWA_LINK_LIBRARIES}
             -largon2)
 else ()
     set(NAWA_FILES ${NAWA_FILES}
-            src/Engines/BcryptOnlyHashTypeTable.cpp)
+            src/hashing/HashTypeTable/impl/BcryptOnlyHashTypeTable.cpp)
 endif ()
 
-add_executable(nawarun src/main.cpp ${NAWA_FILES})
+add_executable(nawarun src/nawarun/main.cpp ${NAWA_FILES})
 
 target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
 target_include_directories(nawarun PUBLIC

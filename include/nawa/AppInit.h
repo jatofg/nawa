@@ -24,7 +24,7 @@
 #ifndef NAWA_APPINIT_H
 #define NAWA_APPINIT_H
 
-#include <nawa/AccessFilterList.h>
+#include <nawa/filter/AccessFilterList.h>
 
 namespace nawa {
     struct AppInit {
