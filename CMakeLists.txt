@@ -98,7 +98,10 @@ set(NAWA_FILES
         include/nawa/mail/Email/Email.h
         include/nawa/mail/EmailAddress.h
         include/nawa/mail/SmtpMailer.h
+        include/nawa/request/Env.h
         include/nawa/request/File.h
+        include/nawa/request/GPC/ext/Post.h
+        include/nawa/request/GPC/GPC.h
         include/nawa/request/Request.h
         include/nawa/request/RequestInitContainer.h
         include/nawa/session/Session.h
@@ -124,6 +127,9 @@ set(NAWA_FILES
         src/mail/Email/impl/SimpleEmail.cpp
         src/mail/EmailAddress.cpp
         src/mail/SmtpMailer.cpp
+        src/request/Env.cpp
+        src/request/GPC/ext/Post.cpp
+        src/request/GPC/GPC.cpp
         src/request/Request.cpp
         src/session/Session.cpp
         src/util/Crypto.cpp

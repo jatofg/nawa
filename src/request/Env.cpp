@@ -1,6 +1,6 @@
 /**
- * \file Request.cpp
- * \brief Implementation of the Request class.
+ * \file Env.cpp
+ * \brief Implementation of the request::Env class.
  */
 
 /*
@@ -21,11 +21,26 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/request/Request.h>
+#include <nawa/request/Env.h>
+#include <nawa/util/Utils.h>
 
 using namespace nawa;
 using namespace std;
 
-Request::Request(const RequestInitContainer &initContainer)
-        : env(initContainer), get(initContainer, request::GPC::Source::GET), post(initContainer),
-          cookie(initContainer, request::GPC::Source::COOKIE) {}
+string request::Env::operator[](const string &envVar) const {
+    if (environment.count(envVar)) {
+        return environment.at(envVar);
+    }
+    return string();
+}
+
+vector<string> request::Env::getAcceptLanguages() const {
+    return acceptLanguages;
+}
+
+vector<string> request::Env::getRequestPath() const {
+    return split_path(operator[]("REQUEST_URI"));
+}
+
+request::Env::Env(const RequestInitContainer &initContainer) : environment(initContainer.environment),
+                                                               acceptLanguages(initContainer.acceptLanguages) {}
