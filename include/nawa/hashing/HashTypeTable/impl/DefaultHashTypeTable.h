@@ -24,7 +24,7 @@
 #ifndef NAWA_DEFAULTHASHTYPETABLE_H
 #define NAWA_DEFAULTHASHTYPETABLE_H
 
-#include <nawa/Engines/HashTypeTable.h>
+#include <nawa/hashing/HashTypeTable/HashTypeTable.h>
 
 namespace nawa::Engines {
 

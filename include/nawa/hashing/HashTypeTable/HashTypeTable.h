@@ -25,7 +25,7 @@
 #define NAWA_HASHTYPETABLE_H
 
 #include <memory>
-#include <nawa/Engines/HashingEngine.h>
+#include <nawa/hashing/HashingEngine/HashingEngine.h>
 
 namespace nawa::Engines {
 

@@ -24,7 +24,7 @@
 #ifndef NAWA_ARGON2HASHINGENGINE_H
 #define NAWA_ARGON2HASHINGENGINE_H
 
-#include <nawa/Engines/HashingEngine.h>
+#include <nawa/hashing/HashingEngine/HashingEngine.h>
 
 namespace nawa::Engines {
 

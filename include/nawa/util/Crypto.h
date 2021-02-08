@@ -24,10 +24,10 @@
 #ifndef NAWA_CRYPTO_H
 #define NAWA_CRYPTO_H
 
-#include <nawa/Engines/BcryptHashingEngine.h>
-#include <nawa/Engines/DefaultHashTypeTable.h>
-#include <nawa/Engines/HashTypeTable.h>
-#include <nawa/Engines/HashingEngine.h>
+#include <nawa/hashing/HashTypeTable/HashTypeTable.h>
+#include <nawa/hashing/HashTypeTable/impl/DefaultHashTypeTable.h>
+#include <nawa/hashing/HashingEngine/HashingEngine.h>
+#include <nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h>
 #include <string>
 
 namespace nawa {

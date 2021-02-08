@@ -24,7 +24,7 @@
 #ifndef NAWA_BCRYPTHASHINGENGINE_H
 #define NAWA_BCRYPTHASHINGENGINE_H
 
-#include <nawa/Engines/HashingEngine.h>
+#include <nawa/hashing/HashingEngine/HashingEngine.h>
 
 namespace nawa::Engines {
 
