@@ -24,9 +24,9 @@
 #ifndef NAWA_ACCESSRULES_H
 #define NAWA_ACCESSRULES_H
 
-#include <nawa/filter/AccessFilter/impl/AuthFilter.h>
-#include <nawa/filter/AccessFilter/impl/BlockFilter.h>
-#include <nawa/filter/AccessFilter/impl/ForwardFilter.h>
+#include <nawa/filter/AccessFilter/ext/AuthFilter.h>
+#include <nawa/filter/AccessFilter/ext/BlockFilter.h>
+#include <nawa/filter/AccessFilter/ext/ForwardFilter.h>
 #include <vector>
 
 namespace nawa {
