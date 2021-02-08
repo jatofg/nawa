@@ -26,7 +26,6 @@
 
 #include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/connection/Cookie.h>
-#include <nawa/connection/FlushCallbackContainer.h>
 #include <nawa/request/Request.h>
 #include <nawa/session/Session.h>
 #include <sstream>
@@ -38,18 +37,12 @@ namespace nawa {
      * Response object to be passed back to NAWA and accessor to the request.
      */
     class Connection {
-        std::string bodyString;
-        unsigned int responseStatus = 200;
-        std::unordered_map<std::string, std::vector<std::string>> headers;
-        std::unordered_map<std::string, Cookie> cookies;
-        Cookie cookiePolicy;
-        bool isFlushed = false;
-        FlushCallbackFunction flushCallback;
+        struct Impl;
+        std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
 
         void clearStream();
 
         void mergeStream();
-
     public:
         nawa::Request request; /**< The Request object representing the current request. */
         nawa::Session session;
@@ -60,6 +53,8 @@ namespace nawa {
          */
         nawa::Config config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
+
+        virtual ~Connection();
 
         /**
          * Create a Connection object.

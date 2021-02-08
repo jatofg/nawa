@@ -21,7 +21,6 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
 #include <fstream>
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
@@ -96,8 +95,20 @@ namespace {
     };
 }
 
+struct Connection::Impl {
+    std::string bodyString;
+    unsigned int responseStatus = 200;
+    std::unordered_map<std::string, std::vector<std::string>> headers;
+    std::unordered_map<std::string, Cookie> cookies;
+    Cookie cookiePolicy;
+    bool isFlushed = false;
+    FlushCallbackFunction flushCallback;
+};
+
+Connection::~Connection() = default;
+
 void Connection::setBody(string content) {
-    bodyString = move(content);
+    impl->bodyString = move(content);
     clearStream();
 }
 
@@ -167,9 +178,9 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
-    bodyString.resize(static_cast<unsigned long>(fs) + 1, '\0');
-    bodyString[fs] = '\0';
-    f.read(&bodyString[0], fs);
+    impl->bodyString.resize(static_cast<unsigned long>(fs) + 1, '\0');
+    impl->bodyString[fs] = '\0';
+    f.read(&impl->bodyString[0], fs);
 
     // also clear the stream so that it doesn't mess with our file
     clearStream();
@@ -178,24 +189,24 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
 void Connection::setHeader(string key, string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    headers[key] = {move(value)};
+    impl->headers[key] = {move(value)};
 }
 
 void Connection::addHeader(string key, string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    headers[key].push_back(move(value));
+    impl->headers[key].push_back(move(value));
 }
 
 void Connection::unsetHeader(string key) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    headers.erase(key);
+    impl->headers.erase(key);
 }
 
 unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) const {
     unordered_multimap<string, string> ret;
-    for (auto const &[key, values]: headers) {
+    for (auto const &[key, values]: impl->headers) {
         for (auto const &value: values) {
             ret.insert({key, value});
         }
@@ -203,39 +214,40 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
 
     // include cookies if desired
     if (includeCookies)
-        for (auto const &e: cookies) {
+        for (auto const &e: impl->cookies) {
             stringstream headerVal;
             headerVal << e.first << "=" << e.second.content;
             // Domain option
-            const string &domain = (!e.second.domain.empty()) ? e.second.domain : cookiePolicy.domain;
+            const string &domain = (!e.second.domain.empty()) ? e.second.domain : impl->cookiePolicy.domain;
             if (!domain.empty()) {
                 headerVal << "; Domain=" << domain;
             }
             // Path option
-            const string &path = (!e.second.path.empty()) ? e.second.path : cookiePolicy.path;
+            const string &path = (!e.second.path.empty()) ? e.second.path : impl->cookiePolicy.path;
             if (!path.empty()) {
                 headerVal << "; Path=" << path;
             }
             // Expires option
-            time_t expiry = (e.second.expires > 0) ? e.second.expires : cookiePolicy.expires;
+            time_t expiry = (e.second.expires > 0) ? e.second.expires : impl->cookiePolicy.expires;
             if (expiry > 0) {
                 headerVal << "; Expires=" << make_http_time(expiry);
             }
             // Max-Age option
-            unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : cookiePolicy.maxAge;
+            unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : impl->cookiePolicy.maxAge;
             if (maxAge > 0) {
                 headerVal << "; Max-Age=" << maxAge;
             }
             // Secure option
-            if (e.second.secure || cookiePolicy.secure) {
+            if (e.second.secure || impl->cookiePolicy.secure) {
                 headerVal << "; Secure";
             }
             // HttpOnly option
-            if (e.second.httpOnly || cookiePolicy.httpOnly) {
+            if (e.second.httpOnly || impl->cookiePolicy.httpOnly) {
                 headerVal << "; HttpOnly";
             }
             // SameSite option
-            uint sameSite = (e.second.sameSite > cookiePolicy.sameSite) ? e.second.sameSite : cookiePolicy.sameSite;
+            uint sameSite = (e.second.sameSite > impl->cookiePolicy.sameSite) ? e.second.sameSite
+                                                                              : impl->cookiePolicy.sameSite;
             if (sameSite == 1) {
                 headerVal << "; SameSite=lax";
             } else if (sameSite > 1) {
@@ -249,11 +261,11 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
 
 string Connection::getBody() {
     mergeStream();
-    return bodyString;
+    return impl->bodyString;
 }
 
 void Connection::mergeStream() {
-    bodyString += response.str();
+    impl->bodyString += response.str();
     clearStream();
 }
 
@@ -263,11 +275,13 @@ void Connection::clearStream() {
 }
 
 Connection::Connection(const ConnectionInitContainer &connectionInit)
-        : flushCallback(connectionInit.flushCallback),
-          request(connectionInit.requestInit),
+        : request(connectionInit.requestInit),
           config(connectionInit.config),
           session(*this) {
-    headers["content-type"] = {"text/html; charset=utf-8"};
+    impl = make_unique<Impl>();
+    impl->flushCallback = connectionInit.flushCallback;
+
+    impl->headers["content-type"] = {"text/html; charset=utf-8"};
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
     if (config[{"session", "autostart"}] == "on") {
@@ -282,7 +296,7 @@ void Connection::setCookie(const string &key, Cookie cookie) {
     if (!regex_match(key, matchKey) || !regex_match(cookie.content, matchContent)) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
-    cookies[key] = move(cookie);
+    impl->cookies[key] = move(cookie);
 }
 
 void Connection::setCookie(const string &key, string cookieContent) {
@@ -290,29 +304,29 @@ void Connection::setCookie(const string &key, string cookieContent) {
 }
 
 void Connection::unsetCookie(const string &key) {
-    cookies.erase(key);
+    impl->cookies.erase(key);
 }
 
 void Connection::flushResponse() {
     // use callback to flush response
-    flushCallback(FlushCallbackContainer{.status=responseStatus, .headers=getHeaders(true),
-            .body=getBody(), .flushedBefore=isFlushed});
+    impl->flushCallback(FlushCallbackContainer{.status=impl->responseStatus, .headers=getHeaders(true),
+            .body=getBody(), .flushedBefore=impl->isFlushed});
     // response has been flushed now
-    isFlushed = true;
+    impl->isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
     setBody("");
 }
 
 void Connection::setStatus(unsigned int status) {
-    responseStatus = status;
+    impl->responseStatus = status;
 }
 
 void Connection::setCookiePolicy(Cookie policy) {
-    cookiePolicy = move(policy);
+    impl->cookiePolicy = move(policy);
 }
 
 unsigned int Connection::getStatus() const {
-    return responseStatus;
+    return impl->responseStatus;
 }
 
 std::string FlushCallbackContainer::getStatusString() const {
