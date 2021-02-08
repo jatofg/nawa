@@ -22,25 +22,33 @@
  */
 
 #include "../../libs/inih/ini.h"
+#include <boost/functional/hash.hpp>
 #include <nawa/Exception.h>
 #include <nawa/config/Config.h>
+#include <nawa/internal/macros.h>
+#include <unordered_map>
 
 using namespace nawa;
 using namespace std;
 
-Config::Config(const string &iniFile) {
+// implementation
+struct Config::Impl {
+    std::unordered_map<std::pair<std::string, std::string>, std::string, boost::hash<std::pair<std::string, std::string>>> values;
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL(Config)
+NAWA_COPY_CONSTRUCTOR_IMPL(Config)
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Config)
+NAWA_MOVE_CONSTRUCTOR_IMPL(Config)
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Config)
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(Config)
+
+Config::Config(initializer_list<pair<pair<string, string>, string>> init) : Config() {
+    impl->values.insert(init.begin(), init.end());
+}
+
+Config::Config(const string &iniFile) : Config() {
     read(iniFile);
-}
-
-Config::Config(initializer_list<pair<pair<string, string>, string>> init) {
-    values.insert(init.begin(), init.end());
-}
-
-Config &Config::operator=(const Config &other) {
-    if (this != &other) {
-        values = other.values;
-    }
-    return *this;
 }
 
 void Config::read(const string &iniFile) {
@@ -48,7 +56,7 @@ void Config::read(const string &iniFile) {
         auto _this = (Config *) obj;
         pair<string, string> keyToInsert(section, name);
         pair<pair<string, string>, string> pairToInsert(keyToInsert, value);
-        _this->values.insert(pairToInsert);
+        _this->impl->values.insert(pairToInsert);
         return 1;
     };
     if (ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
@@ -57,16 +65,16 @@ void Config::read(const string &iniFile) {
 }
 
 void Config::insert(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init) {
-    values.insert(init.begin(), init.end());
+    impl->values.insert(init.begin(), init.end());
 }
 
 bool Config::isSet(const pair<string, string> &key) const {
-    return (values.count(key) == 1);
+    return (impl->values.count(key) == 1);
 }
 
 string Config::operator[](const pair<string, string> &key) const {
-    if (values.count(key) == 1) {
-        return values.at(key);
+    if (impl->values.count(key) == 1) {
+        return impl->values.at(key);
     } else {
         return string();
     }
@@ -74,22 +82,9 @@ string Config::operator[](const pair<string, string> &key) const {
 
 // doxygen bug requires std:: here
 void Config::set(std::pair<string, string> key, std::string value) {
-    values[move(key)] = move(value);
+    impl->values[move(key)] = move(value);
 }
 
 void Config::set(string section, string key, string value) {
     set(pair<string, string>(move(section), move(key)), move(value));
-}
-
-Config::Config(const Config &other) {
-    values = other.values;
-}
-
-Config::Config(Config &&other) noexcept: values(move(other.values)) {}
-
-Config &Config::operator=(Config &&other) noexcept {
-    if (this != &other) {
-        values = move(other.values);
-    }
-    return *this;
 }

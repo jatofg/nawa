@@ -24,6 +24,7 @@
 #ifndef NAWA_FLUSHCALLBACKCONTAINER_H
 #define NAWA_FLUSHCALLBACKCONTAINER_H
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 

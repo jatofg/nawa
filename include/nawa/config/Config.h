@@ -24,21 +24,23 @@
 #ifndef NAWA_CONFIG_H
 #define NAWA_CONFIG_H
 
-#include <boost/functional/hash.hpp>
-#include <unordered_map>
-#include <utility>
+#include <experimental/propagate_const>
+#include <memory>
 
 namespace nawa {
     /**
      * Reader for config files and accessor to config values.
      */
     class Config {
-        std::unordered_map<std::pair<std::string, std::string>, std::string, boost::hash<std::pair<std::string, std::string>>> values;
+        struct Impl;
+        std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
     public:
+        virtual ~Config();
+
         /**
          * Construct empty Config container.
          */
-        Config() = default;
+        Config();
 
         /**
          * Construct Config container and directly parse an ini file. Throws an Exception on failure.
@@ -79,11 +81,6 @@ namespace nawa {
         Config &operator=(Config &&other) noexcept;
 
         /**
-         * Default destructor.
-         */
-        virtual ~Config() = default;
-
-        /**
          * Read an ini file and add the values to the Config container. If a key is already set, the element will be
          * ignored, not overwritten. Throws a SysException on failure.
          * @param iniFile ini file to parse and import values from.
@@ -102,7 +99,7 @@ namespace nawa {
          * @param key Key (pair of section and name of the value) to check for.
          * @return True if the key exists, false if not.
          */
-        bool isSet(const std::pair<std::string, std::string> &key) const;
+        [[nodiscard]] bool isSet(const std::pair<std::string, std::string> &key) const;
 
         /**
          * Get the value belonging to the specified key from the Config container.

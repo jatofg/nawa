@@ -25,6 +25,7 @@
 #include <nawa/Application.h>
 #include <nawa/session/Session.h>
 #include <nawa/util/Encoding.h>
+#include <unistd.h>
 
 using namespace nawa;
 using namespace std;
