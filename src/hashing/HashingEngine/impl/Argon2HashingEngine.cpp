@@ -92,19 +92,19 @@ string hashing::Argon2HashingEngine::generateHash(string input) const {
     memset(c_hash, '\0', encodedHashCeil);
 
     switch (impl->algorithm) {
-        case ARGON2I:
+        case Algorithm::ARGON2I:
             errorCode = argon2i_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
                                              (void *) input.c_str(), input.length(),
                                              (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
                                              encodedHashCeil);
             break;
-        case ARGON2D:
+        case Algorithm::ARGON2D:
             errorCode = argon2d_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
                                              (void *) input.c_str(), input.length(),
                                              (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
                                              encodedHashCeil);
             break;
-        case ARGON2ID:
+        case Algorithm::ARGON2ID:
             errorCode = argon2id_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
                                               (void *) input.c_str(), input.length(),
                                               (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
@@ -136,9 +136,9 @@ bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
     string salt1;
     string hash1;
     if (matches.size() == 9) {
-        if (matches[1] == "d") algorithm1 = ARGON2D;
-        else if (matches[1] == "id") algorithm1 = ARGON2ID;
-        else algorithm1 = ARGON2I;
+        if (matches[1] == "d") algorithm1 = Algorithm::ARGON2D;
+        else if (matches[1] == "id") algorithm1 = Algorithm::ARGON2ID;
+        else algorithm1 = Algorithm::ARGON2I;
         try {
             version1 = stoul(matches[3]);
             memoryCost1 = stoul(matches[4]);

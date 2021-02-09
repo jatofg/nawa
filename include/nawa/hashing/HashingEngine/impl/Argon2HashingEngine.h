@@ -37,7 +37,7 @@ namespace nawa::hashing {
         /**
          * The Argon2 flavor to use.
          */
-        enum Algorithm {
+        enum class Algorithm {
             ARGON2I,
             ARGON2D,
             ARGON2ID
@@ -54,7 +54,7 @@ namespace nawa::hashing {
          * @param salt User-defined salt. Please leave this empty, a good salt will be generated automatically.
          * @param hashLen Desired hash lenght, 32 by default.
          */
-        explicit Argon2HashingEngine(Algorithm algorithm = ARGON2ID, uint32_t timeCost = 2,
+        explicit Argon2HashingEngine(Algorithm algorithm = Algorithm::ARGON2ID, uint32_t timeCost = 2,
                                      uint32_t memoryCost = (1 << 16), uint32_t parallelism = 1, std::string salt = "",
                                      size_t hashLen = 32);
 

@@ -42,7 +42,8 @@ namespace {
      */
     std::string genRandomUnicode(size_t len, unsigned int rseed) {
         const char cl[][50] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
-                               "s", "t", "u", "v", "w", "x", "y", "z", " ", "\t", "<", ">", "\"", "=", "ä", "ö", "ü", "ß",
+                               "s", "t", "u", "v", "w", "x", "y", "z", " ", "\t", "<", ">", "\"", "=", "ä", "ö", "ü",
+                               "ß",
                                "é", "ó", "ú", "𝔸", "@", "#", "$", "€", "?", "!", "/", "\\", "-", "~"};
         stringstream ret;
         default_random_engine dre(rseed);
@@ -116,17 +117,18 @@ TEST_CASE("nawa::Crypto functions", "[crypto]") {
 
     SECTION("argon2 password hashing") {
         auto hashedPw = Crypto::passwordHash(decoded,
-                                             hashing::Argon2HashingEngine(hashing::Argon2HashingEngine::ARGON2ID, 2, 1 << 16,
-                                                                          2, "", 40));
+                                             hashing::Argon2HashingEngine(
+                                                     hashing::Argon2HashingEngine::Algorithm::ARGON2ID, 2, 1 << 16,
+                                                     2, "", 40));
         auto hashedPw_i = Crypto::passwordHash(decoded,
-                                               hashing::Argon2HashingEngine(hashing::Argon2HashingEngine::ARGON2I));
+                                               hashing::Argon2HashingEngine(
+                                                       hashing::Argon2HashingEngine::Algorithm::ARGON2I));
         auto hashedPw_d = Crypto::passwordHash(decoded,
-                                               hashing::Argon2HashingEngine(hashing::Argon2HashingEngine::ARGON2D));
-        // auto startTime = chrono::steady_clock::now();
+                                               hashing::Argon2HashingEngine(
+                                                       hashing::Argon2HashingEngine::Algorithm::ARGON2D));
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw_i));
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw_d));
-        // auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
     }
 
 }
