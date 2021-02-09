@@ -92,6 +92,11 @@ namespace {
             {510, "Not Extended"},
             {511, "Network Authentication Required"}
     };
+
+    void clearStream(Connection *base) {
+        base->response.str(string());
+        base->response.clear();
+    }
 }
 
 struct Connection::Impl {
@@ -102,13 +107,18 @@ struct Connection::Impl {
     Cookie cookiePolicy;
     bool isFlushed = false;
     FlushCallbackFunction flushCallback;
+
+    void mergeStream(Connection *base) {
+        bodyString += base->response.str();
+        clearStream(base);
+    }
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Connection)
 
 void Connection::setBody(string content) {
     impl->bodyString = move(content);
-    clearStream();
+    clearStream(this);
 }
 
 void
@@ -182,7 +192,7 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     f.read(&impl->bodyString[0], fs);
 
     // also clear the stream so that it doesn't mess with our file
-    clearStream();
+    clearStream(this);
 }
 
 void Connection::setHeader(string key, string value) {
@@ -260,18 +270,8 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
 }
 
 string Connection::getBody() {
-    mergeStream();
+    impl->mergeStream(this);
     return impl->bodyString;
-}
-
-void Connection::mergeStream() {
-    impl->bodyString += response.str();
-    clearStream();
-}
-
-void Connection::clearStream() {
-    response.str(string());
-    response.clear();
 }
 
 Connection::Connection(const ConnectionInitContainer &connectionInit)

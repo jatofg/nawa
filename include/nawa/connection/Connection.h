@@ -40,10 +40,6 @@ namespace nawa {
     class Connection {
         NAWA_PRIVATE_IMPL_DEF()
 
-        void clearStream();
-
-        void mergeStream();
-
     public:
         nawa::Request request; /**< The Request object representing the current request. */
         nawa::Session session;
