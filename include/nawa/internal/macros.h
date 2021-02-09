@@ -42,8 +42,8 @@
 #define NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(const Namespace::Class &other) { impl = make_unique<Impl>(*other.impl); }
 
 #define NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Class) Class &operator=(const Class &other)
-#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(const Class &other) { if (this != &other) { impl = make_unique<Impl>(*other.impl); } return *this; }
-#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(const Namespace::Class &other) { if (this != &other) { impl = make_unique<Impl>(*other.impl); } return *this; }
+#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(const Class &other) { if (this != &other) { *impl = *other.impl; } return *this; }
+#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(const Namespace::Class &other) { if (this != &other) { *impl = *other.impl; } return *this; }
 
 #define NAWA_MOVE_CONSTRUCTOR_DEF(Class) Class(Class &&other) noexcept
 #define NAWA_MOVE_CONSTRUCTOR_IMPL(Class) Class::Class(Class &&other) noexcept: impl(move(other.impl)) {}

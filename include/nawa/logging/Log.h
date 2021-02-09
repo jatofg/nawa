@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <nawa/internal/macros.h>
 #include <sstream>
 
 namespace nawa {
@@ -35,6 +36,8 @@ namespace nawa {
      * By default, the logger will write to std::cout.
      */
     class Log {
+        NAWA_PRIVATE_IMPL_DEF()
+
     public:
         /**
          * Available log levels. OFF disables logging, ERROR is for errors only, WARNING for warnings,
@@ -48,10 +51,7 @@ namespace nawa {
             INFORMATIONAL,
             DEBUG
         };
-    private:
-        std::string appname; /**< Name of the current app, appears in brackets in the log. */
-        Level defaultLevel; /**< Default log level of this logger object. */
-    public:
+
         /**
          * Construct a logger object with the default app name nawa and default log level STANDARD
          * (can be changed later).
