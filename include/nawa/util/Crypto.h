@@ -99,7 +99,7 @@ namespace nawa {
          * @return Hash of the password (in case of bcrypt: 60 characters).
          */
         std::string passwordHash(const std::string &password,
-                                 const Engines::HashingEngine &hashingEngine = Engines::BcryptHashingEngine());
+                                 const hashing::HashingEngine &hashingEngine = hashing::BcryptHashingEngine());
 
         /**
          * Validate a password with a matching hashing engine (determined by a HashTypeTable). The underlying function
@@ -115,7 +115,7 @@ namespace nawa {
          * @return True if the password matches, false otherwise.
          */
         bool passwordVerify(const std::string &password, const std::string &hash,
-                            const Engines::HashTypeTable &hashTypeTable = Engines::DefaultHashTypeTable());
+                            const hashing::HashTypeTable &hashTypeTable = hashing::DefaultHashTypeTable());
     };
 }
 

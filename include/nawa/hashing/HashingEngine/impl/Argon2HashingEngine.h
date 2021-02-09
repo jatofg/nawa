@@ -25,10 +25,14 @@
 #define NAWA_ARGON2HASHINGENGINE_H
 
 #include <nawa/hashing/HashingEngine/HashingEngine.h>
+#include <nawa/internal/macros.h>
 
-namespace nawa::Engines {
+namespace nawa::hashing {
 
     class Argon2HashingEngine : public HashingEngine {
+    private:
+        NAWA_PRIVATE_IMPL_DEF()
+
     public:
         /**
          * The Argon2 flavor to use.
@@ -38,14 +42,9 @@ namespace nawa::Engines {
             ARGON2D,
             ARGON2ID
         };
-    private:
-        Algorithm algorithm; /**< The Argon2 flavor to use. */
-        uint32_t timeCost; /**< Number of iterations. */
-        uint32_t memoryCost; /**< Memory usage in kiB. */
-        uint32_t parallelism; /**< Number of threads used. */
-        std::string salt; /**< User-defined salt. */
-        size_t hashLen; /**< Desired length of the hash. */
-    public:
+
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Argon2HashingEngine);
+
         /**
          * Create a new Argon2 hash generator and set the parameters.
          * @param algorithm The Argon2 flavor to use.

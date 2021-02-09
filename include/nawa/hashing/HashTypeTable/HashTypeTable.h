@@ -27,7 +27,7 @@
 #include <memory>
 #include <nawa/hashing/HashingEngine/HashingEngine.h>
 
-namespace nawa::Engines {
+namespace nawa::hashing {
 
     /**
      * A HashTypeTable should be used to determine the HashingEngine that can be used to verify a certain hash. It

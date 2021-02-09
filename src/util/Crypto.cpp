@@ -102,13 +102,13 @@ std::string Crypto::md5(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::passwordHash(const std::string &password, const Engines::HashingEngine &hashingEngine) {
+std::string Crypto::passwordHash(const std::string &password, const hashing::HashingEngine &hashingEngine) {
     // use the provided HashingEngine for generation
     return hashingEngine.generateHash(password);
 }
 
 bool Crypto::passwordVerify(const std::string &password, const std::string &hash,
-                            const Engines::HashTypeTable &hashTypeTable) {
+                            const hashing::HashTypeTable &hashTypeTable) {
     if (hash.empty()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Cannot verify an empty hash");
     }

@@ -31,20 +31,26 @@
 
 #define NAWA_DEFAULT_DESTRUCTOR_DEF(Class) virtual ~Class()
 #define NAWA_DEFAULT_DESTRUCTOR_IMPL(Class) Class::~Class() = default;
+#define NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::~Class() = default;
 
 #define NAWA_DEFAULT_CONSTRUCTOR_DEF(Class) Class()
 #define NAWA_DEFAULT_CONSTRUCTOR_IMPL(Class) Class::Class() { impl = make_unique<Impl>(); }
+#define NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class() { impl = make_unique<Impl>(); }
 
 #define NAWA_COPY_CONSTRUCTOR_DEF(Class) Class(Class const &other)
 #define NAWA_COPY_CONSTRUCTOR_IMPL(Class) Class::Class(const Class &other) { impl = make_unique<Impl>(*other.impl); }
+#define NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(const Namespace::Class &other) { impl = make_unique<Impl>(*other.impl); }
 
 #define NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Class) Class &operator=(const Class &other)
 #define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(const Class &other) { if (this != &other) { impl = make_unique<Impl>(*other.impl); } return *this; }
+#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(const Namespace::Class &other) { if (this != &other) { impl = make_unique<Impl>(*other.impl); } return *this; }
 
 #define NAWA_MOVE_CONSTRUCTOR_DEF(Class) Class(Class &&other) noexcept
 #define NAWA_MOVE_CONSTRUCTOR_IMPL(Class) Class::Class(Class &&other) noexcept: impl(move(other.impl)) {}
+#define NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(Namespace::Class &&other) noexcept: impl(move(other.impl)) {}
 
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Class) Class &operator=(Class &&other) noexcept
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(Class &&other) noexcept { if (this != &other) { impl = move(other.impl); } return *this; }
+#define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(Namespace::Class &&other) noexcept { if (this != &other) { impl = move(other.impl); } return *this; }
 
 #endif //NAWA_MACROS_H

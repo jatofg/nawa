@@ -1,6 +1,6 @@
 /**
  * \file BcryptHashingEngine.cpp
- * \brief Implementation of the BcryptHashingEngine class.
+ * \brief Implementation of the hashing::BcryptHashingEngine class.
  */
 
 /*
@@ -29,20 +29,29 @@
 using namespace nawa;
 using namespace std;
 
-Engines::BcryptHashingEngine::BcryptHashingEngine(int workFactor, string _salt) : workFactor(workFactor) {
-    salt = move(_salt);
+struct hashing::BcryptHashingEngine::Impl {
+    int workFactor;
+    string salt;
+
+    Impl(int workFactor, string salt) : workFactor(workFactor), salt(move(salt)) {}
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(hashing, BcryptHashingEngine)
+
+hashing::BcryptHashingEngine::BcryptHashingEngine(int workFactor, string salt) {
+    impl = make_unique<Impl>(workFactor, move(salt));
 }
 
-string Engines::BcryptHashingEngine::generateHash(string input) const {
+string hashing::BcryptHashingEngine::generateHash(string input) const {
     char bcsalt[BCRYPT_HASHSIZE];
     char hash[BCRYPT_HASHSIZE];
 
     // use the user-defined salt if necessary
-    if (!salt.empty()) {
-        string salt_res = salt;
+    if (!impl->salt.empty()) {
+        string salt_res = impl->salt;
         salt_res.resize(BCRYPT_HASHSIZE, '\0');
         memcpy(hash, salt_res.c_str(), BCRYPT_HASHSIZE);
-    } else if (bcrypt_gensalt(workFactor, bcsalt) != 0) {
+    } else if (bcrypt_gensalt(impl->workFactor, bcsalt) != 0) {
         throw Exception(__PRETTY_FUNCTION__, 10,
                         "Could not generate a salt (unknown bcrypt failure).");
     }
@@ -54,7 +63,7 @@ string Engines::BcryptHashingEngine::generateHash(string input) const {
     return string(hash, 60);
 }
 
-bool Engines::BcryptHashingEngine::verifyHash(string input, string hash) const {
+bool hashing::BcryptHashingEngine::verifyHash(string input, string hash) const {
     // return value of bcrypt_checkpw is -1 on failure, 0 on match, and >0 if not matching
     int ret = bcrypt_checkpw(input.c_str(), hash.c_str());
     return ret == 0;

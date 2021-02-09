@@ -28,13 +28,13 @@
 using namespace nawa;
 using namespace std;
 
-shared_ptr<Engines::HashingEngine> Engines::DefaultHashTypeTable::getEngine(string hash) const {
+shared_ptr<hashing::HashingEngine> hashing::DefaultHashTypeTable::getEngine(string hash) const {
     auto hid = hash.substr(0, 4);
     if (hid == "$2a$" || hid == "$2b$" || hid == "$2x$" || hid == "$2y$") {
-        return shared_ptr<Engines::HashingEngine>(new Engines::BcryptHashingEngine());
+        return shared_ptr<hashing::HashingEngine>(new hashing::BcryptHashingEngine());
     } else if (hash.substr(0, 10) == "$argon2id$" || hash.substr(0, 9) == "$argon2i$" ||
                hash.substr(0, 9) == "$argon2d$") {
-        return shared_ptr<Engines::HashingEngine>(new Engines::Argon2HashingEngine());
+        return shared_ptr<hashing::HashingEngine>(new hashing::Argon2HashingEngine());
     }
-    return shared_ptr<Engines::HashingEngine>();
+    return shared_ptr<hashing::HashingEngine>();
 }

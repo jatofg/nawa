@@ -26,7 +26,7 @@
 
 #include <nawa/hashing/HashTypeTable/HashTypeTable.h>
 
-namespace nawa::Engines {
+namespace nawa::hashing {
 
     class DefaultHashTypeTable : public HashTypeTable {
         /**

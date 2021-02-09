@@ -25,20 +25,19 @@
 #define NAWA_BCRYPTHASHINGENGINE_H
 
 #include <nawa/hashing/HashingEngine/HashingEngine.h>
+#include <nawa/internal/macros.h>
 
-namespace nawa::Engines {
-
+namespace nawa::hashing {
     /**
      * Hashing engine for password hashing using bcrypt. This engine class should not be used directly, but only
      * through the corresponding Nawa::Crypto functions for password hashing.
      */
     class BcryptHashingEngine : public HashingEngine {
-        /**
-         * The bcrypt work factor.
-         */
-        int workFactor;
-        std::string salt;
+        NAWA_PRIVATE_IMPL_DEF()
+
     public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(BcryptHashingEngine);
+
         /**
          * Create a new generator object and set the work factor.
          * @param workFactor The work factor determines how much effort is needed in order to generate the salt.

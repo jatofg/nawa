@@ -1,6 +1,6 @@
 /**
  * \file Argon2HashingEngine.cpp
- * \brief Implementation of the Argon2HashingEngine class.
+ * \brief Implementation of the hashing::Argon2HashingEngine class.
  */
 
 /*
@@ -32,23 +32,37 @@
 using namespace nawa;
 using namespace std;
 
-Engines::Argon2HashingEngine::Argon2HashingEngine(Engines::Argon2HashingEngine::Algorithm algorithm,
+struct hashing::Argon2HashingEngine::Impl {
+    Algorithm algorithm; /**< The Argon2 flavor to use. */
+    uint32_t timeCost; /**< Number of iterations. */
+    uint32_t memoryCost; /**< Memory usage in kiB. */
+    uint32_t parallelism; /**< Number of threads used. */
+    string salt; /**< User-defined salt. */
+    size_t hashLen; /**< Desired length of the hash. */
+
+    Impl(Algorithm algorithm, uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism, string salt, size_t hashLen)
+            : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism),
+              salt(move(salt)), hashLen(hashLen) {}
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(hashing, Argon2HashingEngine)
+
+hashing::Argon2HashingEngine::Argon2HashingEngine(hashing::Argon2HashingEngine::Algorithm algorithm,
                                                   uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,
-                                                  string _salt, size_t hashLen)
-        : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism), hashLen(hashLen) {
-    salt = move(_salt);
+                                                  string salt, size_t hashLen) {
+    impl = make_unique<Impl>(algorithm, timeCost, memoryCost, parallelism, move(salt), hashLen);
 }
 
-string Engines::Argon2HashingEngine::generateHash(string input) const {
+string hashing::Argon2HashingEngine::generateHash(string input) const {
 
     // check validity of parameters
-    if (!salt.empty() && salt.length() < ARGON2_MIN_SALT_LENGTH) {
+    if (!impl->salt.empty() && impl->salt.length() < ARGON2_MIN_SALT_LENGTH) {
         throw Exception(__PRETTY_FUNCTION__, 10,
                         "Provided user-defined salt is not long enough");
     }
 
-    string actualSalt = salt;
-    if (salt.empty()) {
+    string actualSalt = impl->salt;
+    if (impl->salt.empty()) {
         // generate random salt (16 bytes)
         random_device rd;
         stringstream sstr;
@@ -73,24 +87,27 @@ string Engines::Argon2HashingEngine::generateHash(string input) const {
     }
 
     int errorCode = 0;
-    size_t encodedHashCeil = 50 + (actualSalt.length() * 4) / 3 + (hashLen * 4) / 3;
+    size_t encodedHashCeil = 50 + (actualSalt.length() * 4) / 3 + (impl->hashLen * 4) / 3;
     char c_hash[encodedHashCeil];
     memset(c_hash, '\0', encodedHashCeil);
 
-    switch (algorithm) {
+    switch (impl->algorithm) {
         case ARGON2I:
-            errorCode = argon2i_hash_encoded(timeCost, memoryCost, parallelism, (void *) input.c_str(), input.length(),
-                                             (void *) actualSalt.c_str(), actualSalt.length(), hashLen, c_hash,
+            errorCode = argon2i_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
+                                             (void *) input.c_str(), input.length(),
+                                             (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
                                              encodedHashCeil);
             break;
         case ARGON2D:
-            errorCode = argon2d_hash_encoded(timeCost, memoryCost, parallelism, (void *) input.c_str(), input.length(),
-                                             (void *) actualSalt.c_str(), actualSalt.length(), hashLen, c_hash,
+            errorCode = argon2d_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
+                                             (void *) input.c_str(), input.length(),
+                                             (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
                                              encodedHashCeil);
             break;
         case ARGON2ID:
-            errorCode = argon2id_hash_encoded(timeCost, memoryCost, parallelism, (void *) input.c_str(), input.length(),
-                                              (void *) actualSalt.c_str(), actualSalt.length(), hashLen, c_hash,
+            errorCode = argon2id_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
+                                              (void *) input.c_str(), input.length(),
+                                              (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
                                               encodedHashCeil);
             break;
     }
@@ -104,7 +121,7 @@ string Engines::Argon2HashingEngine::generateHash(string input) const {
     return string(c_hash);
 }
 
-bool Engines::Argon2HashingEngine::verifyHash(string input, string hash) const {
+bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
 
     // split the hash and create a new object with the properties of the hash
     regex rgx(

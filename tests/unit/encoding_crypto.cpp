@@ -96,7 +96,7 @@ TEST_CASE("nawa::Encoding functions", "[encoding]") {
     }
 
     SECTION("quoted-printable encoding") {
-        auto hashedPw = Crypto::passwordHash(decoded, Engines::BcryptHashingEngine(8));
+        auto hashedPw = Crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
         //auto startTime = chrono::steady_clock::now();
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
         //auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
@@ -108,7 +108,7 @@ TEST_CASE("nawa::Crypto functions", "[crypto]") {
     string decoded = GENERATE(from_range(inputData));
 
     SECTION("bcrypt password hashing") {
-        auto hashedPw = Crypto::passwordHash(decoded, Engines::BcryptHashingEngine(8));
+        auto hashedPw = Crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
         //auto startTime = chrono::steady_clock::now();
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
         //auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
@@ -116,12 +116,12 @@ TEST_CASE("nawa::Crypto functions", "[crypto]") {
 
     SECTION("argon2 password hashing") {
         auto hashedPw = Crypto::passwordHash(decoded,
-                                        Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2ID, 2, 1 << 16,
-                                                                     2, "", 40));
+                                             hashing::Argon2HashingEngine(hashing::Argon2HashingEngine::ARGON2ID, 2, 1 << 16,
+                                                                          2, "", 40));
         auto hashedPw_i = Crypto::passwordHash(decoded,
-                                               Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2I));
+                                               hashing::Argon2HashingEngine(hashing::Argon2HashingEngine::ARGON2I));
         auto hashedPw_d = Crypto::passwordHash(decoded,
-                                               Engines::Argon2HashingEngine(Engines::Argon2HashingEngine::ARGON2D));
+                                               hashing::Argon2HashingEngine(hashing::Argon2HashingEngine::ARGON2D));
         // auto startTime = chrono::steady_clock::now();
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
         REQUIRE(Crypto::passwordVerify(decoded, hashedPw_i));

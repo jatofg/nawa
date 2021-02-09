@@ -26,7 +26,7 @@
 
 #include <string>
 
-namespace nawa::Engines {
+namespace nawa::hashing {
 
     /**
      * A hashing engine must implement these functions in order to be useful for password hashing. It may store
