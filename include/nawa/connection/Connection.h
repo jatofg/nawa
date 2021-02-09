@@ -24,8 +24,11 @@
 #ifndef NAWA_RESPONSE_H
 #define NAWA_RESPONSE_H
 
+#include <experimental/propagate_const>
+#include <memory>
 #include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/connection/Cookie.h>
+#include <nawa/internal/macros.h>
 #include <nawa/request/Request.h>
 #include <nawa/session/Session.h>
 #include <sstream>
@@ -37,8 +40,7 @@ namespace nawa {
      * Response object to be passed back to NAWA and accessor to the request.
      */
     class Connection {
-        struct Impl;
-        std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
+        NAWA_PRIVATE_IMPL_DEF()
 
         void clearStream();
 
@@ -54,7 +56,7 @@ namespace nawa {
         nawa::Config config;
         std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
 
-        virtual ~Connection();
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Connection);
 
         /**
          * Create a Connection object.
@@ -131,12 +133,9 @@ namespace nawa {
         void unsetCookie(const std::string &key);
 
         /**
-         * This method can be used to set default attributes for cookies. Setting a boolean attribute to true means
-         * that the corresponding attribute will be sent for all cookies, regardless of the value specified in the
-         * Cookie object itself. For sameSite, the policy will be overridden if sameSite > 0 in the Cookie object.
-         * Values of string attributes will be used as default values if the corresponding attributes are not
-         * customized in the Cookie object and ignored otherwise. The content attribute will be ignored.
-         * @param policy Cookie object containing the default attributes.
+         * This method can be used to set default attributes for cookies. All attributes which are not set or enabled
+         * in a cookie will be taken from the policy cookie, if set there. The content attribute will be ignored.
+         * @param policy Cookie object containing default attributes for cookies.
          */
         void setCookiePolicy(Cookie policy);
 

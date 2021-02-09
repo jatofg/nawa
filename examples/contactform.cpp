@@ -47,7 +47,7 @@ int handleRequest(Connection &connection) {
 
     // make sure cookies are a bit more secure
     Cookie policy;
-    policy.httpOnly = true;
+    policy.setHttpOnly(true);
     connection.setCookiePolicy(policy);
 
     // we use session variables for a basic spam protection

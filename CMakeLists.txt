@@ -121,6 +121,7 @@ set(NAWA_FILES
         src/RequestHandler/impl/HttpRequestHandler.cpp
         src/config/Config.cpp
         src/connection/Connection.cpp
+        src/connection/Cookie.cpp
         src/hashing/HashingEngine/impl/BcryptHashingEngine.cpp
         src/logging/Log.cpp
         src/mail/Email/impl/MimeEmail.cpp

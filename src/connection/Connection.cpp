@@ -105,7 +105,7 @@ struct Connection::Impl {
     FlushCallbackFunction flushCallback;
 };
 
-Connection::~Connection() = default;
+NAWA_DEFAULT_DESTRUCTOR_IMPL(Connection)
 
 void Connection::setBody(string content) {
     impl->bodyString = move(content);
@@ -216,41 +216,42 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
     if (includeCookies)
         for (auto const &e: impl->cookies) {
             stringstream headerVal;
-            headerVal << e.first << "=" << e.second.content;
+            headerVal << e.first << "=" << e.second.getContent();
             // Domain option
-            const string &domain = (!e.second.domain.empty()) ? e.second.domain : impl->cookiePolicy.domain;
-            if (!domain.empty()) {
-                headerVal << "; Domain=" << domain;
+            optional<string> domain = e.second.getDomain() ? e.second.getDomain() : impl->cookiePolicy.getDomain();
+            if (domain && !domain->empty()) {
+                headerVal << "; Domain=" << *domain;
             }
             // Path option
-            const string &path = (!e.second.path.empty()) ? e.second.path : impl->cookiePolicy.path;
-            if (!path.empty()) {
-                headerVal << "; Path=" << path;
+            optional<string> path = e.second.getPath() ? e.second.getPath() : impl->cookiePolicy.getPath();
+            if (path && !path->empty()) {
+                headerVal << "; Path=" << *path;
             }
             // Expires option
-            time_t expiry = (e.second.expires > 0) ? e.second.expires : impl->cookiePolicy.expires;
-            if (expiry > 0) {
-                headerVal << "; Expires=" << make_http_time(expiry);
+            optional<time_t> expiry = e.second.getExpires() ? e.second.getExpires() : impl->cookiePolicy.getExpires();
+            if (expiry) {
+                headerVal << "; Expires=" << make_http_time(*expiry);
             }
             // Max-Age option
-            unsigned long maxAge = (e.second.maxAge > 0) ? e.second.maxAge : impl->cookiePolicy.maxAge;
-            if (maxAge > 0) {
-                headerVal << "; Max-Age=" << maxAge;
+            optional<unsigned long> maxAge = e.second.getMaxAge() ? e.second.getMaxAge()
+                                                                  : impl->cookiePolicy.getMaxAge();
+            if (maxAge) {
+                headerVal << "; Max-Age=" << *maxAge;
             }
             // Secure option
-            if (e.second.secure || impl->cookiePolicy.secure) {
+            if (e.second.getSecure() || impl->cookiePolicy.getSecure()) {
                 headerVal << "; Secure";
             }
             // HttpOnly option
-            if (e.second.httpOnly || impl->cookiePolicy.httpOnly) {
+            if (e.second.getHttpOnly() || impl->cookiePolicy.getHttpOnly()) {
                 headerVal << "; HttpOnly";
             }
             // SameSite option
-            uint sameSite = (e.second.sameSite > impl->cookiePolicy.sameSite) ? e.second.sameSite
-                                                                              : impl->cookiePolicy.sameSite;
-            if (sameSite == 1) {
+            Cookie::SameSite sameSite = (e.second.getSameSite() != Cookie::SameSite::OFF) ? e.second.getSameSite()
+                                                                                          : impl->cookiePolicy.getSameSite();
+            if (sameSite == Cookie::SameSite::LAX) {
                 headerVal << "; SameSite=lax";
-            } else if (sameSite > 1) {
+            } else if (sameSite == Cookie::SameSite::STRICT) {
                 headerVal << "; SameSite=strict";
             }
             ret.insert({"set-cookie", headerVal.str()});
@@ -293,7 +294,7 @@ void Connection::setCookie(const string &key, Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
     regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
-    if (!regex_match(key, matchKey) || !regex_match(cookie.content, matchContent)) {
+    if (!regex_match(key, matchKey) || !regex_match(cookie.getContent(), matchContent)) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
     impl->cookies[key] = move(cookie);
