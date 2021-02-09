@@ -25,8 +25,6 @@
 #define NAWA_COOKIE_H
 
 #include <ctime>
-#include <experimental/propagate_const>
-#include <memory>
 #include <nawa/internal/macros.h>
 #include <optional>
 #include <string>
@@ -39,10 +37,15 @@ namespace nawa {
         NAWA_PRIVATE_IMPL_DEF()
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(Cookie);
+
         NAWA_DEFAULT_CONSTRUCTOR_DEF(Cookie);
+
         NAWA_COPY_CONSTRUCTOR_DEF(Cookie);
+
         NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Cookie);
+
         NAWA_MOVE_CONSTRUCTOR_DEF(Cookie);
+
         NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Cookie);
 
         enum class SameSite {

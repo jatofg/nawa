@@ -28,7 +28,6 @@
 #include <nawa/util/Utils.h>
 #include <regex>
 #include <sys/stat.h>
-#include <sys/types.h>
 
 using namespace nawa;
 using namespace std;

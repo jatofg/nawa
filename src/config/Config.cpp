@@ -25,7 +25,6 @@
 #include <boost/functional/hash.hpp>
 #include <nawa/Exception.h>
 #include <nawa/config/Config.h>
-#include <nawa/internal/macros.h>
 #include <unordered_map>
 
 using namespace nawa;
@@ -37,10 +36,15 @@ struct Config::Impl {
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Config)
+
 NAWA_COPY_CONSTRUCTOR_IMPL(Config)
+
 NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Config)
+
 NAWA_MOVE_CONSTRUCTOR_IMPL(Config)
+
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Config)
+
 NAWA_DEFAULT_CONSTRUCTOR_IMPL(Config)
 
 Config::Config(initializer_list<pair<pair<string, string>, string>> init) : Config() {

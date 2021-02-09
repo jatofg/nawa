@@ -24,6 +24,9 @@
 #ifndef NAWA_MACROS_H
 #define NAWA_MACROS_H
 
+#include <experimental/propagate_const>
+#include <memory>
+
 #define NAWA_PRIVATE_IMPL_DEF() struct Impl; std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
 
 #define NAWA_DEFAULT_DESTRUCTOR_DEF(Class) virtual ~Class()

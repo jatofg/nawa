@@ -24,8 +24,6 @@
 #ifndef NAWA_RESPONSE_H
 #define NAWA_RESPONSE_H
 
-#include <experimental/propagate_const>
-#include <memory>
 #include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/connection/Cookie.h>
 #include <nawa/internal/macros.h>
@@ -45,6 +43,7 @@ namespace nawa {
         void clearStream();
 
         void mergeStream();
+
     public:
         nawa::Request request; /**< The Request object representing the current request. */
         nawa::Session session;

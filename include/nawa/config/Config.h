@@ -24,23 +24,26 @@
 #ifndef NAWA_CONFIG_H
 #define NAWA_CONFIG_H
 
-#include <experimental/propagate_const>
-#include <memory>
+#include <nawa/internal/macros.h>
 
 namespace nawa {
     /**
      * Reader for config files and accessor to config values.
      */
     class Config {
-        struct Impl;
-        std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
+        NAWA_PRIVATE_IMPL_DEF()
     public:
-        virtual ~Config();
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Config);
 
-        /**
-         * Construct empty Config container.
-         */
-        Config();
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(Config);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(Config);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(Config);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Config);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Config);
 
         /**
          * Construct Config container and directly parse an ini file. Throws an Exception on failure.
@@ -53,32 +56,6 @@ namespace nawa {
          * @param init Initializer list containing key-value pairs, wherein the keys are section-key pairs.
          */
         Config(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init);
-
-        /**
-         * Copy constructor.
-         * @param other Object to copy from.
-         */
-        Config(Config const &other);
-
-        /**
-         * Move constructor.
-         * @param other Object to move from.
-         */
-        Config(Config &&other) noexcept;
-
-        /**
-         * Copy assignment operator.
-         * @param other Object to copy from.
-         * @return This object.
-         */
-        Config &operator=(const Config &other);
-
-        /**
-         * Move assignment operator.
-         * @param other Object to move from.
-         * @return This object.
-         */
-        Config &operator=(Config &&other) noexcept;
 
         /**
          * Read an ini file and add the values to the Config container. If a key is already set, the element will be
