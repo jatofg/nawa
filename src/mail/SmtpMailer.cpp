@@ -43,46 +43,78 @@ namespace {
         if (!email->headers.count("Date")) {
             email->headers["Date"] = make_smtp_time(time(nullptr));
         }
-        if (!email->headers.count("From") && !from->address.empty()) {
+        if (!email->headers.count("From") && !from->getAddress().empty()) {
             email->headers["From"] = from->get();
         }
         unsigned long atPos;
-        if (!email->headers.count("Message-ID") && !from->address.empty()
-            && (atPos = from->address.find_last_of('@')) != string::npos) {
+        if (!email->headers.count("Message-ID") && !from->getAddress().empty()
+            && (atPos = from->getAddress().find_last_of('@')) != string::npos) {
             stringstream mid;
             stringstream base;
             random_device rd;
             timespec mtime;
             clock_gettime(CLOCK_REALTIME, &mtime);
-            base << mtime.tv_sec << mtime.tv_nsec << from->address << rd();
-            mid << '<' << Crypto::md5(base.str(), true) << '@' << from->address.substr(atPos + 1) << '>';
+            base << mtime.tv_sec << mtime.tv_nsec << from->getAddress() << rd();
+            mid << '<' << Crypto::md5(base.str(), true) << '@' << from->getAddress().substr(atPos + 1) << '>';
             email->headers["Message-ID"] = mid.str();
         }
     }
+
+    /**
+     * An element of the sending queue.
+     */
+    struct QueueElem {
+        std::shared_ptr<const Email> email;
+        std::shared_ptr<const EmailAddress> from;
+        std::vector<EmailAddress> recipients;
+        std::shared_ptr<ReplacementRules> replacementRules;
+    };
 }
+
+struct SmtpMailer::Impl {
+    std::string serverDomain;
+    unsigned int serverPort;
+    TlsMode serverTlsMode;
+    bool verifyServerTlsCert;
+    std::string authUsername;
+    std::string authPassword;
+    long connectionTimeout;
+    std::vector<QueueElem> queue;
+
+    Impl(string serverDomain, unsigned int serverPort, TlsMode serverTlsMode, bool verifyServerTlsCert,
+         string authUsername, string authPassword, long connectionTimeout) : serverDomain(move(serverDomain)),
+                                                                             serverPort(serverPort),
+                                                                             serverTlsMode(serverTlsMode),
+                                                                             verifyServerTlsCert(verifyServerTlsCert),
+                                                                             authUsername(move(authUsername)),
+                                                                             authPassword(move(authPassword)),
+                                                                             connectionTimeout(connectionTimeout) {}
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL(SmtpMailer)
 
 SmtpMailer::SmtpMailer(string serverDomain, unsigned int serverPort, SmtpMailer::TlsMode serverTlsMode,
                        bool verifyServerTlsCert, string authUsername, string authPassword,
-                       long connectionTimeout)
-        : serverDomain(move(serverDomain)), serverPort(serverPort), serverTlsMode(serverTlsMode),
-          verifyServerTlsCert(verifyServerTlsCert),
-          authUsername(move(authUsername)), authPassword(move(authPassword)), connectionTimeout(connectionTimeout) {}
+                       long connectionTimeout) {
+    impl = make_unique<Impl>(move(serverDomain), serverPort, serverTlsMode, verifyServerTlsCert, move(authUsername),
+                             move(authPassword), connectionTimeout);
+}
 
 void
 SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
-    serverDomain = move(domain);
-    serverPort = port;
-    serverTlsMode = tlsMode;
-    verifyServerTlsCert = verifyTlsCert;
+    impl->serverDomain = move(domain);
+    impl->serverPort = port;
+    impl->serverTlsMode = tlsMode;
+    impl->verifyServerTlsCert = verifyTlsCert;
 }
 
 void SmtpMailer::setAuth(string username, string password) {
-    authUsername = move(username);
-    authPassword = move(password);
+    impl->authUsername = move(username);
+    impl->authPassword = move(password);
 }
 
 void SmtpMailer::setConnectionTimeout(long timeout) {
-    connectionTimeout = timeout;
+    impl->connectionTimeout = timeout;
 }
 
 void SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<EmailAddress> from,
@@ -94,12 +126,12 @@ void SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<Em
 void SmtpMailer::bulkEnqueue(shared_ptr<Email> email, vector<EmailAddress> recipients,
                              shared_ptr<EmailAddress> from, shared_ptr<ReplacementRules> replacementRules) {
     addMissingHeaders(email, from);
-    queue.push_back(QueueElem{.email=move(email), .from=move(from), .recipients=move(recipients),
+    impl->queue.push_back(QueueElem{.email=move(email), .from=move(from), .recipients=move(recipients),
             .replacementRules=move(replacementRules)});
 }
 
 void SmtpMailer::clearQueue() {
-    queue.clear();
+    impl->queue.clear();
 }
 
 void SmtpMailer::processQueue() const {
@@ -110,31 +142,31 @@ void SmtpMailer::processQueue() const {
     if (curl) {
 
         // authentication, if requested
-        if (!authUsername.empty()) {
-            curl_easy_setopt(curl, CURLOPT_USERNAME, authUsername.c_str());
-            if (!authPassword.empty())
-                curl_easy_setopt(curl, CURLOPT_PASSWORD, authPassword.c_str());
+        if (!impl->authUsername.empty()) {
+            curl_easy_setopt(curl, CURLOPT_USERNAME, impl->authUsername.c_str());
+            if (!impl->authPassword.empty())
+                curl_easy_setopt(curl, CURLOPT_PASSWORD, impl->authPassword.c_str());
         }
 
         // build URL for curl
         {
             stringstream curlUrl;
-            if (serverTlsMode == TlsMode::SMTPS) {
+            if (impl->serverTlsMode == TlsMode::SMTPS) {
                 curlUrl << "smtps://";
             } else {
                 curlUrl << "smtp://";
             }
-            curlUrl << serverDomain << ":" << serverPort;
+            curlUrl << impl->serverDomain << ":" << impl->serverPort;
             curl_easy_setopt(curl, CURLOPT_URL, curlUrl.str().c_str());
         }
 
         // set up TLS
-        if (serverTlsMode == TlsMode::REQUIRE_STARTTLS) {
+        if (impl->serverTlsMode == TlsMode::REQUIRE_STARTTLS) {
             curl_easy_setopt(curl, CURLOPT_USE_SSL, (long) CURLUSESSL_ALL);
-        } else if (serverTlsMode == TlsMode::TRY_STARTTLS) {
+        } else if (impl->serverTlsMode == TlsMode::TRY_STARTTLS) {
             curl_easy_setopt(curl, CURLOPT_USE_SSL, (long) CURLUSESSL_TRY);
         }
-        if (serverTlsMode != TlsMode::NONE && !verifyServerTlsCert) {
+        if (impl->serverTlsMode != TlsMode::NONE && !impl->verifyServerTlsCert) {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         }
@@ -144,10 +176,10 @@ void SmtpMailer::processQueue() const {
         curl_easy_setopt(curl, CURLOPT_STDERR, devNull);
 
         // connection timeout
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, connectionTimeout);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, impl->connectionTimeout);
 
         // iterate queue
-        for (const auto &mail: queue) {
+        for (const auto &mail: impl->queue) {
 
             // set sender
             curl_easy_setopt(curl, CURLOPT_MAIL_FROM, mail.from->get(false).c_str());

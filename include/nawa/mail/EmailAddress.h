@@ -24,6 +24,7 @@
 #ifndef NAWA_EMAILADDRESS_H
 #define NAWA_EMAILADDRESS_H
 
+#include <nawa/internal/macros.h>
 #include <string>
 
 namespace nawa {
@@ -31,32 +32,58 @@ namespace nawa {
      * Structure containing the name and email address of a recipient or sender. It contains functions for validation
      * and getting a representation in a standard format that can be used for curl.
      */
-    struct EmailAddress {
-        std::string name; /**< The name of the sender or recipient. */
-        std::string address; /**< The email address itself. */
+    class EmailAddress {
+        NAWA_PRIVATE_IMPL_DEF()
 
-        /**
-         * Construct an empty EmailAddress object.
-         */
-        EmailAddress() = default;
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(EmailAddress);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(EmailAddress);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(EmailAddress);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(EmailAddress);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(EmailAddress);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(EmailAddress);
 
         /**
          * Construct an EmailAddress object and initialize it with an email address.
-         * @param _address Email address.
+         * @param address Email address.
          */
-        explicit EmailAddress(std::string _address) {
-            address = std::move(_address);
-        }
+        explicit EmailAddress(std::string address);
 
         /**
          * Construct an EmailAddress object and initialize it with a recipient (or sender) name and email address.
-         * @param _name Name.
-         * @param _address Email address.
+         * @param name Name.
+         * @param address Email address.
          */
-        EmailAddress(std::string _name, std::string _address) {
-            name = std::move(_name);
-            address = std::move(_address);
-        }
+        EmailAddress(std::string name, std::string address);
+
+        /**
+         * Set name.
+         * @param name Name.
+         */
+        void setName(std::string name) noexcept;
+
+        /**
+         * Get name
+         * @return Name.
+         */
+        [[nodiscard]] std::string getName() const noexcept;
+
+        /**
+         * Set email address.
+         * @param address Email address.
+         */
+        void setAddress(std::string address) noexcept;
+
+        /**
+         * Get email address.
+         * @return Email address.
+         */
+        [[nodiscard]] std::string getAddress() const noexcept;
 
         /**
          * Get the email address in a standard representation, i.e., `<john.doe\@example.com>` without name, or

@@ -24,12 +24,15 @@
 #ifndef NAWA_SMTPMAILER_H
 #define NAWA_SMTPMAILER_H
 
+#include <nawa/internal/macros.h>
 #include <nawa/mail/EmailAddress.h>
 #include <nawa/mail/Email/Email.h>
 #include <string>
 
 namespace nawa {
     class SmtpMailer {
+        NAWA_PRIVATE_IMPL_DEF()
+
     public:
         /**
          * How TLS should be used when connecting to an SMTP server.
@@ -45,26 +48,8 @@ namespace nawa {
             TRY_STARTTLS,
             REQUIRE_STARTTLS
         };
-    private:
-        /**
-         * An element of the sending queue.
-         */
-        struct QueueElem {
-            std::shared_ptr<const Email> email;
-            std::shared_ptr<const EmailAddress> from;
-            std::vector<EmailAddress> recipients;
-            std::shared_ptr<ReplacementRules> replacementRules;
-        };
 
-        std::string serverDomain;
-        unsigned int serverPort;
-        TlsMode serverTlsMode;
-        bool verifyServerTlsCert;
-        std::string authUsername;
-        std::string authPassword;
-        long connectionTimeout;
-        std::vector<QueueElem> queue;
-    public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(SmtpMailer);
 
         /**
          * Construct an SmtpMailer object and optionally set the connection and authentication properties. Constructing
