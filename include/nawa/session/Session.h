@@ -27,11 +27,9 @@
 #include <any>
 #include <memory>
 #include <nawa/connection/Cookie.h>
-#include <nawa/session/SessionData.h>
+#include <nawa/internal/fwdecl.h>
 
 namespace nawa {
-    class Connection;
-
     /**
      * Class for managing sessions and getting and setting connection-independent session data.
      */

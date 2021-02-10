@@ -25,8 +25,8 @@
 #include <fstream>
 #include <iomanip>
 #include <nawa/Exception.h>
-#include <nawa/util/Encoding.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/encoding.h>
+#include <nawa/util/utils.h>
 #include <unordered_map>
 
 using namespace nawa;
@@ -522,7 +522,7 @@ unordered_multimap<string, string> nawa::split_query_string(const string &queryS
     for (auto const &p: pairs) {
         size_t eqPos = p.find_first_of('=');
         string k = p.substr(0, eqPos);
-        string v = (eqPos < p.length() - 1) ? Encoding::urlDecode(p.substr(eqPos + 1)) : "";
+        string v = (eqPos < p.length() - 1) ? encoding::urlDecode(p.substr(eqPos + 1)) : "";
         ret.insert({k, v});
     }
     return ret;

@@ -24,7 +24,7 @@
 #include <iostream>
 #include <nawa/Application.h>
 #include <nawa/session/Session.h>
-#include <nawa/util/Encoding.h>
+#include <nawa/util/encoding.h>
 #include <unistd.h>
 
 using namespace nawa;
@@ -87,9 +87,9 @@ int handleRequest(Connection &connection) {
 
     connection.response << "<!DOCTYPE html>\n"
                            "<html><head><title>Test</title></head><body>"
-                           "<p>Hello World! HTML string: " << Encoding::htmlEncode(decoded, true) << "</p>"
+                           "<p>Hello World! HTML string: " << encoding::htmlEncode(decoded, true) << "</p>"
                                                                                                      "<p>Client IP: "
-                        << Encoding::htmlEncode(connection.request.env["REMOTE_ADDR"]) << "</p>"
+                        << encoding::htmlEncode(connection.request.env["REMOTE_ADDR"]) << "</p>"
                                                                                              "<p>Request URI: ("
                         << connection.request.env.getRequestPath().size() << " elements): "
                         << connection.request.env["REQUEST_URI"] << "</p>"
@@ -136,11 +136,11 @@ int handleRequest(Connection &connection) {
         connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 
-    string encodedDecoded = Encoding::htmlDecode(encoded);
+    string encodedDecoded = encoding::htmlDecode(encoded);
     if (decoded == encodedDecoded) {
         connection.response << "<p>yay!</p>";
     } else {
-        connection.response << "<p>" << Encoding::htmlEncode(encodedDecoded) << "</p>";
+        connection.response << "<p>" << encoding::htmlEncode(encodedDecoded) << "</p>";
     }
 
     connection.flushResponse();

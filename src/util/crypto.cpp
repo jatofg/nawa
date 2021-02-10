@@ -22,15 +22,15 @@
  */
 
 #include <nawa/Exception.h>
-#include <nawa/util/Crypto.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/crypto.h>
+#include <nawa/util/utils.h>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 
 using namespace nawa;
 using namespace std;
 
-std::string Crypto::sha1(const std::string &input, bool hex) {
+std::string crypto::sha1(const std::string &input, bool hex) {
     auto sha1Base = (const unsigned char *) input.c_str();
     unsigned char sha1Hash[SHA_DIGEST_LENGTH];
     size_t sha1Size = input.size();
@@ -42,7 +42,7 @@ std::string Crypto::sha1(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::sha224(const std::string &input, bool hex) {
+std::string crypto::sha224(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA224_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -54,7 +54,7 @@ std::string Crypto::sha224(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::sha256(const std::string &input, bool hex) {
+std::string crypto::sha256(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA256_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -66,7 +66,7 @@ std::string Crypto::sha256(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::sha384(const std::string &input, bool hex) {
+std::string crypto::sha384(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA384_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -78,7 +78,7 @@ std::string Crypto::sha384(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::sha512(const std::string &input, bool hex) {
+std::string crypto::sha512(const std::string &input, bool hex) {
     auto sha2Base = (const unsigned char *) input.c_str();
     unsigned char sha2Hash[SHA512_DIGEST_LENGTH];
     size_t sha2Size = input.size();
@@ -90,7 +90,7 @@ std::string Crypto::sha512(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::md5(const std::string &input, bool hex) {
+std::string crypto::md5(const std::string &input, bool hex) {
     auto md5Base = (const unsigned char *) input.c_str();
     unsigned char md5Hash[MD5_DIGEST_LENGTH];
     size_t md5Size = input.size();
@@ -102,12 +102,12 @@ std::string Crypto::md5(const std::string &input, bool hex) {
     return ret;
 }
 
-std::string Crypto::passwordHash(const std::string &password, const hashing::HashingEngine &hashingEngine) {
+std::string crypto::passwordHash(const std::string &password, const hashing::HashingEngine &hashingEngine) {
     // use the provided HashingEngine for generation
     return hashingEngine.generateHash(password);
 }
 
-bool Crypto::passwordVerify(const std::string &password, const std::string &hash,
+bool crypto::passwordVerify(const std::string &password, const std::string &hash,
                             const hashing::HashTypeTable &hashTypeTable) {
     if (hash.empty()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Cannot verify an empty hash");

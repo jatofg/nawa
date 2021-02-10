@@ -23,8 +23,8 @@
 
 #include <catch2/catch.hpp>
 #include <nawa/hashing/HashingEngine/impl/Argon2HashingEngine.h>
-#include <nawa/util/Crypto.h>
-#include <nawa/util/Encoding.h>
+#include <nawa/util/crypto.h>
+#include <nawa/util/encoding.h>
 #include <sstream>
 
 using namespace nawa;
@@ -71,35 +71,35 @@ TEST_CASE("nawa::Encoding functions", "[encoding]") {
 
     SECTION("HTML encoding") {
         string htmlDecoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
-        string htmlEncoded = Encoding::htmlEncode(htmlDecoded, true);
+        string htmlEncoded = encoding::htmlEncode(htmlDecoded, true);
         string htmlEncoded2 = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
         REQUIRE(htmlEncoded.length() > htmlDecoded.length());
-        REQUIRE(Encoding::htmlDecode(htmlEncoded) == htmlDecoded);
-        REQUIRE(htmlDecoded == Encoding::htmlDecode(htmlEncoded2));
-        string htmlEncodedRand = Encoding::htmlEncode(decoded, true);
-        string htmlEncodedRand2 = Encoding::htmlEncode(decoded, false);
-        REQUIRE(Encoding::htmlDecode(htmlEncodedRand) == decoded);
-        REQUIRE(Encoding::htmlDecode(htmlEncodedRand2) == decoded);
+        REQUIRE(encoding::htmlDecode(htmlEncoded) == htmlDecoded);
+        REQUIRE(htmlDecoded == encoding::htmlDecode(htmlEncoded2));
+        string htmlEncodedRand = encoding::htmlEncode(decoded, true);
+        string htmlEncodedRand2 = encoding::htmlEncode(decoded, false);
+        REQUIRE(encoding::htmlDecode(htmlEncodedRand) == decoded);
+        REQUIRE(encoding::htmlDecode(htmlEncodedRand2) == decoded);
     }
 
     SECTION("URL encoding") {
         string urlDecoded = "bla bla bla!??xyzäßédsfsdf ";
-        auto urlEncoded = Encoding::urlEncode(urlDecoded);
-        auto urlEncodedRand = Encoding::urlEncode(decoded);
-        REQUIRE(Encoding::urlDecode(urlEncoded) == urlDecoded);
-        REQUIRE(Encoding::urlDecode(urlEncodedRand) == decoded);
+        auto urlEncoded = encoding::urlEncode(urlDecoded);
+        auto urlEncodedRand = encoding::urlEncode(decoded);
+        REQUIRE(encoding::urlDecode(urlEncoded) == urlDecoded);
+        REQUIRE(encoding::urlDecode(urlEncodedRand) == decoded);
     }
 
     SECTION("Base64 encoding") {
-        auto base64Encoded = Encoding::base64Encode(decoded, 80, "\r\n");
-        REQUIRE(Encoding::isBase64(base64Encoded, true));
-        REQUIRE(Encoding::base64Decode(base64Encoded) == decoded);
+        auto base64Encoded = encoding::base64Encode(decoded, 80, "\r\n");
+        REQUIRE(encoding::isBase64(base64Encoded, true));
+        REQUIRE(encoding::base64Decode(base64Encoded) == decoded);
     }
 
     SECTION("quoted-printable encoding") {
-        auto hashedPw = Crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
+        auto hashedPw = crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
         //auto startTime = chrono::steady_clock::now();
-        REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
+        REQUIRE(crypto::passwordVerify(decoded, hashedPw));
         //auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
     }
 }
@@ -109,26 +109,26 @@ TEST_CASE("nawa::Crypto functions", "[crypto]") {
     string decoded = GENERATE(from_range(inputData));
 
     SECTION("bcrypt password hashing") {
-        auto hashedPw = Crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
+        auto hashedPw = crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
         //auto startTime = chrono::steady_clock::now();
-        REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
+        REQUIRE(crypto::passwordVerify(decoded, hashedPw));
         //auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
     }
 
     SECTION("argon2 password hashing") {
-        auto hashedPw = Crypto::passwordHash(decoded,
+        auto hashedPw = crypto::passwordHash(decoded,
                                              hashing::Argon2HashingEngine(
                                                      hashing::Argon2HashingEngine::Algorithm::ARGON2ID, 2, 1 << 16,
                                                      2, "", 40));
-        auto hashedPw_i = Crypto::passwordHash(decoded,
+        auto hashedPw_i = crypto::passwordHash(decoded,
                                                hashing::Argon2HashingEngine(
                                                        hashing::Argon2HashingEngine::Algorithm::ARGON2I));
-        auto hashedPw_d = Crypto::passwordHash(decoded,
+        auto hashedPw_d = crypto::passwordHash(decoded,
                                                hashing::Argon2HashingEngine(
                                                        hashing::Argon2HashingEngine::Algorithm::ARGON2D));
-        REQUIRE(Crypto::passwordVerify(decoded, hashedPw));
-        REQUIRE(Crypto::passwordVerify(decoded, hashedPw_i));
-        REQUIRE(Crypto::passwordVerify(decoded, hashedPw_d));
+        REQUIRE(crypto::passwordVerify(decoded, hashedPw));
+        REQUIRE(crypto::passwordVerify(decoded, hashedPw_i));
+        REQUIRE(crypto::passwordVerify(decoded, hashedPw_d));
     }
 
 }

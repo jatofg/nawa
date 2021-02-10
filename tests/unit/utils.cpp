@@ -22,7 +22,7 @@
  */
 
 #include <catch2/catch.hpp>
-#include <nawa/util/Utils.h>
+#include <nawa/util/utils.h>
 
 using namespace nawa;
 using namespace std;

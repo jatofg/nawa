@@ -24,7 +24,7 @@
 #include <boost/algorithm/string.hpp>
 #include <nawa/Exception.h>
 #include <nawa/util/MimeMultipart.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/utils.h>
 #include <regex>
 
 using namespace nawa;

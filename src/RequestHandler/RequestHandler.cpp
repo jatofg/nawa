@@ -27,8 +27,8 @@
 #include <nawa/RequestHandler/impl/HttpRequestHandler.h>
 #include <nawa/connection/Connection.h>
 #include <nawa/session/Session.h>
-#include <nawa/util/Encoding.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/encoding.h>
+#include <nawa/util/utils.h>
 
 using namespace nawa;
 using namespace std;
@@ -174,7 +174,7 @@ namespace {
                     auto authResponse = split_string(connection.request.env["authorization"], ' ', true);
                     // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
                     if (authResponse.size() == 2 || authResponse.at(0) == "Basic") {
-                        auto credentials = split_string(Encoding::base64Decode(authResponse.at(1)), ':', true);
+                        auto credentials = split_string(encoding::base64Decode(authResponse.at(1)), ':', true);
                         // credentials must also have 2 elements, a username and a password,
                         // and the auth function must be callable
                         if (credentials.size() == 2 && flt.authFunction) {

@@ -24,9 +24,7 @@
 #ifndef NAWA_NAWAREQUEST_H
 #define NAWA_NAWAREQUEST_H
 
-#include <nawa/config/Config.h>
 #include <nawa/request/Env.h>
-#include <nawa/request/File.h>
 #include <nawa/request/GPC/GPC.h>
 #include <nawa/request/GPC/ext/Post.h>
 #include <string>

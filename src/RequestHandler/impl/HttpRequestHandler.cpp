@@ -26,9 +26,10 @@
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/RequestHandler/impl/HttpRequestHandler.h>
 #include <nawa/connection/Connection.h>
+#include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/logging/Log.h>
 #include <nawa/util/MimeMultipart.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/utils.h>
 
 using namespace nawa;
 using namespace std;

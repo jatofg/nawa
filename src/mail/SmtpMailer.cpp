@@ -25,8 +25,8 @@
 #include <nawa/Exception.h>
 #include <nawa/mail/EmailAddress.h>
 #include <nawa/mail/SmtpMailer.h>
-#include <nawa/util/Crypto.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/crypto.h>
+#include <nawa/util/utils.h>
 #include <random>
 
 using namespace nawa;
@@ -55,7 +55,7 @@ namespace {
             timespec mtime;
             clock_gettime(CLOCK_REALTIME, &mtime);
             base << mtime.tv_sec << mtime.tv_nsec << from->getAddress() << rd();
-            mid << '<' << Crypto::md5(base.str(), true) << '@' << from->getAddress().substr(atPos + 1) << '>';
+            mid << '<' << crypto::md5(base.str(), true) << '@' << from->getAddress().substr(atPos + 1) << '>';
             email->headers["Message-ID"] = mid.str();
         }
     }

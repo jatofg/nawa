@@ -26,7 +26,7 @@
 #include <nawa/logging/Log.h>
 #include <nawa/mail/Email/impl/SimpleEmail.h>
 #include <nawa/mail/SmtpMailer.h>
-#include <nawa/util/Encoding.h>
+#include <nawa/util/encoding.h>
 #include <random>
 
 using namespace std;
@@ -93,7 +93,7 @@ int handleRequest(Connection &connection) {
         email.headers["To"] = to.get();
         email.headers["Content-Type"] = "text/plain; charset=UTF-8";
         // apply Q-encoding to the header, just in case the user used special chars in the subject
-        email.headers["Subject"] = Encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
+        email.headers["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
         email.quotedPrintableEncode = true;
         email.text = "This contact form was sent via an example nawa application!\r\n\r\n"
                      "Name of the sender: " + post["name"] + "\r\n"

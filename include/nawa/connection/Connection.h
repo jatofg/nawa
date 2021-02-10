@@ -24,8 +24,9 @@
 #ifndef NAWA_RESPONSE_H
 #define NAWA_RESPONSE_H
 
-#include <nawa/connection/ConnectionInitContainer.h>
+#include <nawa/config/Config.h>
 #include <nawa/connection/Cookie.h>
+#include <nawa/internal/fwdecl.h>
 #include <nawa/internal/macros.h>
 #include <nawa/request/Request.h>
 #include <nawa/session/Session.h>

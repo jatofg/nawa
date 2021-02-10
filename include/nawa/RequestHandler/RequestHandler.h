@@ -27,12 +27,10 @@
 #include <nawa/RequestHandler/HandleRequestFunction.h>
 #include <nawa/config/Config.h>
 #include <nawa/filter/AccessFilterList.h>
+#include <nawa/internal/fwdecl.h>
 #include <shared_mutex>
 
 namespace nawa {
-    // forward declarations
-    class Connection;
-
     class RequestHandler {
         std::shared_mutex configurationMutex_;
         std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction_;

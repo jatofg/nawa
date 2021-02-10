@@ -25,7 +25,7 @@
 #include <cstring>
 #include <nawa/Exception.h>
 #include <nawa/hashing/HashingEngine/impl/Argon2HashingEngine.h>
-#include <nawa/util/Encoding.h>
+#include <nawa/util/encoding.h>
 #include <random>
 #include <regex>
 
@@ -144,8 +144,8 @@ bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
             memoryCost1 = stoul(matches[4]);
             timeCost1 = stoul(matches[5]);
             parallelism1 = stoul(matches[6]);
-            salt1 = Encoding::base64Decode(matches[7]);
-            hash1 = Encoding::base64Decode(matches[8]);
+            salt1 = encoding::base64Decode(matches[7]);
+            hash1 = encoding::base64Decode(matches[8]);
         }
         catch (...) {
             return false;
@@ -161,7 +161,7 @@ bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
     string inputHash;
     try {
         inputHash = engine1.generateHash(input);
-        inputHash = Encoding::base64Decode(inputHash.substr(inputHash.find_last_of('$') + 1));
+        inputHash = encoding::base64Decode(inputHash.substr(inputHash.find_last_of('$') + 1));
     }
     catch (const Exception &) {
         return false;

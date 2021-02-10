@@ -29,7 +29,7 @@
 /**
  * Namespace containing functions for text encoding and decoding
  */
-namespace nawa::Encoding {
+namespace nawa::encoding {
     /**
      * Escape special HTML characters in the input string.
      * @param input String with characters that need to be escaped for use in HTML.

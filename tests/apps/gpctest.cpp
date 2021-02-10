@@ -22,7 +22,7 @@
  */
 
 #include <nawa/Application.h>
-#include <nawa/util/Encoding.h>
+#include <nawa/util/encoding.h>
 
 using namespace nawa;
 using namespace std;
@@ -53,7 +53,7 @@ int handleRequest(Connection &connection) {
                            "<html><head><title>NAWA GPC Test</title></head><body>\n";
 
     auto printEncoded = [&](const string &k, const string &v) {
-        connection.response << "<li>[" << Encoding::htmlEncode(k) << "] = " << Encoding::htmlEncode(v) << "</li>";
+        connection.response << "<li>[" << encoding::htmlEncode(k) << "] = " << encoding::htmlEncode(v) << "</li>";
     };
 
     if (connection.request.cookie) {
@@ -88,13 +88,13 @@ int handleRequest(Connection &connection) {
                 continue;
             }
 
-            connection.response << "<li>[" << Encoding::htmlEncode(k) << "]: "
-                                << R"(<a href="?download=)" << Encoding::urlEncode(v.filename) << R"(">)"
-                                << Encoding::htmlEncode(v.filename)
+            connection.response << "<li>[" << encoding::htmlEncode(k) << "]: "
+                                << R"(<a href="?download=)" << encoding::urlEncode(v.filename) << R"(">)"
+                                << encoding::htmlEncode(v.filename)
                                 << "; size: "
                                 << v.size
                                 << "; content type: "
-                                << Encoding::htmlEncode(v.contentType)
+                                << encoding::htmlEncode(v.contentType)
                                 << "</a></li>";
 
             // Saving files in session and not even cleaning them up at some point is something that clearly

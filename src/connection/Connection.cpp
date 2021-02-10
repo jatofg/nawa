@@ -24,8 +24,9 @@
 #include <fstream>
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
+#include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/connection/FlushCallbackContainer.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/utils.h>
 #include <regex>
 #include <sys/stat.h>
 

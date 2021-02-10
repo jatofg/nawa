@@ -28,8 +28,8 @@
 #include <nawa/mail/Email/impl/MimeEmail.h>
 #include <nawa/mail/Email/impl/SimpleEmail.h>
 #include <nawa/mail/SmtpMailer.h>
-#include <nawa/util/Encoding.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/encoding.h>
+#include <nawa/util/utils.h>
 
 using namespace nawa;
 using namespace std;
@@ -62,7 +62,7 @@ int handleRequest(Connection &connection) {
     email1.headers["From"] = from.get();
     email1.headers["To"] = to.get();
     email1.headers["Content-Type"] = "text/plain; charset=utf-8";
-    email1.headers["Subject"] = Encoding::makeEncodedWord("Test mail");
+    email1.headers["Subject"] = encoding::makeEncodedWord("Test mail");
     email1.text = "Test email 'm€ssage' =@#$%^&*()===";
     connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
 

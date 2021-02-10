@@ -22,9 +22,9 @@
  */
 
 #include <nawa/mail/Email/impl/MimeEmail.h>
-#include <nawa/util/Crypto.h>
-#include <nawa/util/Encoding.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/crypto.h>
+#include <nawa/util/encoding.h>
+#include <nawa/util/utils.h>
 #include <random>
 #include <sstream>
 
@@ -42,7 +42,7 @@ namespace {
 
         // Use MD5 sum of a random integer
         random_device rd;
-        ret << Crypto::md5(to_string(rd()));
+        ret << crypto::md5(to_string(rd()));
 
         return ret.str();
     }
@@ -94,14 +94,14 @@ namespace {
                 switch (mimePart.applyEncoding) {
                     case MimeEmail::MimePart::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
-                        ret << Encoding::base64Encode(
+                        ret << encoding::base64Encode(
                                 (mimePart.allowReplacements && replacementRules)
                                 ? string_replace(mimePart.data, *replacementRules) : mimePart.data,
                                 76, "\r\n");
                         break;
                     case MimeEmail::MimePart::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-                        ret << Encoding::quotedPrintableEncode(
+                        ret << encoding::quotedPrintableEncode(
                                 (mimePart.allowReplacements && replacementRules)
                                 ? string_replace(mimePart.data, *replacementRules) : mimePart.data
                         );

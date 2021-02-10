@@ -23,7 +23,7 @@
 
 #include <nawa/request/Env.h>
 #include <nawa/request/RequestInitContainer.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/utils.h>
 #include <unordered_map>
 
 using namespace nawa;

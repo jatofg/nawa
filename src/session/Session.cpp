@@ -24,7 +24,8 @@
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
 #include <nawa/session/Session.h>
-#include <nawa/util/Crypto.h>
+#include <nawa/session/SessionData.h>
+#include <nawa/util/crypto.h>
 #include <random>
 
 using namespace nawa;
@@ -53,7 +54,7 @@ namespace {
         base << remoteAddress;
 
         // Calculate and return hex-formatted SHA1
-        return Crypto::sha1(base.str(), true);
+        return crypto::sha1(base.str(), true);
     }
 
     /**

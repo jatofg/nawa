@@ -106,10 +106,10 @@ set(NAWA_FILES
         include/nawa/request/RequestInitContainer.h
         include/nawa/session/Session.h
         include/nawa/session/SessionData.h
-        include/nawa/util/Crypto.h
-        include/nawa/util/Encoding.h
+        include/nawa/util/crypto.h
+        include/nawa/util/encoding.h
         include/nawa/util/MimeMultipart.h
-        include/nawa/util/Utils.h
+        include/nawa/util/utils.h
 
         libs/base64/base64.cpp
         libs/base64/base64.h
@@ -133,10 +133,10 @@ set(NAWA_FILES
         src/request/GPC/GPC.cpp
         src/request/Request.cpp
         src/session/Session.cpp
-        src/util/Crypto.cpp
-        src/util/Encoding.cpp
+        src/util/crypto.cpp
+        src/util/encoding.cpp
         src/util/MimeMultipart.cpp
-        src/util/Utils.cpp
+        src/util/utils.cpp
         )
 
 set(NAWA_LINK_LIBRARIES

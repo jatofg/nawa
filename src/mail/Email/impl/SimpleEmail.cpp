@@ -22,8 +22,8 @@
  */
 
 #include <nawa/mail/Email/impl/SimpleEmail.h>
-#include <nawa/util/Encoding.h>
-#include <nawa/util/Utils.h>
+#include <nawa/util/encoding.h>
+#include <nawa/util/utils.h>
 #include <sstream>
 
 using namespace nawa;
@@ -41,7 +41,7 @@ string SimpleEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules)
     ret << "MIME-Version: 1.0\r\n";
     if (quotedPrintableEncode) {
         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
-        ret << Encoding::quotedPrintableEncode(
+        ret << encoding::quotedPrintableEncode(
                 replacementRules ? string_replace(text, *replacementRules) : text
         );
     } else {
