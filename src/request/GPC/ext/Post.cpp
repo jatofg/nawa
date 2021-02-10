@@ -22,40 +22,52 @@
  */
 
 #include <nawa/request/GPC/ext/Post.h>
+#include <nawa/request/RequestInitContainer.h>
 
 using namespace nawa;
 using namespace std;
 
-request::Post::Post(const RequestInitContainer &requestInit) : GPC(requestInit, GPC::Source::POST),
-                                                               contentType(requestInit.postContentType),
-                                                               rawPost(requestInit.rawPost),
-                                                               fileMap(requestInit.postFiles) {}
+struct request::Post::Impl {
+    std::string contentType;
+    std::shared_ptr<std::string> rawPost;
+    std::unordered_multimap<std::string, File> fileMap;
+
+    explicit Impl(const RequestInitContainer &requestInit) : contentType(requestInit.postContentType),
+                                                             rawPost(requestInit.rawPost),
+                                                             fileMap(requestInit.postFiles) {}
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, Post)
+
+request::Post::Post(const RequestInitContainer &requestInit) : GPC(requestInit, GPC::Source::POST) {
+    impl = make_unique<Impl>(requestInit);
+}
 
 request::Post::operator bool() const {
-    return !(dataMap.empty() && fileMap.empty());
+    return !(getMultimap().empty() && impl->fileMap.empty());
 }
 
 shared_ptr<string> request::Post::getRaw() const {
-    return rawPost;
+    return impl->rawPost;
 }
 
 string request::Post::getContentType() const {
-    return contentType;
+    return impl->contentType;
 }
 
 bool request::Post::hasFiles() const {
-    return !fileMap.empty();
+    return !impl->fileMap.empty();
 }
 
 File request::Post::getFile(const string &postVar) const {
-    auto e = fileMap.find(postVar);
-    if (e != fileMap.end()) return e->second;
+    auto e = impl->fileMap.find(postVar);
+    if (e != impl->fileMap.end()) return e->second;
     return File();
 }
 
 vector<File> request::Post::getFileVector(const string &postVar) const {
     vector<File> ret;
-    auto e = fileMap.equal_range(postVar);
+    auto e = impl->fileMap.equal_range(postVar);
     for (auto it = e.first; it != e.second; ++it) {
         ret.push_back(it->second);
     }
@@ -63,9 +75,9 @@ vector<File> request::Post::getFileVector(const string &postVar) const {
 }
 
 size_t request::Post::countFiles(const string &postVar) const {
-    return fileMap.count(postVar);
+    return impl->fileMap.count(postVar);
 }
 
 std::unordered_multimap<std::string, File> const &request::Post::getFileMultimap() const {
-    return fileMap;
+    return impl->fileMap;
 }

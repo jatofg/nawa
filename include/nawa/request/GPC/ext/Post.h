@@ -33,13 +33,12 @@ namespace nawa::request {
      * Specialized accessor for POST that also allows accessing files (and in future, maybe, the raw POST data).
      */
     class Post : public GPC {
-        std::string contentType;
-        std::shared_ptr<std::string> rawPost;
-        std::unordered_multimap<std::string, File> fileMap;
-    public:
-        explicit Post(const RequestInitContainer &requestInit);
+        NAWA_PRIVATE_IMPL_DEF()
 
-        ~Post() override = default;
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(Post);
+
+        explicit Post(const RequestInitContainer &requestInit);
 
         /**
          * Shortcut to check for the existence of POST values (including files).

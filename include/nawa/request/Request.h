@@ -29,10 +29,11 @@
 #include <nawa/request/File.h>
 #include <nawa/request/GPC/GPC.h>
 #include <nawa/request/GPC/ext/Post.h>
-#include <nawa/request/RequestInitContainer.h>
 #include <string>
 
 namespace nawa {
+    class RequestInitContainer;
+
     /**
      * Represents request objects.
      */

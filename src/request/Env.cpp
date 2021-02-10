@@ -22,25 +22,38 @@
  */
 
 #include <nawa/request/Env.h>
+#include <nawa/request/RequestInitContainer.h>
 #include <nawa/util/Utils.h>
+#include <unordered_map>
 
 using namespace nawa;
 using namespace std;
 
+struct request::Env::Impl {
+    unordered_map<string, string> environment;
+    vector<string> acceptLanguages;
+
+    explicit Impl(const RequestInitContainer &initContainer) : environment(initContainer.environment),
+                                                               acceptLanguages(initContainer.acceptLanguages) {}
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, Env)
+
+request::Env::Env(const RequestInitContainer &initContainer) {
+    impl = make_unique<Impl>(initContainer);
+}
+
 string request::Env::operator[](const string &envVar) const {
-    if (environment.count(envVar)) {
-        return environment.at(envVar);
+    if (impl->environment.count(envVar)) {
+        return impl->environment.at(envVar);
     }
     return string();
 }
 
 vector<string> request::Env::getAcceptLanguages() const {
-    return acceptLanguages;
+    return impl->acceptLanguages;
 }
 
 vector<string> request::Env::getRequestPath() const {
     return split_path(operator[]("REQUEST_URI"));
 }
-
-request::Env::Env(const RequestInitContainer &initContainer) : environment(initContainer.environment),
-                                                               acceptLanguages(initContainer.acceptLanguages) {}

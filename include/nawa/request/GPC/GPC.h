@@ -24,29 +24,32 @@
 #ifndef NAWA_GPC_H
 #define NAWA_GPC_H
 
-#include <nawa/request/RequestInitContainer.h>
+#include <nawa/internal/macros.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+namespace nawa {
+    class RequestInitContainer;
+}
 
 namespace nawa::request {
     /**
      * Accessor for GET, POST, and COOKIE variables.
      */
     class GPC {
+        NAWA_PRIVATE_IMPL_DEF()
+
     public:
         enum class Source {
             GET,
             POST,
             COOKIE
         };
-    protected:
-        Source source;
-        std::unordered_multimap<std::string, std::string> dataMap;
-    public:
-        GPC(const RequestInitContainer &requestInit, Source source);
 
-        virtual ~GPC() = default;
+        NAWA_DEFAULT_DESTRUCTOR_DEF(GPC);
+
+        GPC(const RequestInitContainer &requestInit, Source source);
 
         /**
          * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,

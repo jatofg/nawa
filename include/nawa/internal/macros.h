@@ -30,6 +30,7 @@
 #define NAWA_PRIVATE_IMPL_DEF() struct Impl; std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
 
 #define NAWA_DEFAULT_DESTRUCTOR_DEF(Class) virtual ~Class()
+#define NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(Class) ~Class() override
 #define NAWA_DEFAULT_DESTRUCTOR_IMPL(Class) Class::~Class() = default;
 #define NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::~Class() = default;
 

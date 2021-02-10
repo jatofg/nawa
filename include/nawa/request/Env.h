@@ -24,16 +24,28 @@
 #ifndef NAWA_ENV_H
 #define NAWA_ENV_H
 
-#include <nawa/request/RequestInitContainer.h>
+#include <nawa/internal/macros.h>
 #include <string>
 #include <vector>
+
+namespace nawa {
+    class RequestInitContainer;
+}
 
 namespace nawa::request {
     /**
      * Accessor for environment variables.
      */
     class Env {
+        NAWA_PRIVATE_IMPL_DEF()
+
     public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Env);
+
+        /**
+         * Create Env using a RequestInitContainer.
+         * @param initContainer The RequestInitContainer.
+         */
         explicit Env(const RequestInitContainer &initContainer);
 
         /**
@@ -55,10 +67,6 @@ namespace nawa::request {
          * @return Vector of strings containing the elements of the path.
          */
         [[nodiscard]] std::vector<std::string> getRequestPath() const;
-
-    private:
-        std::unordered_map<std::string, std::string> environment;
-        std::vector<std::string> acceptLanguages;
     };
 }
 

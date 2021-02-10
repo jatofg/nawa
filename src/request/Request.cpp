@@ -22,6 +22,7 @@
  */
 
 #include <nawa/request/Request.h>
+#include <nawa/request/RequestInitContainer.h>
 
 using namespace nawa;
 using namespace std;
