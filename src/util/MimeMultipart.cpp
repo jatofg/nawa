@@ -30,7 +30,64 @@
 using namespace nawa;
 using namespace std;
 
-MimeMultipart::MimeMultipart(const string &contentType, string content) {
+struct MimeMultipart::Impl {
+    string contentType;
+    vector<Part> parts;
+};
+
+struct MimeMultipart::Part::Impl {
+    string partName;
+    string fileName;
+    string contentType;
+    unordered_map<string, string> headers;
+    string content;
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL(MimeMultipart)
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(MimeMultipart)
+
+NAWA_COPY_CONSTRUCTOR_IMPL(MimeMultipart)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(MimeMultipart)
+
+NAWA_MOVE_CONSTRUCTOR_IMPL(MimeMultipart)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(MimeMultipart)
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(MimeMultipart, Part)
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(MimeMultipart, Part)
+
+NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(MimeMultipart, Part)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeMultipart, Part)
+
+NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(MimeMultipart, Part)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeMultipart, Part)
+
+string MimeMultipart::Part::getName() const noexcept {
+    return impl->partName;
+}
+
+string MimeMultipart::Part::getFilename() const noexcept {
+    return impl->fileName;
+}
+
+string MimeMultipart::Part::getContentType() const noexcept {
+    return impl->contentType;
+}
+
+unordered_map<string, string> const &MimeMultipart::Part::getHeaders() const noexcept {
+    return impl->headers;
+}
+
+string const &MimeMultipart::Part::getContent() const noexcept {
+    return impl->content;
+}
+
+MimeMultipart::MimeMultipart(const string &contentType, string content) : MimeMultipart() {
     parse(contentType, move(content));
 }
 
@@ -89,28 +146,32 @@ void MimeMultipart::parse(const string &contentType, string content) {
         }
 
         Part currentPart;
-        currentPart.headers = parse_headers(content.substr(0, headersEndPos));
-        currentPart.contentType = currentPart.headers.count("content-type") ? currentPart.headers.at("content-type")
+        currentPart.impl->headers = parse_headers(content.substr(0, headersEndPos));
+        currentPart.impl->contentType = currentPart.impl->headers.count("content-type") ? currentPart.impl->headers.at("content-type")
                                                                             : "";
-        if (currentPart.headers.count("content-disposition")) {
-            tie(currentPart.partName, currentPart.fileName) = extractPartAndFileName(
-                    currentPart.headers.at("content-disposition"));
+        if (currentPart.impl->headers.count("content-disposition")) {
+            tie(currentPart.impl->partName, currentPart.impl->fileName) = extractPartAndFileName(
+                    currentPart.impl->headers.at("content-disposition"));
         }
 
         // is there a part content in between? (headersEndPos + "\r\n\r\n" + content + "\r\n")
         if (nextBoundaryPos > headersEndPos + 7) {
-            currentPart.content = content.substr(headersEndPos + 4, nextBoundaryPos - 2 - (headersEndPos + 4));
+            currentPart.impl->content = content.substr(headersEndPos + 4, nextBoundaryPos - 2 - (headersEndPos + 4));
         }
 
-        parts_.push_back(currentPart);
+        impl->parts.push_back(currentPart);
         content = content.substr(nextBoundaryPos);
 
     }
 
-    contentType_ = contentType.substr(0, contentType.find_first_of(';'));
+    impl->contentType = contentType.substr(0, contentType.find_first_of(';'));
 }
 
 void MimeMultipart::clear() {
-    contentType_.clear();
-    parts_.clear();
+    impl->contentType.clear();
+    impl->parts.clear();
+}
+
+vector<MimeMultipart::Part> const &MimeMultipart::getParts() const noexcept {
+    return impl->parts;
 }

@@ -121,21 +121,21 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
             try {
                 MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
-                for (auto const &p: postData.parts_) {
+                for (auto const &p: postData.getParts()) {
                     // find out whether the part is a file
-                    if (!p.fileName.empty() || (!p.contentType.empty() &&
-                                                p.contentType.substr(0, plainTextContentType.length()) !=
+                    if (!p.getFilename().empty() || (!p.getContentType().empty() &&
+                                                p.getContentType().substr(0, plainTextContentType.length()) !=
                                                 plainTextContentType)) {
                         File pf;
-                        pf.contentType = p.contentType;
-                        pf.filename = p.fileName;
-                        pf.size = p.content.size();
+                        pf.contentType = p.getContentType();
+                        pf.filename = p.getFilename();
+                        pf.size = p.getContent().size();
                         // TODO better solution can be used when shifting fcgi handler to use MimeMultipart
                         pf.dataPtr = shared_ptr<char[]>(new char[pf.size]);
-                        memcpy(pf.dataPtr.get(), p.content.c_str(), pf.size);
-                        requestInit.postFiles.insert({p.partName, move(pf)});
+                        memcpy(pf.dataPtr.get(), p.getContent().c_str(), pf.size);
+                        requestInit.postFiles.insert({p.getName(), move(pf)});
                     } else {
-                        requestInit.postVars.insert({p.partName, p.content});
+                        requestInit.postVars.insert({p.getName(), p.getContent()});
                     }
                 }
             } catch (Exception const &) {}
