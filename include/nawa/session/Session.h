@@ -28,36 +28,23 @@
 #include <memory>
 #include <nawa/connection/Cookie.h>
 #include <nawa/internal/fwdecl.h>
+#include <nawa/internal/macros.h>
 
 namespace nawa {
     /**
      * Class for managing sessions and getting and setting connection-independent session data.
      */
     class Session {
-        nawa::Connection &connection; /**< Reference to the Connection object in order to access objects. */
-        /**
-         * Pointer to the session data struct for the current session, if established.
-         * Can be used to check whether a session is established by checking shared_ptr::use_count()
-         * (used by established()).
-         */
-        std::shared_ptr<SessionData> currentData;
-        std::string currentID; /**< The current session ID. */
-        std::string cookieName; /**< Name of the session cookie, as determined by start(). */
-
-        /**
-         * Reset the data map to delete all session data. This function is not thread-safe and should be used only
-         * on termination, if at all. May be removed soon.
-         */
-        [[maybe_unused]] static void destroy();
+        NAWA_PRIVATE_IMPL_DEF()
 
     public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Session);
+
         /**
          * Construct a new Session object. This will just store the Connection reference in the object.
          * @param connection Reference to the current Connection (for getting and setting cookies).
          */
         explicit Session(Connection &connection);
-
-        virtual ~Session() = default;
 
         /**
          * Start the session (load existing session basing on a cookie sent by the client or create a new one).
