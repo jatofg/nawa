@@ -69,7 +69,6 @@ namespace nawa {
 
     // session
     class Session;
-    class SessionData;
 
     // util
     class MimeMultipart;

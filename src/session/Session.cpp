@@ -24,14 +24,35 @@
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
 #include <nawa/session/Session.h>
-#include <nawa/session/SessionData.h>
 #include <nawa/util/crypto.h>
 #include <random>
+#include <mutex>
 
 using namespace nawa;
 using namespace std;
 
 namespace {
+    /**
+     * SessionData objects contain all data of one session.
+     */
+    struct SessionData {
+        mutex dLock; /**< Lock for data. */
+        mutex eLock; /**< Lock for expires.  */
+        unordered_map<std::string, std::any> data; /**< Map containing all values of this session. */
+        time_t expires; /**< Time when this session expires. */
+        const string sourceIP; /**< IP address of the session initiator, for optional IP checking. */
+        /**
+         * Construct an empty SessionData object without a source IP.
+         */
+        SessionData() : expires(0) {}
+
+        /**
+         * Construct an empty SessionData object with a source IP.
+         * @param sIP IP address of the session initiator.
+         */
+        explicit SessionData(string sIP) : expires(0), sourceIP(move(sIP)) {}
+    };
+
     mutex gLock; /**< Lock for data. */
     /**
     * Map containing (pointers to) the session data for all sessions. The key is the session ID string.

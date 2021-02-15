@@ -105,7 +105,6 @@ set(NAWA_FILES
         include/nawa/request/Request.h
         include/nawa/request/RequestInitContainer.h
         include/nawa/session/Session.h
-        include/nawa/session/SessionData.h
         include/nawa/util/crypto.h
         include/nawa/util/encoding.h
         include/nawa/util/MimeMultipart.h
