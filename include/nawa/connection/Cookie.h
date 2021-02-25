@@ -34,7 +34,7 @@ namespace nawa {
      * Structure for creating Cookie objects. Content can be set by using a constructor.
      */
     class Cookie {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(Cookie);
 

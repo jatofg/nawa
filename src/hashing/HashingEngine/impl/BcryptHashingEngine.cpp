@@ -29,17 +29,17 @@
 using namespace nawa;
 using namespace std;
 
-struct hashing::BcryptHashingEngine::Impl {
+struct hashing::BcryptHashingEngine::Data {
     int workFactor;
     string salt;
 
-    Impl(int workFactor, string salt) : workFactor(workFactor), salt(move(salt)) {}
+    Data(int workFactor, string salt) : workFactor(workFactor), salt(move(salt)) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(hashing, BcryptHashingEngine)
 
 hashing::BcryptHashingEngine::BcryptHashingEngine(int workFactor, string salt) {
-    impl = make_unique<Impl>(workFactor, move(salt));
+    data = make_unique<Data>(workFactor, move(salt));
 }
 
 string hashing::BcryptHashingEngine::generateHash(string input) const {
@@ -47,11 +47,11 @@ string hashing::BcryptHashingEngine::generateHash(string input) const {
     char hash[BCRYPT_HASHSIZE];
 
     // use the user-defined salt if necessary
-    if (!impl->salt.empty()) {
-        string salt_res = impl->salt;
+    if (!data->salt.empty()) {
+        string salt_res = data->salt;
         salt_res.resize(BCRYPT_HASHSIZE, '\0');
         memcpy(hash, salt_res.c_str(), BCRYPT_HASHSIZE);
-    } else if (bcrypt_gensalt(impl->workFactor, bcsalt) != 0) {
+    } else if (bcrypt_gensalt(data->workFactor, bcsalt) != 0) {
         throw Exception(__PRETTY_FUNCTION__, 10,
                         "Could not generate a salt (unknown bcrypt failure).");
     }

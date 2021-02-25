@@ -26,22 +26,41 @@
 
 #include <nawa/config/Config.h>
 #include <nawa/filter/AccessFilterList.h>
+#include <nawa/internal/macros.h>
 
 namespace nawa {
-    struct AppInit {
+    class AppInit {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(AppInit);
+
+        /**
+         * Create a new AppInit object.
+         * @param config The config.
+         * @param numThreads Number of threads.
+         */
+        AppInit(Config config, size_t numThreads);
+
         /**
          * You can use this to modify the default configuration for every request during initialization.
+         * @return Reference to the configuration.
          */
-        Config config;
+        Config &config();
+
         /**
-         * List of static access filters that can be evaluated before forwarding a request to your app.
+         * Contains the number of started worker threads for information purposes (e.g., to determine dimension of
+         * thread pools).
+         * @return Reference to the access filters container.
          */
-        AccessFilterList accessFilters;
+        AccessFilterList &accessFilters();
+
         /**
-         * Contains the number of started worker threads for information purposes
-         * (e.g., to determine dimension of thread pools).
+         * Contains the number of started worker threads for information purposes (e.g., to determine dimension of
+         * thread pools).
+         * @return Number of started worker threads.
          */
-        size_t numThreads;
+        size_t numThreads();
     };
 }
 

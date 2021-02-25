@@ -27,39 +27,39 @@
 using namespace nawa;
 using namespace std;
 
-struct request::GPC::Impl {
+struct request::GPC::Data {
     Source source;
     std::unordered_multimap<std::string, std::string> dataMap;
 
-    explicit Impl(Source source) : source(source) {}
+    explicit Data(Source source) : source(source) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, GPC)
 
 request::GPC::GPC(const RequestInitContainer &requestInit, Source source) {
-    impl = make_unique<Impl>(source);
+    data = make_unique<Data>(source);
 
     switch (source) {
         case Source::COOKIE:
-            impl->dataMap = requestInit.cookieVars;
+            data->dataMap = requestInit.cookieVars;
             break;
         case Source::POST:
-            impl->dataMap = requestInit.postVars;
+            data->dataMap = requestInit.postVars;
             break;
         default:
-            impl->dataMap = requestInit.getVars;
+            data->dataMap = requestInit.getVars;
     }
 }
 
 string request::GPC::operator[](const string &gpcVar) const {
-    auto e = impl->dataMap.find(gpcVar);
-    if (e != impl->dataMap.end()) return e->second;
+    auto e = data->dataMap.find(gpcVar);
+    if (e != data->dataMap.end()) return e->second;
     else return "";
 }
 
 vector<string> request::GPC::getVector(const string &gpcVar) const {
     vector<string> ret;
-    auto e = impl->dataMap.equal_range(gpcVar);
+    auto e = data->dataMap.equal_range(gpcVar);
     for (auto it = e.first; it != e.second; ++it) {
         ret.push_back(it->second);
     }
@@ -67,21 +67,21 @@ vector<string> request::GPC::getVector(const string &gpcVar) const {
 }
 
 size_t request::GPC::count(const string &gpcVar) const {
-    return impl->dataMap.count(gpcVar);
+    return data->dataMap.count(gpcVar);
 }
 
 unordered_multimap<string, string> const &request::GPC::getMultimap() const {
-    return impl->dataMap;
+    return data->dataMap;
 }
 
 unordered_multimap<string, string>::const_iterator request::GPC::begin() const {
-    return impl->dataMap.begin();
+    return data->dataMap.begin();
 }
 
 unordered_multimap<string, string>::const_iterator request::GPC::end() const {
-    return impl->dataMap.end();
+    return data->dataMap.end();
 }
 
 request::GPC::operator bool() const {
-    return !impl->dataMap.empty();
+    return !data->dataMap.empty();
 }

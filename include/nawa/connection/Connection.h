@@ -39,7 +39,7 @@ namespace nawa {
      * Response object to be passed back to NAWA and accessor to the request.
      */
     class Connection {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         nawa::Request request; /**< The Request object representing the current request. */

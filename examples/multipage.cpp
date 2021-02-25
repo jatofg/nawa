@@ -30,7 +30,7 @@ using namespace nawa;
 int init(AppInit &appInit) {
 
     // enable access filtering
-    appInit.accessFilters.filtersEnabled = true;
+    appInit.accessFilters().filtersEnabled = true;
 
     // apply forward filters for images below '/test/static/images' and '/test2/static/images ...
     ForwardFilter imageFilter;
@@ -38,7 +38,7 @@ int init(AppInit &appInit) {
                               {"test2", "static", "images"}};
     imageFilter.extensionFilter = {"png", "jpeg", "jpg", "gif"};
     imageFilter.basePath = "/var/www/multipage/images";
-    appInit.accessFilters.forwardFilters.push_back(imageFilter);
+    appInit.accessFilters().forwardFilters.push_back(imageFilter);
 
     // and block everything else in these directories
     BlockFilter blockNonImages;
@@ -47,14 +47,14 @@ int init(AppInit &appInit) {
     blockNonImages.extensionFilter = {"png", "jpeg", "jpg", "gif"};
     blockNonImages.invertExtensionFilter = true;
     blockNonImages.status = 404;
-    appInit.accessFilters.blockFilters.push_back(blockNonImages);
+    appInit.accessFilters().blockFilters.push_back(blockNonImages);
 
     // ... and html below '/test/static/html'
     ForwardFilter htmlFilter;
     htmlFilter.pathFilter = {{"test", "static", "html"}};
     htmlFilter.extensionFilter = {"html", "htm"};
     htmlFilter.basePath = "/var/www/multipage/html";
-    appInit.accessFilters.forwardFilters.push_back(htmlFilter);
+    appInit.accessFilters().forwardFilters.push_back(htmlFilter);
 
     // and also block everything else there
     BlockFilter blockNonHtml;
@@ -62,7 +62,7 @@ int init(AppInit &appInit) {
     blockNonHtml.extensionFilter = {"html", "htm"};
     blockNonHtml.invertExtensionFilter = true;
     blockNonHtml.status = 404;
-    appInit.accessFilters.blockFilters.push_back(blockNonHtml);
+    appInit.accessFilters().blockFilters.push_back(blockNonHtml);
 
     // authenticate access to all static resources
     AuthFilter authFilter;
@@ -72,9 +72,9 @@ int init(AppInit &appInit) {
     authFilter.authFunction = [](std::string user, std::string password) -> bool {
         return (user == "test" && password == "supersecure");
     };
-    appInit.accessFilters.authFilters.push_back(authFilter);
+    appInit.accessFilters().authFilters.push_back(authFilter);
 
-    // for an example of regex-based filtering see tests/nawatest.cpp
+    // for an example of regex-based filtering see tests/apps/nawatest.cpp
 
     return 0;
 }

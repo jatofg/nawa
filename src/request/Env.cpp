@@ -29,29 +29,29 @@
 using namespace nawa;
 using namespace std;
 
-struct request::Env::Impl {
+struct request::Env::Data {
     unordered_map<string, string> environment;
     vector<string> acceptLanguages;
 
-    explicit Impl(const RequestInitContainer &initContainer) : environment(initContainer.environment),
+    explicit Data(const RequestInitContainer &initContainer) : environment(initContainer.environment),
                                                                acceptLanguages(initContainer.acceptLanguages) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, Env)
 
 request::Env::Env(const RequestInitContainer &initContainer) {
-    impl = make_unique<Impl>(initContainer);
+    data = make_unique<Data>(initContainer);
 }
 
 string request::Env::operator[](const string &envVar) const {
-    if (impl->environment.count(envVar)) {
-        return impl->environment.at(envVar);
+    if (data->environment.count(envVar)) {
+        return data->environment.at(envVar);
     }
     return string();
 }
 
 vector<string> request::Env::getAcceptLanguages() const {
-    return impl->acceptLanguages;
+    return data->acceptLanguages;
 }
 
 vector<string> request::Env::getRequestPath() const {

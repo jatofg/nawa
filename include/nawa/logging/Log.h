@@ -36,7 +36,7 @@ namespace nawa {
      * By default, the logger will write to std::cout.
      */
     class Log {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         /**

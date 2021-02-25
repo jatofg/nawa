@@ -26,11 +26,10 @@
 using namespace nawa;
 using namespace std;
 
-struct Cookie::Impl {
-    // rework cookie handling (defaults, ...)
+struct Cookie::Data {
     string content; /**< Content of the cookie. */
-    optional<time_t> expires = 0; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
-    optional<unsigned long> maxAge = 0; /**< Set Max-Age attribute. */
+    optional<time_t> expires; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
+    optional<unsigned long> maxAge; /**< Set Max-Age attribute. */
     optional<string> domain; /**< Set Domain attribute. */
     optional<string> path; /**< Set Path attribute. */
     bool secure = false; /**< Set Secure attribute. */
@@ -51,77 +50,77 @@ NAWA_MOVE_CONSTRUCTOR_IMPL(Cookie)
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Cookie)
 
 Cookie::Cookie(string c) : Cookie() {
-    impl->content = move(c);
+    data->content = move(c);
 }
 
 Cookie &Cookie::setContent(string content) noexcept {
-    impl->content = move(content);
+    data->content = move(content);
     return *this;
 }
 
 string Cookie::getContent() const noexcept {
-    return impl->content;
+    return data->content;
 }
 
 Cookie &Cookie::setExpires(time_t expires) noexcept {
-    impl->expires = expires;
+    data->expires = expires;
     return *this;
 }
 
 optional<time_t> Cookie::getExpires() const noexcept {
-    return impl->expires;
+    return data->expires;
 }
 
 Cookie &Cookie::setMaxAge(optional<unsigned long> maxAge) noexcept {
-    impl->maxAge = maxAge;
+    data->maxAge = maxAge;
     return *this;
 }
 
 optional<unsigned long> Cookie::getMaxAge() const noexcept {
-    return impl->maxAge;
+    return data->maxAge;
 }
 
 Cookie &Cookie::setDomain(optional<string> domain) noexcept {
-    impl->domain = move(domain);
+    data->domain = move(domain);
     return *this;
 }
 
 optional<string> Cookie::getDomain() const noexcept {
-    return impl->domain;
+    return data->domain;
 }
 
 Cookie &Cookie::setPath(optional<string> path) noexcept {
-    impl->path = move(path);
+    data->path = move(path);
     return *this;
 }
 
 optional<string> Cookie::getPath() const noexcept {
-    return impl->path;
+    return data->path;
 }
 
 Cookie &Cookie::setSecure(bool secure) noexcept {
-    impl->secure = secure;
+    data->secure = secure;
     return *this;
 }
 
 bool Cookie::getSecure() const noexcept {
-    return impl->secure;
+    return data->secure;
 }
 
 Cookie &Cookie::setHttpOnly(bool httpOnly) noexcept {
-    impl->httpOnly = httpOnly;
+    data->httpOnly = httpOnly;
     return *this;
 }
 
 bool Cookie::getHttpOnly() const noexcept {
-    return impl->httpOnly;
+    return data->httpOnly;
 }
 
 Cookie &Cookie::setSameSite(Cookie::SameSite sameSite) noexcept {
-    impl->sameSite = sameSite;
+    data->sameSite = sameSite;
     return *this;
 }
 
 Cookie::SameSite Cookie::getSameSite() const noexcept {
-    return impl->sameSite;
+    return data->sameSite;
 }

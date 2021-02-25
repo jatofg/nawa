@@ -166,9 +166,7 @@ void reload(int signum) {
         }
 
         {
-            AppInit appInitStruct;
-            appInitStruct.config = config;
-            appInitStruct.numThreads = getConcurrency(config);
+            AppInit appInitStruct(config, getConcurrency(config));
             auto initReturn = appInit(appInitStruct);
 
             // init function of the app should return 0 on success, otherwise we will not reload
@@ -184,7 +182,7 @@ void reload(int signum) {
             }
 
             // reconfigure everything
-            requestHandlerPtr->reconfigure(appHandleRequest, appInitStruct.accessFilters, appInitStruct.config);
+            requestHandlerPtr->reconfigure(appHandleRequest, appInitStruct.accessFilters(), appInitStruct.config());
             readyToReconfigure = true;
         }
     }
@@ -306,9 +304,7 @@ int main(int argc, char **argv) {
 
     // before manager starts, init app
     {
-        AppInit appInitStruct;
-        appInitStruct.config = config;
-        appInitStruct.numThreads = concurrency;
+        AppInit appInitStruct(config, concurrency);
         auto initReturn = appInit(appInitStruct);
 
         // init function of the app should return 0 on success
@@ -318,7 +314,7 @@ int main(int argc, char **argv) {
         }
 
         // reconfigure request handler using access filters and (potentially altered by app init) config
-        requestHandlerPtr->reconfigure(nullopt, appInitStruct.accessFilters, appInitStruct.config);
+        requestHandlerPtr->reconfigure(nullopt, appInitStruct.accessFilters(), appInitStruct.config());
     }
 
     try {

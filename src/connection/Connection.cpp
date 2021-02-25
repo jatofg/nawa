@@ -100,7 +100,7 @@ namespace {
     }
 }
 
-struct Connection::Impl {
+struct Connection::Data {
     std::string bodyString;
     unsigned int responseStatus = 200;
     std::unordered_map<std::string, std::vector<std::string>> headers;
@@ -118,7 +118,7 @@ struct Connection::Impl {
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Connection)
 
 void Connection::setBody(string content) {
-    impl->bodyString = move(content);
+    data->bodyString = move(content);
     clearStream(this);
 }
 
@@ -188,9 +188,9 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
-    impl->bodyString.resize(static_cast<unsigned long>(fs) + 1, '\0');
-    impl->bodyString[fs] = '\0';
-    f.read(&impl->bodyString[0], fs);
+    data->bodyString.resize(static_cast<unsigned long>(fs) + 1, '\0');
+    data->bodyString[fs] = '\0';
+    f.read(&data->bodyString[0], fs);
 
     // also clear the stream so that it doesn't mess with our file
     clearStream(this);
@@ -199,24 +199,24 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
 void Connection::setHeader(string key, string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    impl->headers[key] = {move(value)};
+    data->headers[key] = {move(value)};
 }
 
 void Connection::addHeader(string key, string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    impl->headers[key].push_back(move(value));
+    data->headers[key].push_back(move(value));
 }
 
 void Connection::unsetHeader(string key) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    impl->headers.erase(key);
+    data->headers.erase(key);
 }
 
 unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) const {
     unordered_multimap<string, string> ret;
-    for (auto const &[key, values]: impl->headers) {
+    for (auto const &[key, values]: data->headers) {
         for (auto const &value: values) {
             ret.insert({key, value});
         }
@@ -224,41 +224,41 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
 
     // include cookies if desired
     if (includeCookies)
-        for (auto const &e: impl->cookies) {
+        for (auto const &e: data->cookies) {
             stringstream headerVal;
             headerVal << e.first << "=" << e.second.getContent();
             // Domain option
-            optional<string> domain = e.second.getDomain() ? e.second.getDomain() : impl->cookiePolicy.getDomain();
+            optional<string> domain = e.second.getDomain() ? e.second.getDomain() : data->cookiePolicy.getDomain();
             if (domain && !domain->empty()) {
                 headerVal << "; Domain=" << *domain;
             }
             // Path option
-            optional<string> path = e.second.getPath() ? e.second.getPath() : impl->cookiePolicy.getPath();
+            optional<string> path = e.second.getPath() ? e.second.getPath() : data->cookiePolicy.getPath();
             if (path && !path->empty()) {
                 headerVal << "; Path=" << *path;
             }
             // Expires option
-            optional<time_t> expiry = e.second.getExpires() ? e.second.getExpires() : impl->cookiePolicy.getExpires();
+            optional<time_t> expiry = e.second.getExpires() ? e.second.getExpires() : data->cookiePolicy.getExpires();
             if (expiry) {
                 headerVal << "; Expires=" << make_http_time(*expiry);
             }
             // Max-Age option
             optional<unsigned long> maxAge = e.second.getMaxAge() ? e.second.getMaxAge()
-                                                                  : impl->cookiePolicy.getMaxAge();
+                                                                  : data->cookiePolicy.getMaxAge();
             if (maxAge) {
                 headerVal << "; Max-Age=" << *maxAge;
             }
             // Secure option
-            if (e.second.getSecure() || impl->cookiePolicy.getSecure()) {
+            if (e.second.getSecure() || data->cookiePolicy.getSecure()) {
                 headerVal << "; Secure";
             }
             // HttpOnly option
-            if (e.second.getHttpOnly() || impl->cookiePolicy.getHttpOnly()) {
+            if (e.second.getHttpOnly() || data->cookiePolicy.getHttpOnly()) {
                 headerVal << "; HttpOnly";
             }
             // SameSite option
             Cookie::SameSite sameSite = (e.second.getSameSite() != Cookie::SameSite::OFF) ? e.second.getSameSite()
-                                                                                          : impl->cookiePolicy.getSameSite();
+                                                                                          : data->cookiePolicy.getSameSite();
             if (sameSite == Cookie::SameSite::LAX) {
                 headerVal << "; SameSite=lax";
             } else if (sameSite == Cookie::SameSite::STRICT) {
@@ -271,18 +271,18 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
 }
 
 string Connection::getBody() {
-    impl->mergeStream(this);
-    return impl->bodyString;
+    data->mergeStream(this);
+    return data->bodyString;
 }
 
 Connection::Connection(const ConnectionInitContainer &connectionInit)
         : request(connectionInit.requestInit),
           config(connectionInit.config),
           session(*this) {
-    impl = make_unique<Impl>();
-    impl->flushCallback = connectionInit.flushCallback;
+    data = make_unique<Data>();
+    data->flushCallback = connectionInit.flushCallback;
 
-    impl->headers["content-type"] = {"text/html; charset=utf-8"};
+    data->headers["content-type"] = {"text/html; charset=utf-8"};
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
     if (config[{"session", "autostart"}] == "on") {
@@ -297,7 +297,7 @@ void Connection::setCookie(const string &key, Cookie cookie) {
     if (!regex_match(key, matchKey) || !regex_match(cookie.getContent(), matchContent)) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
-    impl->cookies[key] = move(cookie);
+    data->cookies[key] = move(cookie);
 }
 
 void Connection::setCookie(const string &key, string cookieContent) {
@@ -305,29 +305,29 @@ void Connection::setCookie(const string &key, string cookieContent) {
 }
 
 void Connection::unsetCookie(const string &key) {
-    impl->cookies.erase(key);
+    data->cookies.erase(key);
 }
 
 void Connection::flushResponse() {
     // use callback to flush response
-    impl->flushCallback(FlushCallbackContainer{.status=impl->responseStatus, .headers=getHeaders(true),
-            .body=getBody(), .flushedBefore=impl->isFlushed});
+    data->flushCallback(FlushCallbackContainer{.status=data->responseStatus, .headers=getHeaders(true),
+            .body=getBody(), .flushedBefore=data->isFlushed});
     // response has been flushed now
-    impl->isFlushed = true;
+    data->isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
     setBody("");
 }
 
 void Connection::setStatus(unsigned int status) {
-    impl->responseStatus = status;
+    data->responseStatus = status;
 }
 
 void Connection::setCookiePolicy(Cookie policy) {
-    impl->cookiePolicy = move(policy);
+    data->cookiePolicy = move(policy);
 }
 
 unsigned int Connection::getStatus() const {
-    return impl->responseStatus;
+    return data->responseStatus;
 }
 
 std::string FlushCallbackContainer::getStatusString() const {

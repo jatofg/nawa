@@ -100,7 +100,7 @@ namespace {
     }
 }
 
-struct Session::Impl {
+struct Session::Data {
     nawa::Connection &connection; /**< Reference to the Connection object in order to access objects. */
     /**
      * Pointer to the session data struct for the current session, if established.
@@ -111,13 +111,13 @@ struct Session::Impl {
     std::string currentID; /**< The current session ID. */
     std::string cookieName; /**< Name of the session cookie, as determined by start(). */
 
-    explicit Impl(Connection &connection) : connection(connection) {}
+    explicit Data(Connection &connection) : connection(connection) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Session)
 
 Session::Session(Connection &connection) {
-    impl = make_unique<Impl>(connection);
+    data = make_unique<Data>(connection);
 
     // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
     // thus, it will be triggered by the Connection constructor
@@ -129,9 +129,9 @@ void Session::start(Cookie properties) {
     if (established()) return;
 
     // get name of session cookie from config
-    impl->cookieName = impl->connection.config[{"session", "cookie_name"}];
-    if (impl->cookieName.empty()) {
-        impl->cookieName = "SESSION";
+    data->cookieName = data->connection.config[{"session", "cookie_name"}];
+    if (data->cookieName.empty()) {
+        data->cookieName = "SESSION";
     }
 
     // session duration
@@ -139,7 +139,7 @@ void Session::start(Cookie properties) {
     if (properties.getMaxAge()) {
         sessionKeepalive = *properties.getMaxAge();
     } else {
-        auto sessionKStr = impl->connection.config[{"session", "keepalive"}];
+        auto sessionKStr = data->connection.config[{"session", "keepalive"}];
         if (!sessionKStr.empty()) {
             try {
                 sessionKeepalive = stoul(sessionKStr);
@@ -151,21 +151,21 @@ void Session::start(Cookie properties) {
     }
 
     // check whether client has submitted a session cookie
-    auto sessionCookieStr = impl->connection.request.cookie[impl->cookieName];
+    auto sessionCookieStr = data->connection.request.cookie[data->cookieName];
     if (!sessionCookieStr.empty()) {
         // check for validity
         // global data map may be accessed concurrently by different threads
         lock_guard<mutex> lockGuard(gLock);
         if (sessionData.count(sessionCookieStr) == 1) {
             // read validate_ip setting from config (needed a few lines later)
-            auto sessionValidateIP = impl->connection.config[{"session", "validate_ip"}];
+            auto sessionValidateIP = data->connection.config[{"session", "validate_ip"}];
             // session already expired?
             if (sessionData.at(sessionCookieStr)->expires <= time(nullptr)) {
                 sessionData.erase(sessionCookieStr);
             }
                 // validate_ip enabled in NAWA config and IP mismatch?
             else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax")
-                     && sessionData.at(sessionCookieStr)->sourceIP != impl->connection.request.env["remoteAddress"]) {
+                     && sessionData.at(sessionCookieStr)->sourceIP != data->connection.request.env["remoteAddress"]) {
                 if (sessionValidateIP == "strict") {
                     // in strict mode, session has to be invalidated
                     sessionData.erase(sessionCookieStr);
@@ -173,28 +173,28 @@ void Session::start(Cookie properties) {
             }
                 // session is valid
             else {
-                impl->currentData = sessionData.at(sessionCookieStr);
+                data->currentData = sessionData.at(sessionCookieStr);
                 // reset expiry
-                lock_guard<mutex> currentLock(impl->currentData->eLock);
-                impl->currentData->expires = time(nullptr) + sessionKeepalive;
+                lock_guard<mutex> currentLock(data->currentData->eLock);
+                data->currentData->expires = time(nullptr) + sessionKeepalive;
             }
         }
     }
     // if currentData not yet set (sessionCookieStr empty or invalid) -> initiate new session
-    if (impl->currentData.use_count() < 1) {
+    if (data->currentData.use_count() < 1) {
         // generate new session ID string (and check for duplicate - should not really occur)
         lock_guard<mutex> lockGuard(gLock);
         do {
-            sessionCookieStr = generateID(impl->connection.request.env["remoteAddress"]);
+            sessionCookieStr = generateID(data->connection.request.env["remoteAddress"]);
         } while (sessionData.count(sessionCookieStr) > 0);
-        impl->currentData = make_shared<SessionData>(impl->connection.request.env["remoteAddr"]);
-        impl->currentData->expires = time(nullptr) + sessionKeepalive;
-        sessionData[sessionCookieStr] = impl->currentData;
+        data->currentData = make_shared<SessionData>(data->connection.request.env["remoteAddr"]);
+        data->currentData->expires = time(nullptr) + sessionKeepalive;
+        sessionData[sessionCookieStr] = data->currentData;
     }
 
     // set the response cookie and its properties according to the Cookie parameter or the NAWA config
     string cookieExpiresStr;
-    if (properties.getExpires() || impl->connection.config[{"session", "cookie_expires"}] != "off") {
+    if (properties.getExpires() || data->connection.config[{"session", "cookie_expires"}] != "off") {
         properties.setExpires(time(nullptr) + sessionKeepalive);
         properties.setMaxAge(sessionKeepalive);
     } else {
@@ -202,14 +202,14 @@ void Session::start(Cookie properties) {
         properties.setMaxAge(nullopt);
     }
 
-    if (!properties.getSecure() && impl->connection.config[{"session", "cookie_secure"}] != "off") {
+    if (!properties.getSecure() && data->connection.config[{"session", "cookie_secure"}] != "off") {
         properties.setSecure(true);
     }
-    if (!properties.getHttpOnly() && impl->connection.config[{"session", "cookie_httponly"}] != "off") {
+    if (!properties.getHttpOnly() && data->connection.config[{"session", "cookie_httponly"}] != "off") {
         properties.setHttpOnly(true);
     }
     if (properties.getSameSite() == Cookie::SameSite::OFF) {
-        auto sessionSameSite = impl->connection.config[{"session", "cookie_samesite"}];
+        auto sessionSameSite = data->connection.config[{"session", "cookie_samesite"}];
         if (sessionSameSite == "lax") {
             properties.setSameSite(Cookie::SameSite::LAX);
         } else if (sessionSameSite != "off") {
@@ -218,16 +218,16 @@ void Session::start(Cookie properties) {
     }
 
     // save the ID so we can invalidate the session
-    impl->currentID = sessionCookieStr;
+    data->currentID = sessionCookieStr;
 
     // set the content to the session ID and queue the cookie
     properties.setContent(sessionCookieStr);
-    impl->connection.setCookie(impl->cookieName, properties);
+    data->connection.setCookie(data->cookieName, properties);
 
     // run garbage collection in 1/x of invocations
     unsigned long divisor;
     try {
-        auto divisorStr = impl->connection.config[{"session", "gc_divisor"}];
+        auto divisorStr = data->connection.config[{"session", "gc_divisor"}];
         if (!divisorStr.empty()) {
             divisor = stoul(divisorStr);
         } else {
@@ -244,22 +244,22 @@ void Session::start(Cookie properties) {
 }
 
 bool Session::established() const {
-    return (impl->currentData.use_count() > 0);
+    return (data->currentData.use_count() > 0);
 }
 
 bool Session::isSet(const string &key) const {
     if (established()) {
-        lock_guard<mutex> lockGuard(impl->currentData->dLock);
-        return (impl->currentData->data.count(key) == 1);
+        lock_guard<mutex> lockGuard(data->currentData->dLock);
+        return (data->currentData->data.count(key) == 1);
     }
     return false;
 }
 
 any Session::operator[](const string &key) const {
     if (established()) {
-        lock_guard<mutex> lockGuard(impl->currentData->dLock);
-        if (impl->currentData->data.count(key) == 1) {
-            return impl->currentData->data.at(key);
+        lock_guard<mutex> lockGuard(data->currentData->dLock);
+        if (data->currentData->data.count(key) == 1) {
+            return data->currentData->data.at(key);
         }
     }
     return any();
@@ -270,16 +270,16 @@ void Session::set(std::string key, const std::any &value) {
     if (!established()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
-    lock_guard<mutex> lockGuard(impl->currentData->dLock);
-    impl->currentData->data[move(key)] = value;
+    lock_guard<mutex> lockGuard(data->currentData->dLock);
+    data->currentData->data[move(key)] = value;
 }
 
 void Session::unset(const string &key) {
     if (!established()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
-    lock_guard<mutex> lockGuard(impl->currentData->dLock);
-    impl->currentData->data.erase(key);
+    lock_guard<mutex> lockGuard(data->currentData->dLock);
+    data->currentData->data.erase(key);
 }
 
 void Session::invalidate() {
@@ -288,15 +288,15 @@ void Session::invalidate() {
     if (!established()) return;
 
     // reset currentData pointer, this will also make established() return false
-    impl->currentData.reset();
+    data->currentData.reset();
 
     // erase this session from the data map
     {
         lock_guard<mutex> lockGuard(gLock);
-        sessionData.erase(impl->currentID);
+        sessionData.erase(data->currentID);
     }
 
     // unset the session cookie, so that a new session can be started
-    impl->connection.unsetCookie(impl->cookieName);
+    data->connection.unsetCookie(data->cookieName);
 
 }

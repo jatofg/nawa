@@ -37,7 +37,7 @@ namespace nawa::request {
      * Accessor for environment variables.
      */
     class Env {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(Env);

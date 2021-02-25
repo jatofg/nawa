@@ -31,7 +31,7 @@ namespace nawa::hashing {
 
     class Argon2HashingEngine : public HashingEngine {
     private:
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         /**

@@ -35,7 +35,7 @@ namespace nawa {
      * Class for managing sessions and getting and setting connection-independent session data.
      */
     class Session {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(Session);

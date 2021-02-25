@@ -33,7 +33,7 @@ namespace nawa {
      * and getting a representation in a standard format that can be used for curl.
      */
     class EmailAddress {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(EmailAddress);

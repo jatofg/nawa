@@ -31,7 +31,7 @@
 
 namespace nawa {
     class SmtpMailer {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         /**

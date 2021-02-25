@@ -27,7 +27,7 @@
 #include <experimental/propagate_const>
 #include <memory>
 
-#define NAWA_PRIVATE_IMPL_DEF() struct Impl; std::experimental::propagate_const<std::unique_ptr<Impl>> impl;
+#define NAWA_PRIVATE_DATA() struct Data; std::experimental::propagate_const<std::unique_ptr<Data>> data;
 
 #define NAWA_DEFAULT_DESTRUCTOR_DEF(Class) virtual ~Class()
 #define NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(Class) ~Class() override
@@ -35,23 +35,23 @@
 #define NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::~Class() = default;
 
 #define NAWA_DEFAULT_CONSTRUCTOR_DEF(Class) Class()
-#define NAWA_DEFAULT_CONSTRUCTOR_IMPL(Class) Class::Class() { impl = make_unique<Impl>(); }
-#define NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class() { impl = make_unique<Impl>(); }
+#define NAWA_DEFAULT_CONSTRUCTOR_IMPL(Class) Class::Class() { data = make_unique<Data>(); }
+#define NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class() { data = make_unique<Data>(); }
 
 #define NAWA_COPY_CONSTRUCTOR_DEF(Class) Class(Class const &other)
-#define NAWA_COPY_CONSTRUCTOR_IMPL(Class) Class::Class(const Class &other) { impl = make_unique<Impl>(*other.impl); }
-#define NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(const Namespace::Class &other) { impl = make_unique<Impl>(*other.impl); }
+#define NAWA_COPY_CONSTRUCTOR_IMPL(Class) Class::Class(const Class &other) { data = make_unique<Data>(*other.data); }
+#define NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(const Namespace::Class &other) { data = make_unique<Data>(*other.data); }
 
 #define NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Class) Class &operator=(const Class &other)
-#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(const Class &other) { if (this != &other) { *impl = *other.impl; } return *this; }
-#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(const Namespace::Class &other) { if (this != &other) { *impl = *other.impl; } return *this; }
+#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(const Class &other) { if (this != &other) { *data = *other.data; } return *this; }
+#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(const Namespace::Class &other) { if (this != &other) { *data = *other.data; } return *this; }
 
 #define NAWA_MOVE_CONSTRUCTOR_DEF(Class) Class(Class &&other) noexcept
-#define NAWA_MOVE_CONSTRUCTOR_IMPL(Class) Class::Class(Class &&other) noexcept: impl(move(other.impl)) {}
-#define NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(Namespace::Class &&other) noexcept: impl(move(other.impl)) {}
+#define NAWA_MOVE_CONSTRUCTOR_IMPL(Class) Class::Class(Class &&other) noexcept: data(move(other.data)) {}
+#define NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class::Class(Namespace::Class &&other) noexcept: data(move(other.data)) {}
 
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Class) Class &operator=(Class &&other) noexcept
-#define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(Class &&other) noexcept { if (this != &other) { impl = move(other.impl); } return *this; }
-#define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(Namespace::Class &&other) noexcept { if (this != &other) { impl = move(other.impl); } return *this; }
+#define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Class) Class &Class::operator=(Class &&other) noexcept { if (this != &other) { data = move(other.data); } return *this; }
+#define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class) Namespace::Class &Namespace::Class::operator=(Namespace::Class &&other) noexcept { if (this != &other) { data = move(other.data); } return *this; }
 
 #endif //NAWA_MACROS_H

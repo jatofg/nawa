@@ -31,7 +31,8 @@ namespace nawa {
      * Reader for config files and accessor to config values.
      */
     class Config {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
+
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(Config);
 

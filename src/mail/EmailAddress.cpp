@@ -28,7 +28,7 @@
 using namespace nawa;
 using namespace std;
 
-struct EmailAddress::Impl {
+struct EmailAddress::Data {
     std::string name; /**< The name of the sender or recipient. */
     std::string address; /**< The email address itself. */
 };
@@ -46,40 +46,40 @@ NAWA_MOVE_CONSTRUCTOR_IMPL(EmailAddress)
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(EmailAddress)
 
 EmailAddress::EmailAddress(std::string address) : EmailAddress() {
-    impl->address = move(address);
+    data->address = move(address);
 }
 
 EmailAddress::EmailAddress(std::string name, std::string address) : EmailAddress() {
-    impl->name = move(name);
-    impl->address = move(address);
+    data->name = move(name);
+    data->address = move(address);
 }
 
 string EmailAddress::get(bool includeName) const {
     stringstream ret;
     if (includeName) {
-        ret << impl->name << " ";
+        ret << data->name << " ";
     }
-    ret << '<' << impl->address << '>';
+    ret << '<' << data->address << '>';
     return ret.str();
 }
 
 bool EmailAddress::isValid() const {
     regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", regex::icase);
-    return regex_match(impl->address, emCheck);
+    return regex_match(data->address, emCheck);
 }
 
 void nawa::EmailAddress::setName(std::string name) noexcept {
-    impl->name = move(name);
+    data->name = move(name);
 }
 
 std::string nawa::EmailAddress::getName() const noexcept {
-    return impl->name;
+    return data->name;
 }
 
 void nawa::EmailAddress::setAddress(std::string address) noexcept {
-    impl->address = move(address);
+    data->address = move(address);
 }
 
 std::string nawa::EmailAddress::getAddress() const noexcept {
-    return impl->address;
+    return data->address;
 }

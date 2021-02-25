@@ -33,7 +33,7 @@ namespace nawa::request {
      * Specialized accessor for POST that also allows accessing files (and in future, maybe, the raw POST data).
      */
     class Post : public GPC {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(Post);

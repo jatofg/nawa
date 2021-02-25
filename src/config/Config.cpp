@@ -31,7 +31,7 @@ using namespace nawa;
 using namespace std;
 
 // implementation
-struct Config::Impl {
+struct Config::Data {
     std::unordered_map<std::pair<std::string, std::string>, std::string, boost::hash<std::pair<std::string, std::string>>> values;
 };
 
@@ -48,7 +48,7 @@ NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Config)
 NAWA_DEFAULT_CONSTRUCTOR_IMPL(Config)
 
 Config::Config(initializer_list<pair<pair<string, string>, string>> init) : Config() {
-    impl->values.insert(init.begin(), init.end());
+    data->values.insert(init.begin(), init.end());
 }
 
 Config::Config(const string &iniFile) : Config() {
@@ -60,7 +60,7 @@ void Config::read(const string &iniFile) {
         auto _this = (Config *) obj;
         pair<string, string> keyToInsert(section, name);
         pair<pair<string, string>, string> pairToInsert(keyToInsert, value);
-        _this->impl->values.insert(pairToInsert);
+        _this->data->values.insert(pairToInsert);
         return 1;
     };
     if (ini_parse(iniFile.c_str(), valueHandler, this) < 0) {
@@ -69,16 +69,16 @@ void Config::read(const string &iniFile) {
 }
 
 void Config::insert(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init) {
-    impl->values.insert(init.begin(), init.end());
+    data->values.insert(init.begin(), init.end());
 }
 
 bool Config::isSet(const pair<string, string> &key) const {
-    return (impl->values.count(key) == 1);
+    return (data->values.count(key) == 1);
 }
 
 string Config::operator[](const pair<string, string> &key) const {
-    if (impl->values.count(key) == 1) {
-        return impl->values.at(key);
+    if (data->values.count(key) == 1) {
+        return data->values.at(key);
     } else {
         return string();
     }
@@ -86,7 +86,7 @@ string Config::operator[](const pair<string, string> &key) const {
 
 // doxygen bug requires std:: here
 void Config::set(std::pair<string, string> key, std::string value) {
-    impl->values[move(key)] = move(value);
+    data->values[move(key)] = move(value);
 }
 
 void Config::set(string section, string key, string value) {

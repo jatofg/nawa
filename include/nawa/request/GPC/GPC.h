@@ -38,7 +38,7 @@ namespace nawa::request {
      * Accessor for GET, POST, and COOKIE variables.
      */
     class GPC {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         enum class Source {

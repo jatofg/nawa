@@ -33,7 +33,7 @@ namespace nawa::hashing {
      * through the corresponding Nawa::Crypto functions for password hashing.
      */
     class BcryptHashingEngine : public HashingEngine {
-        NAWA_PRIVATE_IMPL_DEF()
+        NAWA_PRIVATE_DATA()
 
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(BcryptHashingEngine);

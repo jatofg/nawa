@@ -50,15 +50,15 @@ namespace {
     mutex outLock;
 }
 
-struct Log::Impl {
+struct Log::Data {
     std::string appname; /**< Name of the current app, appears in brackets in the log. */
     Level defaultLevel; /**< Default log level of this logger object. */
 
-    explicit Impl(Level defaultLevel = Level::INFORMATIONAL) : defaultLevel(defaultLevel) {}
+    explicit Data(Level defaultLevel = Level::INFORMATIONAL) : defaultLevel(defaultLevel) {}
 };
 
 Log::Log() noexcept {
-    impl = make_unique<Impl>(Level::INFORMATIONAL);
+    data = make_unique<Data>(Level::INFORMATIONAL);
 
     if (instanceCount == 0) {
         out = &cerr;
@@ -73,28 +73,28 @@ Log::Log() noexcept {
     }
 
     // appname is nawa by default
-    impl->appname = "nawa";
+    data->appname = "nawa";
 
     ++instanceCount;
 }
 
 Log::Log(string appname_, Level level) noexcept: Log() {
-    impl->appname = move(appname_);
-    impl->defaultLevel = level;
+    data->appname = move(appname_);
+    data->defaultLevel = level;
 }
 
 Log::Log(Level level) noexcept: Log() {
-    impl->defaultLevel = level;
+    data->defaultLevel = level;
 }
 
 Log::Log(const Log &other) noexcept {
-    impl = make_unique<Impl>(*other.impl);
+    data = make_unique<Data>(*other.data);
     ++instanceCount;
 }
 
 Log &Log::operator=(const Log &other) noexcept {
     if (this != &other) {
-        *impl = *other.impl;
+        *data = *other.data;
         ++instanceCount;
     }
     return *this;
@@ -157,15 +157,15 @@ bool Log::isLocked() noexcept {
 }
 
 void Log::setAppname(string appname_) noexcept {
-    impl->appname = move(appname_);
+    data->appname = move(appname_);
 }
 
 void Log::setDefaultLogLevel(Level level) noexcept {
-    impl->defaultLevel = level;
+    data->defaultLevel = level;
 }
 
 void Log::write(const std::string &msg) {
-    write(msg, impl->defaultLevel);
+    write(msg, data->defaultLevel);
 }
 
 void Log::write(const string &msg, Level level) {
@@ -176,13 +176,13 @@ void Log::write(const string &msg, Level level) {
             *out << put_time(localtime(&now), "%b %d %H:%M:%S ") << *hostnameStr << ' '
                  << program_invocation_short_name << '[' << pid << "]: ";
         }
-        cerr << "[" << impl->appname << "] " << msg << endl;
+        cerr << "[" << data->appname << "] " << msg << endl;
         out->flush();
     }
 }
 
 void Log::operator()(const std::string &msg) {
-    write(msg, impl->defaultLevel);
+    write(msg, data->defaultLevel);
 }
 
 void Log::operator()(const string &msg, Level level) {

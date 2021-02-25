@@ -33,7 +33,7 @@ using namespace std;
 int init(nawa::AppInit &appInit) {
 
     // enable access filtering
-    appInit.accessFilters.filtersEnabled = true;
+    appInit.accessFilters().filtersEnabled = true;
 
     // apply a forward filter for images
     ForwardFilter forwardFilter;
@@ -41,7 +41,7 @@ int init(nawa::AppInit &appInit) {
                                 {"test2", "images"}};
     forwardFilter.extensionFilter = {"png", "jpg", "svg"};
     forwardFilter.basePath = "/home/tobias/Pictures";
-    appInit.accessFilters.forwardFilters.push_back(forwardFilter);
+    appInit.accessFilters().forwardFilters.push_back(forwardFilter);
 
     // send 404 error for non-image files in /test{2}/images
     BlockFilter blockFilter;
@@ -50,7 +50,7 @@ int init(nawa::AppInit &appInit) {
     blockFilter.extensionFilter = {"png", "jpg", "svg"};
     blockFilter.invertExtensionFilter = true;
     blockFilter.status = 404;
-    appInit.accessFilters.blockFilters.push_back(blockFilter);
+    appInit.accessFilters().blockFilters.push_back(blockFilter);
 
     // apply a block filter for everything that is not in /test{2} or /test{2}/images (and some more restrictions)
     BlockFilter blockFilter2;
@@ -58,7 +58,7 @@ int init(nawa::AppInit &appInit) {
     blockFilter2.regexFilterEnabled = true;
     blockFilter2.regexFilter.assign(R"(/test2?(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
     blockFilter2.status = 404;
-    appInit.accessFilters.blockFilters.push_back(blockFilter2);
+    appInit.accessFilters().blockFilters.push_back(blockFilter2);
 
     // authenticate access to the images directory
     AuthFilter authFilter;
@@ -67,7 +67,7 @@ int init(nawa::AppInit &appInit) {
     authFilter.authFunction = [](string user, string password) -> bool {
         return (user == "test" && password == "supersecure");
     };
-    appInit.accessFilters.authFilters.push_back(authFilter);
+    appInit.accessFilters().authFilters.push_back(authFilter);
 
     return 0;
 }

@@ -32,7 +32,7 @@
 using namespace nawa;
 using namespace std;
 
-struct hashing::Argon2HashingEngine::Impl {
+struct hashing::Argon2HashingEngine::Data {
     Algorithm algorithm; /**< The Argon2 flavor to use. */
     uint32_t timeCost; /**< Number of iterations. */
     uint32_t memoryCost; /**< Memory usage in kiB. */
@@ -40,7 +40,7 @@ struct hashing::Argon2HashingEngine::Impl {
     string salt; /**< User-defined salt. */
     size_t hashLen; /**< Desired length of the hash. */
 
-    Impl(Algorithm algorithm, uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism, string salt, size_t hashLen)
+    Data(Algorithm algorithm, uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism, string salt, size_t hashLen)
             : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism),
               salt(move(salt)), hashLen(hashLen) {}
 };
@@ -50,19 +50,19 @@ NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(hashing, Argon2HashingEngine)
 hashing::Argon2HashingEngine::Argon2HashingEngine(hashing::Argon2HashingEngine::Algorithm algorithm,
                                                   uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,
                                                   string salt, size_t hashLen) {
-    impl = make_unique<Impl>(algorithm, timeCost, memoryCost, parallelism, move(salt), hashLen);
+    data = make_unique<Data>(algorithm, timeCost, memoryCost, parallelism, move(salt), hashLen);
 }
 
 string hashing::Argon2HashingEngine::generateHash(string input) const {
 
     // check validity of parameters
-    if (!impl->salt.empty() && impl->salt.length() < ARGON2_MIN_SALT_LENGTH) {
+    if (!data->salt.empty() && data->salt.length() < ARGON2_MIN_SALT_LENGTH) {
         throw Exception(__PRETTY_FUNCTION__, 10,
                         "Provided user-defined salt is not long enough");
     }
 
-    string actualSalt = impl->salt;
-    if (impl->salt.empty()) {
+    string actualSalt = data->salt;
+    if (data->salt.empty()) {
         // generate random salt (16 bytes)
         random_device rd;
         stringstream sstr;
@@ -87,27 +87,27 @@ string hashing::Argon2HashingEngine::generateHash(string input) const {
     }
 
     int errorCode = 0;
-    size_t encodedHashCeil = 50 + (actualSalt.length() * 4) / 3 + (impl->hashLen * 4) / 3;
+    size_t encodedHashCeil = 50 + (actualSalt.length() * 4) / 3 + (data->hashLen * 4) / 3;
     char c_hash[encodedHashCeil];
     memset(c_hash, '\0', encodedHashCeil);
 
-    switch (impl->algorithm) {
+    switch (data->algorithm) {
         case Algorithm::ARGON2I:
-            errorCode = argon2i_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
+            errorCode = argon2i_hash_encoded(data->timeCost, data->memoryCost, data->parallelism,
                                              (void *) input.c_str(), input.length(),
-                                             (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
+                                             (void *) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
                                              encodedHashCeil);
             break;
         case Algorithm::ARGON2D:
-            errorCode = argon2d_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
+            errorCode = argon2d_hash_encoded(data->timeCost, data->memoryCost, data->parallelism,
                                              (void *) input.c_str(), input.length(),
-                                             (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
+                                             (void *) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
                                              encodedHashCeil);
             break;
         case Algorithm::ARGON2ID:
-            errorCode = argon2id_hash_encoded(impl->timeCost, impl->memoryCost, impl->parallelism,
+            errorCode = argon2id_hash_encoded(data->timeCost, data->memoryCost, data->parallelism,
                                               (void *) input.c_str(), input.length(),
-                                              (void *) actualSalt.c_str(), actualSalt.length(), impl->hashLen, c_hash,
+                                              (void *) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
                                               encodedHashCeil);
             break;
     }
