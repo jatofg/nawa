@@ -27,6 +27,7 @@
 #include <nawa/filter/AccessFilter/ext/AuthFilter.h>
 #include <nawa/filter/AccessFilter/ext/BlockFilter.h>
 #include <nawa/filter/AccessFilter/ext/ForwardFilter.h>
+#include <nawa/internal/macros.h>
 #include <vector>
 
 namespace nawa {
@@ -36,11 +37,69 @@ namespace nawa {
      * then forward filters. If one filter leads to a block/forward/denied access, all following filters will be ignored.
      * Filters can only be applied statically on app initialization as part of the AppInit struct (for thread-safety).
      */
-    struct AccessFilterList {
-        bool filtersEnabled = false; /**< Is the filter module enabled? If false, no filters will be applied. */
-        std::vector<BlockFilter> blockFilters; /**< List of BlockFilter objects to be applied. */
-        std::vector<AuthFilter> authFilters; /**< List of AuthFilter objects to be applied. */
-        std::vector<ForwardFilter> forwardFilters; /**< List of ForwardFilter objects to be applied. */
+    class AccessFilterList {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(AccessFilterList);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(AccessFilterList);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(AccessFilterList);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(AccessFilterList);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(AccessFilterList);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(AccessFilterList);
+
+        /**
+         * Is the filter module enabled? If false, no filters will be applied.
+         * @return Reference to element.
+         */
+        bool &filtersEnabled() noexcept;
+
+        /**
+         * Is the filter module enabled? If false, no filters will be applied.
+         * @return The element.
+         */
+        [[nodiscard]] bool filtersEnabled() const noexcept;
+
+        /**
+         * List of BlockFilter objects to be applied.
+         * @return Reference to element.
+         */
+        std::vector<BlockFilter> &blockFilters() noexcept;
+
+        /**
+         * List of BlockFilter objects to be applied.
+         * @return Reference to element.
+         */
+        [[nodiscard]] std::vector<BlockFilter> const &blockFilters() const noexcept;
+
+        /**
+         * List of AuthFilter objects to be applied.
+         * @return Reference to element.
+         */
+        std::vector<AuthFilter> &authFilters() noexcept;
+
+        /**
+         * List of AuthFilter objects to be applied.
+         * @return Reference to element.
+         */
+        [[nodiscard]] std::vector<AuthFilter> const &authFilters() const noexcept;
+
+        /**
+         * List of ForwardFilter objects to be applied.
+         * @return Reference to element.
+         */
+        std::vector<ForwardFilter> &forwardFilters() noexcept;
+
+        /**
+         * List of ForwardFilter objects to be applied.
+         * @return Reference to element.
+         */
+        [[nodiscard]] std::vector<ForwardFilter> const &forwardFilters() const noexcept;
     };
 }
 

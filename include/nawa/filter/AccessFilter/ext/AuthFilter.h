@@ -40,21 +40,58 @@ namespace nawa {
      * </LocationMatch>
      * \endcode
      */
-    struct AuthFilter : public AccessFilter {
+    class AuthFilter : public AccessFilter {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(AuthFilter);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(AuthFilter);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(AuthFilter);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(AuthFilter);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(AuthFilter);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(AuthFilter);
+
         /**
          * The authentication function. It will be called with the provided user name as first parameter and the
          * provided user password as the second parameter. Access will be granted if the authentication function
          * returns true. If the function is not set, authorization will always be denied.
+         * @return Reference to element.
          */
-        std::function<bool(std::string, std::string)> authFunction;
+        std::function<bool(std::string, std::string)> &authFunction() noexcept;
+
+        /**
+         * The authentication function. It will be called with the provided user name as first parameter and the
+         * provided user password as the second parameter. Access will be granted if the authentication function
+         * returns true. If the function is not set, authorization will always be denied.
+         * @return Reference to element.
+         */
+        [[nodiscard]] std::function<bool(std::string, std::string)> const &authFunction() const noexcept;
+
         /**
          * A short description of the required authentication that may be shown by the browser ("realm") (optional).
          * This value should only contain alphanumeric characters and must not contain double quotes or newlines.
          * It will not be checked for validity by NAWA, instead, authentication may fail and the server might even become
          * unaccessible in case of non-compliance. If this value comes from a user, make sure to check it thoroughly
          * (by the way, it shouldn't).
+         * @return Reference to element.
          */
-        std::string authName;
+        std::string &authName() noexcept;
+
+        /**
+         * A short description of the required authentication that may be shown by the browser ("realm") (optional).
+         * This value should only contain alphanumeric characters and must not contain double quotes or newlines.
+         * It will not be checked for validity by NAWA, instead, authentication may fail and the server might even become
+         * unaccessible in case of non-compliance. If this value comes from a user, make sure to check it thoroughly
+         * (by the way, it shouldn't).
+         * @return Reference to element.
+         */
+        [[nodiscard]] std::string const &authName() const noexcept;
+
         /**
          * Use sessions to remember the authenticated user. This will create a std::string session variable
          * "_nawa_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
@@ -62,8 +99,20 @@ namespace nawa {
          * out. This is usually not necessary (but might be more effective or extend the scope of the authorization,
          * and lets you access the user name), as browsers will usually send the authentication string on every single
          * request.
+         * @return Reference to element.
          */
-        bool useSessions = false;
+        bool &useSessions() noexcept;
+
+        /**
+         * Use sessions to remember the authenticated user. This will create a std::string session variable
+         * "_nawa_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
+         * You can use it in your application to find out which user has authenticated and delete it to log the user
+         * out. This is usually not necessary (but might be more effective or extend the scope of the authorization,
+         * and lets you access the user name), as browsers will usually send the authentication string on every single
+         * request.
+         * @return The element.
+         */
+        [[nodiscard]] bool useSessions() const noexcept;
     };
 }
 

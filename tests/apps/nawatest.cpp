@@ -33,41 +33,41 @@ using namespace std;
 int init(nawa::AppInit &appInit) {
 
     // enable access filtering
-    appInit.accessFilters().filtersEnabled = true;
+    appInit.accessFilters().filtersEnabled() = true;
 
     // apply a forward filter for images
     ForwardFilter forwardFilter;
-    forwardFilter.pathFilter = {{"test",  "images"},
-                                {"test2", "images"}};
-    forwardFilter.extensionFilter = {"png", "jpg", "svg"};
-    forwardFilter.basePath = "/home/tobias/Pictures";
-    appInit.accessFilters().forwardFilters.push_back(forwardFilter);
+    forwardFilter.pathFilter() = {{"test",  "images"},
+                                  {"test2", "images"}};
+    forwardFilter.extensionFilter() = {"png", "jpg", "svg"};
+    forwardFilter.basePath() = "/home/tobias/Pictures";
+    appInit.accessFilters().forwardFilters().push_back(forwardFilter);
 
     // send 404 error for non-image files in /test{2}/images
     BlockFilter blockFilter;
-    blockFilter.pathFilter = {{"test",  "images"},
-                              {"test2", "images"}};
-    blockFilter.extensionFilter = {"png", "jpg", "svg"};
-    blockFilter.invertExtensionFilter = true;
-    blockFilter.status = 404;
-    appInit.accessFilters().blockFilters.push_back(blockFilter);
+    blockFilter.pathFilter() = {{"test",  "images"},
+                                {"test2", "images"}};
+    blockFilter.extensionFilter() = {"png", "jpg", "svg"};
+    blockFilter.invertExtensionFilter() = true;
+    blockFilter.status() = 404;
+    appInit.accessFilters().blockFilters().push_back(blockFilter);
 
     // apply a block filter for everything that is not in /test{2} or /test{2}/images (and some more restrictions)
     BlockFilter blockFilter2;
-    blockFilter2.invert = true;
-    blockFilter2.regexFilterEnabled = true;
-    blockFilter2.regexFilter.assign(R"(/test2?(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
-    blockFilter2.status = 404;
-    appInit.accessFilters().blockFilters.push_back(blockFilter2);
+    blockFilter2.invert() = true;
+    blockFilter2.regexFilterEnabled() = true;
+    blockFilter2.regexFilter().assign(R"(/test2?(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
+    blockFilter2.status() = 404;
+    appInit.accessFilters().blockFilters().push_back(blockFilter2);
 
     // authenticate access to the images directory
     AuthFilter authFilter;
-    authFilter.pathFilter = {{"test", "images"}};
-    authFilter.authName = "Not for everyone!";
-    authFilter.authFunction = [](string user, string password) -> bool {
+    authFilter.pathFilter() = {{"test", "images"}};
+    authFilter.authName() = "Not for everyone!";
+    authFilter.authFunction() = [](string user, string password) -> bool {
         return (user == "test" && password == "supersecure");
     };
-    appInit.accessFilters().authFilters.push_back(authFilter);
+    appInit.accessFilters().authFilters().push_back(authFilter);
 
     return 0;
 }
@@ -90,7 +90,7 @@ int handleRequest(Connection &connection) {
                            "<p>Hello World! HTML string: " << encoding::htmlEncode(decoded, true) << "</p>"
                                                                                                      "<p>Client IP: "
                         << encoding::htmlEncode(connection.request.env["REMOTE_ADDR"]) << "</p>"
-                                                                                             "<p>Request URI: ("
+                                                                                          "<p>Request URI: ("
                         << connection.request.env.getRequestPath().size() << " elements): "
                         << connection.request.env["REQUEST_URI"] << "</p>"
                                                                     "<p>HTTPS status: "

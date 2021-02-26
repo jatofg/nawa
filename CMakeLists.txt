@@ -122,6 +122,11 @@ set(NAWA_FILES
         src/config/Config.cpp
         src/connection/Connection.cpp
         src/connection/Cookie.cpp
+        src/filter/AccessFilter/ext/AuthFilter.cpp
+        src/filter/AccessFilter/ext/BlockFilter.cpp
+        src/filter/AccessFilter/ext/ForwardFilter.cpp
+        src/filter/AccessFilter/AccessFilter.cpp
+        src/filter/AccessFilterList.cpp
         src/hashing/HashingEngine/impl/BcryptHashingEngine.cpp
         src/logging/Log.cpp
         src/mail/Email/impl/MimeEmail.cpp

@@ -20,7 +20,7 @@ In your `int init(AppInit &appInit)` function, you can use the
 Enable static filtering by setting:
 
 ```cpp
-appInit.accessFilters_.filtersEnabled = true;
+appInit.accessFilters().filtersEnabled() = true;
 ```
 
 ## Filter conditions
@@ -51,14 +51,14 @@ All files below a given path are matched, in our example, a file
 the paths `/static/images` and `/static2/images` would be matched:
 
 ```cpp
-myFilter.pathFilter = {{"static", "images"}, {"static2", "images"}};
+myFilter.pathFilter() = {{"static", "images"}, {"static2", "images"}};
 ```
 
 If you want to match files outside of the given paths instead, you can 
 invert the path filter condition:
 
 ```cpp
-myFilter.invertPathFilter = true;
+myFilter.invertPathFilter() = true;
 ```
 
 ### File extension condition
@@ -67,14 +67,14 @@ With an extension filter, you could limit the matched extensions to a
 set of common image formats, for example:
 
 ```cpp
-myFilter.extensionFilter = {"jpeg", "jpg", "png", "gif", "svg"};
+myFilter.extensionFilter() = {"jpeg", "jpg", "png", "gif", "svg"};
 ```
 
 You can also invert the extension filter to match only files with other 
 extensions:
 
 ```cpp
-myFilter.invertExtensionFilter = true;
+myFilter.invertExtensionFilter() = true;
 ```
 
 ### Using regular expressions
@@ -83,8 +83,8 @@ To filter basing on a regular expression, you have to enable the regex
 filter explicitly, and then assign a regular expression:
 
 ```cpp
-myFilter.regexFilterEnabled = true;
-myFilter.regexFilter.assign(R"(/test(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
+myFilter.regexFilterEnabled() = true;
+myFilter.regexFilter().assign(R"(/test(/images)?(/[A-Za-z0-9_\-]*\.?[A-Za-z]{2,4})?)");
 ```
 
 The above example would match everything that is not in `/test`, 
@@ -102,7 +102,7 @@ You can invert your whole filter, so that your filter matches when
 matches no requests.
 
 ```cpp
-myFilter.invert = true;
+myFilter.invert() = true;
 ```
 
 ## Forward filters
@@ -120,11 +120,11 @@ Example for a forward filter mapping to :
 
 ```cpp
 nawa::ForwardFilter imageFilter;
-imageFilter.pathFilter = {{"static", "images"}};
-imageFilter.extensionFilter = {"png"};
-imageFilter.basePath = "/var/www/multipage/images";
-imageFilter.basePathExtension = nawa::ForwardFilter::BY_FILENAME; // could be skipped, default option anyway
-appInit.accessFilters_.forwardFilters.push_back(imageFilter); // add the filter to appInit
+imageFilter.pathFilter() = {{"static", "images"}};
+imageFilter.extensionFilter() = {"png"};
+imageFilter.basePath() = "/var/www/multipage/images";
+imageFilter.basePathExtension() = nawa::ForwardFilter::BasePathExtension::BY_FILENAME; // could be skipped, default option anyway
+appInit.accessFilters().forwardFilters().push_back(imageFilter); // add the filter to appInit
 ```
 
 To become active, the filter has to be added to the corresponding 
@@ -143,10 +143,10 @@ of `/app` and `/static`:
 
 ```cpp
 nawa::BlockFilter blockFilter;
-blockFilter.pathFilter = {{"app"}, {"static"}};
-blockFilter.invert = true;
-blockFilter.status = 404;
-appInit.accessFilters_.blockFilters.push_back(blockFilter);
+blockFilter.pathFilter() = {{"app"}, {"static"}};
+blockFilter.invert() = true;
+blockFilter.status() = 404;
+appInit.accessFilters().blockFilters().push_back(blockFilter);
 ```
 
 ## Auth filters
@@ -167,12 +167,12 @@ and requires the user to provide the username "user" and the password
 
 ```cpp
 nawa::AuthFilter authFilter;
-authFilter.pathFilter = {{"secret"}};
-authFilter.authName = "Top secret area!";
-authFilter.authFunction = [](std::string user, std::string password) -> bool {
+authFilter.pathFilter() = {{"secret"}};
+authFilter.authName() = "Top secret area!";
+authFilter.authFunction() = [](std::string user, std::string password) -> bool {
     return (user == "user" && password == "super_secret");
 };
-appInit.accessFilters_.authFilters.push_back(authFilter);
+appInit.accessFilters().authFilters().push_back(authFilter);
 ```
 
 For a working example with static filters, see `examples/multipage.cpp`.

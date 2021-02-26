@@ -41,10 +41,10 @@ namespace {
      * @return True if the filter matches, false otherwise.
      */
     bool filterMatches(const vector<string> &requestPath, const AccessFilter &flt) {
-        if (!flt.pathFilter.empty()) {
+        if (!flt.pathFilter().empty()) {
             // one of the paths in the path filter must match for the path filter to match
             bool pathFilterMatches = false;
-            for (auto const &filter: flt.pathFilter) {
+            for (auto const &filter: flt.pathFilter()) {
                 // path condition is set but does not match -> the whole filter does not match
                 // all elements of the filter path must be in the request path
                 if (requestPath.size() < filter.size()) {
@@ -61,35 +61,35 @@ namespace {
                     break;
                 }
             }
-            if ((!pathFilterMatches && !flt.invertPathFilter) || (pathFilterMatches && flt.invertPathFilter)) {
+            if ((!pathFilterMatches && !flt.invertPathFilter()) || (pathFilterMatches && flt.invertPathFilter())) {
                 return false;
             }
             // path condition matches -> continue to the next filter condition
         }
 
-        if (!flt.extensionFilter.empty()) {
+        if (!flt.extensionFilter().empty()) {
             auto fileExtension = get_file_extension(requestPath.back());
             bool extensionFilterMatches = false;
-            for (auto const &e: flt.extensionFilter) {
+            for (auto const &e: flt.extensionFilter()) {
                 if (fileExtension == e) {
                     extensionFilterMatches = true;
                     break;
                 }
             }
-            if ((!extensionFilterMatches && !flt.invertExtensionFilter) ||
-                (extensionFilterMatches && flt.invertExtensionFilter)) {
+            if ((!extensionFilterMatches && !flt.invertExtensionFilter()) ||
+                (extensionFilterMatches && flt.invertExtensionFilter())) {
                 return false;
             }
             // extension condition matches -> continue to the next filter condition
         }
 
-        if (flt.regexFilterEnabled) {
+        if (flt.regexFilterEnabled()) {
             // merge request path to string
             stringstream pathStr;
             for (auto const &e: requestPath) {
                 pathStr << '/' << e;
             }
-            if (!regex_match(pathStr.str(), flt.regexFilter))
+            if (!regex_match(pathStr.str(), flt.regexFilter()))
                 return false;
         }
 
@@ -107,24 +107,24 @@ namespace {
      */
     bool applyFilters(Connection &connection, const AccessFilterList &accessFilters) {
         // if filters are disabled, do not even check
-        if (!accessFilters.filtersEnabled) return false;
+        if (!accessFilters.filtersEnabled()) return false;
 
         auto requestPath = connection.request.env.getRequestPath();
 
         // check block filters
-        for (auto const &flt: accessFilters.blockFilters) {
+        for (auto const &flt: accessFilters.blockFilters()) {
             // if the filter does not apply (or does in case of an inverted filter), go to the next
             bool matches = filterMatches(requestPath, flt);
-            if ((!matches && !flt.invert) || (matches && flt.invert)) {
+            if ((!matches && !flt.invert()) || (matches && flt.invert())) {
                 continue;
             }
 
             // filter matches -> apply block
-            connection.setStatus(flt.status);
-            if (!flt.response.empty()) {
-                connection.setBody(flt.response);
+            connection.setStatus(flt.status());
+            if (!flt.response().empty()) {
+                connection.setBody(flt.response());
             } else {
-                connection.setBody(generate_error_page(flt.status));
+                connection.setBody(generate_error_page(flt.status()));
             }
             // the request has been blocked, so no more filters have to be applied
             // returning true means: the request has been filtered
@@ -133,11 +133,11 @@ namespace {
 
         // the ID is used to identify the exact filter for session cookie creation
         int authFilterID = -1;
-        for (auto const &flt: accessFilters.authFilters) {
+        for (auto const &flt: accessFilters.authFilters()) {
             ++authFilterID;
 
             bool matches = filterMatches(requestPath, flt);
-            if ((!matches && !flt.invert) || (matches && flt.invert)) {
+            if ((!matches && !flt.invert()) || (matches && flt.invert())) {
                 continue;
             }
 
@@ -145,7 +145,7 @@ namespace {
             string sessionCookieName;
 
             // check session variable for this filter, if session usage is on
-            if (flt.useSessions) {
+            if (flt.useSessions()) {
                 connection.session.start();
                 sessionCookieName = "_nawa_authfilter" + to_string(authFilterID);
                 if (connection.session.isSet(sessionCookieName)) {
@@ -160,8 +160,8 @@ namespace {
                     connection.setStatus(401);
                     stringstream hval;
                     hval << "Basic";
-                    if (!flt.authName.empty()) {
-                        hval << " realm=\"" << flt.authName << '"';
+                    if (!flt.authName().empty()) {
+                        hval << " realm=\"" << flt.authName() << '"';
                     }
                     connection.setHeader("www-authenticate", hval.str());
 
@@ -177,12 +177,12 @@ namespace {
                         auto credentials = split_string(encoding::base64Decode(authResponse.at(1)), ':', true);
                         // credentials must also have 2 elements, a username and a password,
                         // and the auth function must be callable
-                        if (credentials.size() == 2 && flt.authFunction) {
+                        if (credentials.size() == 2 && flt.authFunction()) {
                             // now we can actually check the credentials with our function (if it is set)
-                            if (flt.authFunction(credentials.at(0), credentials.at(1))) {
+                            if (flt.authFunction()(credentials.at(0), credentials.at(1))) {
                                 isAuthenticated = true;
                                 // now, if sessions are used, set the session variable to the username
-                                if (flt.useSessions) {
+                                if (flt.useSessions()) {
                                     connection.session.set(sessionCookieName, any(credentials.at(0)));
                                 }
                             }
@@ -194,8 +194,8 @@ namespace {
             // now, if the user is still not authenticated, send a 403 Forbidden
             if (!isAuthenticated) {
                 connection.setStatus(403);
-                if (!flt.response.empty()) {
-                    connection.setBody(flt.response);
+                if (!flt.response().empty()) {
+                    connection.setBody(flt.response());
                 } else {
                     connection.setBody(generate_error_page(403));
                 }
@@ -210,15 +210,15 @@ namespace {
         }
 
         // check forward filters
-        for (auto const &flt: accessFilters.forwardFilters) {
+        for (auto const &flt: accessFilters.forwardFilters()) {
             bool matches = filterMatches(requestPath, flt);
-            if ((!matches && !flt.invert) || (matches && flt.invert)) {
+            if ((!matches && !flt.invert()) || (matches && flt.invert())) {
                 continue;
             }
 
             stringstream filePath;
-            filePath << flt.basePath;
-            if (flt.basePathExtension == ForwardFilter::BY_PATH) {
+            filePath << flt.basePath();
+            if (flt.basePathExtension() == ForwardFilter::BasePathExtension::BY_PATH) {
                 for (auto const &e: requestPath) {
                     filePath << '/' << e;
                 }
@@ -234,8 +234,8 @@ namespace {
             catch (Exception &) {
                 // file does not exist, send 404
                 connection.setStatus(404);
-                if (!flt.response.empty()) {
-                    connection.setBody(flt.response);
+                if (!flt.response().empty()) {
+                    connection.setBody(flt.response());
                 } else {
                     connection.setBody(generate_error_page(404));
                 }

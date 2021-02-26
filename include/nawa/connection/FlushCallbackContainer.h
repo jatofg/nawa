@@ -1,6 +1,6 @@
 /**
  * \file FlushCallbackContainer.h
- * \brief Container passed to flush callback functions.
+ * \brief Internal container passed to flush callback functions.
  */
 
 /*
@@ -30,7 +30,7 @@
 
 namespace nawa {
     /**
-     * Container passed to the FlushCallbackFunction.
+     * Internal container passed to the FlushCallbackFunction.
      */
     struct FlushCallbackContainer {
         unsigned int status; /**< The HTTP response status as an unsigned integer. */

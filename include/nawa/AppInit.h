@@ -60,7 +60,7 @@ namespace nawa {
          * thread pools).
          * @return Number of started worker threads.
          */
-        size_t numThreads();
+        size_t getNumThreads();
     };
 }
 

@@ -1,6 +1,6 @@
 /**
- * \file AppInit.cpp
- * \brief Implementation of the AppInit class.
+ * \file BlockFilter.cpp
+ * \brief Implementation of the BlockFilter class.
  */
 
 /*
@@ -21,33 +21,31 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/AppInit.h>
+#include <nawa/filter/AccessFilter/ext/BlockFilter.h>
 
 using namespace nawa;
 using namespace std;
 
-struct AppInit::Data {
-    Config config;
-    AccessFilterList accessFilters;
-    size_t numThreads;
-
-    Data(Config config, size_t numThreads) : config(move(config)), numThreads(numThreads) {}
+struct BlockFilter::Data {
+    unsigned int status = 404;
 };
 
-NAWA_DEFAULT_DESTRUCTOR_IMPL(AppInit)
+NAWA_DEFAULT_DESTRUCTOR_IMPL(BlockFilter)
 
-AppInit::AppInit(Config config, size_t numThreads) {
-    data = make_unique<Data>(move(config), numThreads);
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(BlockFilter)
+
+NAWA_COPY_CONSTRUCTOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+
+NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+
+unsigned int &nawa::BlockFilter::status() noexcept {
+    return data->status;
 }
 
-Config &nawa::AppInit::config() {
-    return data->config;
-}
-
-AccessFilterList &nawa::AppInit::accessFilters() {
-    return data->accessFilters;
-}
-
-size_t nawa::AppInit::getNumThreads() {
-    return data->numThreads;
+unsigned int nawa::BlockFilter::status() const noexcept {
+    return data->status;
 }

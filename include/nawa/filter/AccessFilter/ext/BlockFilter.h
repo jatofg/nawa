@@ -30,11 +30,33 @@ namespace nawa {
     /**
      * Defines a request blocking filter.
      */
-    struct BlockFilter : public AccessFilter {
+    class BlockFilter : public AccessFilter {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(BlockFilter);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(BlockFilter);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(BlockFilter);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(BlockFilter);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(BlockFilter);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(BlockFilter);
+
         /**
          * The HTTP status that will be sent to the client if the request is blocked.
+         * @return Reference to element.
          */
-        unsigned int status = 404;
+        unsigned int &status() noexcept;
+
+        /**
+         * The HTTP status that will be sent to the client if the request is blocked.
+         * @return The element.
+         */
+        [[nodiscard]] unsigned int status() const noexcept;
     };
 }
 

@@ -31,22 +31,58 @@ namespace nawa {
      * Filter to bypass the NAWA app for certain requests and directly forward files to the client. This is especially
      * useful for media files, e.g. images, as well as CSS stylesheets.
      */
-    struct ForwardFilter : public AccessFilter {
+    class ForwardFilter : public AccessFilter {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        /**
+         * How a file will be looked up below the base path:
+         * - FILENAME: Only the file name will be added to the base path (i.e., a file "/dir1/dir2/file.ext" will be
+         *   looked up in basePath."/file.ext").
+         * - PATH: The request path will be added to the base path (e.g., the file mentioned above would be looked up
+         *   in basepath."/dir1/dir2/file.ext").
+         */
+        enum class BasePathExtension {
+            BY_FILENAME, BY_PATH
+        };
+
+        NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(ForwardFilter);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(ForwardFilter);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(ForwardFilter);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(ForwardFilter);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(ForwardFilter);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(ForwardFilter);
+
         /**
          * The path under which the file will be looked up (should be an absolute OS path to the files
          * starting with a '/' and *not* ending with a '/', e.g., "/var/www/website1").
+         * @return Reference to element.
          */
-        std::string basePath;
+        std::string &basePath() noexcept;
+
         /**
-         * How should the file be looked up under the base path:
-         * - FILENAME: Only the file name will be added to the base path (i.e., a file "/dir1/dir2/file.ext" will be
-         * looked up in basePath."/file.ext".
-         * - PATH: The request path will be added to the base path (e.g., the file mentioned above would be looked up
-         * in basepath."/dir1/dir2/file.ext".
+         * The path under which the file will be looked up (should be an absolute OS path to the files
+         * starting with a '/' and *not* ending with a '/', e.g., "/var/www/website1").
+         * @return Reference to element.
          */
-        enum BasePathExtension {
-            BY_FILENAME, BY_PATH
-        } basePathExtension = BY_FILENAME;
+        [[nodiscard]] std::string const &basePath() const noexcept;
+
+        /**
+         * How the file will be looked up (see explanation of enum BasePathExtension, default: only file name).
+         * @return Reference to element.
+         */
+        BasePathExtension &basePathExtension() noexcept;
+
+        /**
+         * How the file will be looked up (see explanation of enum BasePathExtension, default: only file name).
+         * @return The element.
+         */
+        [[nodiscard]] BasePathExtension basePathExtension() const noexcept;
     };
 }
 
