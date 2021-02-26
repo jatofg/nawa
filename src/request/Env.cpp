@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "../../internal/RequestInitContainer.h"
 #include <nawa/request/Env.h>
-#include <nawa/request/RequestInitContainer.h>
 #include <nawa/util/utils.h>
 #include <unordered_map>
 

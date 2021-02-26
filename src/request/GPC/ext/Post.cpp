@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "../../../../internal/RequestInitContainer.h"
 #include <nawa/request/GPC/ext/Post.h>
-#include <nawa/request/RequestInitContainer.h>
 
 using namespace nawa;
 using namespace std;

@@ -21,6 +21,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "../../../internal/ConnectionInitContainer.h"
 #include <fastcgi++/log.hpp>
 #include <fastcgi++/manager.hpp>
 #include <fastcgi++/request.hpp>
@@ -28,9 +29,7 @@
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/RequestHandler/impl/FastcgiRequestHandler.h>
 #include <nawa/connection/Connection.h>
-#include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/logging/Log.h>
-#include <nawa/request/RequestInitContainer.h>
 #include <nawa/util/utils.h>
 
 using namespace nawa;

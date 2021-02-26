@@ -24,9 +24,9 @@
 #ifndef NAWA_CONNECTIONINITCONTAINER_H
 #define NAWA_CONNECTIONINITCONTAINER_H
 
+#include "FlushCallbackContainer.h"
+#include "RequestInitContainer.h"
 #include <nawa/config/Config.h>
-#include <nawa/connection/FlushCallbackContainer.h>
-#include <nawa/request/RequestInitContainer.h>
 
 namespace nawa {
     /**

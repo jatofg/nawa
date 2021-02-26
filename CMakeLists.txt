@@ -80,9 +80,7 @@ set(NAWA_FILES
         include/nawa/RequestHandler/impl/HttpRequestHandler.h
         include/nawa/config/Config.h
         include/nawa/connection/Connection.h
-        include/nawa/connection/ConnectionInitContainer.h
         include/nawa/connection/Cookie.h
-        include/nawa/connection/FlushCallbackContainer.h
         include/nawa/filter/AccessFilter/ext/AuthFilter.h
         include/nawa/filter/AccessFilter/ext/BlockFilter.h
         include/nawa/filter/AccessFilter/ext/ForwardFilter.h
@@ -103,12 +101,15 @@ set(NAWA_FILES
         include/nawa/request/GPC/ext/Post.h
         include/nawa/request/GPC/GPC.h
         include/nawa/request/Request.h
-        include/nawa/request/RequestInitContainer.h
         include/nawa/session/Session.h
         include/nawa/util/crypto.h
         include/nawa/util/encoding.h
         include/nawa/util/MimeMultipart.h
         include/nawa/util/utils.h
+
+        internal/ConnectionInitContainer.h
+        internal/FlushCallbackContainer.h
+        internal/RequestInitContainer.h
 
         libs/base64/base64.cpp
         libs/base64/base64.h
