@@ -59,57 +59,57 @@ int handleRequest(Connection &connection) {
     connection.response << "+++++ TEST 1: SimpleEmail +++++\r\n\r\n";
 
     SimpleEmail email1;
-    email1.headers["From"] = from.get();
-    email1.headers["To"] = to.get();
-    email1.headers["Content-Type"] = "text/plain; charset=utf-8";
-    email1.headers["Subject"] = encoding::makeEncodedWord("Test mail");
-    email1.text = "Test email 'm€ssage' =@#$%^&*()===";
+    email1.headers()["From"] = from.get();
+    email1.headers()["To"] = to.get();
+    email1.headers()["Content-Type"] = "text/plain; charset=utf-8";
+    email1.headers()["Subject"] = encoding::makeEncodedWord("Test mail");
+    email1.text() = "Test email 'm€ssage' =@#$%^&*()===";
     connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
 
     // part 2: MIME email
     connection.response << "+++++ TEST 2: MimeEmail +++++\r\n\r\n";
 
     MimeEmail email2;
-    email2.headers["From"] = from.get();
-    email2.headers["To"] = to.get();
-    email2.headers["Subject"] = "Test email 2";
+    email2.headers()["From"] = from.get();
+    email2.headers()["To"] = to.get();
+    email2.headers()["Subject"] = "Test email 2";
 
     // text part
     MimeEmail::MimePart textPart;
-    textPart.applyEncoding = MimeEmail::MimePart::QUOTED_PRINTABLE;
-    textPart.contentType = "text/plain; charset=utf-8";
-    textPart.contentDisposition = "inline";
-    textPart.data = "Test email 'm€ssage' =@#$%^&*()=== asjdflkasjdfoiwej sdflkawjefijwefijsldjf dsnvndvjnwkjenggfweg";
+    textPart.applyEncoding() = MimeEmail::MimePart::ApplyEncoding::QUOTED_PRINTABLE;
+    textPart.contentType() = "text/plain; charset=utf-8";
+    textPart.contentDisposition() = "inline";
+    textPart.partData() = "Test email 'm€ssage' =@#$%^&*()=== asjdflkasjdfoiwej sdflkawjefijwefijsldjf dsnvndvjnwkjenggfweg";
 
     // html part
     MimeEmail::MimePart htmlPart;
-    htmlPart.applyEncoding = MimeEmail::MimePart::QUOTED_PRINTABLE;
-    htmlPart.contentType = "text/html; charset=utf-8";
-    htmlPart.contentDisposition = "inline";
-    htmlPart.allowReplacements = true;
-    htmlPart.data = "<html><head><title>Bla</title></head>\n<body><p>Test T&auml;st email</p></body></html>";
+    htmlPart.applyEncoding() = MimeEmail::MimePart::ApplyEncoding::QUOTED_PRINTABLE;
+    htmlPart.contentType() = "text/html; charset=utf-8";
+    htmlPart.contentDisposition() = "inline";
+    htmlPart.allowReplacements() = true;
+    htmlPart.partData() = "<html><head><title>Bla</title></head>\n<body><p>Test T&auml;st email</p></body></html>";
 
     // attachment
     MimeEmail::MimePart attachmentPart;
-    attachmentPart.applyEncoding = MimeEmail::MimePart::BASE64;
-    attachmentPart.contentType = "image/png; name=test.png";
-    attachmentPart.contentDisposition = "attachment; filename=test.png";
+    attachmentPart.applyEncoding() = MimeEmail::MimePart::ApplyEncoding::BASE64;
+    attachmentPart.contentType() = "image/png; name=test.png";
+    attachmentPart.contentDisposition() = "attachment; filename=test.png";
     try {
-        attachmentPart.data = get_file_contents("/home/tobias/Pictures/testimage.png");
+        attachmentPart.partData() = get_file_contents("/home/tobias/Pictures/testimage.png");
     } catch (Exception const& e) {
         connection.response << "!!! Specified image file could not be loaded: " << e.getMessage() << " !!!\r\n\r\n";
     }
 
     // create an alternative-type MIME container for text and html
     MimeEmail::MimePartList textAndHtml;
-    textAndHtml.multipartType = MimeEmail::MimePartList::MultipartType::ALTERNATIVE;
-    textAndHtml.mimeParts.emplace_back(textPart);
-    textAndHtml.mimeParts.emplace_back(htmlPart);
+    textAndHtml.multipartType() = MimeEmail::MimePartList::MultipartType::ALTERNATIVE;
+    textAndHtml.mimeParts().emplace_back(textPart);
+    textAndHtml.mimeParts().emplace_back(htmlPart);
 
     // add the text/html alternative-type container and the attachment to an outer mixed-type container
-    email2.mimePartList.multipartType = MimeEmail::MimePartList::MultipartType::MIXED;
-    email2.mimePartList.mimeParts.emplace_back(textAndHtml);
-    email2.mimePartList.mimeParts.emplace_back(attachmentPart);
+    email2.mimePartList().multipartType() = MimeEmail::MimePartList::MultipartType::MIXED;
+    email2.mimePartList().mimeParts().emplace_back(textAndHtml);
+    email2.mimePartList().mimeParts().emplace_back(attachmentPart);
 
     // print the result
     connection.response << email2.getRaw(replacementRules);

@@ -25,6 +25,7 @@
 #define NAWA_EMAIL_H
 
 #include <memory>
+#include <nawa/internal/macros.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -35,12 +36,29 @@ namespace nawa {
      * Replacement rules for emails are just a string -> string map. All occurrences of the key string should be
      * replaced by the value string.
      */
-    typedef std::unordered_map<std::string, std::string> ReplacementRules;
+    using ReplacementRules = std::unordered_map<std::string, std::string>;
 
     /**
      * Base structure for emails. To create an email, use the SimpleEmail or MimeEmail class.
      */
-    struct Email {
+    class Email {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Email);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(Email);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(Email);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Email);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(Email);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Email);
+
+        using HeadersMap = std::unordered_map<std::string, std::string>;
+
         /**
          * Map to save the mail headers in (case-sensitive). Headers From and Date are mandatory and must be set
          * automatically by the mail function if not specified in this map. Other fields that should be considered
@@ -50,15 +68,16 @@ namespace nawa {
          *
          * The email function is not obliged to (and should not) do any escaping in the headers. The application
          * creating the email is responsible for ensuring their validity.
+         * @return Reference to element.
          */
-        std::unordered_map<std::string, std::string> headers;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(Email, headers, HeadersMap);
 
         /**
          * This method shall generate the raw source of the email (including headers).
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        virtual std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const = 0;
+        [[nodiscard]] virtual std::string getRaw(std::shared_ptr<ReplacementRules> const &replacementRules) const = 0;
     };
 }
 

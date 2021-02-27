@@ -57,49 +57,25 @@ namespace nawa {
          * Is the filter module enabled? If false, no filters will be applied.
          * @return Reference to element.
          */
-        bool &filtersEnabled() noexcept;
-
-        /**
-         * Is the filter module enabled? If false, no filters will be applied.
-         * @return The element.
-         */
-        [[nodiscard]] bool filtersEnabled() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(AccessFilterList, filtersEnabled, bool);
 
         /**
          * List of BlockFilter objects to be applied.
          * @return Reference to element.
          */
-        std::vector<BlockFilter> &blockFilters() noexcept;
-
-        /**
-         * List of BlockFilter objects to be applied.
-         * @return Reference to element.
-         */
-        [[nodiscard]] std::vector<BlockFilter> const &blockFilters() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(AccessFilterList, blockFilters, std::vector<BlockFilter>);
 
         /**
          * List of AuthFilter objects to be applied.
          * @return Reference to element.
          */
-        std::vector<AuthFilter> &authFilters() noexcept;
-
-        /**
-         * List of AuthFilter objects to be applied.
-         * @return Reference to element.
-         */
-        [[nodiscard]] std::vector<AuthFilter> const &authFilters() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(AccessFilterList, authFilters, std::vector<AuthFilter>);
 
         /**
          * List of ForwardFilter objects to be applied.
          * @return Reference to element.
          */
-        std::vector<ForwardFilter> &forwardFilters() noexcept;
-
-        /**
-         * List of ForwardFilter objects to be applied.
-         * @return Reference to element.
-         */
-        [[nodiscard]] std::vector<ForwardFilter> const &forwardFilters() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(AccessFilterList, forwardFilters, std::vector<ForwardFilter>);
     };
 }
 

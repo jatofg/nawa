@@ -49,66 +49,18 @@ NAWA_MOVE_CONSTRUCTOR_IMPL(AccessFilter)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(AccessFilter)
 
-bool &nawa::AccessFilter::invert() noexcept {
-    return data->invert;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AccessFilter, invert, bool)
 
-bool nawa::AccessFilter::invert() const noexcept {
-    return data->invert;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, pathFilter, vector<vector<string>>)
 
-std::vector<std::vector<std::string>> &nawa::AccessFilter::pathFilter() noexcept {
-    return data->pathFilter;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AccessFilter, invertPathFilter, bool)
 
-std::vector<std::vector<std::string>> const &nawa::AccessFilter::pathFilter() const noexcept {
-    return data->pathFilter;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, extensionFilter, vector<string>)
 
-bool &nawa::AccessFilter::invertPathFilter() noexcept {
-    return data->invertPathFilter;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AccessFilter, invertExtensionFilter, bool)
 
-bool nawa::AccessFilter::invertPathFilter() const noexcept {
-    return data->invertPathFilter;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AccessFilter, regexFilterEnabled, bool)
 
-std::vector<std::string> &nawa::AccessFilter::extensionFilter() noexcept {
-    return data->extensionFilter;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, regexFilter, regex)
 
-std::vector<std::string> const &nawa::AccessFilter::extensionFilter() const noexcept {
-    return data->extensionFilter;
-}
-
-bool &nawa::AccessFilter::invertExtensionFilter() noexcept {
-    return data->invertExtensionFilter;
-}
-
-bool nawa::AccessFilter::invertExtensionFilter() const noexcept {
-    return data->invertExtensionFilter;
-}
-
-bool &nawa::AccessFilter::regexFilterEnabled() noexcept {
-    return data->regexFilterEnabled;
-}
-
-bool nawa::AccessFilter::regexFilterEnabled() const noexcept {
-    return data->regexFilterEnabled;
-}
-
-std::regex &nawa::AccessFilter::regexFilter() noexcept {
-    return data->regexFilter;
-}
-
-std::regex const &nawa::AccessFilter::regexFilter() const noexcept {
-    return data->regexFilter;
-}
-
-std::string &nawa::AccessFilter::response() noexcept {
-    return data->response;
-}
-
-std::string const &nawa::AccessFilter::response() const noexcept {
-    return data->response;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, response, string)

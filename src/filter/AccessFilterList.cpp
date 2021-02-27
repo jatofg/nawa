@@ -45,34 +45,10 @@ NAWA_MOVE_CONSTRUCTOR_IMPL(AccessFilterList)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(AccessFilterList)
 
-bool &nawa::AccessFilterList::filtersEnabled() noexcept {
-    return data->filtersEnabled;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AccessFilterList, filtersEnabled, bool)
 
-bool nawa::AccessFilterList::filtersEnabled() const noexcept {
-    return data->filtersEnabled;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilterList, blockFilters, vector<BlockFilter>)
 
-std::vector<BlockFilter> &nawa::AccessFilterList::blockFilters() noexcept {
-    return data->blockFilters;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilterList, authFilters, vector<AuthFilter>)
 
-std::vector<BlockFilter> const &nawa::AccessFilterList::blockFilters() const noexcept {
-    return data->blockFilters;
-}
-
-std::vector<AuthFilter> &nawa::AccessFilterList::authFilters() noexcept {
-    return data->authFilters;
-}
-
-std::vector<AuthFilter> const &nawa::AccessFilterList::authFilters() const noexcept {
-    return data->authFilters;
-}
-
-std::vector<ForwardFilter> &nawa::AccessFilterList::forwardFilters() noexcept {
-    return data->forwardFilters;
-}
-
-std::vector<ForwardFilter> const &nawa::AccessFilterList::forwardFilters() const noexcept {
-    return data->forwardFilters;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilterList, forwardFilters, vector<ForwardFilter>)

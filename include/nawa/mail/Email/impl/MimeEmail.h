@@ -32,56 +32,111 @@ namespace nawa {
     /**
      * Structure representing a MIME email (headers and MIME parts, excluding the envelope).
      */
-    struct MimeEmail : public Email {
+    class MimeEmail : public Email {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(MimeEmail);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(MimeEmail);
+
+        NAWA_COPY_CONSTRUCTOR_DEF(MimeEmail);
+
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(MimeEmail);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(MimeEmail);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(MimeEmail);
+
+        class MimePartOrList;
+
         /**
          * Structure representing a MIME part of a MIME email.
          */
-        struct MimePart {
-            /**
-             * The Content-Type of this part (e.g., "text/plain; charset=utf-8").
-             */
-            std::string contentType;
-            /**
-             * The Content-Disposition part-header (e.g., "inline", or "attachment; filename=test.zip"). Optional,
-             * if this value is empty, the header will not be set.
-             */
-            std::string contentDisposition;
+        class MimePart {
+            NAWA_PRIVATE_DATA()
+
+        public:
             /**
              * Encodings which can be applied to the MIME part. Choose BASE64 for file attachments, and QUOTED_PRINTABLE
              * for HTML, etc. Use NONE if and only if you made sure that the part contains only valid characters.
              */
-            enum ApplyEncoding {
+            enum class ApplyEncoding {
                 BASE64,
                 QUOTED_PRINTABLE,
                 NONE
-            } applyEncoding = QUOTED_PRINTABLE; /**< The encoding to apply to the MIME part, see nawa::MimeEmail::MimePart::ApplyEncoding. */
+            }; /**< The encoding to apply to the MIME part, see nawa::MimeEmail::MimePart::ApplyEncoding. */
+
+            NAWA_DEFAULT_DESTRUCTOR_DEF(MimePart);
+
+            NAWA_DEFAULT_CONSTRUCTOR_DEF(MimePart);
+
+            NAWA_COPY_CONSTRUCTOR_DEF(MimePart);
+
+            NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(MimePart);
+
+            NAWA_MOVE_CONSTRUCTOR_DEF(MimePart);
+
+            NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(MimePart);
+
+            /**
+             * The Content-Type of this part (e.g., "text/plain; charset=utf-8").
+             */
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePart, contentType, std::string);
+
+            /**
+             * The Content-Disposition part-header (e.g., "inline", or "attachment; filename=test.zip"). Optional,
+             * if this value is empty, the header will not be set.
+             */
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePart, contentDisposition, std::string);
+
+            /**
+             * The encoding to apply to the MIME part, see nawa::MimeEmail::MimePart::ApplyEncoding.
+             * Default: quoted-printable.
+             */
+            NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(MimePart, applyEncoding, ApplyEncoding);
+
             /**
              * Additional headers for this MIME part (such as Content-ID) can be added here.
              */
-            std::unordered_map<std::string, std::string> partHeaders;
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePart, partHeaders, HeadersMap);
+
             /**
              * Whether to allow replacements using ReplacementRules in the data of this MIME part. The replacements
-             * will be applied before the encoding.
+             * will be applied before the encoding. Default: false.
              */
-            bool allowReplacements = false;
+            NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(MimePart, allowReplacements, bool);
+
             /**
              * The data string, containing the body of the MIME part.
              */
-            std::string data;
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePart, partData, std::string);
+
+            friend MimePartOrList;
         };
 
-        struct MimePartList;
+        class MimePartList;
 
         /**
          * This struct can save either a MimePart or a MimePartList object and acts as a basis for the MimePartList.
          * You don't have to deal with this object directly, you can just use the MimePartList::mimePart.emplace_back()
          * function to add a MimePart or another MimePartList object to the list.
          */
-        struct MimePartOrList {
-            /**
-             * Make sure default constructor exists.
-             */
-            MimePartOrList() = default;
+        class MimePartOrList {
+            NAWA_PRIVATE_DATA()
+
+        public:
+            NAWA_DEFAULT_DESTRUCTOR_DEF(MimePartOrList);
+
+            NAWA_DEFAULT_CONSTRUCTOR_DEF(MimePartOrList);
+
+            NAWA_COPY_CONSTRUCTOR_DEF(MimePartOrList);
+
+            NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(MimePartOrList);
+
+            NAWA_MOVE_CONSTRUCTOR_DEF(MimePartOrList);
+
+            NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(MimePartOrList);
 
             /**
              * Construct a MimePartOrList from a MimePart (also implicitly).
@@ -96,31 +151,18 @@ namespace nawa {
             MimePartOrList(const MimePartList &_mimePartList);
 
             /**
-             * Copy constructor, as this struct contains smart pointers.
-             * @param other Object to copy.
-             */
-            MimePartOrList(const MimePartOrList &other);
-
-            /**
-             * Copy assignment operator, as this struct contains smart pointers.
-             * @param other Object to copy from.
-             * @return This object.
-             */
-            MimePartOrList &operator=(const MimePartOrList &other);
-
-            /**
              * Assign a MimePart object to this MimePartOrList.
-             * @param _mimePart Object to assign.
+             * @param otherMimePart Object to assign.
              * @return This object.
              */
-            MimePartOrList &operator=(const MimePart &_mimePart);
+            MimePartOrList &operator=(MimePart const &otherMimePart);
 
             /**
              * Assign a MimePartList object to this MimePartOrList.
-             * @param _mimePartList Object to assign.
+             * @param otherMimePartList Object to assign.
              * @return This object.
              */
-            MimePartOrList &operator=(const MimePartList &_mimePartList);
+            MimePartOrList &operator=(MimePartList const &otherMimePartList);
 
             /**
              * Create a MIME part containing data. If this pointer contains a MimePart object, the second pointer
@@ -128,19 +170,23 @@ namespace nawa {
              * use the assignment operator for assigning a new object, that function will make sure that the old
              * object will be destroyed properly.
              */
-            std::unique_ptr<MimePart> mimePart;
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePartOrList, mimePart, std::unique_ptr<MimePart>);
+
             /**
              * Create a MIME part containing another MIME container with (possibly) multiple MIME parts. Please
              * use the assignment operator for assigning a new object, that function will make sure that the old
              * object will be destroyed properly.
              */
-            std::unique_ptr<MimePartList> mimePartList;
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePartOrList, mimePartList, std::unique_ptr<MimePartList>);
         };
 
         /**
          * A list containing MIME parts, which can also be lists of MIME parts themselves (nested).
          */
-        struct MimePartList {
+        class MimePartList {
+            NAWA_PRIVATE_DATA()
+
+        public:
             /**
              * Possible types of MIME containers (content-type, e.g., `multipart/mixed` for independent parts, or
              * `multipart/alternative` for alternatives like plain text and HTML). See Wikipedia/MIME for details.
@@ -153,26 +199,46 @@ namespace nawa {
                 REPORT,
                 SIGNED,
                 ENCRYPTED
-            } multipartType = MultipartType::MIXED; /**< The type of this MIME container, see nawa::MimeEmail::MimePartList::MultipartType. */
+            };
+
+            NAWA_DEFAULT_DESTRUCTOR_DEF(MimePartList);
+
+            NAWA_DEFAULT_CONSTRUCTOR_DEF(MimePartList);
+
+            NAWA_COPY_CONSTRUCTOR_DEF(MimePartList);
+
+            NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(MimePartList);
+
+            NAWA_MOVE_CONSTRUCTOR_DEF(MimePartList);
+
+            NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(MimePartList);
+
+            /**
+             * The type of this MIME container, see nawa::MimeEmail::MimePartList::MultipartType. Default: MIXED/
+             */
+            NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(MimePartList, multipartType, MultipartType);
+
             /**
              * The list of MIME parts. The MimePartOrList type allows nesting, it can contain either a "final"
              * MIME part with payload, or another nested list of MIME parts.
              */
-            std::vector<MimePartOrList> mimeParts;
+            NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimePartList, mimeParts, std::vector<MimePartOrList>);
+
+            friend MimePartOrList;
         };
 
         /**
          * List containing all MIME parts that should be included in this email. It should contain at least one
          * text (or HTML) part.
          */
-        MimePartList mimePartList;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(MimeEmail, mimePartList, MimePartList);
 
         /**
          * Get the raw source of the email.
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        std::string getRaw(const std::shared_ptr<ReplacementRules> &replacementRules) const override;
+        [[nodiscard]] std::string getRaw(std::shared_ptr<ReplacementRules> const &replacementRules) const override;
     };
 }
 

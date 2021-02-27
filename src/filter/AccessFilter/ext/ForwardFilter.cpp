@@ -43,18 +43,6 @@ NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(ForwardFilter, AccessFilter)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(ForwardFilter, AccessFilter)
 
-std::string &nawa::ForwardFilter::basePath() noexcept {
-    return data->basePath;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(ForwardFilter, basePath, string)
 
-std::string const &nawa::ForwardFilter::basePath() const noexcept {
-    return data->basePath;
-}
-
-ForwardFilter::BasePathExtension &nawa::ForwardFilter::basePathExtension() noexcept {
-    return data->basePathExtension;
-}
-
-ForwardFilter::BasePathExtension nawa::ForwardFilter::basePathExtension() const noexcept {
-    return data->basePathExtension;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(ForwardFilter, basePathExtension, ForwardFilter::BasePathExtension)

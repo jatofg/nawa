@@ -77,38 +77,39 @@ namespace {
         stringstream ret;
 
         // iterate through the list
-        for (auto const &part: mimePartList.mimeParts) {
+        for (auto const &part: mimePartList.mimeParts()) {
             ret << "--" << boundary << "\r\n";
             // if the current part is a MIME part with content
-            if (part.mimePart) {
-                const auto &mimePart = *(part.mimePart);
-                ret << "Content-Type: " << mimePart.contentType << "\r\n";
-                if (!mimePart.contentDisposition.empty()) {
-                    ret << "Content-Disposition: " << mimePart.contentDisposition << "\r\n";
+            if (part.mimePart()) {
+                const auto &mimePart = *(part.mimePart());
+                ret << "Content-Type: " << mimePart.contentType() << "\r\n";
+                if (!mimePart.contentDisposition().empty()) {
+                    ret << "Content-Disposition: " << mimePart.contentDisposition() << "\r\n";
                 }
-                for (const auto &e: mimePart.partHeaders) {
+                for (const auto &e: mimePart.partHeaders()) {
                     ret << e.first << ": " << e.second << "\r\n";
                 }
 
                 // apply the replacement rules (only if necessary) and the selected encoding afterwards
-                switch (mimePart.applyEncoding) {
-                    case MimeEmail::MimePart::BASE64:
+                switch (mimePart.applyEncoding()) {
+                    case MimeEmail::MimePart::ApplyEncoding::BASE64:
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
                         ret << encoding::base64Encode(
-                                (mimePart.allowReplacements && replacementRules)
-                                ? string_replace(mimePart.data, *replacementRules) : mimePart.data,
+                                (mimePart.allowReplacements() && replacementRules)
+                                ? string_replace(mimePart.partData(), *replacementRules) : mimePart.partData(),
                                 76, "\r\n");
                         break;
-                    case MimeEmail::MimePart::QUOTED_PRINTABLE:
+                    case MimeEmail::MimePart::ApplyEncoding::QUOTED_PRINTABLE:
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
                         ret << encoding::quotedPrintableEncode(
-                                (mimePart.allowReplacements && replacementRules)
-                                ? string_replace(mimePart.data, *replacementRules) : mimePart.data
+                                (mimePart.allowReplacements() && replacementRules)
+                                ? string_replace(mimePart.partData(), *replacementRules) : mimePart.partData()
                         );
                         break;
-                    case MimeEmail::MimePart::NONE:
-                        ret << "\r\n" << ((mimePart.allowReplacements && replacementRules)
-                                          ? string_replace(mimePart.data, *replacementRules) : mimePart.data);
+                    case MimeEmail::MimePart::ApplyEncoding::NONE:
+                        ret << "\r\n" << ((mimePart.allowReplacements() && replacementRules)
+                                          ? string_replace(mimePart.partData(), *replacementRules)
+                                          : mimePart.partData());
                         break;
                 }
 
@@ -116,11 +117,11 @@ namespace {
 
             }
                 // if the current part is another list with MIME parts (nested)
-            else if (part.mimePartList) {
-                ret << "Content-Type: multipart/" << multipartTypeToString(part.mimePartList->multipartType);
+            else if (part.mimePartList()) {
+                ret << "Content-Type: multipart/" << multipartTypeToString(part.mimePartList()->multipartType());
                 string partBoundary = genBoundary();
                 ret << "; boundary=\"" << partBoundary << "\"\r\n\r\n";
-                ret << mergeMimePartList(*part.mimePartList, partBoundary, replacementRules) << "\r\n\r\n";
+                ret << mergeMimePartList(*part.mimePartList(), partBoundary, replacementRules) << "\r\n\r\n";
             }
         }
 
@@ -129,78 +130,182 @@ namespace {
     }
 }
 
-MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePartOrList &other) {
-    operator=(other);
-}
+struct MimeEmail::Data {
+    MimePartList mimePartList;
+};
 
-MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePart &_mimePart) {
-    operator=(_mimePart);
-}
+NAWA_DEFAULT_DESTRUCTOR_IMPL(MimeEmail)
 
-MimeEmail::MimePartOrList::MimePartOrList(const MimeEmail::MimePartList &_mimePartList) {
-    operator=(_mimePartList);
-}
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(MimeEmail)
 
-MimeEmail::MimePartOrList &
-MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePartOrList &other) {
-    if (&other == this) {
-        return *this;
+NAWA_COPY_CONSTRUCTOR_DERIVED_IMPL(MimeEmail, Email)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_DERIVED_IMPL(MimeEmail, Email)
+
+NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(MimeEmail, Email)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(MimeEmail, Email)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail, mimePartList, MimeEmail::MimePartList)
+
+struct MimeEmail::MimePart::Data {
+    std::string contentType;
+    std::string contentDisposition;
+    ApplyEncoding applyEncoding = ApplyEncoding::QUOTED_PRINTABLE;
+    HeadersMap partHeaders;
+    bool allowReplacements = false;
+    std::string partData;
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePart)
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePart)
+
+NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePart)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeEmail, MimePart)
+
+NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePart)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeEmail, MimePart)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePart, contentType, string)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePart, contentDisposition, string)
+
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(MimeEmail::MimePart, applyEncoding, MimeEmail::MimePart::ApplyEncoding)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePart, partHeaders, MimeEmail::HeadersMap)
+
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(MimeEmail::MimePart, allowReplacements, bool)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePart, partData, string)
+
+struct MimeEmail::MimePartList::Data {
+    MultipartType multipartType = MultipartType::MIXED;
+    std::vector<MimePartOrList> mimeParts;
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartList)
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartList)
+
+NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartList)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeEmail, MimePartList)
+
+NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartList)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeEmail, MimePartList)
+
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(MimeEmail::MimePartList, multipartType, MimeEmail::MimePartList::MultipartType)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePartList, mimeParts, vector<MimeEmail::MimePartOrList>)
+
+struct MimeEmail::MimePartOrList::Data {
+    unique_ptr<MimePart> mimePart;
+    unique_ptr<MimePartList> mimePartList;
+
+    Data() = default;
+
+    Data(Data const &other) {
+        operator=(other);
     }
-    if (other.mimePart) {
+
+    Data &operator=(MimePart::Data const &otherMimePartData) {
         if (!mimePart) {
             mimePart = make_unique<MimePart>();
         }
         if (mimePartList) {
             mimePartList.reset(nullptr);
         }
-        *mimePart = *(other.mimePart);
-    } else if (other.mimePartList) {
+        *mimePart->data = otherMimePartData;
+        return *this;
+    }
+
+    Data &operator=(MimePartList::Data const &otherMimePartListData) {
         if (!mimePartList) {
             mimePartList = make_unique<MimePartList>();
         }
         if (mimePart) {
             mimePart.reset(nullptr);
         }
-        *mimePartList = *(other.mimePartList);
+        *mimePartList->data = otherMimePartListData;
+        return *this;
     }
+
+    Data &operator=(Data const &other) {
+        if (&other == this) {
+            return *this;
+        }
+        if (other.mimePart) {
+            if (!mimePart) {
+                mimePart = make_unique<MimePart>();
+            }
+            if (mimePartList) {
+                mimePartList.reset(nullptr);
+            }
+            *mimePart = *(other.mimePart);
+        } else if (other.mimePartList) {
+            if (!mimePartList) {
+                mimePartList = make_unique<MimePartList>();
+            }
+            if (mimePart) {
+                mimePart.reset(nullptr);
+            }
+            *mimePartList = *(other.mimePartList);
+        }
+        return *this;
+    }
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartOrList)
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartOrList)
+
+NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartOrList)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeEmail, MimePartOrList)
+
+NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(MimeEmail, MimePartOrList)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeEmail, MimePartOrList)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePartOrList, mimePart, unique_ptr<MimeEmail::MimePart>)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeEmail::MimePartOrList, mimePartList, unique_ptr<MimeEmail::MimePartList>)
+
+MimeEmail::MimePartOrList::MimePartOrList(MimeEmail::MimePart const &otherMimePart) : MimePartOrList() {
+    *data = *otherMimePart.data;
+}
+
+MimeEmail::MimePartOrList::MimePartOrList(MimeEmail::MimePartList const &otherMimePartList) : MimePartOrList() {
+    *data = *otherMimePartList.data;
+}
+
+MimeEmail::MimePartOrList &
+MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePart &otherMimePart) {
+    *data = *otherMimePart.data;
     return *this;
 }
 
 MimeEmail::MimePartOrList &
-MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePart &_mimePart) {
-    if (!mimePart) {
-        mimePart = make_unique<MimePart>();
-    }
-    if (mimePartList) {
-        mimePartList.reset(nullptr);
-    }
-    *mimePart = _mimePart;
+MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePartList &otherMimePartList) {
+    *data = *otherMimePartList.data;
     return *this;
 }
 
-MimeEmail::MimePartOrList &
-MimeEmail::MimePartOrList::operator=(const MimeEmail::MimePartList &_mimePartList) {
-    if (!mimePartList) {
-        mimePartList = make_unique<MimePartList>();
-    }
-    if (mimePart) {
-        mimePart.reset(nullptr);
-    }
-    *mimePartList = _mimePartList;
-    return *this;
-}
-
-string MimeEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules) const {
+string MimeEmail::getRaw(shared_ptr<ReplacementRules> const &replacementRules) const {
     stringstream ret;
-    for (auto const &e: headers) {
+    for (auto const &e: headers()) {
         if (e.first == "MIME-Version" || e.first == "Content-Type") continue;
         ret << e.first << ": " << e.second << "\r\n";
     }
     string boundary = genBoundary();
-    ret << "MIME-Version: 1.0\r\nContent-Type: multipart/" << multipartTypeToString(mimePartList.multipartType);
+    ret << "MIME-Version: 1.0\r\nContent-Type: multipart/" << multipartTypeToString(data->mimePartList.multipartType());
     ret << "; boundary=\"" << boundary;
     ret << "\"\r\n\r\nThis is a multi-part message in MIME format\r\n\r\n";
-    ret << mergeMimePartList(mimePartList, boundary, replacementRules);
+    ret << mergeMimePartList(data->mimePartList, boundary, replacementRules);
 
     return ret.str();
 }

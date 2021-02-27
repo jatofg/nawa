@@ -1,5 +1,5 @@
 /**
- * \file Encoding.h
+ * \file encoding.h
  * \brief Namespace containing functions for text encoding and decoding
  */
 

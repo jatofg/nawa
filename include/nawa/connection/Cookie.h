@@ -61,110 +61,53 @@ namespace nawa {
         explicit Cookie(std::string c);
 
         /**
-         * Set content of the cookie.
-         * @param content Content of the cookie.
-         * @return This Cookie object.
+         * Content of the cookie.
+         * @return Reference to element.
          */
-        Cookie &setContent(std::string content) noexcept;
-
-        /**
-         * Get content of the cookie.
-         * @return Content of the cookie.
-         */
-        [[nodiscard]] std::string getContent() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(Cookie, content, std::string);
 
         /**
          * Set (optional) expiry date as time_t structure. Session cookies usually do not have an expiry date, meaning
          * that they are deleted when the browser is closed.
-         * @param expires Expiry date as time_t structure.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setExpires(std::time_t expires) noexcept;
-
-        /**
-         * Get (optional) expiry date.
-         * @return Optional expiry date.
-         */
-        [[nodiscard]] std::optional<std::time_t> getExpires() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(Cookie, expires, std::optional<time_t>);
 
         /**
          * Set (optional) Max-Age attribute.
-         * @param maxAge Optional Max-Age attribute.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setMaxAge(std::optional<unsigned long> maxAge) noexcept;
-
-        /**
-         * Get (optional) Max-Age attribute.
-         * @return Optional Max-Age attribute.
-         */
-        [[nodiscard]] std::optional<unsigned long> getMaxAge() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(Cookie, maxAge, std::optional<unsigned long>);
 
         /**
          * Set (optional) Domain attribute.
-         * @param domain Optional Domain attribute.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setDomain(std::optional<std::string> domain) noexcept;
-
-        /**
-         * Get (optional) Domain attribute.
-         * @return Optional Domain attribute.
-         */
-        [[nodiscard]] std::optional<std::string> getDomain() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(Cookie, domain, std::optional<std::string>);
 
         /**
          * Set (optional) Path attribute.
-         * @param path Optional Path attribute.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setPath(std::optional<std::string> path) noexcept;
-
-        /**
-         * Get (optional) Path attribute.
-         * @return Optional Path attribute.
-         */
-        [[nodiscard]] std::optional<std::string> getPath() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(Cookie, path, std::optional<std::string>);
 
         /**
          * Set Secure attribute.
-         * @param secure Secure attribute.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setSecure(bool secure) noexcept;
-
-        /**
-         * Get Secure attribute.
-         * @return Secure attribute.
-         */
-        [[nodiscard]] bool getSecure() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(Cookie, secure, bool);
 
         /**
          * Set HttpOnly attribute.
-         * @param httpOnly HttpOnly attribute.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setHttpOnly(bool httpOnly) noexcept;
-
-        /**
-         * Get HttpOnly attribute.
-         * @return HttpOnly attribute.
-         */
-        [[nodiscard]] bool getHttpOnly() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(Cookie, httpOnly, bool);
 
         /**
          * Set SameSite attribute.
-         * @param sameSite SameSite attribute.
-         * @return This Cookie object.
+         * @return Reference to element.
          */
-        Cookie &setSameSite(SameSite sameSite) noexcept;
-
-        /**
-         * Get SameSite attribute.
-         * @return SameSite attribute.
-         * @return This Cookie object.
-         */
-        [[nodiscard]] SameSite getSameSite() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(Cookie, sameSite, SameSite);
     };
 }
 

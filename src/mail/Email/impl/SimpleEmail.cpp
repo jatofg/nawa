@@ -29,23 +29,44 @@
 using namespace nawa;
 using namespace std;
 
+struct SimpleEmail::Data {
+    std::string text;
+    bool quotedPrintableEncode = true;
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL(SimpleEmail)
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(SimpleEmail)
+
+NAWA_COPY_CONSTRUCTOR_DERIVED_IMPL(SimpleEmail, Email)
+
+NAWA_COPY_ASSIGNMENT_OPERATOR_DERIVED_IMPL(SimpleEmail, Email)
+
+NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(SimpleEmail, Email)
+
+NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(SimpleEmail, Email)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(SimpleEmail, text, string)
+
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(SimpleEmail, quotedPrintableEncode, bool)
+
 string SimpleEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules) const {
     stringstream ret;
 
-    for (auto const &e: headers) {
-        if (e.first == "MIME-Version" || (quotedPrintableEncode && e.first == "Content-Transfer-Encoding"))
+    for (auto const &e: headers()) {
+        if (e.first == "MIME-Version" || (data->quotedPrintableEncode && e.first == "Content-Transfer-Encoding"))
             continue;
         ret << e.first << ": " << e.second << "\r\n";
     }
 
     ret << "MIME-Version: 1.0\r\n";
-    if (quotedPrintableEncode) {
+    if (data->quotedPrintableEncode) {
         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
         ret << encoding::quotedPrintableEncode(
-                replacementRules ? string_replace(text, *replacementRules) : text
+                replacementRules ? string_replace(data->text, *replacementRules) : data->text
         );
     } else {
-        ret << "\r\n" << (replacementRules ? string_replace(text, *replacementRules) : text);
+        ret << "\r\n" << (replacementRules ? string_replace(data->text, *replacementRules) : data->text);
     }
 
     return ret.str();

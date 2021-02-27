@@ -225,39 +225,39 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
     if (includeCookies)
         for (auto const &e: data->cookies) {
             stringstream headerVal;
-            headerVal << e.first << "=" << e.second.getContent();
+            headerVal << e.first << "=" << e.second.content();
             // Domain option
-            optional<string> domain = e.second.getDomain() ? e.second.getDomain() : data->cookiePolicy.getDomain();
+            optional<string> domain = e.second.domain() ? e.second.domain() : data->cookiePolicy.domain();
             if (domain && !domain->empty()) {
                 headerVal << "; Domain=" << *domain;
             }
             // Path option
-            optional<string> path = e.second.getPath() ? e.second.getPath() : data->cookiePolicy.getPath();
+            optional<string> path = e.second.path() ? e.second.path() : data->cookiePolicy.path();
             if (path && !path->empty()) {
                 headerVal << "; Path=" << *path;
             }
             // Expires option
-            optional<time_t> expiry = e.second.getExpires() ? e.second.getExpires() : data->cookiePolicy.getExpires();
+            optional<time_t> expiry = e.second.expires() ? e.second.expires() : data->cookiePolicy.expires();
             if (expiry) {
                 headerVal << "; Expires=" << make_http_time(*expiry);
             }
             // Max-Age option
-            optional<unsigned long> maxAge = e.second.getMaxAge() ? e.second.getMaxAge()
-                                                                  : data->cookiePolicy.getMaxAge();
+            optional<unsigned long> maxAge = e.second.maxAge() ? e.second.maxAge()
+                                                               : data->cookiePolicy.maxAge();
             if (maxAge) {
                 headerVal << "; Max-Age=" << *maxAge;
             }
             // Secure option
-            if (e.second.getSecure() || data->cookiePolicy.getSecure()) {
+            if (e.second.secure() || data->cookiePolicy.secure()) {
                 headerVal << "; Secure";
             }
             // HttpOnly option
-            if (e.second.getHttpOnly() || data->cookiePolicy.getHttpOnly()) {
+            if (e.second.httpOnly() || data->cookiePolicy.httpOnly()) {
                 headerVal << "; HttpOnly";
             }
             // SameSite option
-            Cookie::SameSite sameSite = (e.second.getSameSite() != Cookie::SameSite::OFF) ? e.second.getSameSite()
-                                                                                          : data->cookiePolicy.getSameSite();
+            Cookie::SameSite sameSite = (e.second.sameSite() != Cookie::SameSite::OFF) ? e.second.sameSite()
+                                                                                       : data->cookiePolicy.sameSite();
             if (sameSite == Cookie::SameSite::LAX) {
                 headerVal << "; SameSite=lax";
             } else if (sameSite == Cookie::SameSite::STRICT) {
@@ -293,7 +293,7 @@ void Connection::setCookie(const string &key, Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
     regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
-    if (!regex_match(key, matchKey) || !regex_match(cookie.getContent(), matchContent)) {
+    if (!regex_match(key, matchKey) || !regex_match(cookie.content(), matchContent)) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
     data->cookies[key] = move(cookie);

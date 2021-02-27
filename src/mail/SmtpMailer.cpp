@@ -40,23 +40,23 @@ namespace {
      * @param from EmailAddress object to set the From header from, if necessary.
      */
     void addMissingHeaders(shared_ptr<Email> &email, const shared_ptr<EmailAddress> &from) {
-        if (!email->headers.count("Date")) {
-            email->headers["Date"] = make_smtp_time(time(nullptr));
+        if (!email->headers().count("Date")) {
+            email->headers()["Date"] = make_smtp_time(time(nullptr));
         }
-        if (!email->headers.count("From") && !from->getAddress().empty()) {
-            email->headers["From"] = from->get();
+        if (!email->headers().count("From") && !from->address().empty()) {
+            email->headers()["From"] = from->get();
         }
         unsigned long atPos;
-        if (!email->headers.count("Message-ID") && !from->getAddress().empty()
-            && (atPos = from->getAddress().find_last_of('@')) != string::npos) {
+        if (!email->headers().count("Message-ID") && !from->address().empty()
+            && (atPos = from->address().find_last_of('@')) != string::npos) {
             stringstream mid;
             stringstream base;
             random_device rd;
             timespec mtime;
             clock_gettime(CLOCK_REALTIME, &mtime);
-            base << mtime.tv_sec << mtime.tv_nsec << from->getAddress() << rd();
-            mid << '<' << crypto::md5(base.str(), true) << '@' << from->getAddress().substr(atPos + 1) << '>';
-            email->headers["Message-ID"] = mid.str();
+            base << mtime.tv_sec << mtime.tv_nsec << from->address() << rd();
+            mid << '<' << crypto::md5(base.str(), true) << '@' << from->address().substr(atPos + 1) << '>';
+            email->headers()["Message-ID"] = mid.str();
         }
     }
 

@@ -132,6 +132,7 @@ set(NAWA_FILES
         src/logging/Log.cpp
         src/mail/Email/impl/MimeEmail.cpp
         src/mail/Email/impl/SimpleEmail.cpp
+        src/mail/Email/Email.cpp
         src/mail/EmailAddress.cpp
         src/mail/SmtpMailer.cpp
         src/request/Env.cpp

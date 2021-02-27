@@ -50,13 +50,7 @@ namespace nawa {
          * The HTTP status that will be sent to the client if the request is blocked.
          * @return Reference to element.
          */
-        unsigned int &status() noexcept;
-
-        /**
-         * The HTTP status that will be sent to the client if the request is blocked.
-         * @return The element.
-         */
-        [[nodiscard]] unsigned int status() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(BlockFilter, status, unsigned int);
     };
 }
 

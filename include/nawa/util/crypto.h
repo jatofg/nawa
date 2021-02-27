@@ -1,5 +1,5 @@
 /**
- * \file Crypto.h
+ * \file crypto.h
  * \brief A bunch of useful cryptographic functions (esp. hashing), acting as a wrapper to C crypto libraries.
  */
 

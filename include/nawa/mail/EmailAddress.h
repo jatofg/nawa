@@ -62,28 +62,16 @@ namespace nawa {
         EmailAddress(std::string name, std::string address);
 
         /**
-         * Set name.
-         * @param name Name.
+         * The name which is part of the email address.
+         * @return Reference to element.
          */
-        void setName(std::string name) noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(EmailAddress, name, std::string);
 
         /**
-         * Get name
-         * @return Name.
+         * The email address.
+         * @return Reference to element.
          */
-        [[nodiscard]] std::string getName() const noexcept;
-
-        /**
-         * Set email address.
-         * @param address Email address.
-         */
-        void setAddress(std::string address) noexcept;
-
-        /**
-         * Get email address.
-         * @return Email address.
-         */
-        [[nodiscard]] std::string getAddress() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(EmailAddress, address, std::string);
 
         /**
          * Get the email address in a standard representation, i.e., `<john.doe\@example.com>` without name, or

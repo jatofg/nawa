@@ -44,26 +44,8 @@ NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(AuthFilter, AccessFilter)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(AuthFilter, AccessFilter)
 
-std::function<bool(std::string, std::string)> &nawa::AuthFilter::authFunction() noexcept {
-    return data->authFunction;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AuthFilter, authFunction, function<bool(string, string)>)
 
-std::function<bool(std::string, std::string)> const &nawa::AuthFilter::authFunction() const noexcept {
-    return data->authFunction;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AuthFilter, authName, string)
 
-std::string &nawa::AuthFilter::authName() noexcept {
-    return data->authName;
-}
-
-std::string const &nawa::AuthFilter::authName() const noexcept {
-    return data->authName;
-}
-
-bool &nawa::AuthFilter::useSessions() noexcept {
-    return data->useSessions;
-}
-
-bool nawa::AuthFilter::useSessions() const noexcept {
-    return data->useSessions;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AuthFilter, useSessions, bool)

@@ -63,26 +63,13 @@ namespace nawa {
          * starting with a '/' and *not* ending with a '/', e.g., "/var/www/website1").
          * @return Reference to element.
          */
-        std::string &basePath() noexcept;
-
-        /**
-         * The path under which the file will be looked up (should be an absolute OS path to the files
-         * starting with a '/' and *not* ending with a '/', e.g., "/var/www/website1").
-         * @return Reference to element.
-         */
-        [[nodiscard]] std::string const &basePath() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(ForwardFilter, basePath, std::string);
 
         /**
          * How the file will be looked up (see explanation of enum BasePathExtension, default: only file name).
          * @return Reference to element.
          */
-        BasePathExtension &basePathExtension() noexcept;
-
-        /**
-         * How the file will be looked up (see explanation of enum BasePathExtension, default: only file name).
-         * @return The element.
-         */
-        [[nodiscard]] BasePathExtension basePathExtension() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(ForwardFilter, basePathExtension, BasePathExtension);
     };
 }
 

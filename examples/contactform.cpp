@@ -46,9 +46,7 @@ int init(AppInit &appInit) {
 int handleRequest(Connection &connection) {
 
     // make sure cookies are a bit more secure
-    Cookie policy;
-    policy.setHttpOnly(true);
-    connection.setCookiePolicy(policy);
+    connection.setCookiePolicy(Cookie().httpOnly(true));
 
     // we use session variables for a basic spam protection
     connection.session.start();
@@ -89,13 +87,13 @@ int handleRequest(Connection &connection) {
         EmailAddress from(post["name"], "contactform@example.com");
         EmailAddress to("The Admin", "admin@example.com");
         EmailAddress replyTo(post["email"]);
-        email.headers["From"] = from.get();
-        email.headers["To"] = to.get();
-        email.headers["Content-Type"] = "text/plain; charset=UTF-8";
+        email.headers()["From"] = from.get();
+        email.headers()["To"] = to.get();
+        email.headers()["Content-Type"] = "text/plain; charset=UTF-8";
         // apply Q-encoding to the header, just in case the user used special chars in the subject
-        email.headers["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
-        email.quotedPrintableEncode = true;
-        email.text = "This contact form was sent via an example nawa application!\r\n\r\n"
+        email.headers()["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
+        email.quotedPrintableEncode() = true;
+        email.text() = "This contact form was sent via an example nawa application!\r\n\r\n"
                      "Name of the sender: " + post["name"] + "\r\n"
                                                              "Email of the sender: " + post["email"] + "\r\n\r\n" +
                      post["message"];

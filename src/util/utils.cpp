@@ -1,5 +1,5 @@
 /**
- * \file Utils.cpp
+ * \file utils.cpp
  * \brief Implementation of the Utils class.
  */
 

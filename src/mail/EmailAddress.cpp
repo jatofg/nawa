@@ -68,18 +68,6 @@ bool EmailAddress::isValid() const {
     return regex_match(data->address, emCheck);
 }
 
-void nawa::EmailAddress::setName(std::string name) noexcept {
-    data->name = move(name);
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(EmailAddress, name, string)
 
-std::string nawa::EmailAddress::getName() const noexcept {
-    return data->name;
-}
-
-void nawa::EmailAddress::setAddress(std::string address) noexcept {
-    data->address = move(address);
-}
-
-std::string nawa::EmailAddress::getAddress() const noexcept {
-    return data->address;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(EmailAddress, address, string)

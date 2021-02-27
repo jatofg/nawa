@@ -62,15 +62,7 @@ namespace nawa {
          * returns true. If the function is not set, authorization will always be denied.
          * @return Reference to element.
          */
-        std::function<bool(std::string, std::string)> &authFunction() noexcept;
-
-        /**
-         * The authentication function. It will be called with the provided user name as first parameter and the
-         * provided user password as the second parameter. Access will be granted if the authentication function
-         * returns true. If the function is not set, authorization will always be denied.
-         * @return Reference to element.
-         */
-        [[nodiscard]] std::function<bool(std::string, std::string)> const &authFunction() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(AuthFilter, authFunction, std::function<bool(std::string, std::string)>);
 
         /**
          * A short description of the required authentication that may be shown by the browser ("realm") (optional).
@@ -80,17 +72,7 @@ namespace nawa {
          * (by the way, it shouldn't).
          * @return Reference to element.
          */
-        std::string &authName() noexcept;
-
-        /**
-         * A short description of the required authentication that may be shown by the browser ("realm") (optional).
-         * This value should only contain alphanumeric characters and must not contain double quotes or newlines.
-         * It will not be checked for validity by NAWA, instead, authentication may fail and the server might even become
-         * unaccessible in case of non-compliance. If this value comes from a user, make sure to check it thoroughly
-         * (by the way, it shouldn't).
-         * @return Reference to element.
-         */
-        [[nodiscard]] std::string const &authName() const noexcept;
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(AuthFilter, authName, std::string);
 
         /**
          * Use sessions to remember the authenticated user. This will create a std::string session variable
@@ -101,18 +83,7 @@ namespace nawa {
          * request.
          * @return Reference to element.
          */
-        bool &useSessions() noexcept;
-
-        /**
-         * Use sessions to remember the authenticated user. This will create a std::string session variable
-         * "_nawa_authfilter[id]" (wherein [id] is the number of the filter), containing the user name.
-         * You can use it in your application to find out which user has authenticated and delete it to log the user
-         * out. This is usually not necessary (but might be more effective or extend the scope of the authorization,
-         * and lets you access the user name), as browsers will usually send the authentication string on every single
-         * request.
-         * @return The element.
-         */
-        [[nodiscard]] bool useSessions() const noexcept;
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(AuthFilter, useSessions, bool);
     };
 }
 

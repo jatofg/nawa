@@ -1,6 +1,6 @@
 /**
- * \file BlockFilter.cpp
- * \brief Implementation of the BlockFilter class.
+ * \file Email.cpp
+ * \brief Implementation of the Email class
  */
 
 /*
@@ -21,25 +21,25 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/filter/AccessFilter/ext/BlockFilter.h>
+#include <nawa/mail/Email/Email.h>
 
 using namespace nawa;
 using namespace std;
 
-struct BlockFilter::Data {
-    unsigned int status = 404;
+struct Email::Data {
+    std::unordered_map<std::string, std::string> headers;
 };
 
-NAWA_DEFAULT_DESTRUCTOR_IMPL(BlockFilter)
+NAWA_DEFAULT_DESTRUCTOR_IMPL(Email)
 
-NAWA_DEFAULT_CONSTRUCTOR_IMPL(BlockFilter)
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(Email)
 
-NAWA_COPY_CONSTRUCTOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+NAWA_COPY_CONSTRUCTOR_IMPL(Email)
 
-NAWA_COPY_ASSIGNMENT_OPERATOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Email)
 
-NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+NAWA_MOVE_CONSTRUCTOR_IMPL(Email)
 
-NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(BlockFilter, AccessFilter)
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Email)
 
-NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(BlockFilter, status, unsigned int)
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Email, headers, Email::HeadersMap)

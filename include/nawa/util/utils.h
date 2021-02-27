@@ -1,5 +1,5 @@
 /**
- * \file Utils.h
+ * \file utils.h
  * \brief Contains useful functions that improve the readability and facilitate maintenance of the NAWA code.
  */
 

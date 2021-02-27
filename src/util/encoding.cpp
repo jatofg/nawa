@@ -1,5 +1,5 @@
 /**
- * \file Encoding.cpp
+ * \file encoding.cpp
  * \brief Implementation of the Encoding class.
  */
 

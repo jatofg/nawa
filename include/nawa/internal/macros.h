@@ -62,4 +62,13 @@
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(Class, Parent) Class &Class::operator=(Class &&other) noexcept { if (this != &other) { data = move(other.data); Parent::operator=(move(other)); } return *this; }
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL_WITH_NS(Namespace, Class, Parent) Namespace::Class &Namespace::Class::operator=(Namespace::Class &&other) noexcept { if (this != &other) { data = move(other.data); Parent::operator=(move(other)); } return *this; }
 
+#define NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(Class, Member, Type) Type &Member() noexcept; [[nodiscard]] Type Member() const noexcept; Class &Member(Type value) noexcept
+#define NAWA_COMPLEX_DATA_ACCESSORS_DEF(Class, Member, Type) Type &Member() noexcept; [[nodiscard]] Type const &Member() const noexcept; Class &Member(Type value) noexcept
+#define NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(Class, Member, Type) Type &Class::Member() noexcept { return data->Member; } \
+                                                                Type Class::Member() const noexcept { return data->Member; } \
+                                                                Class &Class::Member(Type value) noexcept { data->Member = value; return *this; }
+#define NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Class, Member, Type) Type &Class::Member() noexcept { return data->Member; } \
+                                                              Type const &Class::Member() const noexcept { return data->Member; } \
+                                                              Class &Class::Member(Type value) noexcept { data->Member = move(value); return *this; }
+
 #endif //NAWA_MACROS_H

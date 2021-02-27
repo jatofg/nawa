@@ -78,9 +78,7 @@ int handleRequest(Connection &connection) {
     connection.session.start();
 
     connection.setCookie("TEST", "test");
-    Cookie policy;
-    policy.setHttpOnly(true);
-    connection.setCookiePolicy(policy);
+    connection.setCookiePolicy(Cookie().httpOnly(true));
 
     string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
     string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";

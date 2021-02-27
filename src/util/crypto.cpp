@@ -1,5 +1,5 @@
 /**
- * \file Crypto.cpp
+ * \file crypto.cpp
  * \brief Implementation of the Crypto class.
  */
 

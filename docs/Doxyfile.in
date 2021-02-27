@@ -794,6 +794,7 @@ WARN_LOGFILE           =
 
 INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/nawa" \
                          "@CMAKE_CURRENT_BINARY_DIR@/include/nawa" \
+                         "@CMAKE_CURRENT_BINARY_DIR@/internal" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/src" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/examples" \
                          "@CMAKE_CURRENT_SOURCE_DIR@/tests" \
@@ -2075,7 +2076,9 @@ PREDEFINED             = "NAWA_DEFAULT_DESTRUCTOR_DEF(Class)=virtual ~Class()" \
                          "NAWA_COPY_CONSTRUCTOR_DEF(Class)=Class(Class const &other)" \
                          "NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(Class)=Class &operator=(const Class &other)" \
                          "NAWA_MOVE_CONSTRUCTOR_DEF(Class)=Class(Class &&other) noexcept" \
-                         "NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Class)=Class &operator=(Class &&other) noexcept"
+                         "NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Class)=Class &operator=(Class &&other) noexcept" \
+                         "NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(Class, Member, Type)=Type &Member() noexcept; [[nodiscard]] Type Member() const noexcept; Class &Member(Type value) noexcept" \
+                         "NAWA_COMPLEX_DATA_ACCESSORS_DEF(Class, Member, Type)=Type &Member() noexcept; [[nodiscard]] Type const &Member() const noexcept; Class &Member(Type value) noexcept"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

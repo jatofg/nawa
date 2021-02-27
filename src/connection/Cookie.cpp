@@ -53,74 +53,18 @@ Cookie::Cookie(string c) : Cookie() {
     data->content = move(c);
 }
 
-Cookie &Cookie::setContent(string content) noexcept {
-    data->content = move(content);
-    return *this;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Cookie, content, string)
 
-string Cookie::getContent() const noexcept {
-    return data->content;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Cookie, expires, optional<time_t>)
 
-Cookie &Cookie::setExpires(time_t expires) noexcept {
-    data->expires = expires;
-    return *this;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Cookie, maxAge, optional<unsigned long>)
 
-optional<time_t> Cookie::getExpires() const noexcept {
-    return data->expires;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Cookie, domain, optional<string>)
 
-Cookie &Cookie::setMaxAge(optional<unsigned long> maxAge) noexcept {
-    data->maxAge = maxAge;
-    return *this;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Cookie, path, optional<string>)
 
-optional<unsigned long> Cookie::getMaxAge() const noexcept {
-    return data->maxAge;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(Cookie, secure, bool)
 
-Cookie &Cookie::setDomain(optional<string> domain) noexcept {
-    data->domain = move(domain);
-    return *this;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(Cookie, httpOnly, bool)
 
-optional<string> Cookie::getDomain() const noexcept {
-    return data->domain;
-}
-
-Cookie &Cookie::setPath(optional<string> path) noexcept {
-    data->path = move(path);
-    return *this;
-}
-
-optional<string> Cookie::getPath() const noexcept {
-    return data->path;
-}
-
-Cookie &Cookie::setSecure(bool secure) noexcept {
-    data->secure = secure;
-    return *this;
-}
-
-bool Cookie::getSecure() const noexcept {
-    return data->secure;
-}
-
-Cookie &Cookie::setHttpOnly(bool httpOnly) noexcept {
-    data->httpOnly = httpOnly;
-    return *this;
-}
-
-bool Cookie::getHttpOnly() const noexcept {
-    return data->httpOnly;
-}
-
-Cookie &Cookie::setSameSite(Cookie::SameSite sameSite) noexcept {
-    data->sameSite = sameSite;
-    return *this;
-}
-
-Cookie::SameSite Cookie::getSameSite() const noexcept {
-    return data->sameSite;
-}
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(Cookie, sameSite, Cookie::SameSite)

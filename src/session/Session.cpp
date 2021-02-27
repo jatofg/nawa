@@ -136,8 +136,8 @@ void Session::start(Cookie properties) {
 
     // session duration
     unsigned long sessionKeepalive = 1800;
-    if (properties.getMaxAge()) {
-        sessionKeepalive = *properties.getMaxAge();
+    if (properties.maxAge()) {
+        sessionKeepalive = *properties.maxAge();
     } else {
         auto sessionKStr = data->connection.config[{"session", "keepalive"}];
         if (!sessionKStr.empty()) {
@@ -194,26 +194,26 @@ void Session::start(Cookie properties) {
 
     // set the response cookie and its properties according to the Cookie parameter or the NAWA config
     string cookieExpiresStr;
-    if (properties.getExpires() || data->connection.config[{"session", "cookie_expires"}] != "off") {
-        properties.setExpires(time(nullptr) + sessionKeepalive);
-        properties.setMaxAge(sessionKeepalive);
+    if (properties.expires() || data->connection.config[{"session", "cookie_expires"}] != "off") {
+        properties.expires(time(nullptr) + sessionKeepalive)
+                .maxAge(sessionKeepalive);
     } else {
         // we need to unset the maxAge value if it should not be used for the cookie
-        properties.setMaxAge(nullopt);
+        properties.maxAge(nullopt);
     }
 
-    if (!properties.getSecure() && data->connection.config[{"session", "cookie_secure"}] != "off") {
-        properties.setSecure(true);
+    if (!properties.secure() && data->connection.config[{"session", "cookie_secure"}] != "off") {
+        properties.secure(true);
     }
-    if (!properties.getHttpOnly() && data->connection.config[{"session", "cookie_httponly"}] != "off") {
-        properties.setHttpOnly(true);
+    if (!properties.httpOnly() && data->connection.config[{"session", "cookie_httponly"}] != "off") {
+        properties.httpOnly(true);
     }
-    if (properties.getSameSite() == Cookie::SameSite::OFF) {
+    if (properties.sameSite() == Cookie::SameSite::OFF) {
         auto sessionSameSite = data->connection.config[{"session", "cookie_samesite"}];
         if (sessionSameSite == "lax") {
-            properties.setSameSite(Cookie::SameSite::LAX);
+            properties.sameSite(Cookie::SameSite::LAX);
         } else if (sessionSameSite != "off") {
-            properties.setSameSite(Cookie::SameSite::STRICT);
+            properties.sameSite(Cookie::SameSite::STRICT);
         }
     }
 
@@ -221,7 +221,7 @@ void Session::start(Cookie properties) {
     data->currentID = sessionCookieStr;
 
     // set the content to the session ID and queue the cookie
-    properties.setContent(sessionCookieStr);
+    properties.content(sessionCookieStr);
     data->connection.setCookie(data->cookieName, properties);
 
     // run garbage collection in 1/x of invocations
