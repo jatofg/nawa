@@ -27,7 +27,7 @@ to be necessary):
 email.headers["From"] = from.get();
 email.headers["To"] = to.get();
 email.headers["Content-Type"] = "text/plain; charset=UTF-8";
-email.headers["Subject"] = Encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
+email.headers["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
 ```
 
 In the last line, so-called Q-encoding is applied to the subject, just in case it 
@@ -37,7 +37,7 @@ sure it doesn't contain any illegal characters which would violate the email
 standards:
 
 ```cpp
-email.quotedPrintableEncode = true;
+email.quotedPrintableEncode() = true;
 ```
 
 And of course, don't forget to set the actual text/body of the email:
@@ -98,9 +98,9 @@ or emails containing attachments), you can use the `nawa::MimeEmail` class:
 
 ```cpp
 nawa::MimeEmail email2;
-email2.headers["From"] = from.get();
-email2.headers["To"] = to.get();
-email2.headers["Subject"] = "A MIME email";
+email2.headers()["From"] = from.get();
+email2.headers()["To"] = to.get();
+email2.headers()["Subject"] = "A MIME email";
 ```
 
 As you see, setting the headers works just like with simple emails. Concerning 

@@ -109,7 +109,7 @@ namespace {
         // if filters are disabled, do not even check
         if (!accessFilters.filtersEnabled()) return false;
 
-        auto requestPath = connection.request.env.getRequestPath();
+        auto requestPath = connection.request().env().getRequestPath();
 
         // check block filters
         for (auto const &flt: accessFilters.blockFilters()) {
@@ -122,9 +122,9 @@ namespace {
             // filter matches -> apply block
             connection.setStatus(flt.status());
             if (!flt.response().empty()) {
-                connection.setBody(flt.response());
+                connection.setResponseBody(flt.response());
             } else {
-                connection.setBody(generate_error_page(flt.status()));
+                connection.setResponseBody(generate_error_page(flt.status()));
             }
             // the request has been blocked, so no more filters have to be applied
             // returning true means: the request has been filtered
@@ -146,9 +146,9 @@ namespace {
 
             // check session variable for this filter, if session usage is on
             if (flt.useSessions()) {
-                connection.session.start();
+                connection.session().start();
                 sessionCookieName = "_nawa_authfilter" + to_string(authFilterID);
-                if (connection.session.isSet(sessionCookieName)) {
+                if (connection.session().isSet(sessionCookieName)) {
                     isAuthenticated = true;
                 }
             }
@@ -156,7 +156,7 @@ namespace {
             // if this did not work, request authentication or invoke auth function if credentials have already been sent
             if (!isAuthenticated) {
                 // case 1: no authorization header sent by client -> send a 401 without body
-                if (connection.request.env["authorization"].empty()) {
+                if (connection.request().env()["authorization"].empty()) {
                     connection.setStatus(401);
                     stringstream hval;
                     hval << "Basic";
@@ -171,7 +171,7 @@ namespace {
                     // case 2: credentials already sent
                 else {
                     // split the authorization string, only the last part should contain base64
-                    auto authResponse = split_string(connection.request.env["authorization"], ' ', true);
+                    auto authResponse = split_string(connection.request().env()["authorization"], ' ', true);
                     // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
                     if (authResponse.size() == 2 || authResponse.at(0) == "Basic") {
                         auto credentials = split_string(encoding::base64Decode(authResponse.at(1)), ':', true);
@@ -183,7 +183,7 @@ namespace {
                                 isAuthenticated = true;
                                 // now, if sessions are used, set the session variable to the username
                                 if (flt.useSessions()) {
-                                    connection.session.set(sessionCookieName, any(credentials.at(0)));
+                                    connection.session().set(sessionCookieName, any(credentials.at(0)));
                                 }
                             }
                         }
@@ -195,9 +195,9 @@ namespace {
             if (!isAuthenticated) {
                 connection.setStatus(403);
                 if (!flt.response().empty()) {
-                    connection.setBody(flt.response());
+                    connection.setResponseBody(flt.response());
                 } else {
-                    connection.setBody(generate_error_page(403));
+                    connection.setResponseBody(generate_error_page(403));
                 }
 
                 // request blocked
@@ -235,9 +235,9 @@ namespace {
                 // file does not exist, send 404
                 connection.setStatus(404);
                 if (!flt.response().empty()) {
-                    connection.setBody(flt.response());
+                    connection.setResponseBody(flt.response());
                 } else {
-                    connection.setBody(generate_error_page(404));
+                    connection.setResponseBody(generate_error_page(404));
                 }
             }
 

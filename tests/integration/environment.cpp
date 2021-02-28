@@ -77,7 +77,7 @@ TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     auto &requestHandler = httpRequestHandler;
 
     auto handlingFunction = [](Connection &connection) -> int {
-        connection.response << "Hello World!";
+        connection.responseStream() << "Hello World!";
         return 0;
     };
     REQUIRE_NOTHROW(
@@ -96,19 +96,22 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     auto &requestHandler = httpRequestHandler;
 
     auto handlingFunction = [](Connection &connection) -> int {
-        connection.response << connection.request.env.getRequestPath().size() << "\n"; // [0]
-        connection.response << connection.request.env["REMOTE_ADDR"] << "\n"; // [1]
-        connection.response << connection.request.env["REQUEST_URI"] << "\n"; // [2]
-        connection.response << connection.request.env["REMOTE_PORT"] << "\n"; // [3]
-        connection.response << connection.request.env["REQUEST_METHOD"] << "\n"; // [4]
-        connection.response << connection.request.env["SERVER_ADDR"] << "\n"; // [5]
-        connection.response << connection.request.env["SERVER_PORT"] << "\n"; // [6]
-        connection.response << connection.request.env["SERVER_SOFTWARE"] << "\n"; // [7]
-        connection.response << connection.request.env["BASE_URL"] << "\n"; // [8]
-        connection.response << connection.request.env["FULL_URL_WITH_QS"] << "\n"; // [9]
-        connection.response << connection.request.env["FULL_URL_WITHOUT_QS"] << "\n"; // [10]
-        connection.response << connection.request.env["host"] << "\n"; // [11]
-        connection.response << connection.request.env["content-type"] << "\n"; // [12]
+        auto &resp = connection.responseStream();
+        auto &env = connection.request().env();
+
+        resp << env.getRequestPath().size() << "\n"; // [0]
+        resp << env["REMOTE_ADDR"] << "\n"; // [1]
+        resp << env["REQUEST_URI"] << "\n"; // [2]
+        resp << env["REMOTE_PORT"] << "\n"; // [3]
+        resp << env["REQUEST_METHOD"] << "\n"; // [4]
+        resp << env["SERVER_ADDR"] << "\n"; // [5]
+        resp << env["SERVER_PORT"] << "\n"; // [6]
+        resp << env["SERVER_SOFTWARE"] << "\n"; // [7]
+        resp << env["BASE_URL"] << "\n"; // [8]
+        resp << env["FULL_URL_WITH_QS"] << "\n"; // [9]
+        resp << env["FULL_URL_WITHOUT_QS"] << "\n"; // [10]
+        resp << env["host"] << "\n"; // [11]
+        resp << env["content-type"] << "\n"; // [12]
 
         // response headers
         connection.setHeader("x-test-header", "test");

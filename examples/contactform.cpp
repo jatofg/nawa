@@ -49,15 +49,18 @@ int handleRequest(Connection &connection) {
     connection.setCookiePolicy(Cookie().httpOnly(true));
 
     // we use session variables for a basic spam protection
-    connection.session.start();
+    connection.session().start();
     // randVal is a random value that could be present from a previous request
-    auto randVal = connection.session["randVal"];
+    auto randVal = connection.session()["randVal"];
 
     // we will work with POST data quite often now, so we'll create a shortcut
-    auto const &post = connection.request.post;
+    auto const &post = connection.request().post();
+
+    // get a shortcut for the response stream
+    auto &resp = connection.responseStream();
 
     // HTML header
-    connection.response << "<!DOCTYPE html><head><title>Contact Form</title></head><body>";
+    resp << "<!DOCTYPE html><head><title>Contact Form</title></head><body>";
 
     // if there is POST data, and randVal is not empty, process it
     if (randVal.has_value() && post.count("rand_val") == 1) {
@@ -72,13 +75,13 @@ int handleRequest(Connection &connection) {
         catch (...) {}
 
         if (!randValid) {
-            connection.response << "<p>No spamming, please!</p>";
+            resp << "<p>No spamming, please!</p>";
             return 0;
         }
 
         // check whether the user filled in all required fields
         if (post["name"].empty() || post["email"].empty() || post["subject"].empty() || post["message"].empty()) {
-            connection.response << "<p>Please go back and fill in all required fields!</p></body></html>";
+            resp << "<p>Please go back and fill in all required fields!</p></body></html>";
             return 0;
         }
 
@@ -94,9 +97,9 @@ int handleRequest(Connection &connection) {
         email.headers()["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
         email.quotedPrintableEncode() = true;
         email.text() = "This contact form was sent via an example nawa application!\r\n\r\n"
-                     "Name of the sender: " + post["name"] + "\r\n"
-                                                             "Email of the sender: " + post["email"] + "\r\n\r\n" +
-                     post["message"];
+                       "Name of the sender: " + post["name"] + "\r\n"
+                                                               "Email of the sender: " + post["email"] + "\r\n\r\n" +
+                       post["message"];
 
         // now use SmtpMailer to send the email to your mailbox
         SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
@@ -104,15 +107,15 @@ int handleRequest(Connection &connection) {
         smtp.enqueue(std::make_shared<SimpleEmail>(email), to, std::make_shared<EmailAddress>(from));
         try {
             smtp.processQueue();
-            connection.response << "<p>Message sent successfully!</p>";
+            resp << "<p>Message sent successfully!</p>";
         }
         catch (const Exception &e) {
-            connection.response << "<p>Message could not be sent due to a technical problem :(</p>";
+            resp << "<p>Message could not be sent due to a technical problem :(</p>";
             NLOG_ERROR(logger, "Error sending email: " << e.getMessage())
             NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         }
 
-        connection.response << "</body></html>";
+        resp << "</body></html>";
 
         return 0;
     }
@@ -120,20 +123,19 @@ int handleRequest(Connection &connection) {
     // generate a new random value for inclusion in our form, so we can check it later
     random_device rd;
     randVal = rd();
-    connection.session.set("randVal", randVal);
+    connection.session().set("randVal", randVal);
 
     // and show the form!
-    connection.response
-            << "<p>Please fill in the following form in order to contact us! All fields are required.</p>\r\n"
-               "<form name=\"contact\" method=\"post\" action=\"?\">"
-               "<input type=\"hidden\" name=\"rand_val\" value=\"" << any_cast<unsigned int>(randVal)
-            << "\" />"
-               "<p>Your name: <input type=\"text\" name=\"name\" /></p>"
-               "<p>Email address: <input type=\"email\" name=\"email\" /></p>"
-               "<p>Subject: <input type=\"text\" name=\"subject\" /></p>"
-               "<p>Message: <textarea name=\"message\" rows=\"5\" cols=\"30\"></textarea></p>"
-               "<p><input type=\"submit\" name=\"go\" value=\"Submit\" /></p>"
-               "</form></body></html>";
+    resp << "<p>Please fill in the following form in order to contact us! All fields are required.</p>\r\n"
+            "<form name=\"contact\" method=\"post\" action=\"?\">"
+            "<input type=\"hidden\" name=\"rand_val\" value=\"" << any_cast<unsigned int>(randVal)
+         << "\" />"
+            "<p>Your name: <input type=\"text\" name=\"name\" /></p>"
+            "<p>Email address: <input type=\"email\" name=\"email\" /></p>"
+            "<p>Subject: <input type=\"text\" name=\"subject\" /></p>"
+            "<p>Message: <textarea name=\"message\" rows=\"5\" cols=\"30\"></textarea></p>"
+            "<p><input type=\"submit\" name=\"go\" value=\"Submit\" /></p>"
+            "</form></body></html>";
 
     return 0;
 }

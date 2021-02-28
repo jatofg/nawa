@@ -30,6 +30,6 @@ int init(AppInit &appInit) {
 }
 
 int handleRequest(Connection &connection) {
-    connection.response << "Hello World!";
+    connection.responseStream() << "Hello World!";
     return 0;
 }

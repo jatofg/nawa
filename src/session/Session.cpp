@@ -129,7 +129,7 @@ void Session::start(Cookie properties) {
     if (established()) return;
 
     // get name of session cookie from config
-    data->cookieName = data->connection.config[{"session", "cookie_name"}];
+    data->cookieName = data->connection.config()[{"session", "cookie_name"}];
     if (data->cookieName.empty()) {
         data->cookieName = "SESSION";
     }
@@ -139,7 +139,7 @@ void Session::start(Cookie properties) {
     if (properties.maxAge()) {
         sessionKeepalive = *properties.maxAge();
     } else {
-        auto sessionKStr = data->connection.config[{"session", "keepalive"}];
+        auto sessionKStr = data->connection.config()[{"session", "keepalive"}];
         if (!sessionKStr.empty()) {
             try {
                 sessionKeepalive = stoul(sessionKStr);
@@ -151,21 +151,22 @@ void Session::start(Cookie properties) {
     }
 
     // check whether client has submitted a session cookie
-    auto sessionCookieStr = data->connection.request.cookie[data->cookieName];
+    auto sessionCookieStr = data->connection.request().cookie()[data->cookieName];
     if (!sessionCookieStr.empty()) {
         // check for validity
         // global data map may be accessed concurrently by different threads
         lock_guard<mutex> lockGuard(gLock);
         if (sessionData.count(sessionCookieStr) == 1) {
             // read validate_ip setting from config (needed a few lines later)
-            auto sessionValidateIP = data->connection.config[{"session", "validate_ip"}];
+            auto sessionValidateIP = data->connection.config()[{"session", "validate_ip"}];
             // session already expired?
             if (sessionData.at(sessionCookieStr)->expires <= time(nullptr)) {
                 sessionData.erase(sessionCookieStr);
             }
                 // validate_ip enabled in NAWA config and IP mismatch?
             else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax")
-                     && sessionData.at(sessionCookieStr)->sourceIP != data->connection.request.env["remoteAddress"]) {
+                     &&
+                     sessionData.at(sessionCookieStr)->sourceIP != data->connection.request().env()["remoteAddress"]) {
                 if (sessionValidateIP == "strict") {
                     // in strict mode, session has to be invalidated
                     sessionData.erase(sessionCookieStr);
@@ -185,16 +186,16 @@ void Session::start(Cookie properties) {
         // generate new session ID string (and check for duplicate - should not really occur)
         lock_guard<mutex> lockGuard(gLock);
         do {
-            sessionCookieStr = generateID(data->connection.request.env["remoteAddress"]);
+            sessionCookieStr = generateID(data->connection.request().env()["remoteAddress"]);
         } while (sessionData.count(sessionCookieStr) > 0);
-        data->currentData = make_shared<SessionData>(data->connection.request.env["remoteAddr"]);
+        data->currentData = make_shared<SessionData>(data->connection.request().env()["remoteAddr"]);
         data->currentData->expires = time(nullptr) + sessionKeepalive;
         sessionData[sessionCookieStr] = data->currentData;
     }
 
     // set the response cookie and its properties according to the Cookie parameter or the NAWA config
     string cookieExpiresStr;
-    if (properties.expires() || data->connection.config[{"session", "cookie_expires"}] != "off") {
+    if (properties.expires() || data->connection.config()[{"session", "cookie_expires"}] != "off") {
         properties.expires(time(nullptr) + sessionKeepalive)
                 .maxAge(sessionKeepalive);
     } else {
@@ -202,14 +203,14 @@ void Session::start(Cookie properties) {
         properties.maxAge(nullopt);
     }
 
-    if (!properties.secure() && data->connection.config[{"session", "cookie_secure"}] != "off") {
+    if (!properties.secure() && data->connection.config()[{"session", "cookie_secure"}] != "off") {
         properties.secure(true);
     }
-    if (!properties.httpOnly() && data->connection.config[{"session", "cookie_httponly"}] != "off") {
+    if (!properties.httpOnly() && data->connection.config()[{"session", "cookie_httponly"}] != "off") {
         properties.httpOnly(true);
     }
     if (properties.sameSite() == Cookie::SameSite::OFF) {
-        auto sessionSameSite = data->connection.config[{"session", "cookie_samesite"}];
+        auto sessionSameSite = data->connection.config()[{"session", "cookie_samesite"}];
         if (sessionSameSite == "lax") {
             properties.sameSite(Cookie::SameSite::LAX);
         } else if (sessionSameSite != "off") {
@@ -227,7 +228,7 @@ void Session::start(Cookie properties) {
     // run garbage collection in 1/x of invocations
     unsigned long divisor;
     try {
-        auto divisorStr = data->connection.config[{"session", "gc_divisor"}];
+        auto divisorStr = data->connection.config()[{"session", "gc_divisor"}];
         if (!divisorStr.empty()) {
             divisor = stoul(divisorStr);
         } else {

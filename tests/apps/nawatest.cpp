@@ -74,8 +74,12 @@ int init(nawa::AppInit &appInit) {
 
 int handleRequest(Connection &connection) {
 
+    auto &resp = connection.responseStream();
+    auto &req = connection.request();
+    auto &session = connection.session();
+
     // start a session
-    connection.session.start();
+    session.start();
 
     connection.setCookie("TEST", "test");
     connection.setCookiePolicy(Cookie().httpOnly(true));
@@ -83,26 +87,26 @@ int handleRequest(Connection &connection) {
     string encoded = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
     string decoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
 
-    connection.response << "<!DOCTYPE html>\n"
-                           "<html><head><title>Test</title></head><body>"
-                           "<p>Hello World! HTML string: " << encoding::htmlEncode(decoded, true) << "</p>"
-                                                                                                     "<p>Client IP: "
-                        << encoding::htmlEncode(connection.request.env["REMOTE_ADDR"]) << "</p>"
-                                                                                          "<p>Request URI: ("
-                        << connection.request.env.getRequestPath().size() << " elements): "
-                        << connection.request.env["REQUEST_URI"] << "</p>"
-                                                                    "<p>HTTPS status: "
-                        << connection.request.env["HTTPS"] << "</p>"
-                                                              "<p>SERVER_NAME: "
-                        << connection.request.env["SERVER_NAME"]
-                        << "</p>"
-                           "<p>Server software: " << connection.request.env["SERVER_SOFTWARE"] << "</p>"
-                                                                                                  "<p>Base URL: "
-                        << connection.request.env["BASE_URL"] << "</p>"
-                                                                 "<p>Full URL with QS: "
-                        << connection.request.env["FULL_URL_WITH_QS"] << "</p>"
-                                                                         "<p>Full URL without QS: "
-                        << connection.request.env["FULL_URL_WITHOUT_QS"] << "</p>";
+    resp << "<!DOCTYPE html>\n"
+            "<html><head><title>Test</title></head><body>"
+            "<p>Hello World! HTML string: " << encoding::htmlEncode(decoded, true) << "</p>"
+                                                                                      "<p>Client IP: "
+         << encoding::htmlEncode(req.env()["REMOTE_ADDR"]) << "</p>"
+                                                              "<p>Request URI: ("
+         << req.env().getRequestPath().size() << " elements): "
+         << req.env()["REQUEST_URI"] << "</p>"
+                                        "<p>HTTPS status: "
+         << req.env()["HTTPS"] << "</p>"
+                                  "<p>SERVER_NAME: "
+         << req.env()["SERVER_NAME"]
+         << "</p>"
+            "<p>Server software: " << req.env()["SERVER_SOFTWARE"] << "</p>"
+                                                                      "<p>Base URL: "
+         << req.env()["BASE_URL"] << "</p>"
+                                     "<p>Full URL with QS: "
+         << req.env()["FULL_URL_WITH_QS"] << "</p>"
+                                             "<p>Full URL without QS: "
+         << req.env()["FULL_URL_WITHOUT_QS"] << "</p>";
 
     // test privileges
     auto currentUid = getuid();
@@ -110,41 +114,41 @@ int handleRequest(Connection &connection) {
     auto currentEUid = geteuid();
     auto currentEGid = getegid();
     int groupCount = getgroups(0, nullptr);
-    connection.response << "<p>Privileges: uid = " << currentUid << "; gid = " << currentGid << "; euid = "
-                        << currentEUid << "; egid = " << currentEGid << "</p>";
+    resp << "<p>Privileges: uid = " << currentUid << "; gid = " << currentGid << "; euid = "
+         << currentEUid << "; egid = " << currentEGid << "</p>";
     vector<gid_t> currentGL(groupCount, 0);
     if (getgroups(groupCount, &currentGL[0]) >= 0) {
-        connection.response << "<p>Current groups: ";
+        resp << "<p>Current groups: ";
         for (auto const &e: currentGL) {
-            connection.response << e << ", ";
+            resp << e << ", ";
         }
-        connection.response << "</p>";
+        resp << "</p>";
     }
 
-    // alternative: connection.session["test"].isSet()
-    if (connection.session.isSet("test")) {
-        connection.response << "<p>Session available! Value: " << any_cast<string>(connection.session["test"])
-                            << "</p>";
-        connection.session.invalidate();
-        connection.session.start();
-        connection.session.set("test", string("and even more blah"));
+    // alternative: session["test"].isSet()
+    if (session.isSet("test")) {
+        resp << "<p>Session available! Value: " << any_cast<string>(session["test"])
+             << "</p>";
+        session.invalidate();
+        session.start();
+        session.set("test", string("and even more blah"));
 
     } else {
-        connection.session.set("test", "blah blah blah");
-        connection.response << "<p>There was no session yet, but now there should be one!" << "</p>";
+        session.set("test", "blah blah blah");
+        resp << "<p>There was no session yet, but now there should be one!" << "</p>";
     }
 
     string encodedDecoded = encoding::htmlDecode(encoded);
     if (decoded == encodedDecoded) {
-        connection.response << "<p>yay!</p>";
+        resp << "<p>yay!</p>";
     } else {
-        connection.response << "<p>" << encoding::htmlEncode(encodedDecoded) << "</p>";
+        resp << "<p>" << encoding::htmlEncode(encodedDecoded) << "</p>";
     }
 
     connection.flushResponse();
 
-    connection.response << "<p>Hello World 2!</p>"
-                           "</body></html>";
+    resp << "<p>Hello World 2!</p>"
+            "</body></html>";
 
     return 0;
 }

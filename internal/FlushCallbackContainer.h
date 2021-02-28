@@ -39,14 +39,14 @@ namespace nawa {
         bool flushedBefore; /**< True if the response has been flushed before, false otherwise. */
 
         /**
-         * Get a textual representation of the HTTP status (such as "200 OK").
+         * Get a textual representation of the HTTP status (such as "200 OK"). Implemented in Connection.cpp.
          * @return Textual representation of the HTTP status.
          */
         std::string getStatusString() const;
 
         /**
          * Generate a full raw HTTP source, including headers when flushing for the first time
-         * (but without HTTP status).
+         * (but without HTTP status). Implemented in Connection.cpp.
          * @return The HTTP source.
          */
         std::string getFullHttp() const;

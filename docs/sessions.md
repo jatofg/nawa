@@ -34,9 +34,9 @@ before being able to access session variables. `connection` refers to
 the `nawa::Connection` object you get as a parameter of your 
 `handleRequest` function throughout this tutorial.
 
-`connection.session.start();`
+`connection.session().start();`
 
-You can use `connection.session.established()` to check whether a 
+You can use `connection.session().established()` to check whether a 
 session has already been started.
 
 ### Setting variables
@@ -47,9 +47,9 @@ two arguments: the key (a string), and the value (an arbitrary object).
 Examples:
 
 ```cpp
-connection.session.set("myInt", 5);
-connection.session.set("myString", "Hello World!"); // see *
-connection.session.set("myObject", obj);
+connection.session().set("myInt", 5);
+connection.session().set("myString", "Hello World!"); // see *
+connection.session().set("myObject", obj);
 ```
 
 \* Please note that "Hello World!" in this example is actually a 
@@ -70,13 +70,13 @@ It will return an object of type `std::any`. Using this object,
 you can retrieve the original stored object by using `std::any_cast`:
 
 ```cpp
-int mySessionInt = std::any_cast<int>(connection.session["myInt"]);
-std::string mySessionString = std::any_cast<std::string>(connection.session["myString"]);
+int mySessionInt = std::any_cast<int>(connection.session()["myInt"]);
+std::string mySessionString = std::any_cast<std::string>(connection.session()["myString"]);
 ```
 
 To just check whether a variable exists, you can use 
-`connection.session.isSet("variable")` or 
-`connection.session["variable"].has_value()`.
+`connection.session().isSet("variable")` or 
+`connection.session()["variable"].has_value()`.
 
 **Please note:** When trying to access a non-existent variable using 
 the `[]` operator, a `std::any` object without value will be returned. 
@@ -86,11 +86,11 @@ this exception, too.
 
 ### Unsetting variables
 
-To unset a session variable, use `connection.session.unset("variable")`.
+To unset a session variable, use `connection.session().unset("variable")`.
 
 ### Terminating a session
 
-You can use `connection.session.invalidate()` to delete the current 
+You can use `connection.session().invalidate()` to delete the current 
 session along with its data, see `nawa::Session::invalidate()`.
 
 ## Learn more

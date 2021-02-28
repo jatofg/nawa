@@ -42,30 +42,59 @@ namespace nawa {
         NAWA_PRIVATE_DATA()
 
     public:
-        nawa::Request request; /**< The Request object representing the current request. */
-        nawa::Session session;
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Connection);
+
+        /**
+         * The Request object representing the current request.
+         * @return Reference to the Request object.
+         */
+        nawa::Request const &request() const noexcept;
+
+        /**
+         * The Session object for accessing the current session.
+         * @return Reference to the Session object.
+         */
+        nawa::Session &session() noexcept;
+
+        /**
+         * The Session object for accessing the current session.
+         * @return Reference to the Session object.
+         */
+        [[nodiscard]] nawa::Session const &session() const noexcept;
+
         /**
          * Access the NAWA configuration. This is a copy of the Config object that contains the values of the config file
          * which was read at the startup of NAWA. You can use the Config::set method to change values at runtime, however,
          * these changes only affect the current connection.
+         * @return Reference to the Config object.
          */
-        nawa::Config config;
-        std::stringstream response; /**< Stringstream that allows you to write stuff to the HTTP body comfortably. */
+        nawa::Config &config() noexcept;
 
-        NAWA_DEFAULT_DESTRUCTOR_DEF(Connection);
+        /**
+         * Access the NAWA configuration. This is a copy of the Config object that contains the values of the config file
+         * which was read at the startup of NAWA.
+         * @return Reference to the Config object.
+         */
+        [[nodiscard]] nawa::Config const &config() const noexcept;
+
+        /**
+         * Stream which allows you to write stuff to the HTTP body comfortably.
+         * @return Reference to the response ostream.
+         */
+        std::ostream &responseStream() noexcept;
 
         /**
          * Create a Connection object.
          * @param connectionInit The ConnectionInitContainer object containing the necessary parameters.
          */
-        explicit Connection(const ConnectionInitContainer &connectionInit);
+        explicit Connection(ConnectionInitContainer const &connectionInit);
 
         /**
          * Set the HTTP response body (everything that comes after the headers). This will overwrite everything
-         * that was set previously. You can use the Response object as an ostream instead.
+         * that was set previously. You can use responseStream() instead to get a stream to write to.
          * @param content Complete content of the HTTP body.
          */
-        void setBody(std::string content);
+        void setResponseBody(std::string content);
 
         /**
          * Set the HTTP status code. It will be passed to the web server without checking for validity. For known
@@ -158,20 +187,20 @@ namespace nawa {
          * Get the response body.
          * @return The response body.
          */
-        std::string getBody();
+        std::string getResponseBody();
 
         /**
          * Get the HTTP response status.
          * @return The HTTP response status.
          */
-        unsigned int getStatus() const;
+        [[nodiscard]] unsigned int getStatus() const;
 
         /**
          * Get a map of all response headers.
          * @param includeCookies Also include set-cookie headers for the cookies.
          * @return A map of all headers.
          */
-        std::unordered_multimap<std::string, std::string> getHeaders(bool includeCookies = true) const;
+        [[nodiscard]] std::unordered_multimap<std::string, std::string> getHeaders(bool includeCookies = true) const;
 
         /**
          * Flush the Response object, i.e., send headers and body to the client and reset it.

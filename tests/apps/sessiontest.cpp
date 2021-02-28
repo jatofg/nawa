@@ -40,47 +40,49 @@ int handleRequest(Connection &connection) {
     random_device rd;
     unsigned int cm[1000];
 
-    connection.session.start();
+    auto &session = connection.session();
+
+    session.start();
 
     // set session variables
     for (int i = 0; i < 1000; ++i) {
         // fill with a random uint from urandom
         cm[i] = rd();
-        connection.session.set("sessiontest" + to_string(i), cm[i]);
+        session.set("sessiontest" + to_string(i), cm[i]);
     }
 
     // set some other session variables in an alternating fashion
     bool desc = false;
-    if (connection.session.isSet("descending") && any_cast<bool>(connection.session["descending"])) {
+    if (session.isSet("descending") && any_cast<bool>(session["descending"])) {
         desc = true;
-        connection.session.set("descending", false);
+        session.set("descending", false);
     } else {
-        connection.session.set("descending", true);
+        session.set("descending", true);
     }
     for (int i = 0; i < 1000; ++i) {
         int val = desc ? 1000 - i : i;
-        connection.session.set("sessioncount" + to_string(i), val);
+        session.set("sessioncount" + to_string(i), val);
     }
 
     // get sessiontest variables and compare - this should actually fail now and then in a multithreading env
     // so matchcount does not necessarily have to be 1000
     int matchcount = 0;
     for (int i = 0; i < 1000; ++i) {
-        if (any_cast<unsigned int>(connection.session["sessiontest" + to_string(i)]) == cm[i]) {
+        if (any_cast<unsigned int>(session["sessiontest" + to_string(i)]) == cm[i]) {
             ++matchcount;
         }
     }
-    connection.response << "Match count for sessiontest vars: " << matchcount << "\n";
+    connection.responseStream() << "Match count for sessiontest vars: " << matchcount << "\n";
 
     // consistency check for the sessioncount variables - failcount should definitely be zero!
     int failcount = 0;
     for (int i = 0; i < 1000; ++i) {
-        auto val = any_cast<int>(connection.session["sessioncount" + to_string(i)]);
+        auto val = any_cast<int>(session["sessioncount" + to_string(i)]);
         if (val != i && val != 1000 - i) {
             ++failcount;
         }
     }
-    connection.response << "Fail count for sessioncount vars: " << failcount << "\n";
+    connection.responseStream() << "Fail count for sessioncount vars: " << failcount << "\n";
 
     return 0;
 }

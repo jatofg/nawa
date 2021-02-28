@@ -24,24 +24,52 @@
 #ifndef NAWA_NAWAREQUEST_H
 #define NAWA_NAWAREQUEST_H
 
+#include <nawa/internal/fwdecl.h>
+#include <nawa/internal/macros.h>
 #include <nawa/request/Env.h>
 #include <nawa/request/GPC/GPC.h>
 #include <nawa/request/GPC/ext/Post.h>
 #include <string>
 
 namespace nawa {
-    class RequestInitContainer;
-
     /**
      * Represents request objects.
      */
     class Request {
+        NAWA_PRIVATE_DATA()
+
     public:
-        const request::Env env; /**< The Env object you should use to access environment variables. */
-        const request::GPC get; /**< The GPC object you should use to access GET variables. */
-        const request::Post post; /**< The Post object you should use to access POST variables. */
-        const request::GPC cookie; /**< The GPC object you should use to access COOKIE variables. */
-        explicit Request(const RequestInitContainer &initContainer);
+        NAWA_DEFAULT_DESTRUCTOR_DEF(Request);
+
+        /**
+         * Initialize a Request object from a RequestInitContainer.
+         * @param initContainer The RequestInitContainer with data needed to create a Request object.
+         */
+        explicit Request(RequestInitContainer const &initContainer);
+
+        /**
+         * The Env object you should use to access environment variables.
+         * @return Reference to the object.
+         */
+        [[nodiscard]] request::Env const &env() const noexcept;
+
+        /**
+         * The GPC object you should use to access the request's GET variables.
+         * @return Reference to the object.
+         */
+        [[nodiscard]] request::GPC const &get() const noexcept;
+
+        /**
+         * The Post object you should use to access the request's POST variables.
+         * @return Reference to the object.
+         */
+        [[nodiscard]] request::Post const &post() const noexcept;
+
+        /**
+         * The GPC object you should use to access the request's COOKIE variables.
+         * @return Reference to the object.
+         */
+        [[nodiscard]] request::GPC const &cookie() const noexcept;
     };
 }
 

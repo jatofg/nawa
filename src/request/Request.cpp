@@ -27,6 +27,36 @@
 using namespace nawa;
 using namespace std;
 
-Request::Request(const RequestInitContainer &initContainer)
-        : env(initContainer), get(initContainer, request::GPC::Source::GET), post(initContainer),
-          cookie(initContainer, request::GPC::Source::COOKIE) {}
+struct Request::Data {
+    request::Env const env;
+    request::GPC const get;
+    request::Post const post;
+    request::GPC const cookie;
+
+    explicit Data(RequestInitContainer const &initContainer) : env(initContainer),
+                                                               get(initContainer, request::GPC::Source::GET),
+                                                               post(initContainer),
+                                                               cookie(initContainer, request::GPC::Source::COOKIE) {}
+};
+
+NAWA_DEFAULT_DESTRUCTOR_IMPL(Request)
+
+Request::Request(const RequestInitContainer &initContainer) {
+    data = make_unique<Data>(initContainer);
+}
+
+request::Env const &nawa::Request::env() const noexcept {
+    return data->env;
+}
+
+request::GPC const &nawa::Request::get() const noexcept {
+    return data->get;
+}
+
+request::Post const &nawa::Request::post() const noexcept {
+    return data->post;
+}
+
+request::GPC const &nawa::Request::cookie() const noexcept {
+    return data->cookie;
+}

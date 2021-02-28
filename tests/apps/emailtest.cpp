@@ -39,13 +39,15 @@ int init(AppInit &appInit) {
 }
 
 int handleRequest(Connection &connection) {
+    auto &resp = connection.responseStream();
+
     connection.setHeader("content-type", "text/plain; charset=utf-8");
 
-    connection.response << "SMTP time: ";
+    resp << "SMTP time: ";
     time_t currentTime = time(nullptr);
     tm ltime;
     localtime_r(&currentTime, &ltime);
-    connection.response << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
+    resp << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
 
     // The replacement rules to apply
     auto replacementRules = make_shared<ReplacementRules>();
@@ -56,7 +58,7 @@ int handleRequest(Connection &connection) {
     EmailAddress to("The Admin", "theadmin@example.com");
 
     // part 1: simple email
-    connection.response << "+++++ TEST 1: SimpleEmail +++++\r\n\r\n";
+    resp << "+++++ TEST 1: SimpleEmail +++++\r\n\r\n";
 
     SimpleEmail email1;
     email1.headers()["From"] = from.get();
@@ -64,10 +66,10 @@ int handleRequest(Connection &connection) {
     email1.headers()["Content-Type"] = "text/plain; charset=utf-8";
     email1.headers()["Subject"] = encoding::makeEncodedWord("Test mail");
     email1.text() = "Test email 'm€ssage' =@#$%^&*()===";
-    connection.response << email1.getRaw(replacementRules) << "\r\n\r\n";
+    resp << email1.getRaw(replacementRules) << "\r\n\r\n";
 
     // part 2: MIME email
-    connection.response << "+++++ TEST 2: MimeEmail +++++\r\n\r\n";
+    resp << "+++++ TEST 2: MimeEmail +++++\r\n\r\n";
 
     MimeEmail email2;
     email2.headers()["From"] = from.get();
@@ -96,8 +98,8 @@ int handleRequest(Connection &connection) {
     attachmentPart.contentDisposition() = "attachment; filename=test.png";
     try {
         attachmentPart.partData() = get_file_contents("/home/tobias/Pictures/testimage.png");
-    } catch (Exception const& e) {
-        connection.response << "!!! Specified image file could not be loaded: " << e.getMessage() << " !!!\r\n\r\n";
+    } catch (Exception const &e) {
+        resp << "!!! Specified image file could not be loaded: " << e.getMessage() << " !!!\r\n\r\n";
     }
 
     // create an alternative-type MIME container for text and html
@@ -112,12 +114,12 @@ int handleRequest(Connection &connection) {
     email2.mimePartList().mimeParts().emplace_back(attachmentPart);
 
     // print the result
-    connection.response << email2.getRaw(replacementRules);
+    resp << email2.getRaw(replacementRules);
 
     // if GET sendit=yes, then send it via SMTP localhost
-    if (connection.request.get["sendit"] == "yes") {
+    if (connection.request().get()["sendit"] == "yes") {
 
-        connection.response << "\r\n";
+        resp << "\r\n";
 
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
         SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
@@ -127,10 +129,10 @@ int handleRequest(Connection &connection) {
 
         try {
             smtp.processQueue();
-            connection.response << "Mail sent successfully!";
+            resp << "Mail sent successfully!";
         }
         catch (const Exception &e) {
-            connection.response << "Error sending mail: " << e.getDebugMessage();
+            resp << "Error sending mail: " << e.getDebugMessage();
         }
 
     }

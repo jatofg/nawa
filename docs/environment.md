@@ -1,7 +1,7 @@
 Environment {#environmentmanual}
 ===
 
-The `nawa::Request` object `connection.request` (which can be accessed 
+The `nawa::Request` object `connection.request()` (which can be accessed 
 through `connection`, the `nawa::Connection` object you get as a parameter 
 of your `handleRequest` function) allows you to access information about 
 the request (such as POST, GET, and COOKIE data) and the environment.
@@ -14,7 +14,7 @@ and the HTTP status.
 The request path is probably the most important information you want to 
 access in your application, as it allows you to respond with the correct 
 page. The function `nawa::Request::Env::getRequestPath()`, accessible as 
-`connection.request.env.getRequestPath()`, returns a vector of strings 
+`connection.request().env().getRequestPath()`, returns a vector of strings 
 containing all elements of the request URI (without query string).
 
 If the user requested the URI "/dir1/dir2/page", the vector would contain 
@@ -25,7 +25,7 @@ For an example concerning the usage of the request path, see
 
 Other environment variables and request headers can be accessed as strings 
 by using the `[]` operator. For example, to access the server hostname, use 
-`connection.request.env["host"]`. In the following section, you'll find 
+`connection.request().env()["host"]`. In the following section, you'll find 
 the full list of environment variables that can be accessed this way.
 
 ### List of environment variables
@@ -95,8 +95,8 @@ FastCGI parameters. Refer to your web server's docs for instructions.
 ## GET, POST, and COOKIE
 
 You can access the GET, POST, and COOKIE variables through the `[]` 
-operator of `connection.request.get`, `connection.request.post`, and 
-`connection.request.cookie`, respectively. If the variable exists more than 
+operator of `connection.request().get()`, `connection.request().post()`, and 
+`connection.request().cookie()`, respectively. If the variable exists more than 
 once (which is possible), the operator will only access one definition 
 (usually the first one). Example:
 
@@ -105,25 +105,25 @@ std::string firstName = connection.request.post["first_name"];
 ```
 
 To find out how many definitions exist for the name "variable", use  
-`connection.request.post.count("variable")`.
+`connection.request().post().count("variable")`.
 
 If there are multiple definitions, you can use 
-`connection.request.post.getVector("variable")` to get a vector of strings. 
+`connection.request().post().getVector("variable")` to get a vector of strings. 
 Alternatively, you can get a multimap of all key-value pairs via 
-`connection.request.post.getMultimap()`. You can also iterate through the 
+`connection.request().post().getMultimap()`. You can also iterate through the 
 GET, POST, or COOKIE data, for example:
 
 ```cpp
-for (auto const &e: connection.request.post) {
-    connection.response << "<p>POST[" << e.first << "] = " << e.second << "</p>";
+for (auto const &e: connection.request().post()) {
+    connection.responseStream() << "<p>POST[" << e.first << "] = " << e.second << "</p>";
 }
 ```
 
 To find out if anything has been submitted via POST at all, you can just use 
-`connection.request.post` as a boolean value:
+`connection.request().post()` as a boolean value:
 
 ```cpp
-if (connection.request.post) {
+if (connection.request().post()) {
     // do something
 }
 ```
@@ -136,10 +136,10 @@ An example can be found in `examples/contactform.cpp`.
 
 POST is not limited to key-value pairs, the browser might also send files, 
 or something completely else. You can access the content type (as a string) 
-via `connection.request.post.getContentType()`.
+via `connection.request().post().getContentType()`.
 
 If files have been submitted (content type `multipart/form-data`), 
-you can access them through `connection.request.post.getFile("key")` 
+you can access them through `connection.request().post().getFile("key")` 
 (see `nawa::Request::Post::getFile()`). For multiple files with the same name, 
 `nawa::Request::Post::getFileVector()` can be used, or the full multimap can 
 be accessed via `nawa::Request::Post::getFileMultimap()`.
@@ -148,7 +148,7 @@ Files are represented as `nawa::File` objects, have a look at the documentation
 of that class to see how to retrieve the file and its meta data.
 
 To access the raw POST data as a string, you can use  
-`connection.request.post.getRawHttp()` depending on the config value 
+`connection.request().post().getRawHttp()` depending on the config value 
 `raw_access` in the `[post]` section. By default, the value is 
 `nonstandard`, meaning you can access the raw data only if it doesn't 
 contain standard content types (key-value pairs or files). You can, 

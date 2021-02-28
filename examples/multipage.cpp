@@ -83,23 +83,25 @@ int handleRequest(Connection &connection) {
 
     // we do not have to care about requests for static resources -- the filters are doing that for us!
 
-    auto requestPath = connection.request.env.getRequestPath();
+    // shortcuts
+    auto &resp = connection.responseStream();
+    auto requestPath = connection.request().env().getRequestPath();
 
-    connection.response << "<!DOCTYPE html><html><head>"
-                           "<title>nawa Multipage Example</title>"
-                           "</head><body><p>Request Path Elements: ";
+    resp << "<!DOCTYPE html><html><head>"
+            "<title>nawa Multipage Example</title>"
+            "</head><body><p>Request Path Elements: ";
     for (auto const &e: requestPath) {
-        connection.response << e << ", ";
+        resp << e << ", ";
     }
-    connection.response << "</p>";
+    resp << "</p>";
 
     if (requestPath.size() > 1) {
 
         // if the request path starts with "/test/page1", show the following page
         if (requestPath.at(0) == "test" && requestPath.at(1) == "page1") {
-            connection.response << "<h1>First Page</h1>"
-                                   "<p>Lorem ipsum sit dolor</p>"
-                                   "</body></html>";
+            resp << "<h1>First Page</h1>"
+                    "<p>Lorem ipsum sit dolor</p>"
+                    "</body></html>";
 
             return 0;
         }
@@ -107,11 +109,11 @@ int handleRequest(Connection &connection) {
     }
 
     // otherwise, the index will be displayed
-    connection.response << "<h1>Index</h1>"
-                           "<ul>"
-                           "<li><a href=\"/test/page1\">First Page</a></li>"
-                           "<li><a href=\"/test/static/html/somedocument.html\">A static HTML document</a></li>"
-                           "</ul></body></html>";
+    resp << "<h1>Index</h1>"
+            "<ul>"
+            "<li><a href=\"/test/page1\">First Page</a></li>"
+            "<li><a href=\"/test/static/html/somedocument.html\">A static HTML document</a></li>"
+            "</ul></body></html>";
 
     return 0;
 }

@@ -32,89 +32,94 @@ int init(AppInit &appInit) {
 }
 
 int handleRequest(Connection &connection) {
-    connection.session.start();
 
-    if (connection.request.get.count("download") == 1 && connection.session.isSet(connection.request.get["download"])) {
+    auto &resp = connection.responseStream();
+    auto &req = connection.request();
+    auto &session = connection.session();
+
+    session.start();
+
+    if (req.get().count("download") == 1 && session.isSet(req.get()["download"])) {
         File downloadFile;
         try {
-            downloadFile = any_cast<const File>(connection.session[connection.request.get["download"]]);
+            downloadFile = any_cast<const File>(session[req.get()["download"]]);
         } catch (const bad_any_cast &e) {
-            connection.response << "Bad any cast: " << e.what();
+            resp << "Bad any cast: " << e.what();
             return 0;
         }
         connection.setHeader("content-type", downloadFile.contentType);
         connection.setHeader("content-disposition", "attachment; filename=\"" + downloadFile.filename + "\"");
         connection.setHeader("content-length", to_string(downloadFile.size));
-        connection.setBody(downloadFile.copyFile());
+        connection.setResponseBody(downloadFile.copyFile());
         return 0;
     }
 
-    connection.response << "<!DOCTYPE html>\n"
-                           "<html><head><title>NAWA GPC Test</title></head><body>\n";
+    resp << "<!DOCTYPE html>\n"
+            "<html><head><title>NAWA GPC Test</title></head><body>\n";
 
     auto printEncoded = [&](const string &k, const string &v) {
-        connection.response << "<li>[" << encoding::htmlEncode(k) << "] = " << encoding::htmlEncode(v) << "</li>";
+        resp << "<li>[" << encoding::htmlEncode(k) << "] = " << encoding::htmlEncode(v) << "</li>";
     };
 
-    if (connection.request.cookie) {
-        connection.response << "<p>COOKIE vars:</p><ul>";
-        for (auto const& [k, v]: connection.request.cookie) {
+    if (req.cookie()) {
+        resp << "<p>COOKIE vars:</p><ul>";
+        for (auto const&[k, v]: req.cookie()) {
             printEncoded(k, v);
         }
-        connection.response << "</ul>";
+        resp << "</ul>";
     }
 
-    if (connection.request.get) {
-        connection.response << "<p>GET vars:</p><ul>";
-        for (auto const& [k, v]: connection.request.get) {
+    if (req.get()) {
+        resp << "<p>GET vars:</p><ul>";
+        for (auto const&[k, v]: req.get()) {
             printEncoded(k, v);
         }
-        connection.response << "</ul>";
+        resp << "</ul>";
     }
 
-    if (connection.request.post) {
-        connection.response << "<p>POST vars (without files):</p><ul>";
-        for (auto const& [k, v]: connection.request.post) {
+    if (req.post()) {
+        resp << "<p>POST vars (without files):</p><ul>";
+        for (auto const&[k, v]: req.post()) {
             printEncoded(k, v);
         }
-        connection.response << "</ul>";
+        resp << "</ul>";
     }
 
-    if(connection.request.post.hasFiles()) {
-        connection.response << "<p>POST files:</p><ul>";
-        for (auto const& [k, v]: connection.request.post.getFileMultimap()) {
+    if (req.post().hasFiles()) {
+        resp << "<p>POST files:</p><ul>";
+        for (auto const&[k, v]: req.post().getFileMultimap()) {
             // skip empty files
             if (v.size == 0) {
                 continue;
             }
 
-            connection.response << "<li>[" << encoding::htmlEncode(k) << "]: "
-                                << R"(<a href="?download=)" << encoding::urlEncode(v.filename) << R"(">)"
-                                << encoding::htmlEncode(v.filename)
-                                << "; size: "
-                                << v.size
-                                << "; content type: "
-                                << encoding::htmlEncode(v.contentType)
-                                << "</a></li>";
+            resp << "<li>[" << encoding::htmlEncode(k) << "]: "
+                 << R"(<a href="?download=)" << encoding::urlEncode(v.filename) << R"(">)"
+                 << encoding::htmlEncode(v.filename)
+                 << "; size: "
+                 << v.size
+                 << "; content type: "
+                 << encoding::htmlEncode(v.contentType)
+                 << "</a></li>";
 
             // Saving files in session and not even cleaning them up at some point is something that clearly
             // shouldn't be done outside of a test app :)
-            connection.session.set(v.filename, v);
+            session.set(v.filename, v);
         }
-        connection.response << "</ul>";
+        resp << "</ul>";
     }
 
-    if (connection.request.post.getRaw()) {
-        connection.response << "<p>Raw POST data:</p><pre>" << *connection.request.post.getRaw() << "</pre>";
+    if (req.post().getRaw()) {
+        resp << "<p>Raw POST data:</p><pre>" << *req.post().getRaw() << "</pre>";
     }
 
-    connection.response << R"(<p>Some POST form:</p><form name="testform" method="post" action="?" enctype="multipart/form-data">)"
-                        << R"(<p>Field one (1): <input type="text" name="one"></p>)"
-                        << R"(<p>Field one (2): <input type="text" name="one"></p>)"
-                        << R"(<p>Field two: <input type="text" name="two"></p>)"
-                        << R"(<p>Field fileupload (1): <input type="file" name="fileupload"></p>)"
-                        << R"(<p>Field fileupload (2): <input type="file" name="fileupload"></p>)"
-                        << R"(<p><input type="submit" value="Go" name="submit"></p></form>)";
+    resp << R"(<p>Some POST form:</p><form name="testform" method="post" action="?" enctype="multipart/form-data">)"
+         << R"(<p>Field one (1): <input type="text" name="one"></p>)"
+         << R"(<p>Field one (2): <input type="text" name="one"></p>)"
+         << R"(<p>Field two: <input type="text" name="two"></p>)"
+         << R"(<p>Field fileupload (1): <input type="file" name="fileupload"></p>)"
+         << R"(<p>Field fileupload (2): <input type="file" name="fileupload"></p>)"
+         << R"(<p><input type="submit" value="Go" name="submit"></p></form>)";
 
     return 0;
 }

@@ -55,7 +55,7 @@ int main() {
         // Our simple example app will just print "Hello World!" for every request
         // and therefore do exactly the same thing as examples/helloworld.cpp
         // (but in a more complicated way)
-        connection.response << "Hello World!";
+        connection.responseStream() << "Hello World!";
         return 0;
 
     };

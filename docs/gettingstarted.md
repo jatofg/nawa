@@ -135,16 +135,16 @@ the browser. Let's go:
 
 ```cpp
 int handleRequest(nawa::Connection &connection) {
-    connection.response << "Hello World!";
+    connection.responseStream() << "Hello World!";
     return 0;
 }
 ```
 
-And that's it! `connection.response` is an `iostream`, its contents 
-will only be used after the response is flushed, either wenn the 
+And that's it! `connection.responseStream()` is an `ostream`, its contents 
+will only be used after the response is flushed, either when the 
 `handleRequest` function returns, or when you call 
 `connection.flushResponse()` manually. Instead of using the stream, you 
-could also do `connection.setBody("Hello World!")`.
+could also do `connection.setResponseBody("Hello World!")`.
 
 You can find the full source code of this example in the 
 `examples/helloworld.cpp` file.

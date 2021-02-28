@@ -92,11 +92,6 @@ namespace {
             {510, "Not Extended"},
             {511, "Network Authentication Required"}
     };
-
-    void clearStream(Connection *base) {
-        base->response.str(string());
-        base->response.clear();
-    }
 }
 
 struct Connection::Data {
@@ -108,17 +103,31 @@ struct Connection::Data {
     bool isFlushed = false;
     FlushCallbackFunction flushCallback;
 
-    void mergeStream(Connection *base) {
-        bodyString += base->response.str();
-        clearStream(base);
+    nawa::Request request;
+    nawa::Session session;
+    nawa::Config config;
+    std::stringstream responseStream;
+
+    void clearStream() {
+        responseStream.str(string());
+        responseStream.clear();
     }
+
+    void mergeStream() {
+        bodyString += responseStream.str();
+        clearStream();
+    }
+
+    Data(Connection *base, ConnectionInitContainer const &connectionInit) : request(connectionInit.requestInit),
+                                                                            config(connectionInit.config),
+                                                                            session(*base) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Connection)
 
-void Connection::setBody(string content) {
+void Connection::setResponseBody(string content) {
     data->bodyString = move(content);
-    clearStream(this);
+    data->clearStream();
 }
 
 void
@@ -143,11 +152,11 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     // check if-modified if requested
     time_t ifModifiedSince = 0;
     try {
-        ifModifiedSince = stoul(request.env["if-modified-since"]);
+        ifModifiedSince = stoul(data->request.env()["if-modified-since"]);
     } catch (invalid_argument const &) {} catch (out_of_range const &) {}
     if (checkIfModifiedSince && ifModifiedSince >= lastModified) {
         setStatus(304);
-        setBody(string());
+        setResponseBody(string());
         return;
     }
 
@@ -192,7 +201,7 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     f.read(&data->bodyString[0], fs);
 
     // also clear the stream so that it doesn't mess with our file
-    clearStream(this);
+    data->clearStream();
 }
 
 void Connection::setHeader(string key, string value) {
@@ -269,23 +278,20 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
     return ret;
 }
 
-string Connection::getBody() {
-    data->mergeStream(this);
+string Connection::getResponseBody() {
+    data->mergeStream();
     return data->bodyString;
 }
 
-Connection::Connection(const ConnectionInitContainer &connectionInit)
-        : request(connectionInit.requestInit),
-          config(connectionInit.config),
-          session(*this) {
-    data = make_unique<Data>();
+Connection::Connection(ConnectionInitContainer const &connectionInit) {
+    data = make_unique<Data>(this, connectionInit);
     data->flushCallback = connectionInit.flushCallback;
 
     data->headers["content-type"] = {"text/html; charset=utf-8"};
     // autostart of session must happen here (as config is not yet accessible in Session constructor)
     // check if autostart is enabled in config and if yes, directly call ::start
-    if (config[{"session", "autostart"}] == "on") {
-        session.start();
+    if (data->config[{"session", "autostart"}] == "on") {
+        data->session.start();
     }
 }
 
@@ -310,11 +316,11 @@ void Connection::unsetCookie(const string &key) {
 void Connection::flushResponse() {
     // use callback to flush response
     data->flushCallback(FlushCallbackContainer{.status=data->responseStatus, .headers=getHeaders(true),
-            .body=getBody(), .flushedBefore=data->isFlushed});
+            .body=getResponseBody(), .flushedBefore=data->isFlushed});
     // response has been flushed now
     data->isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
-    setBody("");
+    setResponseBody("");
 }
 
 void Connection::setStatus(unsigned int status) {
@@ -327,6 +333,30 @@ void Connection::setCookiePolicy(Cookie policy) {
 
 unsigned int Connection::getStatus() const {
     return data->responseStatus;
+}
+
+nawa::Request const &nawa::Connection::request() const noexcept {
+    return data->request;
+}
+
+nawa::Session &nawa::Connection::session() noexcept {
+    return data->session;
+}
+
+nawa::Session const &nawa::Connection::session() const noexcept {
+    return data->session;
+}
+
+nawa::Config &nawa::Connection::config() noexcept {
+    return data->config;
+}
+
+nawa::Config const &nawa::Connection::config() const noexcept {
+    return data->config;
+}
+
+std::ostream &nawa::Connection::responseStream() noexcept {
+    return data->responseStream;
 }
 
 std::string FlushCallbackContainer::getStatusString() const {
