@@ -124,15 +124,13 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
                 for (auto const &p: postData.getParts()) {
                     // find out whether the part is a file
                     if (!p.getFilename().empty() || (!p.getContentType().empty() &&
-                                                p.getContentType().substr(0, plainTextContentType.length()) !=
-                                                plainTextContentType)) {
-                        File pf;
-                        pf.contentType = p.getContentType();
-                        pf.filename = p.getFilename();
-                        pf.size = p.getContent().size();
+                                                     p.getContentType().substr(0, plainTextContentType.length()) !=
+                                                     plainTextContentType)) {
+                        File pf = File().contentType(p.getContentType()).filename(p.getFilename()).size(
+                                p.getContent().size());
                         // TODO better solution can be used when shifting fcgi handler to use MimeMultipart
-                        pf.dataPtr = shared_ptr<char[]>(new char[pf.size]);
-                        memcpy(pf.dataPtr.get(), p.getContent().c_str(), pf.size);
+                        pf.dataPtr() = shared_ptr<char[]>(new char[pf.size()]);
+                        memcpy(pf.dataPtr().get(), p.getContent().c_str(), pf.size());
                         requestInit.postFiles.insert({p.getName(), move(pf)});
                     } else {
                         requestInit.postVars.insert({p.getName(), p.getContent()});

@@ -136,6 +136,7 @@ set(NAWA_FILES
         src/mail/EmailAddress.cpp
         src/mail/SmtpMailer.cpp
         src/request/Env.cpp
+        src/request/File.cpp
         src/request/GPC/ext/Post.cpp
         src/request/GPC/GPC.cpp
         src/request/Request.cpp

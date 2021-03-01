@@ -10,7 +10,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Save build timestamp
-      run: echo "VERSION_TS=$(date +%s)" >> $GITHUB_ENV
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag docker.pkg.github.com/jatofg/nawa/nawa:0.7-${VERSION_TS}
+    - name: Build
+      run: docker build . --file Dockerfile --tag nawaci
+    - name: Unit Tests
+      run: docker run nawaci /opt/nawabuild/unittests
+    - name: Integration Tests
+      run: docker run nawaci /opt/nawabuild/integrationtests

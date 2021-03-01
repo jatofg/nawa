@@ -26,45 +26,76 @@
 
 #include <fstream>
 #include <memory>
+#include <nawa/internal/macros.h>
 #include <string>
 
 namespace nawa {
     /**
      * Container for (especially POST-submitted) files.
      */
-    struct File {
-        std::string filename; /**< Original file name (submitted by sender) */
-        std::string contentType; /**< Content-Type string */
-        size_t size; /**< File size in bytes */
-        std::shared_ptr<char[]> dataPtr; /**< Pointer to the first byte of the memory area */
+    class File {
+        NAWA_PRIVATE_DATA()
+
+    public:
+        NAWA_DEFAULT_DESTRUCTOR_DEF(File);
+
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(File);
+
+        /**
+         * Copy the File object which contains a reference to a file. Please note that this does *not* deep-copy the
+         * file in memory, just the reference!
+         * @param other File object to copy (the refence) from.
+         */
+        NAWA_COPY_CONSTRUCTOR_DEF(File);
+
+        /**
+         * Copy-assign from another File object. Please note that this does *not* deep-copy the file in memory, just
+         * the reference!
+         * @param other File object to copy (the refence) from.
+         * @return This File object.
+         */
+        NAWA_COPY_ASSIGNMENT_OPERATOR_DEF(File);
+
+        NAWA_MOVE_CONSTRUCTOR_DEF(File);
+
+        NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(File);
+
+        /**
+         * Original file name (submitted by sender).
+         * @return Reference to file name.
+         */
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(File, filename, std::string);
+
+        /**
+         * Content-Type string.
+         * @return Reference to content-type string.
+         */
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(File, contentType, std::string);
+
+        /**
+         * File size in bytes.
+         * @return Reference to file size.
+         */
+        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(File, size, size_t);
+
+        /**
+         * Pointer to the first byte of the memory area.
+         * @return Reference to the shared pointer.
+         */
+        NAWA_COMPLEX_DATA_ACCESSORS_DEF(File, dataPtr, std::shared_ptr<char[]>);
 
         /**
          * Copy the file into a std::string
          * @return std::string containing the whole file
          */
-        [[nodiscard]] std::string copyFile() const {
-            return std::string(dataPtr.get(), size);
-        }
+        [[nodiscard]] std::string copyFile() const;
 
         /**
          * Write the file to disk.
          * @param path File name and path where to write the file.
          * @return true on success, false on failure
          */
-        bool writeFile(const std::string &path) const {
-            std::ofstream outfile;
-            std::ios_base::iostate exceptionMask = outfile.exceptions() | std::ios::failbit;
-            outfile.exceptions(exceptionMask);
-            try {
-                outfile.open(path, std::ofstream::out | std::ofstream::binary);
-                outfile.write(dataPtr.get(), size);
-                outfile.close();
-            }
-            catch (std::ios_base::failure &e) {
-                return false;
-            }
-            return true;
-        }
+        bool writeFile(const std::string &path) const;
     };
 }
 

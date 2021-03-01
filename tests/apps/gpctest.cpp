@@ -47,9 +47,9 @@ int handleRequest(Connection &connection) {
             resp << "Bad any cast: " << e.what();
             return 0;
         }
-        connection.setHeader("content-type", downloadFile.contentType);
-        connection.setHeader("content-disposition", "attachment; filename=\"" + downloadFile.filename + "\"");
-        connection.setHeader("content-length", to_string(downloadFile.size));
+        connection.setHeader("content-type", downloadFile.contentType());
+        connection.setHeader("content-disposition", "attachment; filename=\"" + downloadFile.filename() + "\"");
+        connection.setHeader("content-length", to_string(downloadFile.size()));
         connection.setResponseBody(downloadFile.copyFile());
         return 0;
     }
@@ -89,22 +89,22 @@ int handleRequest(Connection &connection) {
         resp << "<p>POST files:</p><ul>";
         for (auto const&[k, v]: req.post().getFileMultimap()) {
             // skip empty files
-            if (v.size == 0) {
+            if (v.size() == 0) {
                 continue;
             }
 
             resp << "<li>[" << encoding::htmlEncode(k) << "]: "
-                 << R"(<a href="?download=)" << encoding::urlEncode(v.filename) << R"(">)"
-                 << encoding::htmlEncode(v.filename)
+                 << R"(<a href="?download=)" << encoding::urlEncode(v.filename()) << R"(">)"
+                 << encoding::htmlEncode(v.filename())
                  << "; size: "
-                 << v.size
+                 << v.size()
                  << "; content type: "
-                 << encoding::htmlEncode(v.contentType)
+                 << encoding::htmlEncode(v.contentType())
                  << "</a></li>";
 
             // Saving files in session and not even cleaning them up at some point is something that clearly
             // shouldn't be done outside of a test app :)
-            session.set(v.filename, v);
+            session.set(v.filename(), v);
         }
         resp << "</ul>";
     }
