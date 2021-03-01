@@ -1,3 +1,4 @@
+# For CI and testing purposes only
 FROM debian:buster-slim
 COPY examples /opt/nawasrc/examples
 COPY include /opt/nawasrc/include
