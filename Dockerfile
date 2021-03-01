@@ -1,6 +1,7 @@
 FROM debian:buster-slim
 COPY examples /opt/nawasrc/examples
 COPY include /opt/nawasrc/include
+COPY internal /opt/nawasrc/internal
 COPY libs /opt/nawasrc/libs
 COPY src /opt/nawasrc/src
 COPY systemd /opt/nawasrc/systemd
