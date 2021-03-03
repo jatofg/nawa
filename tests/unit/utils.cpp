@@ -31,10 +31,9 @@ TEST_CASE("nawa::Utils functions", "[utils]") {
 
     SECTION("Time conversions") {
         time_t currentTime = time(nullptr);
-        string testTimeStr1 = "Thu,  7 Nov 2019 16:29:50 +0100";
+        REQUIRE(read_smtp_time("Thu,  7 Nov 2019 16:29:50 +0100") == 1573140590);
         REQUIRE(read_http_time(make_http_time(currentTime)) == currentTime);
         REQUIRE(read_smtp_time(make_smtp_time(currentTime)) == currentTime);
-        REQUIRE(make_smtp_time(read_smtp_time(testTimeStr1)) == testTimeStr1);
     }
 
     SECTION("Path splitting") {
