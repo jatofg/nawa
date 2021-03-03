@@ -40,18 +40,17 @@ int handleRequest(Connection &connection) {
     session.start();
 
     if (req.get().count("download") == 1 && session.isSet(req.get()["download"])) {
-        File downloadFile;
         try {
-            downloadFile = any_cast<const File>(session[req.get()["download"]]);
+            auto downloadFile = any_cast<File const>(session[req.get()["download"]]);
+            connection.setHeader("content-type", downloadFile.contentType());
+            connection.setHeader("content-disposition", "attachment; filename=\"" + downloadFile.filename() + "\"");
+            connection.setHeader("content-length", to_string(downloadFile.size()));
+            connection.setResponseBody(downloadFile.toString());
+            return 0;
         } catch (const bad_any_cast &e) {
             resp << "Bad any cast: " << e.what();
             return 0;
         }
-        connection.setHeader("content-type", downloadFile.contentType());
-        connection.setHeader("content-disposition", "attachment; filename=\"" + downloadFile.filename() + "\"");
-        connection.setHeader("content-length", to_string(downloadFile.size()));
-        connection.setResponseBody(downloadFile.copyFile());
-        return 0;
     }
 
     resp << "<!DOCTYPE html>\n"

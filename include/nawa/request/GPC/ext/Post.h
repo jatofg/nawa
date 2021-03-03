@@ -25,6 +25,7 @@
 #define NAWA_POST_H
 
 #include <memory>
+#include <optional>
 #include <nawa/request/File.h>
 #include <nawa/request/GPC/GPC.h>
 
@@ -51,7 +52,7 @@ namespace nawa::request {
          * @return Shared pointer to a string containing the raw POST data if available, otherwise the
          * shared_ptr does not contain an object.
          */
-        [[nodiscard]] std::shared_ptr<std::string> getRaw() const;
+        [[nodiscard]] std::shared_ptr<std::string const> getRaw() const;
 
         /**
          * Get the POST content type as submitted by the browser
@@ -70,25 +71,24 @@ namespace nawa::request {
          * only one of them (usually the first definition) will be returned. For accessing all definitions,
          * please use getFileVector(). Complexity is logarithmic, so if you want to access a value multiple times,
          * saving it in a variable is a good idea.
-         * @param postVar Name of the variable.
-         * @return Value of the variable. Empty string if not set
-         * (use countFiles() for checking whether the variable is set).
+         * @param key Key of the POST file.
+         * @return The file if available. Nullopt if no file with the given key has been submitted.
          */
-        [[nodiscard]] File getFile(const std::string &postVar) const;
+        [[nodiscard]] std::optional<File> getFile(const std::string &key) const;
 
         /**
-         * Get all POST files with the given name.
-         * @param postVar Name of the files.
-         * @return Vector of files. Empty if no file with the given name exists.
+         * Get all POST files with the given key.
+         * @param key Key of the files.
+         * @return Vector of files. Empty if no file with the given key exists.
          */
-        [[nodiscard]] std::vector<File> getFileVector(const std::string &postVar) const;
+        [[nodiscard]] std::vector<File> getFileVector(const std::string &key) const;
 
         /**
-         * Get the number of submitted POST files with the given name.
-         * @param postVar Name of the file.
+         * Get the number of submitted POST files with the given key.
+         * @param key Key of the file.
          * @return Number of occurrences.
          */
-        [[nodiscard]] size_t countFiles(const std::string &postVar) const;
+        [[nodiscard]] size_t countFiles(const std::string &key) const;
 
         /**
          * Get a reference to the POST file multimap.

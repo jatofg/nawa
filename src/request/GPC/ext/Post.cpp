@@ -47,7 +47,7 @@ request::Post::operator bool() const {
     return !(getMultimap().empty() && data->fileMap.empty());
 }
 
-shared_ptr<string> request::Post::getRaw() const {
+shared_ptr<string const> request::Post::getRaw() const {
     return data->rawPost;
 }
 
@@ -59,23 +59,23 @@ bool request::Post::hasFiles() const {
     return !data->fileMap.empty();
 }
 
-File request::Post::getFile(const string &postVar) const {
-    auto e = data->fileMap.find(postVar);
+optional<File> request::Post::getFile(const string &key) const {
+    auto e = data->fileMap.find(key);
     if (e != data->fileMap.end()) return e->second;
-    return File();
+    return nullopt;
 }
 
-vector<File> request::Post::getFileVector(const string &postVar) const {
+vector<File> request::Post::getFileVector(const string &key) const {
     vector<File> ret;
-    auto e = data->fileMap.equal_range(postVar);
+    auto e = data->fileMap.equal_range(key);
     for (auto it = e.first; it != e.second; ++it) {
         ret.push_back(it->second);
     }
     return ret;
 }
 
-size_t request::Post::countFiles(const string &postVar) const {
-    return data->fileMap.count(postVar);
+size_t request::Post::countFiles(const string &key) const {
+    return data->fileMap.count(key);
 }
 
 std::unordered_multimap<std::string, File> const &request::Post::getFileMultimap() const {

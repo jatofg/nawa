@@ -132,8 +132,8 @@ bool FastcgippRequestAdapter::response() {
         // POST files
         // TODO use MimeMultipart
         for (auto const &[k, fcgiFile]: renv.files) {
-            requestInit.postFiles.insert({k, File().filename(fcgiFile.filename).size(fcgiFile.size).contentType(
-                    fcgiFile.contentType).dataPtr(fcgiFile.data)});
+            requestInit.postFiles.insert({k, File(fcgiFile.data, fcgiFile.size).filename(fcgiFile.filename).contentType(
+                    fcgiFile.contentType)});
         }
 
     }

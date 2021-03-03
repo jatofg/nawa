@@ -39,7 +39,19 @@ namespace nawa {
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(File);
 
-        NAWA_DEFAULT_CONSTRUCTOR_DEF(File);
+        /**
+         * Construct a File from data.
+         * @param dataPtr Shared pointer to the file data.
+         * @param size Size of the file.
+         * @deprecated Files should be constructed from std::string objects instead.
+         */
+        File(std::shared_ptr<char[]> dataPtr, size_t size);
+
+        /**
+         * Construct a file from data stored in a string.
+         * @param data File data.
+         */
+        explicit File(const std::string &data);
 
         /**
          * Copy the File object which contains a reference to a file. Please note that this does *not* deep-copy the
@@ -73,29 +85,22 @@ namespace nawa {
         NAWA_COMPLEX_DATA_ACCESSORS_DEF(File, contentType, std::string);
 
         /**
-         * File size in bytes.
-         * @return Reference to file size.
+         * Get file size in bytes.
+         * @return File size.
          */
-        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(File, size, size_t);
-
-        /**
-         * Pointer to the first byte of the memory area.
-         * @return Reference to the shared pointer.
-         */
-        NAWA_COMPLEX_DATA_ACCESSORS_DEF(File, dataPtr, std::shared_ptr<char[]>);
+        [[nodiscard]] size_t size() const noexcept;
 
         /**
          * Copy the file into a std::string
          * @return std::string containing the whole file
          */
-        [[nodiscard]] std::string copyFile() const;
+        [[nodiscard]] std::string toString() const;
 
         /**
-         * Write the file to disk.
+         * Write the file to disk. Throws a nawa::Excption with error code 1 on failure.
          * @param path File name and path where to write the file.
-         * @return true on success, false on failure
          */
-        bool writeFile(const std::string &path) const;
+        void writeToDisk(const std::string &path) const;
     };
 }
 
