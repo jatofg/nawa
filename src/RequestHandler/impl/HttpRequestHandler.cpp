@@ -121,15 +121,15 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
             try {
                 MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
-                for (auto const &p: postData.getParts()) {
+                for (auto const &p: postData.parts()) {
                     // find out whether the part is a file
-                    if (!p.getFilename().empty() || (!p.getContentType().empty() &&
-                                                     p.getContentType().substr(0, plainTextContentType.length()) !=
+                    if (!p.filename().empty() || (!p.contentType().empty() &&
+                                                     p.contentType().substr(0, plainTextContentType.length()) !=
                                                      plainTextContentType)) {
-                        File pf = File(p.getContent()).contentType(p.getContentType()).filename(p.getFilename());
-                        requestInit.postFiles.insert({p.getName(), move(pf)});
+                        File pf = File(p.content()).contentType(p.contentType()).filename(p.filename());
+                        requestInit.postFiles.insert({p.partName(), move(pf)});
                     } else {
-                        requestInit.postVars.insert({p.getName(), p.getContent()});
+                        requestInit.postVars.insert({p.partName(), p.content()});
                     }
                 }
             } catch (Exception const &) {}

@@ -37,7 +37,7 @@ struct MimeMultipart::Data {
 
 struct MimeMultipart::Part::Data {
     string partName;
-    string fileName;
+    string filename;
     string contentType;
     unordered_map<string, string> headers;
     string content;
@@ -67,25 +67,17 @@ NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(MimeMultipart, Part)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(MimeMultipart, Part)
 
-string MimeMultipart::Part::getName() const noexcept {
-    return data->partName;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, partName, string)
 
-string MimeMultipart::Part::getFilename() const noexcept {
-    return data->fileName;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, filename, string)
 
-string MimeMultipart::Part::getContentType() const noexcept {
-    return data->contentType;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, contentType, string)
 
-unordered_map<string, string> const &MimeMultipart::Part::getHeaders() const noexcept {
-    return data->headers;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, headers, MimeMultipart::HeadersMap)
 
-string const &MimeMultipart::Part::getContent() const noexcept {
-    return data->content;
-}
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, content, string)
+
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart, parts, vector<MimeMultipart::Part>)
 
 MimeMultipart::MimeMultipart(const string &contentType, string content) : MimeMultipart() {
     parse(contentType, move(content));
@@ -150,7 +142,7 @@ void MimeMultipart::parse(const string &contentType, string content) {
         currentPart.data->contentType = currentPart.data->headers.count("content-type") ? currentPart.data->headers.at("content-type")
                                                                             : "";
         if (currentPart.data->headers.count("content-disposition")) {
-            tie(currentPart.data->partName, currentPart.data->fileName) = extractPartAndFileName(
+            tie(currentPart.data->partName, currentPart.data->filename) = extractPartAndFileName(
                     currentPart.data->headers.at("content-disposition"));
         }
 
@@ -170,8 +162,4 @@ void MimeMultipart::parse(const string &contentType, string content) {
 void MimeMultipart::clear() {
     data->contentType.clear();
     data->parts.clear();
-}
-
-vector<MimeMultipart::Part> const &MimeMultipart::getParts() const noexcept {
-    return data->parts;
 }
