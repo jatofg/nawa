@@ -72,6 +72,12 @@ void Config::insert(std::initializer_list<std::pair<std::pair<std::string, std::
     data->values.insert(init.begin(), init.end());
 }
 
+void Config::override(const std::vector<std::pair<std::pair<std::string, std::string>, std::string>> &overrides) {
+    for (auto &[k, v]: overrides) {
+        data->values[k] = v;
+    }
+}
+
 bool Config::isSet(const pair<string, string> &key) const {
     return (data->values.count(key) == 1);
 }

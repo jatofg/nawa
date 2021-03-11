@@ -25,6 +25,8 @@
 #define NAWA_CONFIG_H
 
 #include <nawa/internal/macros.h>
+#include <string>
+#include <vector>
 
 namespace nawa {
     /**
@@ -71,6 +73,12 @@ namespace nawa {
          * @param init Initializer list containing key-value pairs, wherein the keys are section-key pairs.
          */
         void insert(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init);
+
+        /**
+         * Sets the elements form the vector to the given values (or inserts them, if they did not exist yet).
+         * @param overrides Vector containing key-value pairs, wherein the keys are section-key pairs.
+         */
+        void override(const std::vector<std::pair<std::pair<std::string, std::string>, std::string>> &overrides);
 
         /**
          * Check whether a key exists in this Config container.

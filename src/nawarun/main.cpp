@@ -30,6 +30,7 @@
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/config/Config.h>
 #include <nawa/logging/Log.h>
+#include <nawa/util/utils.h>
 #include <pwd.h>
 #include <stdexcept>
 #include <thread>
@@ -40,7 +41,7 @@ using namespace std;
 
 namespace {
     unique_ptr<RequestHandler> requestHandlerPtr;
-    string configFile;
+    optional<string> configFile;
     atomic<bool> readyToReconfigure(false);
     Log logger;
     unsigned int terminationTimeout = 10;
@@ -137,7 +138,7 @@ pair<init_t *, shared_ptr<HandleRequestFunctionWrapper>> loadAppFunctions(Config
  * Set the termination timeout from config, if available, log a warning in case of an invalid value.
  * @param config Config
  */
-void setTerminationTimeout(Config const& config) {
+void setTerminationTimeout(Config const &config) {
     string terminationTimeoutStr = config[{"system", "termination_timeout"}];
     if (!terminationTimeoutStr.empty()) {
         try {
@@ -152,13 +153,19 @@ void setTerminationTimeout(Config const& config) {
 
 // signal handler for SIGHUP (reload configuration and app)
 void reload(int signum) {
+    if (!configFile) {
+        NLOG_WARNING(logger, "WARNING: Reloading is not supported without config file and will therefore not "
+                             "happen.")
+        return;
+    }
+
     if (requestHandlerPtr && readyToReconfigure) {
         NLOG_INFO(logger, "Reloading config and app on signal " << signum)
         readyToReconfigure = false;
 
         Config config;
         try {
-            config.read(configFile);
+            config.read(*configFile);
         }
         catch (Exception const &e) {
             NLOG_ERROR(logger, "ERROR: Could not reload config: " << e.getMessage())
@@ -276,6 +283,72 @@ void doPrivilegeDowngrade(tuple<uid_t, gid_t, vector<gid_t>> const &data) {
     }
 }
 
+void printHelpAndExit() {
+    cout << "nawarun is the runner for NAWA web applications.\n\n"
+            "Usage: nawarun [<overrides>] [<config-file> | --no-config-file]\n\n"
+            "Format for configuration overrides: --<category>:<key>=<value>\n\n"
+            "If no config file is given, nawarun will try to use config.ini from the current\n"
+            "working directory, unless the --no-config-file option is given. The config file\n"
+            "as well as --no-config-file are only accepted as the last command line argument\n"
+            "after the overrides.\n";
+    exit(0);
+}
+
+/**
+ * Parse command line arguments. If --help or -h is encountered as the first argument, printHelpAndExit() is invoked.
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * @return A pair consisting of the path to the config file (optional, as it can be skipped with --no-config-file), and
+ * a list of config option overrides (identifier-value pairs, wherein the identifier is a pair of category and key).
+ */
+pair<optional<string>, vector<pair<pair<string, string>, string>>> parseCommandLine(int argc, char **argv) {
+    // start from arg 1 (as 0 is the program), iterate through all arguments and add valid options in the format
+    // --category:key=value to overrides
+    optional<string> configPath;
+    vector<pair<pair<string, string>, string>> overrides;
+    bool noConfigFile = false;
+    for (size_t i = 1; i < argc; ++i) {
+        string currentArg(argv[i]);
+
+        if (i == 1 && (currentArg == "--help" || currentArg == "-h")) {
+            printHelpAndExit();
+        }
+
+        if (currentArg.substr(0, 2) == "--") {
+            auto idAndVal = split_string(currentArg.substr(2), '=', true);
+            if (idAndVal.size() == 2) {
+                auto categoryAndKey = split_string(idAndVal.at(0), ':', true);
+                string const &value = idAndVal.at(1);
+                if (categoryAndKey.size() == 2) {
+                    string const &category = categoryAndKey.at(0);
+                    string const &key = categoryAndKey.at(1);
+                    overrides.push_back({{category, key}, value});
+                    continue;
+                }
+            }
+        }
+
+        // last argument is interpreted as config file if it does not match the pattern
+        // if "--no-config-file" is given as the last argument, no config file is used
+        if (i == argc - 1) {
+            if (currentArg != "--no-config-file") {
+                configPath = currentArg;
+            } else {
+                noConfigFile = true;
+            }
+        } else {
+            NLOG_WARNING(logger, "WARNING: Invalid command line argument \"" << currentArg << "\" will be ignored")
+        }
+    }
+
+    // use config.ini in current directory if no config file was given and --no-config-file option is not set
+    if (!configPath && !noConfigFile) {
+        configPath = "config.ini";
+    }
+
+    return {configPath, overrides};
+}
+
 int main(int argc, char **argv) {
 
     // set up signal handlers
@@ -284,23 +357,24 @@ int main(int argc, char **argv) {
     signal(SIGUSR1, shutdown);
     signal(SIGHUP, reload);
 
-    // read config file
-    // nawarun will take the path to the config as an argument
-    // if no argument was given, look for a config.ini in the current path
-    if (argc > 1) {
-        configFile = argv[1];
-    } else {
-        configFile = "config.ini";
-    }
+    // parse command line
+    auto commandLine = parseCommandLine(argc, argv);
+    configFile = commandLine.first;
+    auto const &configOverrides = commandLine.second;
+
+    // read config file, if not explicitly running without
     Config config;
-    try {
-        config.read(configFile);
+    if (configFile) {
+        try {
+            config.read(*configFile);
+        }
+        catch (Exception &e) {
+            NLOG_ERROR(logger, "Fatal Error: Could not load config: " << e.getMessage())
+            NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
+            return 1;
+        }
     }
-    catch (Exception &e) {
-        NLOG_ERROR(logger, "Fatal Error: Could not load config: " << e.getMessage())
-        NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
-        return 1;
-    }
+    config.override(configOverrides);
 
     // set termination timeout if available in config, otherwise use default
     setTerminationTimeout(config);
