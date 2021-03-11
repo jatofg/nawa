@@ -29,6 +29,7 @@
 #include <nawa/session/Session.h>
 #include <nawa/util/encoding.h>
 #include <nawa/util/utils.h>
+#include <shared_mutex>
 
 using namespace nawa;
 using namespace std;
@@ -251,38 +252,47 @@ namespace {
     }
 }
 
+struct RequestHandler::Data {
+    std::shared_mutex configurationMutex;
+    std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction;
+    std::shared_ptr<AccessFilterList> accessFilters;
+    std::shared_ptr<Config> config;
+};
+
+NAWA_DEFAULT_CONSTRUCTOR_IMPL(RequestHandler)
+
 void
 RequestHandler::setAppRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept {
-    unique_lock l(configurationMutex_);
-    handleRequestFunction_ = move(handleRequestFunction);
+    unique_lock l(data->configurationMutex);
+    data->handleRequestFunction = move(handleRequestFunction);
 }
 
 void RequestHandler::setAccessFilters(AccessFilterList accessFilters) noexcept {
-    unique_lock l(configurationMutex_);
-    accessFilters_ = make_shared<AccessFilterList>(move(accessFilters));
+    unique_lock l(data->configurationMutex);
+    data->accessFilters = make_shared<AccessFilterList>(move(accessFilters));
 }
 
 void RequestHandler::setConfig(Config config) noexcept {
-    unique_lock l(configurationMutex_);
-    config_ = make_shared<Config>(move(config));
+    unique_lock l(data->configurationMutex);
+    data->config = make_shared<Config>(move(config));
 }
 
 shared_ptr<Config const> RequestHandler::getConfig() const noexcept {
-    return config_;
+    return data->config;
 }
 
 void RequestHandler::reconfigure(optional<std::shared_ptr<HandleRequestFunctionWrapper>> handleRequestFunction,
                                  optional<AccessFilterList> accessFilters,
                                  optional<Config> config) noexcept {
-    unique_lock l(configurationMutex_);
+    unique_lock l(data->configurationMutex);
     if (handleRequestFunction) {
-        handleRequestFunction_ = *handleRequestFunction;
+        data->handleRequestFunction = *handleRequestFunction;
     }
     if (accessFilters) {
-        accessFilters_ = make_shared<AccessFilterList>(move(*accessFilters));
+        data->accessFilters = make_shared<AccessFilterList>(move(*accessFilters));
     }
     if (config) {
-        config_ = make_shared<Config>(move(*config));
+        data->config = make_shared<Config>(move(*config));
     }
 }
 
@@ -291,9 +301,9 @@ void RequestHandler::handleRequest(Connection &connection) {
     shared_ptr<AccessFilterList> accessFilters;
     shared_ptr<Config> config;
     {
-        shared_lock l(configurationMutex_);
-        handleRequestFunction = handleRequestFunction_;
-        accessFilters = accessFilters_;
+        shared_lock l(data->configurationMutex);
+        handleRequestFunction = data->handleRequestFunction;
+        accessFilters = data->accessFilters;
     }
     // test filters and run app if no filter was triggered
     if (!accessFilters || !applyFilters(connection, *accessFilters)) {

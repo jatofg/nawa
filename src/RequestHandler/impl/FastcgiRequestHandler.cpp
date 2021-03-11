@@ -87,7 +87,7 @@ bool FastcgippRequestAdapter::response() {
 
         {
             // the base URL is the URL without the request URI, e.g., https://www.example.com
-            std::stringstream baseUrl;
+            stringstream baseUrl;
             auto https = renv.parameters.count("HTTPS");
             baseUrl << (https ? "https://" : "http://")
                     << renvp("HTTP_HOST");
@@ -176,14 +176,16 @@ bool FastcgippRequestAdapter::inProcessor() {
     return false;
 }
 
-struct nawa::FastcgiRequestHandler::FastcgippManagerAdapter {
-    std::unique_ptr<Fastcgipp::Manager<FastcgippRequestAdapter>> manager;
+struct FastcgiRequestHandler::Data {
+    unique_ptr<Fastcgipp::Manager<FastcgippRequestAdapter>> fastcgippManager;
     bool requestHandlingActive = false;
     bool joined = false;
 };
 
-FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
+FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
                                              Config config, int concurrency) {
+    data = make_unique<Data>();
+
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config));
     auto configPtr = getConfig();
@@ -191,15 +193,15 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
     size_t postMax = 0;
     try {
         postMax = configPtr->isSet({"post", "max_size"})
-                  ? static_cast<size_t>(std::stoul((*configPtr)[{"post", "max_size"}])) * 1024 : 0;
+                  ? static_cast<size_t>(stoul((*configPtr)[{"post", "max_size"}])) * 1024 : 0;
     }
-    catch (std::invalid_argument &e) {
+    catch (invalid_argument &e) {
         NLOG_WARNING(logger, "WARNING: Invalid value given for post/max_size given in the config file.")
     }
 
     // set up fastcgilite logging
     Fastcgipp::Logging::addHeader = false;
-    Fastcgipp::Logging::logFunction = [&](const std::string &msg, Fastcgipp::Logging::Level level) {
+    Fastcgipp::Logging::logFunction = [&](const string &msg, Fastcgipp::Logging::Level level) {
         Log::Level nawaLevel;
         switch (level) {
             case Fastcgipp::Logging::INFO:
@@ -222,10 +224,9 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
         logger.write(msg, nawaLevel);
     };
 
-    fastcgippManager = std::make_unique<FastcgippManagerAdapter>();
     // TODO it should be possible to change postMax after fastcgilite manager creation
-    fastcgippManager->manager = std::make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, postMax,
-                                                                                              static_cast<RequestHandler *>(this));
+    data->fastcgippManager = make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, postMax,
+                                                                                      static_cast<RequestHandler *>(this));
 
     // socket handling
     string mode = (*configPtr)[{"fastcgi", "mode"}];
@@ -236,7 +237,7 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
         const char *fastcgiListenC = fastcgiListen.c_str();
         if (fastcgiListen == "all") fastcgiListenC = nullptr;
         if (fastcgiPort.empty()) fastcgiPort = "8000";
-        if (!fastcgippManager->manager->listen(fastcgiListenC, fastcgiPort.c_str())) {
+        if (!data->fastcgippManager->listen(fastcgiListenC, fastcgiPort.c_str())) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             "Could not create TCP socket for FastCGI.");
         }
@@ -260,9 +261,9 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
         auto fastcgiOwner = (*configPtr)[{"fastcgi", "owner"}];
         auto fastcgiGroup = (*configPtr)[{"fastcgi", "group"}];
 
-        if (!fastcgippManager->manager->listen(fastcgiSocketPath.c_str(), permissions,
-                                               fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
-                                               fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
+        if (!data->fastcgippManager->listen(fastcgiSocketPath.c_str(), permissions,
+                                            fastcgiOwner.empty() ? nullptr : fastcgiOwner.c_str(),
+                                            fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
             throw Exception(__PRETTY_FUNCTION__, 2,
                             "Could not create UNIX socket for FastCGI.");
 
@@ -274,33 +275,31 @@ FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFuncti
 
     // tell fastcgi to use SO_REUSEADDR if enabled in config
     if ((*configPtr)[{"fastcgi", "reuseaddr"}] != "off") {
-        fastcgippManager->manager->reuseAddress(true);
+        data->fastcgippManager->reuseAddress(true);
     }
 }
 
 FastcgiRequestHandler::~FastcgiRequestHandler() {
-    if (fastcgippManager) {
-        if (fastcgippManager->requestHandlingActive && !fastcgippManager->joined) {
-            fastcgippManager->manager->terminate();
-        }
-        if (!fastcgippManager->joined) {
-            fastcgippManager->manager->join();
-            fastcgippManager->manager.reset(nullptr);
-        }
+    if (data->requestHandlingActive && !data->joined) {
+        data->fastcgippManager->terminate();
+    }
+    if (!data->joined) {
+        data->fastcgippManager->join();
+        data->fastcgippManager.reset(nullptr);
     }
 }
 
 void FastcgiRequestHandler::start() {
-    if (fastcgippManager && fastcgippManager->requestHandlingActive) {
+    if (data->requestHandlingActive) {
         return;
     }
-    if (fastcgippManager && fastcgippManager->joined) {
+    if (data->joined) {
         throw Exception(__PRETTY_FUNCTION__, 10, "FastcgiRequestHandler was already joined.");
     }
-    if (fastcgippManager && fastcgippManager->manager) {
+    if (data->fastcgippManager) {
         try {
-            fastcgippManager->manager->start();
-            fastcgippManager->requestHandlingActive = true;
+            data->fastcgippManager->start();
+            data->requestHandlingActive = true;
         } catch (...) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             "An unknown error occurred during start of request handling.");
@@ -311,36 +310,30 @@ void FastcgiRequestHandler::start() {
 }
 
 void FastcgiRequestHandler::stop() noexcept {
-    if (fastcgippManager) {
-        if (fastcgippManager->joined) {
-            return;
-        }
-        if (fastcgippManager->manager) {
-            fastcgippManager->manager->stop();
-        }
+    if (data->joined) {
+        return;
+    }
+    if (data->fastcgippManager) {
+        data->fastcgippManager->stop();
     }
 }
 
 void FastcgiRequestHandler::terminate() noexcept {
-    if (fastcgippManager) {
-        if (fastcgippManager->joined) {
-            return;
-        }
-        if (fastcgippManager->manager) {
-            fastcgippManager->manager->terminate();
-        }
+    if (data->joined) {
+        return;
+    }
+    if (data->fastcgippManager) {
+        data->fastcgippManager->terminate();
     }
 }
 
 void FastcgiRequestHandler::join() noexcept {
-    if (fastcgippManager) {
-        if (fastcgippManager->joined) {
-            return;
-        }
-        if (fastcgippManager->manager) {
-            fastcgippManager->manager->join();
-            fastcgippManager->joined = true;
-            fastcgippManager->manager.reset(nullptr);
-        }
+    if (data->joined) {
+        return;
+    }
+    if (data->fastcgippManager) {
+        data->fastcgippManager->join();
+        data->joined = true;
+        data->fastcgippManager.reset(nullptr);
     }
 }

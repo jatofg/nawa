@@ -28,8 +28,8 @@
 
 namespace nawa {
     class FastcgiRequestHandler : public RequestHandler {
-        struct FastcgippManagerAdapter;
-        std::unique_ptr<FastcgippManagerAdapter> fastcgippManager;
+        NAWA_PRIVATE_DATA()
+
     public:
         /**
          * Construct a FastcgiRequestHandler object. May throw a nawa::Exception on failure.

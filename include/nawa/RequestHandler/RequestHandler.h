@@ -28,14 +28,17 @@
 #include <nawa/config/Config.h>
 #include <nawa/filter/AccessFilterList.h>
 #include <nawa/internal/fwdecl.h>
-#include <shared_mutex>
+#include <nawa/internal/macros.h>
+#include <memory>
+#include <optional>
 
 namespace nawa {
     class RequestHandler {
-        std::shared_mutex configurationMutex_;
-        std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction_;
-        std::shared_ptr<AccessFilterList> accessFilters_;
-        std::shared_ptr<Config> config_;
+        NAWA_PRIVATE_DATA()
+
+    protected:
+        NAWA_DEFAULT_CONSTRUCTOR_DEF(RequestHandler);
+
     public:
         /**
          * The overridden virtual destructor must terminate request handling and join worker threads, if not yet done.
@@ -146,6 +149,7 @@ namespace nawa {
 
         /**
          * Handle request by processing the filters and calling the app's handleRequest function, if necessary.
+         * Internal function which should only be used by request handlers.
          * @param connection The current Connection object.
          */
         void handleRequest(Connection &connection);

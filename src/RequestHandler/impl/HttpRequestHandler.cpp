@@ -99,7 +99,7 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         if (postBody.size() < expectedSize) {
             auto self = this->shared_from_this();
             httpConn->read([self](HttpServer::connection::input_range input,
-                                  boost::system::error_code ec, std::size_t bytes_transferred,
+                                  boost::system::error_code ec, size_t bytes_transferred,
                                   HttpServer::connection_ptr httpConn) {
                 (*self)(input, ec, bytes_transferred, httpConn);
             });
@@ -124,8 +124,8 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
                 for (auto const &p: postData.parts()) {
                     // find out whether the part is a file
                     if (!p.filename().empty() || (!p.contentType().empty() &&
-                                                     p.contentType().substr(0, plainTextContentType.length()) !=
-                                                     plainTextContentType)) {
+                                                  p.contentType().substr(0, plainTextContentType.length()) !=
+                                                  plainTextContentType)) {
                         File pf = File(p.content()).contentType(p.contentType()).filename(p.filename());
                         requestInit.postFiles.insert({p.partName(), move(pf)});
                     } else {
@@ -173,7 +173,7 @@ struct HttpHandler {
 
         {
             // the base URL is the URL without the request URI, e.g., https://www.example.com
-            std::stringstream baseUrl;
+            stringstream baseUrl;
 
             // change following section if HTTPS should ever be implemented (copy from fastcgi)
             baseUrl << "http://" << requestInit.environment["host"];
@@ -209,7 +209,7 @@ struct HttpHandler {
         // is there POST data to be handled?
         if (request.method == "POST" && connectionInit.requestInit.environment.count("content-length")) {
             try {
-                std::string rawPostStr = (*configPtr)[{"post", "raw_access"}];
+                string rawPostStr = (*configPtr)[{"post", "raw_access"}];
                 auto rawPostAccess = (rawPostStr == "never")
                                      ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
                                                                                         : RawPostAccess::NONSTANDARD);
@@ -241,7 +241,7 @@ struct HttpHandler {
     }
 };
 
-struct nawa::HttpRequestHandler::HttpHandlerAdapter {
+struct HttpRequestHandler::Data {
     unique_ptr<HttpHandler> handler;
     unique_ptr<HttpServer> server;
     int concurrency = 1;
@@ -250,33 +250,34 @@ struct nawa::HttpRequestHandler::HttpHandlerAdapter {
     bool joined = false;
 };
 
-HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
+HttpRequestHandler::HttpRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
                                        Config config,
                                        int concurrency) {
+    data = make_unique<Data>();
+
     setAppRequestHandler(move(handleRequestFunction));
     setConfig(move(config));
     auto configPtr = getConfig();
 
     logger.setAppname("HttpRequestHandler");
 
-    httpHandler = make_unique<HttpHandlerAdapter>();
-    httpHandler->handler = make_unique<HttpHandler>();
-    httpHandler->handler->requestHandler = this;
-    HttpServer::options httpServerOptions(*httpHandler->handler);
+    data->handler = make_unique<HttpHandler>();
+    data->handler->requestHandler = this;
+    HttpServer::options httpServerOptions(*data->handler);
 
     // set options from config
     string listenAddr = getListenAddr(configPtr);
     string listenPort = getListenPort(configPtr);
     bool reuseAddr = (*configPtr)[{"http", "reuseaddr"}] != "off";
-    httpHandler->server = make_unique<HttpServer>(
+    data->server = make_unique<HttpServer>(
             httpServerOptions.address(listenAddr).port(listenPort).reuse_address(reuseAddr));
 
     if (concurrency > 0) {
-        httpHandler->concurrency = concurrency;
+        data->concurrency = concurrency;
     }
 
     try {
-        httpHandler->server->listen();
+        data->server->listen();
     } catch (exception const &e) {
         throw Exception(__PRETTY_FUNCTION__, 1,
                         "Could not listen to host/port.", e.what());
@@ -284,32 +285,30 @@ HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrap
 }
 
 HttpRequestHandler::~HttpRequestHandler() {
-    if (httpHandler) {
-        if (httpHandler->requestHandlingActive && !httpHandler->joined) {
-            httpHandler->server->stop();
+    if (data->requestHandlingActive && !data->joined) {
+        data->server->stop();
+    }
+    if (!data->joined) {
+        for (auto &t: data->threadPool) {
+            t.join();
         }
-        if (!httpHandler->joined) {
-            for (auto &t: httpHandler->threadPool) {
-                t.join();
-            }
-            httpHandler->threadPool.clear();
-        }
+        data->threadPool.clear();
     }
 }
 
 void HttpRequestHandler::start() {
-    if (httpHandler && httpHandler->requestHandlingActive) {
+    if (data->requestHandlingActive) {
         return;
     }
-    if (httpHandler && httpHandler->joined) {
+    if (data->joined) {
         throw Exception(__PRETTY_FUNCTION__, 10, "HttpRequestHandler was already joined.");
     }
-    if (httpHandler && httpHandler->server) {
+    if (data->server) {
         try {
-            for (int i = 0; i < httpHandler->concurrency; ++i) {
-                httpHandler->threadPool.emplace_back([this] { httpHandler->server->run(); });
+            for (int i = 0; i < data->concurrency; ++i) {
+                data->threadPool.emplace_back([this] { data->server->run(); });
             }
-            httpHandler->requestHandlingActive = true;
+            data->requestHandlingActive = true;
         } catch (exception const &e) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             string("An error occurred during start of request handling."),
@@ -321,37 +320,31 @@ void HttpRequestHandler::start() {
 }
 
 void HttpRequestHandler::stop() noexcept {
-    if (httpHandler) {
-        if (httpHandler->joined) {
-            return;
-        }
-        if (httpHandler->server) {
-            httpHandler->server->stop();
-        }
+    if (data->joined) {
+        return;
+    }
+    if (data->server) {
+        data->server->stop();
     }
 }
 
 void HttpRequestHandler::terminate() noexcept {
     // TODO find (implement in fork of cpp-netlib) a way to forcefully terminate
-    if (httpHandler) {
-        if (httpHandler->joined) {
-            return;
-        }
-        if (httpHandler->server) {
-            httpHandler->server->stop();
-        }
+    if (data->joined) {
+        return;
+    }
+    if (data->server) {
+        data->server->stop();
     }
 }
 
 void HttpRequestHandler::join() noexcept {
-    if (httpHandler) {
-        if (httpHandler->joined) {
-            return;
-        }
-        for (auto &t: httpHandler->threadPool) {
-            t.join();
-        }
-        httpHandler->joined = true;
-        httpHandler->threadPool.clear();
+    if (data->joined) {
+        return;
     }
+    for (auto &t: data->threadPool) {
+        t.join();
+    }
+    data->joined = true;
+    data->threadPool.clear();
 }

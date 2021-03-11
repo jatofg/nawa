@@ -28,8 +28,8 @@
 
 namespace nawa {
     class HttpRequestHandler : public RequestHandler {
-        struct HttpHandlerAdapter;
-        std::unique_ptr<HttpHandlerAdapter> httpHandler;
+        NAWA_PRIVATE_DATA()
+
     public:
         /**
          * Construct a FastcgiRequestHandler object. May throw a nawa::Exception on failure.
