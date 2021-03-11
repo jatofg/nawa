@@ -135,7 +135,7 @@ pair<init_t *, shared_ptr<HandleRequestFunctionWrapper>> loadAppFunctions(Config
 // signal handler for SIGHUP (reload configuration and app)
 void reload(int signum) {
     if (requestHandlerPtr && readyToReconfigure) {
-        NLOG_INFO(logger, "Reloading config and app on signal" << signum)
+        NLOG_INFO(logger, "Reloading config and app on signal " << signum)
         readyToReconfigure = false;
 
         Config config;
