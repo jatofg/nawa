@@ -43,6 +43,7 @@ namespace {
     string configFile;
     atomic<bool> readyToReconfigure(false);
     Log logger;
+    unsigned int terminationTimeout = 10;
 
     // Types of functions that need to be accessed from NAWA applications
     using init_t = int(AppInit &); /**< Type for the init() function of NAWA apps. */
@@ -59,7 +60,7 @@ void shutdown(int signum) {
         requestHandlerPtr->stop();
 
         // if this did not work, try harder after 10 seconds
-        sleep(10);
+        sleep(terminationTimeout);
         if (requestHandlerPtr && signum != SIGUSR1) {
             NLOG_INFO(logger, "Enforcing termination now, ignoring pending requests.")
             requestHandlerPtr->terminate();
@@ -132,6 +133,23 @@ pair<init_t *, shared_ptr<HandleRequestFunctionWrapper>> loadAppFunctions(Config
     return {appInit, make_shared<HandleRequestFunctionWrapper>(appHandleRequest, appOpen, closeApp)};
 }
 
+/**
+ * Set the termination timeout from config, if available, log a warning in case of an invalid value.
+ * @param config Config
+ */
+void setTerminationTimeout(Config const& config) {
+    string terminationTimeoutStr = config[{"system", "termination_timeout"}];
+    if (!terminationTimeoutStr.empty()) {
+        try {
+            auto newTerminationTimeout = stoul(terminationTimeoutStr);
+            terminationTimeout = newTerminationTimeout;
+        } catch (invalid_argument &e) {
+            NLOG_WARNING(logger, "WARNING: Invalid termination timeout given in configuration, default value "
+                                 "or previous value will be used.")
+        }
+    }
+}
+
 // signal handler for SIGHUP (reload configuration and app)
 void reload(int signum) {
     if (requestHandlerPtr && readyToReconfigure) {
@@ -149,6 +167,9 @@ void reload(int signum) {
             readyToReconfigure = true;
             return;
         }
+
+        // set new termination timeout, if given
+        setTerminationTimeout(config);
 
         init_t *appInit;
         shared_ptr<HandleRequestFunctionWrapper> appHandleRequest;
@@ -188,6 +209,73 @@ void reload(int signum) {
     }
 }
 
+/**
+ * Prepare privilege downgrade considering the corresponding options in the config and check for errors. Will exit the
+ * program with exit code 1 after logging an error in case of a fatal error.
+ * @param config Config
+ * @return A tuple with the UID and GID and a list of supplementary groups if privilege downgrade should happen
+ * (i.e., nawarun is running as root).
+ */
+optional<tuple<uid_t, gid_t, vector<gid_t>>> preparePrivilegeDowngrade(Config const &config) {
+    auto initialUID = getuid();
+    uid_t privUID = -1;
+    gid_t privGID = -1;
+    vector<gid_t> supplementaryGroups;
+
+    if (initialUID == 0) {
+        if (!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
+            NLOG_ERROR(logger, "Fatal Error: Running as root and user or group for privilege downgrade is not "
+                               "set in the configuration.")
+            exit(1);
+        }
+        string username = config[{"privileges", "user"}];
+        string groupname = config[{"privileges", "group"}];
+        passwd *privUser;
+        group *privGroup;
+        privUser = getpwnam(username.c_str());
+        privGroup = getgrnam(groupname.c_str());
+        if (privUser == nullptr || privGroup == nullptr) {
+            NLOG_ERROR(logger, "Fatal Error: The user or group name for privilege downgrade given in the "
+                               "configuration is invalid.")
+            exit(1);
+        }
+        privUID = privUser->pw_uid;
+        privGID = privGroup->gr_gid;
+        if (privUID == 0 || privGID == 0) {
+            NLOG_WARNING(logger, "WARNING: nawarun will be running as user or group root. Security risk!")
+        } else {
+            // get supplementary groups for non-root user
+            int n = 0;
+            getgrouplist(username.c_str(), privGID, nullptr, &n);
+            supplementaryGroups.resize(n, 0);
+            if (getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
+                NLOG_WARNING(logger, "WARNING: Could not get supplementary groups for user " << username)
+                supplementaryGroups = {privGID};
+            }
+        }
+        return make_tuple(privUID, privGID, supplementaryGroups);
+    }
+
+    NLOG_WARNING(logger, "WARNING: Not starting as root, cannot set privileges.")
+    return nullopt;
+}
+
+/**
+ * Do the privilege downgrade using the data supplied, log an error message and exit the program on failure.
+ * @param data Tuple containing the UID, GID, and list of supplementary groups to downgrade to.
+ */
+void doPrivilegeDowngrade(tuple<uid_t, gid_t, vector<gid_t>> const &data) {
+    auto const &[uid, gid, supplementaryGroups] = data;
+    if (uid != 0 && gid != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
+        NLOG_ERROR(logger, "Fatal Error: Could not set supplementary groups during privilege downgrade.")
+        exit(1);
+    }
+    if (setgid(gid) != 0 || setuid(uid) != 0) {
+        NLOG_ERROR(logger, "Fatal Error: Could not set privileges during privilege downgrade.")
+        exit(1);
+    }
+}
+
 int main(int argc, char **argv) {
 
     // set up signal handlers
@@ -214,6 +302,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    // set termination timeout if available in config, otherwise use default
+    setTerminationTimeout(config);
+
     // set up logging
     auto configuredLogLevel = config[{"logging", "level"}];
     if (configuredLogLevel == "off") {
@@ -231,42 +322,7 @@ int main(int argc, char **argv) {
     Log::lockStream();
 
     // prepare privilege downgrade and check for errors (downgrade will happen after socket setup)
-    auto initialUID = getuid();
-    uid_t privUID = -1;
-    gid_t privGID = -1;
-    vector<gid_t> supplementaryGroups;
-    if (initialUID == 0) {
-        if (!config.isSet({"privileges", "user"}) || !config.isSet({"privileges", "group"})) {
-            NLOG_ERROR(logger, "Fatal Error: Username or password not correctly set in config.ini.")
-            return 1;
-        }
-        string username = config[{"privileges", "user"}];
-        string groupname = config[{"privileges", "group"}];
-        passwd *privUser;
-        group *privGroup;
-        privUser = getpwnam(username.c_str());
-        privGroup = getgrnam(groupname.c_str());
-        if (privUser == nullptr || privGroup == nullptr) {
-            NLOG_ERROR(logger, "Fatal Error: Username or groupname invalid")
-            return 1;
-        }
-        privUID = privUser->pw_uid;
-        privGID = privGroup->gr_gid;
-        if (privUID == 0 || privGID == 0) {
-            NLOG_WARNING(logger, "WARNING: nawarun will be running as user or group root. Security risk!")
-        } else {
-            // get supplementary groups for non-root user
-            int n = 0;
-            getgrouplist(username.c_str(), privGID, nullptr, &n);
-            supplementaryGroups.resize(n, 0);
-            if (getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
-                NLOG_WARNING(logger, "WARNING: Could not get supplementary groups for user " << username)
-                supplementaryGroups = {privGID};
-            }
-        }
-    } else {
-        NLOG_WARNING(logger, "WARNING: Not starting as root, cannot set privileges.")
-    }
+    auto privilegeDowngradeData = preparePrivilegeDowngrade(config);
 
     // load init and handleRequest symbols from app
     init_t *appInit;
@@ -290,16 +346,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // do privilege downgrade
-    if (initialUID == 0) {
-        if (privUID != 0 && privGID != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
-            NLOG_ERROR(logger, "Fatal Error: Could not set supplementary groups.")
-            return 1;
-        }
-        if (setgid(privGID) != 0 || setuid(privUID) != 0) {
-            NLOG_ERROR(logger, "Fatal Error: Could not set privileges.")
-            return 1;
-        }
+    // do privilege downgrade if possible
+    if (privilegeDowngradeData) {
+        doPrivilegeDowngrade(*privilegeDowngradeData);
     }
 
     // before manager starts, init app
