@@ -25,9 +25,11 @@
 #include <fstream>
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
+#include <nawa/filter/AccessFilterList.h>
 #include <nawa/util/utils.h>
 #include <regex>
 #include <sys/stat.h>
+#include <nawa/util/encoding.h>
 
 using namespace nawa;
 using namespace std;
@@ -357,6 +359,151 @@ nawa::Config const &nawa::Connection::config() const noexcept {
 
 std::ostream &nawa::Connection::responseStream() noexcept {
     return data->responseStream;
+}
+
+bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
+    // if filters are disabled, do not even check
+    if (!accessFilters.filtersEnabled()) return false;
+
+    auto requestPath = data->request.env().getRequestPath();
+
+    // check block filters
+    for (auto const &flt: accessFilters.blockFilters()) {
+        // if the filter does not apply (or does in case of an inverted filter), go to the next
+        bool matches = flt.matches(requestPath);
+        if ((!matches && !flt.invert()) || (matches && flt.invert())) {
+            continue;
+        }
+
+        // filter matches -> apply block
+        setStatus(flt.status());
+        if (!flt.response().empty()) {
+            setResponseBody(flt.response());
+        } else {
+            setResponseBody(generate_error_page(flt.status()));
+        }
+        // the request has been blocked, so no more filters have to be applied
+        // returning true means: the request has been filtered
+        return true;
+    }
+
+    // the ID is used to identify the exact filter for session cookie creation
+    int authFilterID = -1;
+    for (auto const &flt: accessFilters.authFilters()) {
+        ++authFilterID;
+
+        bool matches = flt.matches(requestPath);
+        if ((!matches && !flt.invert()) || (matches && flt.invert())) {
+            continue;
+        }
+
+        bool isAuthenticated = false;
+        string sessionVarKey;
+
+        // check session variable for this filter, if session usage is on
+        if (flt.useSessions()) {
+            data->session.start();
+            sessionVarKey = "_nawa_authfilter" + to_string(authFilterID);
+            if (data->session.isSet(sessionVarKey)) {
+                isAuthenticated = true;
+            }
+        }
+
+        // if this did not work, request authentication or invoke auth function if credentials have already been sent
+        if (!isAuthenticated) {
+            // case 1: no authorization header sent by client -> send a 401 without body
+            if (data->request.env()["authorization"].empty()) {
+                setStatus(401);
+                stringstream hval;
+                hval << "Basic";
+                if (!flt.authName().empty()) {
+                    hval << " realm=\"" << flt.authName() << '"';
+                }
+                setHeader("www-authenticate", hval.str());
+
+                // that's it, the response must be sent to the client directly so it can authenticate
+                return true;
+            }
+                // case 2: credentials already sent
+            else {
+                // split the authorization string, only the last part should contain base64
+                auto authResponse = split_string(data->request.env()["authorization"], ' ', true);
+                // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
+                if (authResponse.size() == 2 || authResponse.at(0) == "Basic") {
+                    auto credentials = split_string(encoding::base64Decode(authResponse.at(1)), ':', true);
+                    // credentials must also have 2 elements, a username and a password,
+                    // and the auth function must be callable
+                    if (credentials.size() == 2 && flt.authFunction()) {
+                        // now we can actually check the credentials with our function (if it is set)
+                        if (flt.authFunction()(credentials.at(0), credentials.at(1))) {
+                            isAuthenticated = true;
+                            // now, if sessions are used, set the session variable to the username
+                            if (flt.useSessions()) {
+                                data->session.set(sessionVarKey, any(credentials.at(0)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // now, if the user is still not authenticated, send a 403 Forbidden
+        if (!isAuthenticated) {
+            setStatus(403);
+            if (!flt.response().empty()) {
+                setResponseBody(flt.response());
+            } else {
+                setResponseBody(generate_error_page(403));
+            }
+
+            // request blocked
+            return true;
+        }
+
+        // if the user is authenticated, we can continue to process forward filters
+        break;
+
+    }
+
+    // check forward filters
+    for (auto const &flt: accessFilters.forwardFilters()) {
+        bool matches = flt.matches(requestPath);
+        if ((!matches && !flt.invert()) || (matches && flt.invert())) {
+            continue;
+        }
+
+        stringstream filePath;
+        filePath << flt.basePath();
+        if (flt.basePathExtension() == ForwardFilter::BasePathExtension::BY_PATH) {
+            for (auto const &e: requestPath) {
+                filePath << '/' << e;
+            }
+        } else {
+            filePath << '/' << requestPath.back();
+        }
+
+        // send file if it exists, catch the "file does not exist" nawa::Exception and send 404 document if not
+        auto filePathStr = filePath.str();
+        try {
+            sendFile(filePathStr, "", false, "", true);
+        }
+        catch (Exception &) {
+            // file does not exist, send 404
+            setStatus(404);
+            if (!flt.response().empty()) {
+                setResponseBody(flt.response());
+            } else {
+                setResponseBody(generate_error_page(404));
+            }
+        }
+
+        // return true as the request has been filtered
+        return true;
+    }
+
+    // if no filters were triggered (and therefore returned true), return false so that the request can be handled by
+    // the app
+    return false;
 }
 
 std::string FlushCallbackContainer::getStatusString() const {

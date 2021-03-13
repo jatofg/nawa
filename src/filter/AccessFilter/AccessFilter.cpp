@@ -22,6 +22,7 @@
  */
 
 #include <nawa/filter/AccessFilter/AccessFilter.h>
+#include <nawa/util/utils.h>
 
 using namespace nawa;
 using namespace std;
@@ -64,3 +65,60 @@ NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(AccessFilter, regexFilterEnabled, bool)
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, regexFilter, regex)
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, response, string)
+
+bool nawa::AccessFilter::matches(const vector<string> &requestPath) const {
+    if (!data->pathFilter.empty()) {
+        // one of the paths in the path filter must match for the path filter to match
+        bool pathFilterMatches = false;
+        for (auto const &filter: data->pathFilter) {
+            // path condition is set but does not match -> the whole filter does not match
+            // all elements of the filter path must be in the request path
+            if (requestPath.size() < filter.size()) {
+                continue;
+            }
+            pathFilterMatches = true;
+            for (size_t i = 0; i < filter.size(); ++i) {
+                if (filter.at(i) != requestPath.at(i)) {
+                    pathFilterMatches = false;
+                    break;
+                }
+            }
+            if (pathFilterMatches) {
+                break;
+            }
+        }
+        if ((!pathFilterMatches && !data->invertPathFilter) || (pathFilterMatches && data->invertPathFilter)) {
+            return false;
+        }
+        // path condition matches -> continue to the next filter condition
+    }
+
+    if (!data->extensionFilter.empty()) {
+        auto fileExtension = get_file_extension(requestPath.back());
+        bool extensionFilterMatches = false;
+        for (auto const &e: data->extensionFilter) {
+            if (fileExtension == e) {
+                extensionFilterMatches = true;
+                break;
+            }
+        }
+        if ((!extensionFilterMatches && !data->invertExtensionFilter) ||
+            (extensionFilterMatches && data->invertExtensionFilter)) {
+            return false;
+        }
+        // extension condition matches -> continue to the next filter condition
+    }
+
+    if (data->regexFilterEnabled) {
+        // merge request path to string
+        stringstream pathStr;
+        for (auto const &e: requestPath) {
+            pathStr << '/' << e;
+        }
+        if (!regex_match(pathStr.str(), data->regexFilter))
+            return false;
+    }
+
+    // all conditions match or no condition has been set -> the filter matches
+    return true;
+}

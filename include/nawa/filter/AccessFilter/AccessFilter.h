@@ -112,6 +112,13 @@ namespace nawa {
          * @return Reference to element.
          */
         NAWA_COMPLEX_DATA_ACCESSORS_DEF(AccessFilter, response, std::string);
+
+        /**
+         * Check whether the conditions of this filter match the given request path.
+         * @param requestPath The request path of the current request.
+         * @return True if the filter matches, false otherwise.
+         */
+        bool matches(const std::vector<std::string> &requestPath) const;
     };
 }
 

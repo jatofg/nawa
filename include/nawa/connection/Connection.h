@@ -48,7 +48,7 @@ namespace nawa {
          * The Request object representing the current request.
          * @return Reference to the Request object.
          */
-        nawa::Request const &request() const noexcept;
+        [[nodiscard]] nawa::Request const &request() const noexcept;
 
         /**
          * The Session object for accessing the current session.
@@ -209,6 +209,17 @@ namespace nawa {
          * NOTE: Flushing might not work as expected with Apache 2.4 and mod_proxy_fcgi
          */
         void flushResponse();
+
+        /**
+         * Apply access filters (if enabled in the AccessFilterList object) and set the response accordingly, if they
+         * match. You shouldn't need to call this function manually, just add them to AppInit or (when using NAWA as a
+         * library) to the RequestHandler. Then, NAWA will filter your requests before they even reach your app or
+         * request handling function.
+         * @param accessFilters The filters to apply.
+         * @return True if the request has been filtered and a response has already been set by this function
+         * (and the app should not be invoked on this request). False if the app should handle this request.
+         */
+        bool applyFilters(AccessFilterList const &accessFilters);
     };
 }
 
