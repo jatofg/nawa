@@ -96,8 +96,9 @@ int main() {
     // Tip: Use signal handlers to control request handling.
 
     // If you want to hot-swap the config, filters, or request handling function, use:
-    // requestHandler->reconfigure(make_shared<HandleRequestFunctionWrapper>(handlingFunction), accessFilters, config);
-    // (see docs of nawa::RequestHandler::reconfigure())
+    // requestHandler->reconfigure(handlingFunction, accessFilters, config);
+    // (see docs of nawa::RequestHandler::reconfigure() -- you can use std::nullopt for things you don't want to
+    // reconfigure)
 
     // Now, before your main function returns, make sure to block until request handling has terminated:
     requestHandler->join();

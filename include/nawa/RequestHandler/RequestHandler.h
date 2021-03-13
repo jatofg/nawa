@@ -101,12 +101,21 @@ namespace nawa {
 
         /**
          * Reconfigure the request handler (thread-safe, blocking).
-         * @param handleRequestFunction The request handling function of the app.
+         * @param handleRequestFunction A HandleRequestFunctionWrapper containing the handleRequest function of the app.
          * @param accessFilters The access filters.
          * @param config The config.
          */
         void reconfigure(std::optional<std::shared_ptr<HandleRequestFunctionWrapper>> handleRequestFunction,
                          std::optional<AccessFilterList> accessFilters, std::optional<Config> config) noexcept;
+
+        /**
+         * Reconfigure the request handler (thread-safe, blocking).
+         * @param handleRequestFunction The request handling function of the app.
+         * @param accessFilters The access filters.
+         * @param config The config.
+         */
+        void reconfigure(HandleRequestFunction handleRequestFunction, std::optional<AccessFilterList> accessFilters,
+                         std::optional<Config> config) noexcept;
 
         /**
          * Start request handling. Must not block and return immediately if request handling is already running.

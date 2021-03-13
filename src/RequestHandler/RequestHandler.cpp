@@ -262,7 +262,7 @@ struct RequestHandler::Data {
 NAWA_DEFAULT_CONSTRUCTOR_IMPL(RequestHandler)
 
 void
-RequestHandler::setAppRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept {
+RequestHandler::setAppRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept {
     unique_lock l(data->configurationMutex);
     data->handleRequestFunction = move(handleRequestFunction);
 }
@@ -281,7 +281,7 @@ shared_ptr<Config const> RequestHandler::getConfig() const noexcept {
     return data->config;
 }
 
-void RequestHandler::reconfigure(optional<std::shared_ptr<HandleRequestFunctionWrapper>> handleRequestFunction,
+void RequestHandler::reconfigure(optional<shared_ptr<HandleRequestFunctionWrapper>> handleRequestFunction,
                                  optional<AccessFilterList> accessFilters,
                                  optional<Config> config) noexcept {
     unique_lock l(data->configurationMutex);
@@ -294,6 +294,13 @@ void RequestHandler::reconfigure(optional<std::shared_ptr<HandleRequestFunctionW
     if (config) {
         data->config = make_shared<Config>(move(*config));
     }
+}
+
+void
+nawa::RequestHandler::reconfigure(HandleRequestFunction handleRequestFunction, optional<AccessFilterList> accessFilters,
+                                  optional<Config> config) noexcept {
+    reconfigure(make_shared<HandleRequestFunctionWrapper>(move(handleRequestFunction)), move(accessFilters),
+                move(config));
 }
 
 void RequestHandler::handleRequest(Connection &connection) {
