@@ -117,6 +117,7 @@ set(NAWA_FILES
         libs/inih/ini.h
 
         src/AppInit.cpp
+        src/RequestHandler/HandleRequestFunction.cpp
         src/RequestHandler/RequestHandler.cpp
         src/RequestHandler/impl/FastcgiRequestHandler.cpp
         src/RequestHandler/impl/HttpRequestHandler.cpp
