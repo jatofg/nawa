@@ -107,9 +107,9 @@ set(NAWA_FILES
         include/nawa/util/MimeMultipart.h
         include/nawa/util/utils.h
 
-        internal/ConnectionInitContainer.h
-        internal/FlushCallbackContainer.h
-        internal/RequestInitContainer.h
+        internal/connection/ConnectionInitContainer.h
+        internal/connection/FlushCallbackContainer.h
+        internal/request/RequestInitContainer.h
 
         libs/base64/base64.cpp
         libs/base64/base64.h
@@ -168,7 +168,11 @@ else ()
             src/hashing/HashTypeTable/impl/BcryptOnlyHashTypeTable.cpp)
 endif ()
 
-add_executable(nawarun src/nawarun/main.cpp ${NAWA_FILES})
+add_executable(nawarun
+        src/nawarun/main.cpp
+        internal/nawarun/nawarun.h
+        src/nawarun/nawarun.cpp
+        ${NAWA_FILES})
 
 target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
 target_include_directories(nawarun PUBLIC

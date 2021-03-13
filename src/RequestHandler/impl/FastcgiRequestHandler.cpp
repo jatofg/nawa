@@ -21,7 +21,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../internal/ConnectionInitContainer.h"
+#include "../../../internal/connection/ConnectionInitContainer.h"
 #include <fastcgi++/log.hpp>
 #include <fastcgi++/manager.hpp>
 #include <fastcgi++/request.hpp>

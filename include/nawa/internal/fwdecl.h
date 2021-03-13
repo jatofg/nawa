@@ -67,6 +67,10 @@ namespace nawa {
         class Post;
     }
 
+    // RequestHandler
+    class HandleRequestFunctionWrapper;
+    class RequestHandler;
+
     // session
     class Session;
 

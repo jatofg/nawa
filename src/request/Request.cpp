@@ -21,7 +21,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../internal/RequestInitContainer.h"
+#include "../../internal/request/RequestInitContainer.h"
 #include <nawa/request/Request.h>
 
 using namespace nawa;
