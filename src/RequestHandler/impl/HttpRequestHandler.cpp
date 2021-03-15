@@ -21,12 +21,12 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../internal/connection/ConnectionInitContainer.h"
 #include <boost/network/protocol/http/server.hpp>
 #include <nawa/Exception.h>
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/RequestHandler/impl/HttpRequestHandler.h>
 #include <nawa/connection/Connection.h>
+#include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/logging/Log.h>
 #include <nawa/util/MimeMultipart.h>
 #include <nawa/util/utils.h>

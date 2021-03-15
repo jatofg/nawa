@@ -21,15 +21,15 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../internal/connection/ConnectionInitContainer.h"
 #include <fstream>
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
+#include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/filter/AccessFilterList.h>
+#include <nawa/util/encoding.h>
 #include <nawa/util/utils.h>
 #include <regex>
 #include <sys/stat.h>
-#include <nawa/util/encoding.h>
 
 using namespace nawa;
 using namespace std;

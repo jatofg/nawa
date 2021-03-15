@@ -31,11 +31,11 @@
 #include <nawa/config/Config.h>
 #include <nawa/logging/Log.h>
 #include <nawa/util/utils.h>
+#include <nawarun/nawarun.h>
 #include <pwd.h>
 #include <stdexcept>
 #include <thread>
 #include <unistd.h>
-#include "../../internal/nawarun/nawarun.h"
 
 using namespace nawa;
 using namespace nawarun;

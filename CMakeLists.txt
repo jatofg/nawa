@@ -107,9 +107,9 @@ set(NAWA_FILES
         include/nawa/util/MimeMultipart.h
         include/nawa/util/utils.h
 
-        internal/connection/ConnectionInitContainer.h
-        internal/connection/FlushCallbackContainer.h
-        internal/request/RequestInitContainer.h
+        internal/nawa/connection/ConnectionInitContainer.h
+        internal/nawa/connection/FlushCallbackContainer.h
+        internal/nawa/request/RequestInitContainer.h
 
         libs/base64/base64.cpp
         libs/base64/base64.h
@@ -180,6 +180,7 @@ target_include_directories(nawarun PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
         $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
@@ -194,6 +195,7 @@ if (BuildSharedLib OR BuildTests)
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
             $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
@@ -207,7 +209,8 @@ if (BuildTests)
     target_link_libraries(unittests nawa Catch2::Catch2)
     target_include_directories(unittests PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>)
 
     add_executable(integrationtests
             tests/main.cpp
@@ -215,7 +218,8 @@ if (BuildTests)
     target_link_libraries(integrationtests nawa Catch2::Catch2)
     target_include_directories(integrationtests PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>)
 
     include(${catch2_SOURCE_DIR}/contrib/Catch.cmake)
     enable_testing()

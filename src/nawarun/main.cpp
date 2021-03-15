@@ -21,7 +21,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../internal/nawarun/nawarun.h"
+#include <nawarun/nawarun.h>
 
 using namespace nawarun;
 
