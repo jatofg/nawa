@@ -76,8 +76,6 @@ set(NAWA_FILES
         include/nawa/Exception.h
         include/nawa/RequestHandler/HandleRequestFunction.h
         include/nawa/RequestHandler/RequestHandler.h
-        include/nawa/RequestHandler/impl/FastcgiRequestHandler.h
-        include/nawa/RequestHandler/impl/HttpRequestHandler.h
         include/nawa/config/Config.h
         include/nawa/connection/Connection.h
         include/nawa/connection/Cookie.h
@@ -107,6 +105,8 @@ set(NAWA_FILES
         include/nawa/util/MimeMultipart.h
         include/nawa/util/utils.h
 
+        internal/nawa/RequestHandler/impl/FastcgiRequestHandler.h
+        internal/nawa/RequestHandler/impl/HttpRequestHandler.h
         internal/nawa/connection/ConnectionInitContainer.h
         internal/nawa/connection/FlushCallbackContainer.h
         internal/nawa/request/RequestInitContainer.h
