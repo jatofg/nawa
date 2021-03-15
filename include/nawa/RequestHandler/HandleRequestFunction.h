@@ -43,32 +43,12 @@ namespace nawa {
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(HandleRequestFunctionWrapper);
 
-        NAWA_DEFAULT_CONSTRUCTOR_DEF(HandleRequestFunctionWrapper);
-
-        /**
-         * The request handling function.
-         * @return The request handling function.
-         */
-        NAWA_COMPLEX_DATA_ACCESSORS_DEF(HandleRequestFunctionWrapper, handleRequestFunction, HandleRequestFunction);
-
-        /**
-         * An arbitrary reference pointer which can be used as a hint during destruction.
-         * @return An arbitrary reference pointer which can be used as a hint during destruction.
-         */
-        NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(HandleRequestFunctionWrapper, reference, void *);
-
-        /**
-         * A function which will be called on destruction of the wrapper object, the reference pointer is passed to
-         * this function as a reference.
-         * @return Reference to the function.
-         */
-        NAWA_COMPLEX_DATA_ACCESSORS_DEF(HandleRequestFunctionWrapper, destructionCallback, DestructionCallbackFunction);
-
         /**
          * Construct a wrapper for a HandleRequestFunction.
          * @param handleRequestFunction The request handling function.
          * @param reference An arbitrary reference pointer which can be used as a hint during destruction.
-         * @param destructionCallback The destruction callback function.
+         * @param destructionCallback A function which will be called on destruction of the wrapper object, the
+         * reference pointer is passed to this function as a reference.
          */
         explicit HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction, void *reference = nullptr,
                                               DestructionCallbackFunction destructionCallback = DestructionCallbackFunction());

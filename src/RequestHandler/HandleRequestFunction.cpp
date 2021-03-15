@@ -40,25 +40,18 @@ struct HandleRequestFunctionWrapper::Data {
             destructionCallback(reference);
         }
     }
+
+    Data(HandleRequestFunction handleRequestFunction, void *reference, DestructionCallbackFunction destructionCallback)
+            : handleRequestFunction(move(handleRequestFunction)), reference(reference),
+              destructionCallback(move(destructionCallback)) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(HandleRequestFunctionWrapper)
 
-NAWA_DEFAULT_CONSTRUCTOR_IMPL(HandleRequestFunctionWrapper)
-
-NAWA_COMPLEX_DATA_ACCESSORS_IMPL(HandleRequestFunctionWrapper, handleRequestFunction, HandleRequestFunction)
-
-NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(HandleRequestFunctionWrapper, reference, void *)
-
-NAWA_COMPLEX_DATA_ACCESSORS_IMPL(HandleRequestFunctionWrapper, destructionCallback, DestructionCallbackFunction)
-
 nawa::HandleRequestFunctionWrapper::HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction,
                                                                  void *reference,
-                                                                 DestructionCallbackFunction destructionCallback)
-        : HandleRequestFunctionWrapper() {
-    data->handleRequestFunction = move(handleRequestFunction);
-    data->reference = reference;
-    data->destructionCallback = move(destructionCallback);
+                                                                 DestructionCallbackFunction destructionCallback) {
+    data = make_unique<Data>(move(handleRequestFunction), reference, move(destructionCallback));
 }
 
 int nawa::HandleRequestFunctionWrapper::operator()(Connection &connection) const {
