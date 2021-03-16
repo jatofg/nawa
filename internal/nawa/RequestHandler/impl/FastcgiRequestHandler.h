@@ -51,6 +51,6 @@ namespace nawa {
 
         void join() noexcept override;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_FASTCGIREQUESTHANDLER_H
+#endif//NAWA_FASTCGIREQUESTHANDLER_H

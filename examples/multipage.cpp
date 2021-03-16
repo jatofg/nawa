@@ -27,14 +27,14 @@
 using namespace std;
 using namespace nawa;
 
-int init(AppInit &appInit) {
+int init(AppInit& appInit) {
 
     // enable access filtering
     appInit.accessFilters().filtersEnabled() = true;
 
     // apply forward filters for images below '/test/static/images' and '/test2/static/images ...
     ForwardFilter imageFilter;
-    imageFilter.pathFilter() = {{"test",  "static", "images"},
+    imageFilter.pathFilter() = {{"test", "static", "images"},
                                 {"test2", "static", "images"}};
     imageFilter.extensionFilter() = {"png", "jpeg", "jpg", "gif"};
     imageFilter.basePath() = "/var/www/multipage/images";
@@ -42,7 +42,7 @@ int init(AppInit &appInit) {
 
     // and block everything else in these directories
     BlockFilter blockNonImages;
-    blockNonImages.pathFilter() = {{"test",  "static", "images"},
+    blockNonImages.pathFilter() = {{"test", "static", "images"},
                                    {"test2", "static", "images"}};
     blockNonImages.extensionFilter() = {"png", "jpeg", "jpg", "gif"};
     blockNonImages.invertExtensionFilter() = true;
@@ -66,7 +66,7 @@ int init(AppInit &appInit) {
 
     // authenticate access to all static resources
     AuthFilter authFilter;
-    authFilter.pathFilter() = {{"test",  "static"},
+    authFilter.pathFilter() = {{"test", "static"},
                                {"test2", "static"}};
     authFilter.authName() = "Not for everyone!";
     authFilter.authFunction() = [](std::string user, std::string password) -> bool {
@@ -79,18 +79,18 @@ int init(AppInit &appInit) {
     return 0;
 }
 
-int handleRequest(Connection &connection) {
+int handleRequest(Connection& connection) {
 
     // we do not have to care about requests for static resources -- the filters are doing that for us!
 
     // shortcuts
-    auto &resp = connection.responseStream();
+    auto& resp = connection.responseStream();
     auto requestPath = connection.request().env().getRequestPath();
 
     resp << "<!DOCTYPE html><html><head>"
             "<title>nawa Multipage Example</title>"
             "</head><body><p>Request Path Elements: ";
-    for (auto const &e: requestPath) {
+    for (auto const& e : requestPath) {
         resp << e << ", ";
     }
     resp << "</p>";
@@ -105,7 +105,6 @@ int handleRequest(Connection &connection) {
 
             return 0;
         }
-
     }
 
     // otherwise, the index will be displayed

@@ -109,6 +109,6 @@ namespace nawa {
          */
         NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(Cookie, sameSite, SameSite);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_COOKIE_H
+#endif//NAWA_COOKIE_H

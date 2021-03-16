@@ -55,6 +55,6 @@ namespace nawa::hashing {
         [[nodiscard]] virtual bool verifyHash(std::string input, std::string hash) const = 0;
     };
 
-}
+}// namespace nawa::hashing
 
-#endif //NAWA_HASHINGENGINE_H
+#endif//NAWA_HASHINGENGINE_H

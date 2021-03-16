@@ -46,14 +46,14 @@ namespace nawa {
          * You can use this to modify the default configuration for every request during initialization.
          * @return Reference to the configuration.
          */
-        Config &config();
+        Config& config();
 
         /**
          * Contains the number of started worker threads for information purposes (e.g., to determine dimension of
          * thread pools).
          * @return Reference to the access filters container.
          */
-        AccessFilterList &accessFilters();
+        AccessFilterList& accessFilters();
 
         /**
          * Contains the number of started worker threads for information purposes (e.g., to determine dimension of
@@ -62,6 +62,6 @@ namespace nawa {
          */
         size_t getNumThreads();
     };
-}
+}// namespace nawa
 
-#endif //NAWA_APPINIT_H
+#endif//NAWA_APPINIT_H

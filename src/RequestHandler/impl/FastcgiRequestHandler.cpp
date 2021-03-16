@@ -46,39 +46,40 @@ namespace {
         NONSTANDARD,
         ALWAYS
     };
-}
 
-class FastcgippRequestAdapter : public Fastcgipp::Request<char> {
-    shared_ptr<string> rawPost;
-public:
-    /**
-     * Request handling happens through a child class of Fastcgipp::Request. All necessary objects from outside that
-     * we need are induced by the fastcgipp-lite manager (which has been modified to achieve that).
-     */
-    FastcgippRequestAdapter() : Fastcgipp::Request<char>() {}
+    class FastcgippRequestAdapter : public Fastcgipp::Request<char> {
+        shared_ptr<string> rawPost;
 
-    /**
-     * The response function is responsible for handling the request in fastcgipp-lite.
-     * @return true, to indicate that we handled the request
-     */
-    bool response() override;
+    public:
+        /**
+         * Request handling happens through a child class of Fastcgipp::Request. All necessary objects from outside that
+         * we need are induced by the fastcgipp-lite manager (which has been modified to achieve that).
+         */
+        FastcgippRequestAdapter() : Fastcgipp::Request<char>() {}
 
-    /**
-     * The inProcessor function tells fastcgipp-lite processes POST data and tells fastcgipp-lite what to do with it
-     * afterwards.
-     * @return false, to indicate that the multimaps should still be filled by the library
-     */
-    bool inProcessor() override;
-};
+        /**
+         * The response function is responsible for handling the request in fastcgipp-lite.
+         * @return true, to indicate that we handled the request
+         */
+        bool response() override;
+
+        /**
+         * The inProcessor function tells fastcgipp-lite processes POST data and tells fastcgipp-lite what to do with it
+         * afterwards.
+         * @return false, to indicate that the multimaps should still be filled by the library
+         */
+        bool inProcessor() override;
+    };
+}// namespace
 
 bool FastcgippRequestAdapter::response() {
     RequestInitContainer requestInit;
-    auto requestHandler = any_cast<RequestHandler *>(m_externalObject);
+    auto requestHandler = any_cast<RequestHandler*>(m_externalObject);
 
     // fill environment
     {
-        auto const &renv = environment();
-        auto renvp = [&](const string &k) {
+        auto const& renv = environment();
+        auto renvp = [&](string const& k) {
             return renv.parameters.count(k) ? renv.parameters.at(k) : string();
         };
         requestInit.environment = {
@@ -103,7 +104,7 @@ bool FastcgippRequestAdapter::response() {
             requestInit.environment["FULL_URL_WITHOUT_QS"] = baseUrl.str();
         }
 
-        for (const auto&[k, v]: renv.parameters) {
+        for (auto const& [k, v] : renv.parameters) {
             string envKey;
             // parameters starting with HTTP_ are usually HTTP headers
             // convert them so they should match their original name (lowercase), e.g., HTTP_USER_AGENT => user-agent
@@ -131,11 +132,9 @@ bool FastcgippRequestAdapter::response() {
 
         // POST files
         // TODO use MimeMultipart
-        for (auto const &[k, fcgiFile]: renv.files) {
-            requestInit.postFiles.insert({k, File(fcgiFile.data, fcgiFile.size).filename(fcgiFile.filename).contentType(
-                    fcgiFile.contentType)});
+        for (auto const& [k, fcgiFile] : renv.files) {
+            requestInit.postFiles.insert({k, File(fcgiFile.data, fcgiFile.size).filename(fcgiFile.filename).contentType(fcgiFile.contentType)});
         }
-
     }
 
     ConnectionInitContainer connectionInit;
@@ -159,15 +158,13 @@ bool FastcgippRequestAdapter::response() {
 }
 
 bool FastcgippRequestAdapter::inProcessor() {
-    auto requestHandler = any_cast<RequestHandler *>(m_externalObject);
+    auto requestHandler = any_cast<RequestHandler*>(m_externalObject);
     auto postContentType = environment().contentType;
     auto configPtr = requestHandler->getConfig();
 
     string rawPostAccess = (*configPtr)[{"post", "raw_access"}];
-    if (postContentType.empty() || rawPostAccess == "never" || (rawPostAccess != "always" &&
-                                                                (postContentType == "multipart/form-data" ||
-                                                                 postContentType ==
-                                                                 "application/x-www-form-urlencoded"))) {
+    if (postContentType.empty() || rawPostAccess == "never" ||
+        (rawPostAccess != "always" && (postContentType == "multipart/form-data" || postContentType == "application/x-www-form-urlencoded"))) {
         return false;
     }
 
@@ -193,15 +190,15 @@ FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWra
     size_t postMax = 0;
     try {
         postMax = configPtr->isSet({"post", "max_size"})
-                  ? static_cast<size_t>(stoul((*configPtr)[{"post", "max_size"}])) * 1024 : 0;
-    }
-    catch (invalid_argument &e) {
+                          ? static_cast<size_t>(stoul((*configPtr)[{"post", "max_size"}])) * 1024
+                          : 0;
+    } catch (invalid_argument& e) {
         NLOG_WARNING(logger, "WARNING: Invalid value given for post/max_size given in the config file.")
     }
 
     // set up fastcgilite logging
     Fastcgipp::Logging::addHeader = false;
-    Fastcgipp::Logging::logFunction = [&](const string &msg, Fastcgipp::Logging::Level level) {
+    Fastcgipp::Logging::logFunction = [&](string const& msg, Fastcgipp::Logging::Level level) {
         Log::Level nawaLevel;
         switch (level) {
             case Fastcgipp::Logging::INFO:
@@ -226,17 +223,20 @@ FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWra
 
     // TODO it should be possible to change postMax after fastcgilite manager creation
     data->fastcgippManager = make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, postMax,
-                                                                                      static_cast<RequestHandler *>(this));
+                                                                                      static_cast<RequestHandler*>(this));
 
     // socket handling
     string mode = (*configPtr)[{"fastcgi", "mode"}];
     if (mode == "tcp") {
         auto fastcgiListen = (*configPtr)[{"fastcgi", "listen"}];
         auto fastcgiPort = (*configPtr)[{"fastcgi", "port"}];
-        if (fastcgiListen.empty()) fastcgiListen = "127.0.0.1";
-        const char *fastcgiListenC = fastcgiListen.c_str();
-        if (fastcgiListen == "all") fastcgiListenC = nullptr;
-        if (fastcgiPort.empty()) fastcgiPort = "8000";
+        if (fastcgiListen.empty())
+            fastcgiListen = "127.0.0.1";
+        char const* fastcgiListenC = fastcgiListen.c_str();
+        if (fastcgiListen == "all")
+            fastcgiListenC = nullptr;
+        if (fastcgiPort.empty())
+            fastcgiPort = "8000";
         if (!data->fastcgippManager->listen(fastcgiListenC, fastcgiPort.c_str())) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             "Could not create TCP socket for FastCGI.");
@@ -246,8 +246,8 @@ FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWra
         string permStr = (*configPtr)[{"fastcgi", "permissions"}];
         // convert the value from the config file
         if (!permStr.empty()) {
-            const char *psptr = permStr.c_str();
-            char *endptr;
+            char const* psptr = permStr.c_str();
+            char* endptr;
             long perm = strtol(psptr, &endptr, 8);
             if (*endptr == '\0') {
                 permissions = (uint32_t) perm;
@@ -266,7 +266,6 @@ FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWra
                                             fastcgiGroup.empty() ? nullptr : fastcgiGroup.c_str())) {
             throw Exception(__PRETTY_FUNCTION__, 2,
                             "Could not create UNIX socket for FastCGI.");
-
         }
     } else {
         throw Exception(__PRETTY_FUNCTION__, 3,

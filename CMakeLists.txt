@@ -181,6 +181,7 @@ target_include_directories(nawarun PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs>
         $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
@@ -196,6 +197,7 @@ if (BuildSharedLib OR BuildTests)
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs>
             $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
             $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)

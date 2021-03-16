@@ -90,6 +90,6 @@ namespace nawa {
          */
         [[nodiscard]] bool isValid() const;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_EMAILADDRESS_H
+#endif//NAWA_EMAILADDRESS_H

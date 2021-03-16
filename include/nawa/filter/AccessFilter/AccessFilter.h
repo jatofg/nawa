@@ -118,8 +118,8 @@ namespace nawa {
          * @param requestPath The request path of the current request.
          * @return True if the filter matches, false otherwise.
          */
-        bool matches(const std::vector<std::string> &requestPath) const;
+        [[nodiscard]] bool matches(std::vector<std::string> const& requestPath) const;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_ACCESSFILTER_H
+#endif//NAWA_ACCESSFILTER_H

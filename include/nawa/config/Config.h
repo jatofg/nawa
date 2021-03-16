@@ -52,7 +52,7 @@ namespace nawa {
          * Construct Config container and directly parse an ini file. Throws an Exception on failure.
          * @param iniFile ini file to parse, values will be added to the Config container.
          */
-        explicit Config(const std::string &iniFile);
+        explicit Config(std::string const& iniFile);
 
         /**
          * Construct Config container based on values from an initializer list.
@@ -65,7 +65,7 @@ namespace nawa {
          * ignored, not overwritten. Throws a SysException on failure.
          * @param iniFile ini file to parse and import values from.
          */
-        void read(const std::string &iniFile);
+        void read(std::string const& iniFile);
 
         /**
          * Insert values from an initializer list. If a key is already set, the element will be ignored, not
@@ -78,14 +78,14 @@ namespace nawa {
          * Sets the elements form the vector to the given values (or inserts them, if they did not exist yet).
          * @param overrides Vector containing key-value pairs, wherein the keys are section-key pairs.
          */
-        void override(const std::vector<std::pair<std::pair<std::string, std::string>, std::string>> &overrides);
+        void override(std::vector<std::pair<std::pair<std::string, std::string>, std::string>> const& overrides);
 
         /**
          * Check whether a key exists in this Config container.
          * @param key Key (pair of section and name of the value) to check for.
          * @return True if the key exists, false if not.
          */
-        [[nodiscard]] bool isSet(const std::pair<std::string, std::string> &key) const;
+        [[nodiscard]] bool isSet(std::pair<std::string, std::string> const& key) const;
 
         /**
          * Get the value belonging to the specified key from the Config container.
@@ -93,7 +93,7 @@ namespace nawa {
          * @return The value belonging to the key if it exists, an empty string otherwise (for distinguishing between
          * an empty value and a non-existing one, use the isSet() function).
          */
-        std::string operator[](const std::pair<std::string, std::string> &key) const;
+        std::string operator[](std::pair<std::string, std::string> const& key) const;
 
         /**
          * Set a key to a new value or insert a new key with the given value.
@@ -110,6 +110,6 @@ namespace nawa {
          */
         void set(std::string section, std::string key, std::string value);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_CONFIG_H
+#endif//NAWA_CONFIG_H

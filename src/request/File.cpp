@@ -56,7 +56,7 @@ File::File(std::shared_ptr<char[]> dataPtr, size_t size) {
     data = make_unique<Data>(move(dataPtr), size);
 }
 
-File::File(const std::string &data) {
+File::File(std::string const& data) {
     shared_ptr<char[]> dataPtr(new char[data.size()]);
     memcpy(dataPtr.get(), data.c_str(), data.size());
     this->data = make_unique<Data>(move(dataPtr), data.size());
@@ -70,7 +70,7 @@ string File::toString() const {
     return string(data->dataPtr.get(), data->size);
 }
 
-void File::writeToDisk(const string &path) const {
+void File::writeToDisk(string const& path) const {
     ofstream outfile;
     ios_base::iostate exceptionMask = outfile.exceptions() | ios::failbit;
     outfile.exceptions(exceptionMask);
@@ -78,8 +78,7 @@ void File::writeToDisk(const string &path) const {
         outfile.open(path, ofstream::out | ofstream::binary);
         outfile.write(data->dataPtr.get(), data->size);
         outfile.close();
-    }
-    catch (ios_base::failure &e) {
+    } catch (ios_base::failure const& e) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Could not write file to disk.", e.what());
     }
 }

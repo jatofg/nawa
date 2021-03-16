@@ -50,10 +50,10 @@ NAWA_COMPLEX_DATA_ACCESSORS_IMPL(SimpleEmail, text, string)
 
 NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(SimpleEmail, quotedPrintableEncode, bool)
 
-string SimpleEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules) const {
+string SimpleEmail::getRaw(shared_ptr<ReplacementRules> const& replacementRules) const {
     stringstream ret;
 
-    for (auto const &e: headers()) {
+    for (auto const& e : headers()) {
         if (e.first == "MIME-Version" || (data->quotedPrintableEncode && e.first == "Content-Transfer-Encoding"))
             continue;
         ret << e.first << ": " << e.second << "\r\n";
@@ -63,10 +63,10 @@ string SimpleEmail::getRaw(const shared_ptr<ReplacementRules> &replacementRules)
     if (data->quotedPrintableEncode) {
         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
         ret << encoding::quotedPrintableEncode(
-                replacementRules ? string_replace(data->text, *replacementRules) : data->text
-        );
+                replacementRules ? string_replace(data->text, *replacementRules) : data->text);
     } else {
-        ret << "\r\n" << (replacementRules ? string_replace(data->text, *replacementRules) : data->text);
+        ret << "\r\n"
+            << (replacementRules ? string_replace(data->text, *replacementRules) : data->text);
     }
 
     return ret.str();

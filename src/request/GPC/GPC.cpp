@@ -36,7 +36,7 @@ struct request::GPC::Data {
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, GPC)
 
-request::GPC::GPC(const RequestInitContainer &requestInit, Source source) {
+request::GPC::GPC(RequestInitContainer const& requestInit, Source source) {
     data = make_unique<Data>(source);
 
     switch (source) {
@@ -51,13 +51,15 @@ request::GPC::GPC(const RequestInitContainer &requestInit, Source source) {
     }
 }
 
-string request::GPC::operator[](const string &gpcVar) const {
+string request::GPC::operator[](string const& gpcVar) const {
     auto e = data->dataMap.find(gpcVar);
-    if (e != data->dataMap.end()) return e->second;
-    else return "";
+    if (e != data->dataMap.end())
+        return e->second;
+    else
+        return "";
 }
 
-vector<string> request::GPC::getVector(const string &gpcVar) const {
+vector<string> request::GPC::getVector(string const& gpcVar) const {
     vector<string> ret;
     auto e = data->dataMap.equal_range(gpcVar);
     for (auto it = e.first; it != e.second; ++it) {
@@ -66,11 +68,11 @@ vector<string> request::GPC::getVector(const string &gpcVar) const {
     return ret;
 }
 
-size_t request::GPC::count(const string &gpcVar) const {
+size_t request::GPC::count(string const& gpcVar) const {
     return data->dataMap.count(gpcVar);
 }
 
-unordered_multimap<string, string> const &request::GPC::getMultimap() const {
+unordered_multimap<string, string> const& request::GPC::getMultimap() const {
     return data->dataMap;
 }
 

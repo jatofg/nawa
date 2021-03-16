@@ -37,9 +37,9 @@ namespace nawa {
          * Callback function which takes a `nawa::FlushCallbackContainer` and flushes the response to the user.
          */
         FlushCallbackFunction flushCallback;
-        Config config; /**< The NAWA config. */
+        Config config;                    /**< The NAWA config. */
         RequestInitContainer requestInit; /**< The RequestInitContainer containing necessary request data. */
     };
-}
+}// namespace nawa
 
-#endif //NAWA_CONNECTIONINITCONTAINER_H
+#endif//NAWA_CONNECTIONINITCONTAINER_H

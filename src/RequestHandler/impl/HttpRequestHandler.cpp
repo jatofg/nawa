@@ -49,33 +49,34 @@ namespace {
         ALWAYS
     };
 
-    auto sendServerError = [](HttpServer::connection_ptr &httpConn) {
+    auto sendServerError = [](HttpServer::connection_ptr& httpConn) {
         httpConn->set_status(HttpServer::connection::internal_server_error);
         httpConn->set_headers(unordered_multimap<string, string>({{"content-type", "text/html; charset=utf-8"}}));
         httpConn->write(generate_error_page(500));
     };
 
-    inline string getListenAddr(shared_ptr<Config const> const &configPtr) {
+    inline string getListenAddr(shared_ptr<Config const> const& configPtr) {
         return (*configPtr)[{"http", "listen"}].empty() ? "127.0.0.1" : (*configPtr)[{"http", "listen"}];
     }
 
-    inline string getListenPort(shared_ptr<Config const> const &configPtr) {
-        return (*configPtr)[{"http", "port"}].empty() ? "8080" : (*configPtr)[{"http", "port"}];;
+    inline string getListenPort(shared_ptr<Config const> const& configPtr) {
+        return (*configPtr)[{"http", "port"}].empty() ? "8080" : (*configPtr)[{"http", "port"}];
+        ;
     }
-}
+}// namespace
 
 struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsumingHttpHandler> {
-    RequestHandler *requestHandler = nullptr;
+    RequestHandler* requestHandler = nullptr;
     ConnectionInitContainer connectionInit;
     ssize_t maxPostSize;
     size_t expectedSize;
     string postBody;
     RawPostAccess rawPostAccess;
 
-    InputConsumingHttpHandler(RequestHandler *requestHandler, ConnectionInitContainer connectionInit,
+    InputConsumingHttpHandler(RequestHandler* requestHandler, ConnectionInitContainer connectionInit,
                               ssize_t maxPostSize, size_t expectedSize, RawPostAccess rawPostAccess)
-            : requestHandler(requestHandler), connectionInit(move(connectionInit)), maxPostSize(maxPostSize),
-              expectedSize(expectedSize), rawPostAccess(rawPostAccess) {}
+        : requestHandler(requestHandler), connectionInit(move(connectionInit)), maxPostSize(maxPostSize),
+          expectedSize(expectedSize), rawPostAccess(rawPostAccess) {}
 
     void operator()(HttpServer::connection::input_range input, boost::system::error_code ec,
                     size_t bytesTransferred, HttpServer::connection_ptr httpConn) {
@@ -109,7 +110,7 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         string const multipartContentType = "multipart/form-data";
         string const plainTextContentType = "text/plain";
         auto postContentType = to_lowercase(connectionInit.requestInit.environment["content-type"]);
-        auto &requestInit = connectionInit.requestInit;
+        auto& requestInit = connectionInit.requestInit;
 
         if (rawPostAccess == RawPostAccess::ALWAYS) {
             requestInit.rawPost = make_shared<string>(postBody);
@@ -121,18 +122,18 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
             try {
                 MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
-                for (auto const &p: postData.parts()) {
+                for (auto const& p : postData.parts()) {
                     // find out whether the part is a file
                     if (!p.filename().empty() || (!p.contentType().empty() &&
                                                   p.contentType().substr(0, plainTextContentType.length()) !=
-                                                  plainTextContentType)) {
+                                                          plainTextContentType)) {
                         File pf = File(p.content()).contentType(p.contentType()).filename(p.filename());
                         requestInit.postFiles.insert({p.partName(), move(pf)});
                     } else {
                         requestInit.postVars.insert({p.partName(), p.content()});
                     }
                 }
-            } catch (Exception const &) {}
+            } catch (Exception const&) {}
         } else if (rawPostAccess == RawPostAccess::NONSTANDARD) {
             requestInit.rawPost = make_shared<string>(move(postBody));
         }
@@ -141,31 +142,30 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
         Connection connection(connectionInit);
         requestHandler->handleRequest(connection);
         connection.flushResponse();
-
     }
 };
 
 struct HttpHandler {
-    RequestHandler *requestHandler = nullptr;
+    RequestHandler* requestHandler = nullptr;
 
-    void operator()(HttpServer::request const &request, HttpServer::connection_ptr httpConn) {
+    void operator()(HttpServer::request const& request, HttpServer::connection_ptr httpConn) {
         auto configPtr = requestHandler->getConfig();
 
         RequestInitContainer requestInit;
         requestInit.environment = {
-                {"REMOTE_ADDR",     request.source.substr(0, request.source.find_first_of(':'))},
-                {"REQUEST_URI",     request.destination},
-                {"REMOTE_PORT",     to_string(request.source_port)},
-                {"REQUEST_METHOD",  request.method},
-                {"SERVER_ADDR",     getListenAddr(configPtr)},
-                {"SERVER_PORT",     getListenPort(configPtr)},
+                {"REMOTE_ADDR", request.source.substr(0, request.source.find_first_of(':'))},
+                {"REQUEST_URI", request.destination},
+                {"REMOTE_PORT", to_string(request.source_port)},
+                {"REQUEST_METHOD", request.method},
+                {"SERVER_ADDR", getListenAddr(configPtr)},
+                {"SERVER_PORT", getListenPort(configPtr)},
                 {"SERVER_SOFTWARE", "NAWA Development Web Server"},
         };
 
         // evaluate request headers
         // TODO accept languages (split), split acceptContentTypes?, acceptCharsets (where to find?)
         //      - consistent names for other elements in req handlers?
-        for (auto const &h: request.headers) {
+        for (auto const& h : request.headers) {
             if (requestInit.environment.count(to_lowercase(h.name)) == 0) {
                 requestInit.environment[to_lowercase(h.name)] = h.value;
             }
@@ -211,8 +211,9 @@ struct HttpHandler {
             try {
                 string rawPostStr = (*configPtr)[{"post", "raw_access"}];
                 auto rawPostAccess = (rawPostStr == "never")
-                                     ? RawPostAccess::NEVER : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
-                                                                                        : RawPostAccess::NONSTANDARD);
+                                             ? RawPostAccess::NEVER
+                                             : ((rawPostStr == "always") ? RawPostAccess::ALWAYS
+                                                                         : RawPostAccess::NONSTANDARD);
 
                 auto contentLength = stoul(connectionInit.requestInit.environment.at("content-length"));
                 ssize_t maxPostSize = stol((*configPtr)[{"post", "max_size"}]) * 1024;
@@ -230,14 +231,14 @@ struct HttpHandler {
                                                        HttpServer::connection_ptr httpConn) {
                     (*inputConsumingHandler)(input, ec, bytesTransferred, httpConn);
                 });
-            } catch (const invalid_argument &) {} catch (const out_of_range &) {}
+            } catch (invalid_argument const&) {
+            } catch (out_of_range const&) {}
             return;
         }
 
         Connection connection(connectionInit);
         requestHandler->handleRequest(connection);
         connection.flushResponse();
-
     }
 };
 
@@ -278,7 +279,7 @@ HttpRequestHandler::HttpRequestHandler(shared_ptr<HandleRequestFunctionWrapper> 
 
     try {
         data->server->listen();
-    } catch (exception const &e) {
+    } catch (exception const& e) {
         throw Exception(__PRETTY_FUNCTION__, 1,
                         "Could not listen to host/port.", e.what());
     }
@@ -289,7 +290,7 @@ HttpRequestHandler::~HttpRequestHandler() {
         data->server->stop();
     }
     if (!data->joined) {
-        for (auto &t: data->threadPool) {
+        for (auto& t : data->threadPool) {
             t.join();
         }
         data->threadPool.clear();
@@ -309,7 +310,7 @@ void HttpRequestHandler::start() {
                 data->threadPool.emplace_back([this] { data->server->run(); });
             }
             data->requestHandlingActive = true;
-        } catch (exception const &e) {
+        } catch (exception const& e) {
             throw Exception(__PRETTY_FUNCTION__, 1,
                             string("An error occurred during start of request handling."),
                             e.what());
@@ -342,7 +343,7 @@ void HttpRequestHandler::join() noexcept {
     if (data->joined) {
         return;
     }
-    for (auto &t: data->threadPool) {
+    for (auto& t : data->threadPool) {
         t.join();
     }
     data->joined = true;

@@ -39,20 +39,20 @@ namespace {
         ~DestructionDetector() { destructed = true; }
     } destructionDetector;
 
-    bool locked = false; /**< If true, the stream and outfile cannot be changed anymore. */
-    ostream *out; /**< Stream to send the logging output to. */
-    ofstream logFile; /**< Log file handle in case a file is used and managed by this class. */
+    bool locked = false;                                /**< If true, the stream and outfile cannot be changed anymore. */
+    ostream* out;                                       /**< Stream to send the logging output to. */
+    ofstream logFile;                                   /**< Log file handle in case a file is used and managed by this class. */
     Log::Level outputLevel = Log::Level::INFORMATIONAL; /**< Output log level. */
-    bool extendedFormat = false; /**< Use the extended, systemd-style logging. */
+    bool extendedFormat = false;                        /**< Use the extended, systemd-style logging. */
     unique_ptr<string> hostnameStr;
     pid_t pid = 0;
     atomic_uint instanceCount(0);
     mutex outLock;
-}
+}// namespace
 
 struct Log::Data {
     std::string appname; /**< Name of the current app, appears in brackets in the log. */
-    Level defaultLevel; /**< Default log level of this logger object. */
+    Level defaultLevel;  /**< Default log level of this logger object. */
 
     explicit Data(Level defaultLevel = Level::INFORMATIONAL) : defaultLevel(defaultLevel) {}
 };
@@ -78,21 +78,21 @@ Log::Log() noexcept {
     ++instanceCount;
 }
 
-Log::Log(string appname_, Level level) noexcept: Log() {
-    data->appname = move(appname_);
+Log::Log(string appname, Level level) noexcept : Log() {
+    data->appname = move(appname);
     data->defaultLevel = level;
 }
 
-Log::Log(Level level) noexcept: Log() {
+Log::Log(Level level) noexcept : Log() {
     data->defaultLevel = level;
 }
 
-Log::Log(const Log &other) noexcept {
+Log::Log(Log const& other) noexcept {
     data = make_unique<Data>(*other.data);
     ++instanceCount;
 }
 
-Log &Log::operator=(const Log &other) noexcept {
+Log& Log::operator=(Log const& other) noexcept {
     if (this != &other) {
         *data = *other.data;
         ++instanceCount;
@@ -116,13 +116,13 @@ Log::~Log() {
     }
 }
 
-void Log::setStream(ostream *os) noexcept {
+void Log::setStream(ostream* os) noexcept {
     if (!locked) {
         out = os;
     }
 }
 
-void Log::setOutfile(const string &filename) {
+void Log::setOutfile(string const& filename) {
     if (!locked) {
         if (logFile.is_open()) {
             logFile.close();
@@ -156,19 +156,19 @@ bool Log::isLocked() noexcept {
     return locked;
 }
 
-void Log::setAppname(string appname_) noexcept {
-    data->appname = move(appname_);
+void Log::setAppname(string appname) noexcept {
+    data->appname = move(appname);
 }
 
 void Log::setDefaultLogLevel(Level level) noexcept {
     data->defaultLevel = level;
 }
 
-void Log::write(const std::string &msg) {
+void Log::write(string const& msg) {
     write(msg, data->defaultLevel);
 }
 
-void Log::write(const string &msg, Level level) {
+void Log::write(string const& msg, Level level) {
     if (level <= outputLevel && outputLevel != Level::OFF && level != Level::OFF) {
         auto now = time(nullptr);
         lock_guard<mutex> l(outLock);
@@ -181,10 +181,10 @@ void Log::write(const string &msg, Level level) {
     }
 }
 
-void Log::operator()(const std::string &msg) {
+void Log::operator()(string const& msg) {
     write(msg, data->defaultLevel);
 }
 
-void Log::operator()(const string &msg, Level level) {
+void Log::operator()(string const& msg, Level level) {
     write(msg, level);
 }

@@ -63,7 +63,7 @@ namespace {
         }
         isInputDataInitialized = true;
     }
-}
+}// namespace
 
 TEST_CASE("nawa::Encoding functions", "[encoding]") {
     initializeInputDataIfNotYetDone();
@@ -130,5 +130,4 @@ TEST_CASE("nawa::Crypto functions", "[crypto]") {
         REQUIRE(crypto::passwordVerify(decoded, hashedPw_i));
         REQUIRE(crypto::passwordVerify(decoded, hashedPw_d));
     }
-
 }

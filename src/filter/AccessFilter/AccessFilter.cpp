@@ -66,11 +66,11 @@ NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, regexFilter, regex)
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, response, string)
 
-bool nawa::AccessFilter::matches(const vector<string> &requestPath) const {
+bool nawa::AccessFilter::matches(vector<string> const& requestPath) const {
     if (!data->pathFilter.empty()) {
         // one of the paths in the path filter must match for the path filter to match
         bool pathFilterMatches = false;
-        for (auto const &filter: data->pathFilter) {
+        for (auto const& filter : data->pathFilter) {
             // path condition is set but does not match -> the whole filter does not match
             // all elements of the filter path must be in the request path
             if (requestPath.size() < filter.size()) {
@@ -96,7 +96,7 @@ bool nawa::AccessFilter::matches(const vector<string> &requestPath) const {
     if (!data->extensionFilter.empty()) {
         auto fileExtension = get_file_extension(requestPath.back());
         bool extensionFilterMatches = false;
-        for (auto const &e: data->extensionFilter) {
+        for (auto const& e : data->extensionFilter) {
             if (fileExtension == e) {
                 extensionFilterMatches = true;
                 break;
@@ -112,7 +112,7 @@ bool nawa::AccessFilter::matches(const vector<string> &requestPath) const {
     if (data->regexFilterEnabled) {
         // merge request path to string
         stringstream pathStr;
-        for (auto const &e: requestPath) {
+        for (auto const& e : requestPath) {
             pathStr << '/' << e;
         }
         if (!regex_match(pathStr.str(), data->regexFilter))

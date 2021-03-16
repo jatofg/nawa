@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../../libs/libbcrypt/bcrypt.h"
 #include <cstring>
+#include <libbcrypt/bcrypt.h>
 #include <nawa/Exception.h>
 #include <nawa/hashing/HashingEngine/impl/BcryptHashingEngine.h>
 

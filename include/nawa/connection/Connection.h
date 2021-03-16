@@ -48,19 +48,19 @@ namespace nawa {
          * The Request object representing the current request.
          * @return Reference to the Request object.
          */
-        [[nodiscard]] nawa::Request const &request() const noexcept;
+        [[nodiscard]] nawa::Request const& request() const noexcept;
 
         /**
          * The Session object for accessing the current session.
          * @return Reference to the Session object.
          */
-        nawa::Session &session() noexcept;
+        nawa::Session& session() noexcept;
 
         /**
          * The Session object for accessing the current session.
          * @return Reference to the Session object.
          */
-        [[nodiscard]] nawa::Session const &session() const noexcept;
+        [[nodiscard]] nawa::Session const& session() const noexcept;
 
         /**
          * Access the NAWA configuration. This is a copy of the Config object that contains the values of the config file
@@ -68,26 +68,26 @@ namespace nawa {
          * these changes only affect the current connection.
          * @return Reference to the Config object.
          */
-        nawa::Config &config() noexcept;
+        nawa::Config& config() noexcept;
 
         /**
          * Access the NAWA configuration. This is a copy of the Config object that contains the values of the config file
          * which was read at the startup of NAWA.
          * @return Reference to the Config object.
          */
-        [[nodiscard]] nawa::Config const &config() const noexcept;
+        [[nodiscard]] nawa::Config const& config() const noexcept;
 
         /**
          * Stream which allows you to write stuff to the HTTP body comfortably.
          * @return Reference to the response ostream.
          */
-        std::ostream &responseStream() noexcept;
+        std::ostream& responseStream() noexcept;
 
         /**
          * Create a Connection object.
          * @param connectionInit The ConnectionInitContainer object containing the necessary parameters.
          */
-        explicit Connection(ConnectionInitContainer const &connectionInit);
+        explicit Connection(ConnectionInitContainer const& connectionInit);
 
         /**
          * Set the HTTP response body (everything that comes after the headers). This will overwrite everything
@@ -138,7 +138,7 @@ namespace nawa {
          * @param cookie Cookie object containing the value and options of the cookie.
          * Valid characters in the cookie content (as regex): [A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]
          */
-        void setCookie(const std::string &key, Cookie cookie);
+        void setCookie(std::string const& key, Cookie cookie);
 
         /**
          * Set a new HTTP cookie or overwrite the cookie with the given key. This function will create a Cookie 
@@ -148,14 +148,14 @@ namespace nawa {
          * @param key Key of the cookie. Valid characters in the key (as regex): [A-Za-z0-9!#$%&'*+\-.^_`|~]
          * @param cookieContent Cookie object containing the value and options of the cookie.
          */
-        void setCookie(const std::string &key, std::string cookieContent);
+        void setCookie(std::string const& key, std::string cookieContent);
 
         /**
          * Unset an HTTP cookie that was previously set using setCookie(). Will just do nothing if no cookie with the
          * given key exists. Won't remove a cookie from the user's browser, just undoes the `setCookie` operation.
          * @param key Key of the cookie.
          */
-        void unsetCookie(const std::string &key);
+        void unsetCookie(const std::string& key);
 
         /**
          * This method can be used to set default attributes for cookies. All attributes which are not set or enabled
@@ -180,8 +180,8 @@ namespace nawa {
          * the modification date of the file. Prepare a not-modified response and clear the body if the file has not
          * been modified. Using this parameter only makes sense if the client requested exactly this file, of course.
          */
-        void sendFile(const std::string &path, const std::string &contentType = "", bool forceDownload = false,
-                      const std::string &downloadFilename = "", bool checkIfModifiedSince = false);
+        void sendFile(std::string const& path, std::string const& contentType = "", bool forceDownload = false,
+                      std::string const& downloadFilename = "", bool checkIfModifiedSince = false);
 
         /**
          * Get the response body.
@@ -219,8 +219,8 @@ namespace nawa {
          * @return True if the request has been filtered and a response has already been set by this function
          * (and the app should not be invoked on this request). False if the app should handle this request.
          */
-        bool applyFilters(AccessFilterList const &accessFilters);
+        bool applyFilters(AccessFilterList const& accessFilters);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_RESPONSE_H
+#endif//NAWA_RESPONSE_H

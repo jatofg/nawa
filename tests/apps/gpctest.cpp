@@ -27,15 +27,15 @@
 using namespace nawa;
 using namespace std;
 
-int init(AppInit &appInit) {
+int init(AppInit& appInit) {
     return 0;
 }
 
-int handleRequest(Connection &connection) {
+int handleRequest(Connection& connection) {
 
-    auto &resp = connection.responseStream();
-    auto &req = connection.request();
-    auto &session = connection.session();
+    auto& resp = connection.responseStream();
+    auto& req = connection.request();
+    auto& session = connection.session();
 
     session.start();
 
@@ -47,7 +47,7 @@ int handleRequest(Connection &connection) {
             connection.setHeader("content-length", to_string(downloadFile.size()));
             connection.setResponseBody(downloadFile.toString());
             return 0;
-        } catch (const bad_any_cast &e) {
+        } catch (bad_any_cast const& e) {
             resp << "Bad any cast: " << e.what();
             return 0;
         }
@@ -56,13 +56,13 @@ int handleRequest(Connection &connection) {
     resp << "<!DOCTYPE html>\n"
             "<html><head><title>NAWA GPC Test</title></head><body>\n";
 
-    auto printEncoded = [&](const string &k, const string &v) {
+    auto printEncoded = [&](string const& k, string const& v) {
         resp << "<li>[" << encoding::htmlEncode(k) << "] = " << encoding::htmlEncode(v) << "</li>";
     };
 
     if (req.cookie()) {
         resp << "<p>COOKIE vars:</p><ul>";
-        for (auto const&[k, v]: req.cookie()) {
+        for (auto const& [k, v] : req.cookie()) {
             printEncoded(k, v);
         }
         resp << "</ul>";
@@ -70,7 +70,7 @@ int handleRequest(Connection &connection) {
 
     if (req.get()) {
         resp << "<p>GET vars:</p><ul>";
-        for (auto const&[k, v]: req.get()) {
+        for (auto const& [k, v] : req.get()) {
             printEncoded(k, v);
         }
         resp << "</ul>";
@@ -78,7 +78,7 @@ int handleRequest(Connection &connection) {
 
     if (req.post()) {
         resp << "<p>POST vars (without files):</p><ul>";
-        for (auto const&[k, v]: req.post()) {
+        for (auto const& [k, v] : req.post()) {
             printEncoded(k, v);
         }
         resp << "</ul>";
@@ -86,7 +86,7 @@ int handleRequest(Connection &connection) {
 
     if (req.post().hasFiles()) {
         resp << "<p>POST files:</p><ul>";
-        for (auto const&[k, v]: req.post().getFileMultimap()) {
+        for (auto const& [k, v] : req.post().getFileMultimap()) {
             // skip empty files
             if (v.size() == 0) {
                 continue;

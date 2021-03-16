@@ -39,7 +39,7 @@ namespace {
      * @param email Email to check and modify.
      * @param from EmailAddress object to set the From header from, if necessary.
      */
-    void addMissingHeaders(shared_ptr<Email> &email, const shared_ptr<EmailAddress> &from) {
+    void addMissingHeaders(shared_ptr<Email>& email, shared_ptr<EmailAddress> const& from) {
         if (!email->headers().count("Date")) {
             email->headers()["Date"] = make_smtp_time(time(nullptr));
         }
@@ -47,8 +47,7 @@ namespace {
             email->headers()["From"] = from->get();
         }
         unsigned long atPos;
-        if (!email->headers().count("Message-ID") && !from->address().empty()
-            && (atPos = from->address().find_last_of('@')) != string::npos) {
+        if (!email->headers().count("Message-ID") && !from->address().empty() && (atPos = from->address().find_last_of('@')) != string::npos) {
             stringstream mid;
             stringstream base;
             random_device rd;
@@ -69,7 +68,7 @@ namespace {
         std::vector<EmailAddress> recipients;
         std::shared_ptr<ReplacementRules> replacementRules;
     };
-}
+}// namespace
 
 struct SmtpMailer::Data {
     std::string serverDomain;
@@ -100,8 +99,7 @@ SmtpMailer::SmtpMailer(string serverDomain, unsigned int serverPort, SmtpMailer:
                              move(authPassword), connectionTimeout);
 }
 
-void
-SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
+void SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
     data->serverDomain = move(domain);
     data->serverPort = port;
     data->serverTlsMode = tlsMode;
@@ -126,8 +124,7 @@ void SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<Em
 void SmtpMailer::bulkEnqueue(shared_ptr<Email> email, vector<EmailAddress> recipients,
                              shared_ptr<EmailAddress> from, shared_ptr<ReplacementRules> replacementRules) {
     addMissingHeaders(email, from);
-    data->queue.push_back(QueueElem{.email=move(email), .from=move(from), .recipients=move(recipients),
-            .replacementRules=move(replacementRules)});
+    data->queue.push_back(QueueElem{.email = move(email), .from = move(from), .recipients = move(recipients), .replacementRules = move(replacementRules)});
 }
 
 void SmtpMailer::clearQueue() {
@@ -135,7 +132,7 @@ void SmtpMailer::clearQueue() {
 }
 
 void SmtpMailer::processQueue() const {
-    CURL *curl;
+    CURL* curl;
     CURLcode res = CURLE_OK;
 
     curl = curl_easy_init();
@@ -171,22 +168,22 @@ void SmtpMailer::processQueue() const {
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         }
 
-//        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-        FILE *devNull = fopen("/dev/null", "wb");
+        //        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+        FILE* devNull = fopen("/dev/null", "wb");
         curl_easy_setopt(curl, CURLOPT_STDERR, devNull);
 
         // connection timeout
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, data->connectionTimeout);
 
         // iterate queue
-        for (const auto &mail: data->queue) {
+        for (const auto& mail : data->queue) {
 
             // set sender
             curl_easy_setopt(curl, CURLOPT_MAIL_FROM, mail.from->get(false).c_str());
 
             // set recipients
-            curl_slist *recipients = nullptr;
-            for (const auto &to: mail.recipients) {
+            curl_slist* recipients = nullptr;
+            for (const auto& to : mail.recipients) {
                 recipients = curl_slist_append(recipients, to.get(false).c_str());
             }
             curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
@@ -194,8 +191,8 @@ void SmtpMailer::processQueue() const {
             // specify how to read the mail data
             string payload = mail.email->getRaw(mail.replacementRules);
             // fmemopen will create a FILE* to read from the string (curl expects that, unfortunately)
-            FILE *payloadFile = fmemopen((void *) payload.c_str(), payload.length(), "r");
-            curl_easy_setopt(curl, CURLOPT_READDATA, (void *) payloadFile);
+            FILE* payloadFile = fmemopen((void*) payload.c_str(), payload.length(), "r");
+            curl_easy_setopt(curl, CURLOPT_READDATA, (void*) payloadFile);
             curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
             // perform sending
@@ -211,12 +208,9 @@ void SmtpMailer::processQueue() const {
                 throw Exception(__PRETTY_FUNCTION__, 1,
                                 string("CURL error: ") + curl_easy_strerror(res));
             }
-
         }
 
         curl_easy_cleanup(curl);
         fclose(devNull);
-
     }
-
 }

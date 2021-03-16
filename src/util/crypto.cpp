@@ -30,85 +30,84 @@
 using namespace nawa;
 using namespace std;
 
-std::string crypto::sha1(const std::string &input, bool hex) {
-    auto sha1Base = (const unsigned char *) input.c_str();
+string crypto::sha1(string const& input, bool hex) {
+    auto sha1Base = (unsigned char const*) input.c_str();
     unsigned char sha1Hash[SHA_DIGEST_LENGTH];
     size_t sha1Size = input.size();
     SHA1(sha1Base, sha1Size, sha1Hash);
-    std::string ret((char *) sha1Hash, SHA_DIGEST_LENGTH);
+    string ret((char*) sha1Hash, SHA_DIGEST_LENGTH);
     if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string crypto::sha224(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char *) input.c_str();
+string crypto::sha224(string const& input, bool hex) {
+    auto sha2Base = (unsigned char const*) input.c_str();
     unsigned char sha2Hash[SHA224_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA224(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char *) sha2Hash, SHA224_DIGEST_LENGTH);
+    string ret((char*) sha2Hash, SHA224_DIGEST_LENGTH);
     if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string crypto::sha256(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char *) input.c_str();
+string crypto::sha256(string const& input, bool hex) {
+    auto sha2Base = (unsigned char const*) input.c_str();
     unsigned char sha2Hash[SHA256_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA256(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char *) sha2Hash, SHA256_DIGEST_LENGTH);
+    string ret((char*) sha2Hash, SHA256_DIGEST_LENGTH);
     if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string crypto::sha384(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char *) input.c_str();
+string crypto::sha384(string const& input, bool hex) {
+    auto sha2Base = (unsigned char const*) input.c_str();
     unsigned char sha2Hash[SHA384_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA384(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char *) sha2Hash, SHA384_DIGEST_LENGTH);
+    string ret((char*) sha2Hash, SHA384_DIGEST_LENGTH);
     if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string crypto::sha512(const std::string &input, bool hex) {
-    auto sha2Base = (const unsigned char *) input.c_str();
+string crypto::sha512(string const& input, bool hex) {
+    auto sha2Base = (unsigned char const*) input.c_str();
     unsigned char sha2Hash[SHA512_DIGEST_LENGTH];
     size_t sha2Size = input.size();
     SHA512(sha2Base, sha2Size, sha2Hash);
-    std::string ret((char *) sha2Hash, SHA512_DIGEST_LENGTH);
+    string ret((char*) sha2Hash, SHA512_DIGEST_LENGTH);
     if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string crypto::md5(const std::string &input, bool hex) {
-    auto md5Base = (const unsigned char *) input.c_str();
+string crypto::md5(string const& input, bool hex) {
+    auto md5Base = (unsigned char const*) input.c_str();
     unsigned char md5Hash[MD5_DIGEST_LENGTH];
     size_t md5Size = input.size();
     MD5(md5Base, md5Size, md5Hash);
-    std::string ret((char *) md5Hash, MD5_DIGEST_LENGTH);
+    string ret((char*) md5Hash, MD5_DIGEST_LENGTH);
     if (hex) {
         return hex_dump(ret);
     }
     return ret;
 }
 
-std::string crypto::passwordHash(const std::string &password, const hashing::HashingEngine &hashingEngine) {
+string crypto::passwordHash(string const& password, hashing::HashingEngine const& hashingEngine) {
     // use the provided HashingEngine for generation
     return hashingEngine.generateHash(password);
 }
 
-bool crypto::passwordVerify(const std::string &password, const std::string &hash,
-                            const hashing::HashTypeTable &hashTypeTable) {
+bool crypto::passwordVerify(string const& password, string const& hash, hashing::HashTypeTable const& hashTypeTable) {
     if (hash.empty()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Cannot verify an empty hash");
     }

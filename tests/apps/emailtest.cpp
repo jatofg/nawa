@@ -34,12 +34,12 @@
 using namespace nawa;
 using namespace std;
 
-int init(AppInit &appInit) {
+int init(AppInit& appInit) {
     return 0;
 }
 
-int handleRequest(Connection &connection) {
-    auto &resp = connection.responseStream();
+int handleRequest(Connection& connection) {
+    auto& resp = connection.responseStream();
 
     connection.setHeader("content-type", "text/plain; charset=utf-8");
 
@@ -98,7 +98,7 @@ int handleRequest(Connection &connection) {
     attachmentPart.contentDisposition() = "attachment; filename=test.png";
     try {
         attachmentPart.partData() = get_file_contents("/home/tobias/Pictures/testimage.png");
-    } catch (Exception const &e) {
+    } catch (Exception const& e) {
         resp << "!!! Specified image file could not be loaded: " << e.getMessage() << " !!!\r\n\r\n";
     }
 
@@ -130,13 +130,10 @@ int handleRequest(Connection &connection) {
         try {
             smtp.processQueue();
             resp << "Mail sent successfully!";
-        }
-        catch (const Exception &e) {
+        } catch (Exception const& e) {
             resp << "Error sending mail: " << e.getDebugMessage();
         }
-
     }
 
     return 0;
-
 }

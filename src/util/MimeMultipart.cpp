@@ -79,11 +79,11 @@ NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, content, string)
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart, parts, vector<MimeMultipart::Part>)
 
-MimeMultipart::MimeMultipart(const string &contentType, string content) : MimeMultipart() {
+MimeMultipart::MimeMultipart(string const& contentType, string content) : MimeMultipart() {
     parse(contentType, move(content));
 }
 
-void MimeMultipart::parse(const string &contentType, string content) {
+void MimeMultipart::parse(string const& contentType, string content) {
     regex findBoundary(R"X(boundary="?([A-Za-z0-9'()+_,\-.\/:=? ]+)"?)X");
     smatch boundaryMatch;
     if (!regex_search(contentType, boundaryMatch, findBoundary) || boundaryMatch.size() != 2) {
@@ -94,7 +94,7 @@ void MimeMultipart::parse(const string &contentType, string content) {
     size_t boundaryLen = boundary.length();
 
     regex matchPartAndFileName(R"X((;| )name="?([^"]+)"?(; ?filename="?([^"]+)"?)?)X");
-    auto extractPartAndFileName = [&](const string &contentDisposition) -> pair<string, string> {
+    auto extractPartAndFileName = [&](string const& contentDisposition) -> pair<string, string> {
         smatch sm;
         if (!regex_search(contentDisposition, sm, matchPartAndFileName) || sm.size() < 3) {
             return make_pair(string(), string());
@@ -140,7 +140,7 @@ void MimeMultipart::parse(const string &contentType, string content) {
         Part currentPart;
         currentPart.data->headers = parse_headers(content.substr(0, headersEndPos));
         currentPart.data->contentType = currentPart.data->headers.count("content-type") ? currentPart.data->headers.at(
-                "content-type")
+                                                                                                  "content-type")
                                                                                         : "";
         if (currentPart.data->headers.count("content-disposition")) {
             tie(currentPart.data->partName, currentPart.data->filename) = extractPartAndFileName(
@@ -154,7 +154,6 @@ void MimeMultipart::parse(const string &contentType, string content) {
 
         data->parts.push_back(currentPart);
         content = content.substr(nextBoundaryPos);
-
     }
 
     data->contentType = contentType.substr(0, contentType.find_first_of(';'));

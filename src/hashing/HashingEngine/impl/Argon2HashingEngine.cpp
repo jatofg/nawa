@@ -33,16 +33,16 @@ using namespace nawa;
 using namespace std;
 
 struct hashing::Argon2HashingEngine::Data {
-    Algorithm algorithm; /**< The Argon2 flavor to use. */
-    uint32_t timeCost; /**< Number of iterations. */
-    uint32_t memoryCost; /**< Memory usage in kiB. */
+    Algorithm algorithm;  /**< The Argon2 flavor to use. */
+    uint32_t timeCost;    /**< Number of iterations. */
+    uint32_t memoryCost;  /**< Memory usage in kiB. */
     uint32_t parallelism; /**< Number of threads used. */
-    string salt; /**< User-defined salt. */
-    size_t hashLen; /**< Desired length of the hash. */
+    string salt;          /**< User-defined salt. */
+    size_t hashLen;       /**< Desired length of the hash. */
 
     Data(Algorithm algorithm, uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism, string salt, size_t hashLen)
-            : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism),
-              salt(move(salt)), hashLen(hashLen) {}
+        : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism),
+          salt(move(salt)), hashLen(hashLen) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(hashing, Argon2HashingEngine)
@@ -94,20 +94,20 @@ string hashing::Argon2HashingEngine::generateHash(string input) const {
     switch (data->algorithm) {
         case Algorithm::ARGON2I:
             errorCode = argon2i_hash_encoded(data->timeCost, data->memoryCost, data->parallelism,
-                                             (void *) input.c_str(), input.length(),
-                                             (void *) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
+                                             (void*) input.c_str(), input.length(),
+                                             (void*) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
                                              encodedHashCeil);
             break;
         case Algorithm::ARGON2D:
             errorCode = argon2d_hash_encoded(data->timeCost, data->memoryCost, data->parallelism,
-                                             (void *) input.c_str(), input.length(),
-                                             (void *) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
+                                             (void*) input.c_str(), input.length(),
+                                             (void*) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
                                              encodedHashCeil);
             break;
         case Algorithm::ARGON2ID:
             errorCode = argon2id_hash_encoded(data->timeCost, data->memoryCost, data->parallelism,
-                                              (void *) input.c_str(), input.length(),
-                                              (void *) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
+                                              (void*) input.c_str(), input.length(),
+                                              (void*) actualSalt.c_str(), actualSalt.length(), data->hashLen, c_hash,
                                               encodedHashCeil);
             break;
     }
@@ -136,9 +136,12 @@ bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
     string salt1;
     string hash1;
     if (matches.size() == 9) {
-        if (matches[1] == "d") algorithm1 = Algorithm::ARGON2D;
-        else if (matches[1] == "id") algorithm1 = Algorithm::ARGON2ID;
-        else algorithm1 = Algorithm::ARGON2I;
+        if (matches[1] == "d")
+            algorithm1 = Algorithm::ARGON2D;
+        else if (matches[1] == "id")
+            algorithm1 = Algorithm::ARGON2ID;
+        else
+            algorithm1 = Algorithm::ARGON2I;
         try {
             version1 = stoul(matches[3]);
             memoryCost1 = stoul(matches[4]);
@@ -146,8 +149,7 @@ bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
             parallelism1 = stoul(matches[6]);
             salt1 = encoding::base64Decode(matches[7]);
             hash1 = encoding::base64Decode(matches[8]);
-        }
-        catch (...) {
+        } catch (...) {
             return false;
         }
     } else {
@@ -162,16 +164,15 @@ bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
     try {
         inputHash = engine1.generateHash(input);
         inputHash = encoding::base64Decode(inputHash.substr(inputHash.find_last_of('$') + 1));
-    }
-    catch (const Exception &) {
+    } catch (Exception const&) {
         return false;
     }
 
     if (hash1.length() != inputHash.length())
         return false;
 
-    auto u1 = (const unsigned char *) hash1.c_str();
-    auto u2 = (const unsigned char *) inputHash.c_str();
+    auto u1 = (const unsigned char*) hash1.c_str();
+    auto u2 = (const unsigned char*) inputHash.c_str();
 
     int ret = 0;
     for (int i = 0; i < hash1.length(); ++i)

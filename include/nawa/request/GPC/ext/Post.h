@@ -25,9 +25,9 @@
 #define NAWA_POST_H
 
 #include <memory>
-#include <optional>
 #include <nawa/request/File.h>
 #include <nawa/request/GPC/GPC.h>
+#include <optional>
 
 namespace nawa::request {
     /**
@@ -39,7 +39,7 @@ namespace nawa::request {
     public:
         NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(Post);
 
-        explicit Post(const RequestInitContainer &requestInit);
+        explicit Post(RequestInitContainer const& requestInit);
 
         /**
          * Shortcut to check for the existence of POST values (including files).
@@ -74,28 +74,28 @@ namespace nawa::request {
          * @param key Key of the POST file.
          * @return The file if available. Nullopt if no file with the given key has been submitted.
          */
-        [[nodiscard]] std::optional<File> getFile(const std::string &key) const;
+        [[nodiscard]] std::optional<File> getFile(std::string const& key) const;
 
         /**
          * Get all POST files with the given key.
          * @param key Key of the files.
          * @return Vector of files. Empty if no file with the given key exists.
          */
-        [[nodiscard]] std::vector<File> getFileVector(const std::string &key) const;
+        [[nodiscard]] std::vector<File> getFileVector(std::string const& key) const;
 
         /**
          * Get the number of submitted POST files with the given key.
          * @param key Key of the file.
          * @return Number of occurrences.
          */
-        [[nodiscard]] size_t countFiles(const std::string &key) const;
+        [[nodiscard]] size_t countFiles(std::string const& key) const;
 
         /**
          * Get a reference to the POST file multimap.
          * @return Reference to the multimap.
          */
-        [[nodiscard]] std::unordered_multimap<std::string, File> const &getFileMultimap() const;
+        [[nodiscard]] std::unordered_multimap<std::string, File> const& getFileMultimap() const;
     };
-}
+}// namespace nawa::request
 
-#endif //NAWA_POST_H
+#endif//NAWA_POST_H

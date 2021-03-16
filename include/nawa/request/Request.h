@@ -45,32 +45,32 @@ namespace nawa {
          * Initialize a Request object from a RequestInitContainer.
          * @param initContainer The RequestInitContainer with data needed to create a Request object.
          */
-        explicit Request(RequestInitContainer const &initContainer);
+        explicit Request(RequestInitContainer const& initContainer);
 
         /**
          * The Env object you should use to access environment variables.
          * @return Reference to the object.
          */
-        [[nodiscard]] request::Env const &env() const noexcept;
+        [[nodiscard]] request::Env const& env() const noexcept;
 
         /**
          * The GPC object you should use to access the request's GET variables.
          * @return Reference to the object.
          */
-        [[nodiscard]] request::GPC const &get() const noexcept;
+        [[nodiscard]] request::GPC const& get() const noexcept;
 
         /**
          * The Post object you should use to access the request's POST variables.
          * @return Reference to the object.
          */
-        [[nodiscard]] request::Post const &post() const noexcept;
+        [[nodiscard]] request::Post const& post() const noexcept;
 
         /**
          * The GPC object you should use to access the request's COOKIE variables.
          * @return Reference to the object.
          */
-        [[nodiscard]] request::GPC const &cookie() const noexcept;
+        [[nodiscard]] request::GPC const& cookie() const noexcept;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_NAWAREQUEST_H
+#endif//NAWA_NAWAREQUEST_H

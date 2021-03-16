@@ -25,11 +25,11 @@
 
 using namespace nawa;
 
-int init(AppInit &appInit) {
+int init(AppInit& appInit) {
     return 0;
 }
 
-int handleRequest(Connection &connection) {
+int handleRequest(Connection& connection) {
     connection.responseStream() << "Hello World!";
     return 0;
 }

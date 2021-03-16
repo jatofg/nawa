@@ -33,17 +33,17 @@ struct request::Env::Data {
     unordered_map<string, string> environment;
     vector<string> acceptLanguages;
 
-    explicit Data(const RequestInitContainer &initContainer) : environment(initContainer.environment),
+    explicit Data(RequestInitContainer const& initContainer) : environment(initContainer.environment),
                                                                acceptLanguages(initContainer.acceptLanguages) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, Env)
 
-request::Env::Env(const RequestInitContainer &initContainer) {
+request::Env::Env(RequestInitContainer const& initContainer) {
     data = make_unique<Data>(initContainer);
 }
 
-string request::Env::operator[](const string &envVar) const {
+string request::Env::operator[](string const& envVar) const {
     if (data->environment.count(envVar)) {
         return data->environment.at(envVar);
     }

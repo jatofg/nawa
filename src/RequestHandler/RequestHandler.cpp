@@ -33,16 +33,15 @@ using namespace nawa;
 using namespace std;
 
 struct RequestHandler::Data {
-    std::shared_mutex configurationMutex;
-    std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction;
-    std::shared_ptr<AccessFilterList> accessFilters;
-    std::shared_ptr<Config> config;
+    shared_mutex configurationMutex;
+    shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction;
+    shared_ptr<AccessFilterList> accessFilters;
+    shared_ptr<Config> config;
 };
 
 NAWA_DEFAULT_CONSTRUCTOR_IMPL(RequestHandler)
 
-void
-RequestHandler::setAppRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept {
+void RequestHandler::setAppRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction) noexcept {
     unique_lock l(data->configurationMutex);
     data->handleRequestFunction = move(handleRequestFunction);
 }
@@ -76,14 +75,13 @@ void RequestHandler::reconfigure(optional<shared_ptr<HandleRequestFunctionWrappe
     }
 }
 
-void
-nawa::RequestHandler::reconfigure(HandleRequestFunction handleRequestFunction, optional<AccessFilterList> accessFilters,
-                                  optional<Config> config) noexcept {
+void nawa::RequestHandler::reconfigure(HandleRequestFunction handleRequestFunction, optional<AccessFilterList> accessFilters,
+                                       optional<Config> config) noexcept {
     reconfigure(make_shared<HandleRequestFunctionWrapper>(move(handleRequestFunction)), move(accessFilters),
                 move(config));
 }
 
-void RequestHandler::handleRequest(Connection &connection) {
+void RequestHandler::handleRequest(Connection& connection) {
     shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction;
     shared_ptr<AccessFilterList> accessFilters;
     shared_ptr<Config> config;
@@ -98,8 +96,8 @@ void RequestHandler::handleRequest(Connection &connection) {
     }
 }
 
-std::unique_ptr<RequestHandler>
-RequestHandler::newRequestHandler(const std::shared_ptr<HandleRequestFunctionWrapper> &handleRequestFunction,
+unique_ptr<RequestHandler>
+RequestHandler::newRequestHandler(shared_ptr<HandleRequestFunctionWrapper> const& handleRequestFunction,
                                   Config config, int concurrency) {
     if (config[{"system", "request_handler"}] == "http") {
         return make_unique<HttpRequestHandler>(handleRequestFunction, move(config), concurrency);
@@ -107,7 +105,7 @@ RequestHandler::newRequestHandler(const std::shared_ptr<HandleRequestFunctionWra
     return make_unique<FastcgiRequestHandler>(handleRequestFunction, move(config), concurrency);
 }
 
-std::unique_ptr<RequestHandler>
+unique_ptr<RequestHandler>
 RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config,
                                   int concurrency) {
     return newRequestHandler(make_shared<HandleRequestFunctionWrapper>(move(handleRequestFunction)), move(config),

@@ -69,8 +69,8 @@ namespace {
     }
 
     // load a symbol from an app .so file
-    void *loadAppSymbol(void *appOpen, const char *symbolName, const string &error) {
-        void *symbol = dlsym(appOpen, symbolName);
+    void* loadAppSymbol(void* appOpen, char const* symbolName, string const& error) {
+        void* symbol = dlsym(appOpen, symbolName);
         auto dlsymError = dlerror();
         if (dlsymError) {
             throw Exception(__FUNCTION__, 11, error, dlsymError);
@@ -79,7 +79,7 @@ namespace {
     }
 
     // free memory of an open app
-    void closeApp(void *appOpen) {
+    void closeApp(void* appOpen) {
         dlclose(appOpen);
     }
 
@@ -87,13 +87,13 @@ namespace {
      * Set the termination timeout from config, if available, log a warning in case of an invalid value.
      * @param config Config
      */
-    void setTerminationTimeout(Config const &config) {
+    void setTerminationTimeout(Config const& config) {
         string terminationTimeoutStr = config[{"system", "termination_timeout"}];
         if (!terminationTimeoutStr.empty()) {
             try {
                 auto newTerminationTimeout = stoul(terminationTimeoutStr);
                 terminationTimeout = newTerminationTimeout;
-            } catch (invalid_argument &e) {
+            } catch (invalid_argument& e) {
                 NLOG_WARNING(logger, "WARNING: Invalid termination timeout given in configuration, default value "
                                      "or previous value will be used.")
             }
@@ -108,8 +108,7 @@ namespace {
         if (configFile) {
             try {
                 return Config(*configFile);
-            }
-            catch (Exception &e) {
+            } catch (Exception const& e) {
                 if (reload) {
                     NLOG_ERROR(logger, "ERROR: Could not reload config: " << e.getMessage())
                     NLOG_WARNING(logger, "WARNING: App will not be reloaded as well")
@@ -127,8 +126,8 @@ namespace {
      * Do the privilege downgrade using the data supplied, log an error message and exit the program on failure.
      * @param data Tuple containing the UID, GID, and list of supplementary groups to downgrade to.
      */
-    void doPrivilegeDowngrade(PrivilegeDowngradeData const &data) {
-        auto const &[uid, gid, supplementaryGroups] = data;
+    void doPrivilegeDowngrade(PrivilegeDowngradeData const& data) {
+        auto const& [uid, gid, supplementaryGroups] = data;
         if (uid != 0 && gid != 0 && setgroups(supplementaryGroups.size(), &supplementaryGroups[0]) != 0) {
             NLOG_ERROR(logger, "Fatal Error: Could not set supplementary groups during privilege downgrade.")
             exit(1);
@@ -157,7 +156,7 @@ namespace {
         signal(SIGHUP, reload);
     }
 
-    void setUpLogging(Config const &config) {
+    void setUpLogging(Config const& config) {
         auto configuredLogLevel = config[{"logging", "level"}];
         if (configuredLogLevel == "off") {
             Log::setOutputLevel(Log::Level::OFF);
@@ -173,15 +172,15 @@ namespace {
         }
         Log::lockStream();
     }
-}
+}// namespace
 
-unsigned int nawarun::getConcurrency(Config const &config) {
+unsigned int nawarun::getConcurrency(Config const& config) {
     double cReal;
     try {
         cReal = config.isSet({"system", "threads"})
-                ? stod(config[{"system", "threads"}]) : 1.0;
-    }
-    catch (invalid_argument &e) {
+                        ? stod(config[{"system", "threads"}])
+                        : 1.0;
+    } catch (invalid_argument& e) {
         NLOG_WARNING(logger, "WARNING: Invalid value given for system/concurrency given in the config file.")
         cReal = 1.0;
     }
@@ -191,13 +190,13 @@ unsigned int nawarun::getConcurrency(Config const &config) {
     return static_cast<unsigned int>(cReal);
 }
 
-pair<init_t *, shared_ptr<HandleRequestFunctionWrapper>> nawarun::loadAppFunctions(Config const &config) {
+pair<init_t*, shared_ptr<HandleRequestFunctionWrapper>> nawarun::loadAppFunctions(Config const& config) {
     // load application init function
     string appPath = config[{"application", "path"}];
     if (appPath.empty()) {
         throw Exception(__FUNCTION__, 1, "Application path not set in config file.");
     }
-    void *appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
+    void* appOpen = dlopen(appPath.c_str(), RTLD_LAZY);
     if (!appOpen) {
         throw Exception(__FUNCTION__, 2, "Application file could not be loaded.", dlerror());
     }
@@ -209,14 +208,14 @@ pair<init_t *, shared_ptr<HandleRequestFunctionWrapper>> nawarun::loadAppFunctio
     // first load nawa_version_major (defined in Application.h, included in Connection.h)
     // the version the app has been compiled against should match the version of this nawarun
     string appVersionError = "Could not read nawa version from application.";
-    auto appNawaVersionMajor = (int *) loadAppSymbol(appOpen, "nawa_version_major", appVersionError);
-    auto appNawaVersionMinor = (int *) loadAppSymbol(appOpen, "nawa_version_minor", appVersionError);
+    auto appNawaVersionMajor = (int*) loadAppSymbol(appOpen, "nawa_version_major", appVersionError);
+    auto appNawaVersionMinor = (int*) loadAppSymbol(appOpen, "nawa_version_minor", appVersionError);
     if (*appNawaVersionMajor != nawa_version_major || *appNawaVersionMinor != nawa_version_minor) {
         throw Exception(__FUNCTION__, 3, "App has been compiled against another version of NAWA.");
     }
-    auto appInit = (init_t *) loadAppSymbol(appOpen, "init", "Could not load init function from application.");
-    auto appHandleRequest = (handleRequest_t *) loadAppSymbol(appOpen, "handleRequest",
-                                                              "Could not load handleRequest function from application.");
+    auto appInit = (init_t*) loadAppSymbol(appOpen, "init", "Could not load init function from application.");
+    auto appHandleRequest = (handleRequest_t*) loadAppSymbol(appOpen, "handleRequest",
+                                                             "Could not load handleRequest function from application.");
     return {appInit, make_shared<HandleRequestFunctionWrapper>(appHandleRequest, appOpen, closeApp)};
 }
 
@@ -240,11 +239,11 @@ void nawarun::reload(int signum) {
         // set new termination timeout, if given
         setTerminationTimeout(*config);
 
-        init_t *appInit;
+        init_t* appInit;
         shared_ptr<HandleRequestFunctionWrapper> appHandleRequest;
         try {
             tie(appInit, appHandleRequest) = loadAppFunctions(*config);
-        } catch (Exception const &e) {
+        } catch (Exception const& e) {
             NLOG_ERROR(logger, "ERROR: Could not reload app: " << e.getMessage())
             NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
             NLOG_WARNING(logger, "WARNING: Configuration will be reloaded anyway")
@@ -278,7 +277,7 @@ void nawarun::reload(int signum) {
     }
 }
 
-optional<PrivilegeDowngradeData> nawarun::preparePrivilegeDowngrade(Config const &config) {
+optional<PrivilegeDowngradeData> nawarun::preparePrivilegeDowngrade(Config const& config) {
     auto initialUID = getuid();
     uid_t privUID = -1;
     gid_t privGID = -1;
@@ -291,8 +290,8 @@ optional<PrivilegeDowngradeData> nawarun::preparePrivilegeDowngrade(Config const
         }
         string username = config[{"privileges", "user"}];
         string groupname = config[{"privileges", "group"}];
-        passwd *privUser;
-        group *privGroup;
+        passwd* privUser;
+        group* privGroup;
         privUser = getpwnam(username.c_str());
         privGroup = getgrnam(groupname.c_str());
         if (privUser == nullptr || privGroup == nullptr) {
@@ -320,7 +319,7 @@ optional<PrivilegeDowngradeData> nawarun::preparePrivilegeDowngrade(Config const
     return nullopt;
 }
 
-void nawarun::replaceLogger(Log const &log) {
+void nawarun::replaceLogger(Log const& log) {
     logger = log;
 }
 
@@ -331,7 +330,7 @@ void nawarun::replaceLogger(Log const &log) {
  * @return A structure containing the path to the config file (optional, as it can be skipped with --no-config-file)
  * and a list of config option overrides (identifier-value pairs, wherein the identifier is a pair of category and key).
  */
-Parameters nawarun::parseCommandLine(int argc, char **argv) {
+Parameters nawarun::parseCommandLine(int argc, char** argv) {
     // start from arg 1 (as 0 is the program), iterate through all arguments and add valid options in the format
     // --category:key=value to overrides
     optional<string> configPath;
@@ -348,10 +347,10 @@ Parameters nawarun::parseCommandLine(int argc, char **argv) {
             auto idAndVal = split_string(currentArg.substr(2), '=', true);
             if (idAndVal.size() == 2) {
                 auto categoryAndKey = split_string(idAndVal.at(0), ':', true);
-                string const &value = idAndVal.at(1);
+                string const& value = idAndVal.at(1);
                 if (categoryAndKey.size() == 2) {
-                    string const &category = categoryAndKey.at(0);
-                    string const &key = categoryAndKey.at(1);
+                    string const& category = categoryAndKey.at(0);
+                    string const& key = categoryAndKey.at(1);
                     overrides.push_back({{category, key}, value});
                     continue;
                 }
@@ -379,12 +378,13 @@ Parameters nawarun::parseCommandLine(int argc, char **argv) {
     return {configPath, overrides};
 }
 
-int nawarun::run(Parameters const &parameters) {
+int nawarun::run(Parameters const& parameters) {
     setUpSignalHandlers();
 
     configFile = parameters.configFile;
     optional<Config> config = loadConfig();
-    if (!config) return 1;
+    if (!config)
+        return 1;
     config->override(parameters.configOverrides);
 
     setTerminationTimeout(*config);
@@ -394,18 +394,18 @@ int nawarun::run(Parameters const &parameters) {
     optional<PrivilegeDowngradeData> privilegeDowngradeData;
     try {
         privilegeDowngradeData = preparePrivilegeDowngrade(*config);
-    } catch (Exception const &e) {
+    } catch (Exception const& e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
     }
 
     // load init and handleRequest symbols from app
-    init_t *appInit;
+    init_t* appInit;
     shared_ptr<HandleRequestFunctionWrapper> appHandleRequest;
     try {
         tie(appInit, appHandleRequest) = loadAppFunctions(*config);
-    } catch (Exception const &e) {
+    } catch (Exception const& e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
@@ -416,7 +416,7 @@ int nawarun::run(Parameters const &parameters) {
     auto concurrency = getConcurrency(*config);
     try {
         requestHandlerPtr = RequestHandler::newRequestHandler(appHandleRequest, *config, concurrency);
-    } catch (const Exception &e) {
+    } catch (Exception const& e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
         return 1;
@@ -445,7 +445,7 @@ int nawarun::run(Parameters const &parameters) {
     try {
         requestHandlerPtr->start();
         readyToReconfigure = true;
-    } catch (const Exception &e) {
+    } catch (const Exception& e) {
         NLOG_ERROR(logger, "Fatal Error: " << e.getMessage())
         NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
     }

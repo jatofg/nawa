@@ -34,102 +34,101 @@ using namespace std;
 
 namespace {
     unordered_map<string, string> contentTypeMap = {
-            {"aac",   "audio/aac"},
-            {"arc",   "application/x-freearc"},
-            {"avi",   "video/x-msvideo"},
-            {"azw",   "application/vnd.amazon.ebook"},
-            {"bmp",   "image/bmp"},
-            {"bz",    "application/x-bzip"},
-            {"bz2",   "application/x-bzip2"},
-            {"csh",   "application/x-csh"},
-            {"css",   "text/css"},
-            {"csv",   "text/csv"},
-            {"deb",   "application/vnd.debian.binary-package"},
-            {"doc",   "application/msword"},
-            {"dot",   "application/msword"},
-            {"docx",  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {"dotx",  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {"eot",   "application/vnd.ms-fontobject"},
-            {"epub",  "application/epub+zip"},
-            {"flv",   "video/x-flv"},
-            {"f4v",   "video/mp4"},
-            {"f4a",   "audio/mp4"},
-            {"gif",   "image/gif"},
-            {"gz",    "application/x-gzip"},
-            {"htm",   "text/html"},
-            {"html",  "text/html"},
-            {"ico",   "image/vnd.microsoft.icon"},
-            {"ics",   "text/calendar"},
-            {"jar",   "application/java-archive"},
-            {"java",  "text/plain"},
-            {"jpg",   "image/jpeg"},
-            {"jpeg",  "image/jpeg"},
-            {"js",    "text/javascript"},
-            {"json",  "application/json"},
-            {"mid",   "audio/x-midi"},
-            {"midi",  "audio/x-midi"},
-            {"mjs",   "application/javascript"},
-            {"mp3",   "audio/mpeg"},
-            {"mpeg",  "video/mpeg"},
-            {"mp4",   "application/mp4"},
-            {"m4v",   "video/mp4"},
-            {"m4a",   "audio/mp4"},
-            {"mpkg",  "application/vnd.apple.installer+xml"},
-            {"odp",   "application/vnd.oasis.opendocument.presentation"},
-            {"otp",   "application/vnd.oasis.opendocument.presentation"},
-            {"ods",   "application/vnd.oasis.opendocument.spreadsheet"},
-            {"ots",   "application/vnd.oasis.opendocument.spreadsheet"},
-            {"odt",   "application/vnd.oasis.opendocument.text"},
-            {"ott",   "application/vnd.oasis.opendocument.text"},
-            {"ogg",   "application/ogg"},
-            {"ogx",   "application/ogg"},
-            {"oga",   "audio/ogg"},
-            {"ogv",   "video/ogg"},
-            {"otf",   "font/otf"},
-            {"png",   "image/png"},
-            {"pdf",   "application/pdf"},
-            {"ppt",   "application/vnd.ms-powerpoint"},
-            {"pptx",  "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
-            {"rar",   "application/x-rar-compressed"},
-            {"rtf",   "application/rtf"},
-            {"sh",    "application/x-sh"},
-            {"svg",   "image/svg+xml"},
-            {"swf",   "application/x-shockwave-flash"},
-            {"tar",   "application/x-tar"},
-            {"tif",   "image/tiff"},
-            {"tiff",  "image/tiff"},
-            {"ttf",   "font/ttf"},
-            {"txt",   "text/plain"},
-            {"vsd",   "application/vnd.visio"},
-            {"wav",   "audio/wav"},
-            {"weba",  "audio/webm"},
-            {"webm",  "video/webm"},
-            {"webp",  "image/webp"},
-            {"woff",  "font/woff"},
+            {"aac", "audio/aac"},
+            {"arc", "application/x-freearc"},
+            {"avi", "video/x-msvideo"},
+            {"azw", "application/vnd.amazon.ebook"},
+            {"bmp", "image/bmp"},
+            {"bz", "application/x-bzip"},
+            {"bz2", "application/x-bzip2"},
+            {"csh", "application/x-csh"},
+            {"css", "text/css"},
+            {"csv", "text/csv"},
+            {"deb", "application/vnd.debian.binary-package"},
+            {"doc", "application/msword"},
+            {"dot", "application/msword"},
+            {"docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            {"dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            {"eot", "application/vnd.ms-fontobject"},
+            {"epub", "application/epub+zip"},
+            {"flv", "video/x-flv"},
+            {"f4v", "video/mp4"},
+            {"f4a", "audio/mp4"},
+            {"gif", "image/gif"},
+            {"gz", "application/x-gzip"},
+            {"htm", "text/html"},
+            {"html", "text/html"},
+            {"ico", "image/vnd.microsoft.icon"},
+            {"ics", "text/calendar"},
+            {"jar", "application/java-archive"},
+            {"java", "text/plain"},
+            {"jpg", "image/jpeg"},
+            {"jpeg", "image/jpeg"},
+            {"js", "text/javascript"},
+            {"json", "application/json"},
+            {"mid", "audio/x-midi"},
+            {"midi", "audio/x-midi"},
+            {"mjs", "application/javascript"},
+            {"mp3", "audio/mpeg"},
+            {"mpeg", "video/mpeg"},
+            {"mp4", "application/mp4"},
+            {"m4v", "video/mp4"},
+            {"m4a", "audio/mp4"},
+            {"mpkg", "application/vnd.apple.installer+xml"},
+            {"odp", "application/vnd.oasis.opendocument.presentation"},
+            {"otp", "application/vnd.oasis.opendocument.presentation"},
+            {"ods", "application/vnd.oasis.opendocument.spreadsheet"},
+            {"ots", "application/vnd.oasis.opendocument.spreadsheet"},
+            {"odt", "application/vnd.oasis.opendocument.text"},
+            {"ott", "application/vnd.oasis.opendocument.text"},
+            {"ogg", "application/ogg"},
+            {"ogx", "application/ogg"},
+            {"oga", "audio/ogg"},
+            {"ogv", "video/ogg"},
+            {"otf", "font/otf"},
+            {"png", "image/png"},
+            {"pdf", "application/pdf"},
+            {"ppt", "application/vnd.ms-powerpoint"},
+            {"pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+            {"rar", "application/x-rar-compressed"},
+            {"rtf", "application/rtf"},
+            {"sh", "application/x-sh"},
+            {"svg", "image/svg+xml"},
+            {"swf", "application/x-shockwave-flash"},
+            {"tar", "application/x-tar"},
+            {"tif", "image/tiff"},
+            {"tiff", "image/tiff"},
+            {"ttf", "font/ttf"},
+            {"txt", "text/plain"},
+            {"vsd", "application/vnd.visio"},
+            {"wav", "audio/wav"},
+            {"weba", "audio/webm"},
+            {"webm", "video/webm"},
+            {"webp", "image/webp"},
+            {"woff", "font/woff"},
             {"woff2", "font/woff2"},
             {"xhtml", "application/xhtml+xml"},
-            {"xls",   "application/vnd.ms-excel"},
-            {"xlt",   "application/vnd.ms-excel"},
-            {"xlsx",  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-            {"xltx",  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-            {"xml",   "application/xml"},
-            {"xul",   "application/vnd.mozilla.xul+xml"},
-            {"xz",    "application/x-xz"},
-            {"zip",   "application/zip"},
-            {"3gp",   "video/3gpp"},
-            {"3g2",   "video/3gpp2"},
-            {"7z",    "application/x-7z-compressed"}
-    };
+            {"xls", "application/vnd.ms-excel"},
+            {"xlt", "application/vnd.ms-excel"},
+            {"xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {"xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {"xml", "application/xml"},
+            {"xul", "application/vnd.mozilla.xul+xml"},
+            {"xz", "application/x-xz"},
+            {"zip", "application/zip"},
+            {"3gp", "video/3gpp"},
+            {"3g2", "video/3gpp2"},
+            {"7z", "application/x-7z-compressed"}};
 
     /**
      * Check whether current locale is "C" and, if it is not, reset it to "C". This function might not be thread-safe,
      * but ideally, it should never have to update the locale. The app should not update the locale itself.
      */
-//    inline void resetLocale() {
-//        if(locale() != locale::classic()) {
-//            locale::global(locale::classic());
-//        }
-//    }
+    //    inline void resetLocale() {
+    //        if(locale() != locale::classic()) {
+    //            locale::global(locale::classic());
+    //        }
+    //    }
 
     /**
      * Get the day of week as a string. This function is used instead of the %a specifier, as it is locale-independent,
@@ -218,12 +217,11 @@ namespace {
         return ret;
     }
 
-}
+}// namespace
 
 // doxygen bug, somehow doxygen does not like std::function
-void
-nawa::regex_replace_callback(std::string &s, const std::regex &rgx,
-                             const std::function<std::string(const std::vector<std::string> &)> &fmt) {
+void nawa::regex_replace_callback(std::string& s, std::regex const& rgx,
+                                  std::function<std::string(std::vector<std::string> const&)> const& fmt) {
     // how many submatches do we have to deal with?
     int marks = rgx.mark_count();
     // we want to iterate through all submatches (to collect them in a vector passed to fmt())
@@ -256,10 +254,10 @@ nawa::regex_replace_callback(std::string &s, const std::regex &rgx,
     s = out.str();
 }
 
-string nawa::hex_dump(const string &in) {
+string nawa::hex_dump(string const& in) {
     stringstream rets;
     rets << hex << setfill('0');
-    for (char c: in) {
+    for (char c : in) {
         rets << setw(2) << (int) (unsigned char) c;
     }
     return rets.str();
@@ -352,11 +350,10 @@ string nawa::generate_error_page(unsigned int httpStatus) {
     return ep.str();
 }
 
-string nawa::get_file_extension(const string &filename) {
+string nawa::get_file_extension(string const& filename) {
     try {
         return filename.substr(filename.find_last_of('.') + 1);
-    }
-    catch (out_of_range &) {}
+    } catch (out_of_range&) {}
 
     return string();
 }
@@ -379,7 +376,7 @@ string nawa::make_http_time(time_t time1) {
     return httpTime.str();
 }
 
-time_t nawa::read_http_time(const string &httpTime) {
+time_t nawa::read_http_time(string const& httpTime) {
     istringstream timeStream(httpTime);
     tm timeStruct;
     timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
@@ -398,7 +395,7 @@ string nawa::make_smtp_time(time_t time1) {
     return smtpTime.str();
 }
 
-time_t nawa::read_smtp_time(const string &smtpTime) {
+time_t nawa::read_smtp_time(string const& smtpTime) {
     string smtpTimeM = smtpTime;
     tm timeStruct;
 
@@ -445,33 +442,35 @@ vector<string> nawa::split_string(string str, char delimiter, bool ignoreEmpty) 
     return ret;
 }
 
-string nawa::merge_path(const vector<string> &path) {
+string nawa::merge_path(vector<string> const& path) {
     if (path.empty()) {
         return "/";
     }
     stringstream stringPath;
-    for (auto const &e: path) {
+    for (auto const& e : path) {
         stringPath << '/' << e;
     }
     return stringPath.str();
 }
 
-vector<string> nawa::split_path(const string &pathString) {
+vector<string> nawa::split_path(string const& pathString) {
     // remove query string
     string rawPath = pathString.substr(0, pathString.find('?'));
     return split_string(rawPath, '/', true);
 }
 
-string nawa::convert_line_endings(const string &in, const string &ending) {
+string nawa::convert_line_endings(string const& in, string const& ending) {
     stringstream ret;
-    for (const auto &c: in) {
-        if (c == '\n') ret << ending;
-        else if (c != '\r') ret << c;
+    for (const auto& c : in) {
+        if (c == '\n')
+            ret << ending;
+        else if (c != '\r')
+            ret << c;
     }
     return ret.str();
 }
 
-string nawa::get_file_contents(const string &path) {
+string nawa::get_file_contents(string const& path) {
     // open file as binary
     ifstream f(path, ifstream::binary);
 
@@ -492,15 +491,15 @@ string nawa::get_file_contents(const string &path) {
     return ret;
 }
 
-string nawa::string_replace(string input, const unordered_map<char, char> &patterns) {
-    for (const auto &[key, val]: patterns) {
+string nawa::string_replace(string input, unordered_map<char, char> const& patterns) {
+    for (auto const& [key, val] : patterns) {
         replace(input.begin(), input.end(), key, val);
     }
     return input;
 }
 
-string nawa::string_replace(string input, const unordered_map<string, string> &patterns) {
-    for (const auto &[key, val]: patterns) {
+string nawa::string_replace(string input, unordered_map<string, string> const& patterns) {
+    for (auto const& [key, val] : patterns) {
         for (size_t pos = input.find(key); pos != string::npos;) {
             input.replace(pos, key.length(), val);
             pos = input.find(key, pos + val.length());
@@ -509,7 +508,7 @@ string nawa::string_replace(string input, const unordered_map<string, string> &p
     return input;
 }
 
-unordered_multimap<string, string> nawa::split_query_string(const string &queryString) {
+unordered_multimap<string, string> nawa::split_query_string(string const& queryString) {
     string qs;
     size_t qmrkPos = queryString.find_first_of('?');
     unordered_multimap<string, string> ret;
@@ -519,7 +518,7 @@ unordered_multimap<string, string> nawa::split_query_string(const string &queryS
         qs = queryString;
     }
     auto pairs = split_string(qs, '&', true);
-    for (auto const &p: pairs) {
+    for (auto const& p : pairs) {
         size_t eqPos = p.find_first_of('=');
         string k = p.substr(0, eqPos);
         string v = (eqPos < p.length() - 1) ? encoding::urlDecode(p.substr(eqPos + 1)) : "";
@@ -534,7 +533,7 @@ unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
     boost::erase_all(rawHeaders, "\r");
     // split
     auto lines = split_string(rawHeaders, '\n', true);
-    for (auto const &line: lines) {
+    for (auto const& line : lines) {
         auto colonPos = line.find_first_of(':');
         if (line.length() < colonPos + 2) {
             continue;
@@ -547,11 +546,11 @@ unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
     return ret;
 }
 
-unordered_multimap<std::string, std::string> nawa::parse_cookies(const string &rawCookies) {
+unordered_multimap<std::string, std::string> nawa::parse_cookies(string const& rawCookies) {
     unordered_multimap<std::string, std::string> ret;
     // split by ;
     auto cookies = split_string(rawCookies, ';', true);
-    for (auto c: cookies) {
+    for (auto c : cookies) {
         // remove whitespaces
         boost::trim(c);
         // key and value

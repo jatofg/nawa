@@ -70,6 +70,6 @@ namespace nawa::hashing {
         [[nodiscard]] bool verifyHash(std::string input, std::string hash) const override;
     };
 
-}
+}// namespace nawa::hashing
 
-#endif //NAWA_BCRYPTHASHINGENGINE_H
+#endif//NAWA_BCRYPTHASHINGENGINE_H

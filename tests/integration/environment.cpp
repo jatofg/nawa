@@ -53,30 +53,30 @@ namespace {
 
         config = loadConfig();
         config.insert({
-                              {{"http",    "reuseaddr"},       "on"},
-                              {{"post",    "max_size"},        "1"},
-                              {{"system",  "request_handler"}, "http"},
-                              {{"logging", "level"},           "debug"},
-                              {{"logging", "extended"},        "on"},
-                      });
+                {{"http", "reuseaddr"}, "on"},
+                {{"post", "max_size"}, "1"},
+                {{"system", "request_handler"}, "http"},
+                {{"logging", "level"}, "debug"},
+                {{"logging", "extended"}, "on"},
+        });
 
         port = config[{"http", "port"}].empty() ? "8080" : config[{"http", "port"}];
         baseUrl = "http://127.0.0.1:" + port;
 
         REQUIRE_NOTHROW(
-                httpRequestHandler = RequestHandler::newRequestHandler([](Connection &) { return 0; }, config, 1));
+                httpRequestHandler = RequestHandler::newRequestHandler([](Connection&) { return 0; }, config, 1));
 
         isEnvironmentInitialized = true;
         return true;
     }
-}
+}// namespace
 
 TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     REQUIRE(initializeEnvironmentIfNotYetDone());
     // GENERATE can be used to run test cases with both HTTP and FCGI request handler
-    auto &requestHandler = httpRequestHandler;
+    auto& requestHandler = httpRequestHandler;
 
-    auto handlingFunction = [](Connection &connection) -> int {
+    auto handlingFunction = [](Connection& connection) -> int {
         connection.responseStream() << "Hello World!";
         return 0;
     };
@@ -93,25 +93,25 @@ TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
 
 TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     REQUIRE(initializeEnvironmentIfNotYetDone());
-    auto &requestHandler = httpRequestHandler;
+    auto& requestHandler = httpRequestHandler;
 
-    auto handlingFunction = [](Connection &connection) -> int {
-        auto &resp = connection.responseStream();
-        auto &env = connection.request().env();
+    auto handlingFunction = [](Connection& connection) -> int {
+        auto& resp = connection.responseStream();
+        auto& env = connection.request().env();
 
-        resp << env.getRequestPath().size() << "\n"; // [0]
-        resp << env["REMOTE_ADDR"] << "\n"; // [1]
-        resp << env["REQUEST_URI"] << "\n"; // [2]
-        resp << env["REMOTE_PORT"] << "\n"; // [3]
-        resp << env["REQUEST_METHOD"] << "\n"; // [4]
-        resp << env["SERVER_ADDR"] << "\n"; // [5]
-        resp << env["SERVER_PORT"] << "\n"; // [6]
-        resp << env["SERVER_SOFTWARE"] << "\n"; // [7]
-        resp << env["BASE_URL"] << "\n"; // [8]
-        resp << env["FULL_URL_WITH_QS"] << "\n"; // [9]
+        resp << env.getRequestPath().size() << "\n";// [0]
+        resp << env["REMOTE_ADDR"] << "\n";         // [1]
+        resp << env["REQUEST_URI"] << "\n";         // [2]
+        resp << env["REMOTE_PORT"] << "\n";         // [3]
+        resp << env["REQUEST_METHOD"] << "\n";      // [4]
+        resp << env["SERVER_ADDR"] << "\n";         // [5]
+        resp << env["SERVER_PORT"] << "\n";         // [6]
+        resp << env["SERVER_SOFTWARE"] << "\n";     // [7]
+        resp << env["BASE_URL"] << "\n";            // [8]
+        resp << env["FULL_URL_WITH_QS"] << "\n";    // [9]
         resp << env["FULL_URL_WITHOUT_QS"] << "\n"; // [10]
-        resp << env["host"] << "\n"; // [11]
-        resp << env["content-type"] << "\n"; // [12]
+        resp << env["host"] << "\n";                // [11]
+        resp << env["content-type"] << "\n";        // [12]
 
         // response headers
         connection.setHeader("x-test-header", "test");
@@ -126,7 +126,7 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     http::client client;
     http::client::response response;
 
-    auto checkResponse = [&](const string &method) {
+    auto checkResponse = [&](string const& method) {
         auto respLines = split_string(response.body(), '\n');
         REQUIRE(respLines.size() == 13);
         REQUIRE(respLines[0] == "3");

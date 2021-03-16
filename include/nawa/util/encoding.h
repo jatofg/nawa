@@ -56,7 +56,7 @@ namespace nawa::encoding {
      * @param input String with characters that need to be escaped for use in a URL.
      * @return String with escaped characters.
      */
-    std::string urlEncode(const std::string &input);
+    std::string urlEncode(std::string const& input);
 
     /**
      * Decode a percent-encoded string (byte-wise, in URLs always utf-8).
@@ -71,7 +71,7 @@ namespace nawa::encoding {
      * @param allowWhitespaces If true, the whitespace characters '\\r', '\\n', '\\t', and ' ' will be allowed.
      * @return True if the string contains only valid base64 characters, false otherwise.
      */
-    bool isBase64(const std::string &input, bool allowWhitespaces = true);
+    bool isBase64(std::string const& input, bool allowWhitespaces = true);
 
     /**
      * Encode a string (of bytes) as base64.
@@ -81,7 +81,7 @@ namespace nawa::encoding {
      * @param breakSequence The characters to use as a line break. (e.g., "\\n" or "\\r\\n").
      * @return Base64-encoded string.
      */
-    std::string base64Encode(const std::string &input, size_t breakAfter = 0, const std::string &breakSequence = "");
+    std::string base64Encode(std::string const& input, size_t breakAfter = 0, std::string const& breakSequence = "");
 
     /**
      * Decode a base64-encoded string (of bytes). If the input string does not (only) contain valid base64, the
@@ -90,7 +90,7 @@ namespace nawa::encoding {
      * @param input Base64 representation of a string.
      * @return The decoded string.
      */
-    std::string base64Decode(const std::string &input);
+    std::string base64Decode(std::string const& input);
 
     /**
      * Encode a string using quoted-printable encoding (especially useful for emails).
@@ -101,7 +101,7 @@ namespace nawa::encoding {
      * limit on line length will be applied.
      * @return The encoded string.
      */
-    std::string quotedPrintableEncode(const std::string &input, const std::string &lineEnding = "\r\n",
+    std::string quotedPrintableEncode(std::string const& input, std::string const& lineEnding = "\r\n",
                                       bool replaceCrlf = false, bool qEncoding = false);
 
     /**
@@ -119,7 +119,7 @@ namespace nawa::encoding {
      * input (does not apply to base64 encoding).
      * @return Encoded string.
      */
-    std::string makeEncodedWord(const std::string &input, bool base64 = false, bool onlyIfNecessary = true);
-}
+    std::string makeEncodedWord(std::string const& input, bool base64 = false, bool onlyIfNecessary = true);
+}// namespace nawa::encoding
 
-#endif //NAWA_ENCODING_H
+#endif//NAWA_ENCODING_H

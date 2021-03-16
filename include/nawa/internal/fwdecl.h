@@ -45,7 +45,7 @@ namespace nawa {
         class BcryptHashingEngine;
         class HashTypeTable;
         class DefaultHashTypeTable;
-    }
+    }// namespace hashing
 
     // logging
     class Log;
@@ -65,7 +65,7 @@ namespace nawa {
         class Env;
         class GPC;
         class Post;
-    }
+    }// namespace request
 
     // RequestHandler
     class HandleRequestFunctionWrapper;
@@ -81,6 +81,6 @@ namespace nawa {
 
     class AppInit;
     class Exception;
-}
+}// namespace nawa
 
-#endif //NAWA_FWDECL_H
+#endif//NAWA_FWDECL_H

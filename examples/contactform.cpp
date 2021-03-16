@@ -36,14 +36,14 @@ namespace {
     Log logger;
 }
 
-int init(AppInit &appInit) {
+int init(AppInit& appInit) {
     // set up logging
     logger.setAppname("Contact form app");
 
     return 0;
 }
 
-int handleRequest(Connection &connection) {
+int handleRequest(Connection& connection) {
 
     // make sure cookies are a bit more secure
     connection.setCookiePolicy(Cookie().httpOnly(true));
@@ -54,10 +54,10 @@ int handleRequest(Connection &connection) {
     auto randVal = connection.session()["randVal"];
 
     // we will work with POST data quite often now, so we'll create a shortcut
-    auto const &post = connection.request().post();
+    auto const& post = connection.request().post();
 
     // get a shortcut for the response stream
-    auto &resp = connection.responseStream();
+    auto& resp = connection.responseStream();
 
     // HTML header
     resp << "<!DOCTYPE html><head><title>Contact Form</title></head><body>";
@@ -71,8 +71,7 @@ int handleRequest(Connection &connection) {
             if (any_cast<unsigned int>(randVal) == stoul(post["rand_val"])) {
                 randValid = true;
             }
-        }
-        catch (...) {}
+        } catch (...) {}
 
         if (!randValid) {
             resp << "<p>No spamming, please!</p>";
@@ -97,8 +96,10 @@ int handleRequest(Connection &connection) {
         email.headers()["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
         email.quotedPrintableEncode() = true;
         email.text() = "This contact form was sent via an example nawa application!\r\n\r\n"
-                       "Name of the sender: " + post["name"] + "\r\n"
-                                                               "Email of the sender: " + post["email"] + "\r\n\r\n" +
+                       "Name of the sender: " +
+                       post["name"] + "\r\n"
+                                      "Email of the sender: " +
+                       post["email"] + "\r\n\r\n" +
                        post["message"];
 
         // now use SmtpMailer to send the email to your mailbox
@@ -108,8 +109,7 @@ int handleRequest(Connection &connection) {
         try {
             smtp.processQueue();
             resp << "<p>Message sent successfully!</p>";
-        }
-        catch (const Exception &e) {
+        } catch (const Exception& e) {
             resp << "<p>Message could not be sent due to a technical problem :(</p>";
             NLOG_ERROR(logger, "Error sending email: " << e.getMessage())
             NLOG_DEBUG(logger, "Debug info: " << e.getDebugMessage())
@@ -128,7 +128,8 @@ int handleRequest(Connection &connection) {
     // and show the form!
     resp << "<p>Please fill in the following form in order to contact us! All fields are required.</p>\r\n"
             "<form name=\"contact\" method=\"post\" action=\"?\">"
-            "<input type=\"hidden\" name=\"rand_val\" value=\"" << any_cast<unsigned int>(randVal)
+            "<input type=\"hidden\" name=\"rand_val\" value=\""
+         << any_cast<unsigned int>(randVal)
          << "\" />"
             "<p>Your name: <input type=\"text\" name=\"name\" /></p>"
             "<p>Email address: <input type=\"email\" name=\"email\" /></p>"

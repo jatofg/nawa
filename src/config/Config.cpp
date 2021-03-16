@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../libs/inih/ini.h"
 #include <boost/functional/hash.hpp>
+#include <inih/ini.h>
 #include <nawa/Exception.h>
 #include <nawa/config/Config.h>
 #include <unordered_map>
@@ -51,13 +51,13 @@ Config::Config(initializer_list<pair<pair<string, string>, string>> init) : Conf
     data->values.insert(init.begin(), init.end());
 }
 
-Config::Config(const string &iniFile) : Config() {
+Config::Config(string const& iniFile) : Config() {
     read(iniFile);
 }
 
-void Config::read(const string &iniFile) {
-    auto valueHandler = [](void *obj, const char *section, const char *name, const char *value) -> int {
-        auto _this = (Config *) obj;
+void Config::read(string const& iniFile) {
+    auto valueHandler = [](void* obj, char const* section, char const* name, char const* value) -> int {
+        auto _this = (Config*) obj;
         pair<string, string> keyToInsert(section, name);
         pair<pair<string, string>, string> pairToInsert(keyToInsert, value);
         _this->data->values.insert(pairToInsert);
@@ -72,17 +72,17 @@ void Config::insert(std::initializer_list<std::pair<std::pair<std::string, std::
     data->values.insert(init.begin(), init.end());
 }
 
-void Config::override(const std::vector<std::pair<std::pair<std::string, std::string>, std::string>> &overrides) {
-    for (auto &[k, v]: overrides) {
+void Config::override(std::vector<std::pair<std::pair<std::string, std::string>, std::string>> const& overrides) {
+    for (auto& [k, v] : overrides) {
         data->values[k] = v;
     }
 }
 
-bool Config::isSet(const pair<string, string> &key) const {
+bool Config::isSet(pair<string, string> const& key) const {
     return (data->values.count(key) == 1);
 }
 
-string Config::operator[](const pair<string, string> &key) const {
+string Config::operator[](pair<string, string> const& key) const {
     if (data->values.count(key) == 1) {
         return data->values.at(key);
     } else {

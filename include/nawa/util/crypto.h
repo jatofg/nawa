@@ -38,7 +38,7 @@ namespace nawa::crypto {
      * be binary (20 bytes).
      * @return SHA-1 hash of input.
      */
-    std::string sha1(const std::string &input, bool hex = true);
+    std::string sha1(std::string const& input, bool hex = true);
 
     /**
      * Get SHA-224 hash of a string.
@@ -47,7 +47,7 @@ namespace nawa::crypto {
      * be binary (28 bytes).
      * @return Hash of input.
      */
-    std::string sha224(const std::string &input, bool hex = true);
+    std::string sha224(std::string const& input, bool hex = true);
 
     /**
      * Get SHA-256 hash of a string.
@@ -56,7 +56,7 @@ namespace nawa::crypto {
      * be binary (32 bytes).
      * @return Hash of input.
      */
-    std::string sha256(const std::string &input, bool hex = true);
+    std::string sha256(std::string const& input, bool hex = true);
 
     /**
      * Get SHA-384 hash of a string.
@@ -65,7 +65,7 @@ namespace nawa::crypto {
      * be binary (48 bytes).
      * @return Hash of input.
      */
-    std::string sha384(const std::string &input, bool hex = true);
+    std::string sha384(std::string const& input, bool hex = true);
 
     /**
      * Get SHA-512 hash of a string.
@@ -74,7 +74,7 @@ namespace nawa::crypto {
      * be binary (64 bytes).
      * @return Hash of input.
      */
-    std::string sha512(const std::string &input, bool hex = true);
+    std::string sha512(std::string const& input, bool hex = true);
 
     /**
      * Get MD5 hash of a string.
@@ -83,7 +83,7 @@ namespace nawa::crypto {
      * be binary (16 bytes).
      * @return Hash of input.
      */
-    std::string md5(const std::string &input, bool hex = true);
+    std::string md5(std::string const& input, bool hex = true);
 
     /**
      * Create a (hopefully) secure password hash using a hash algorithm (bcrypt by default). \n
@@ -97,8 +97,8 @@ namespace nawa::crypto {
      * you wish to customize hashing properties (such as using your own salt or changing the work factor).
      * @return Hash of the password (in case of bcrypt: 60 characters).
      */
-    std::string passwordHash(const std::string &password,
-                             const hashing::HashingEngine &hashingEngine = hashing::BcryptHashingEngine());
+    std::string passwordHash(std::string const& password,
+                             hashing::HashingEngine const& hashingEngine = hashing::BcryptHashingEngine());
 
     /**
      * Validate a password with a matching hashing engine (determined by a HashTypeTable). The underlying function
@@ -113,9 +113,9 @@ namespace nawa::crypto {
      * with NAWA.
      * @return True if the password matches, false otherwise.
      */
-    bool passwordVerify(const std::string &password, const std::string &hash,
-                        const hashing::HashTypeTable &hashTypeTable = hashing::DefaultHashTypeTable());
+    bool passwordVerify(std::string const& password, std::string const& hash,
+                        hashing::HashTypeTable const& hashTypeTable = hashing::DefaultHashTypeTable());
 
-}
+}// namespace nawa::crypto
 
-#endif //NAWA_CRYPTO_H
+#endif//NAWA_CRYPTO_H

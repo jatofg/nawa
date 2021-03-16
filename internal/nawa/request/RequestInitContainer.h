@@ -49,8 +49,8 @@ namespace nawa {
          */
         std::unordered_multimap<std::string, std::string> postVars;
         std::unordered_multimap<std::string, std::string> cookieVars; /**< The HTTP COOKIE vars. */
-        std::string postContentType; /**< The HTTP POST content type. */
-        std::unordered_multimap<std::string, File> postFiles; /**< Files submitted via POST. */
+        std::string postContentType;                                  /**< The HTTP POST content type. */
+        std::unordered_multimap<std::string, File> postFiles;         /**< Files submitted via POST. */
         /**
          * A shared_ptr to a string which contains the raw POST data. Raw data does not have to be available
          * if the config option {"post", "raw_access"} is set to "never", or when it's set to "nonstandard" and the
@@ -59,6 +59,6 @@ namespace nawa {
          */
         std::shared_ptr<std::string> rawPost;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_REQUESTINITCONTAINER_H
+#endif//NAWA_REQUESTINITCONTAINER_H

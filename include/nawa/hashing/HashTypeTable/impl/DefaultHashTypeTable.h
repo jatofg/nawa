@@ -39,6 +39,6 @@ namespace nawa::hashing {
         [[nodiscard]] std::shared_ptr<HashingEngine> getEngine(std::string hash) const override;
     };
 
-}
+}// namespace nawa::hashing
 
-#endif //NAWA_DEFAULTHASHTYPETABLE_H
+#endif//NAWA_DEFAULTHASHTYPETABLE_H

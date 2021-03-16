@@ -29,8 +29,8 @@
 #include <nawa/internal/macros.h>
 
 namespace nawa {
-    using HandleRequestFunction = std::function<int(nawa::Connection &)>;
-    using DestructionCallbackFunction = std::function<void(void *)>;
+    using HandleRequestFunction = std::function<int(nawa::Connection&)>;
+    using DestructionCallbackFunction = std::function<void(void*)>;
 
     /**
      * A wrapper structure for a HandleRequestFunction which can store an additional reference pointer and a
@@ -50,7 +50,7 @@ namespace nawa {
          * @param destructionCallback A function which will be called on destruction of the wrapper object, the
          * reference pointer is passed to this function as a reference.
          */
-        explicit HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction, void *reference = nullptr,
+        explicit HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction, void* reference = nullptr,
                                               DestructionCallbackFunction destructionCallback = DestructionCallbackFunction());
 
         /**
@@ -58,9 +58,8 @@ namespace nawa {
          * @param connection The nawa::Connection object (parameter of the request handling function).
          * @return Return value of the request handling function.
          */
-        int operator()(nawa::Connection &connection) const;
-
+        int operator()(nawa::Connection& connection) const;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_HANDLEREQUESTFUNCTION_H
+#endif//NAWA_HANDLEREQUESTFUNCTION_H

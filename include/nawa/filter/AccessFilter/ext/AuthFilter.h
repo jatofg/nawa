@@ -85,6 +85,6 @@ namespace nawa {
          */
         NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(AuthFilter, useSessions, bool);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_AUTHFILTER_H
+#endif//NAWA_AUTHFILTER_H

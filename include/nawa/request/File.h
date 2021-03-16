@@ -51,7 +51,7 @@ namespace nawa {
          * Construct a file from data stored in a string.
          * @param data File data.
          */
-        explicit File(const std::string &data);
+        explicit File(std::string const& data);
 
         /**
          * Copy the File object which contains a reference to a file. Please note that this does *not* deep-copy the
@@ -100,8 +100,8 @@ namespace nawa {
          * Write the file to disk. Throws a nawa::Excption with error code 1 on failure.
          * @param path File name and path where to write the file.
          */
-        void writeToDisk(const std::string &path) const;
+        void writeToDisk(std::string const& path) const;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_FILE_H
+#endif//NAWA_FILE_H

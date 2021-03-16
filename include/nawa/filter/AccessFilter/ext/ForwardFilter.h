@@ -43,7 +43,8 @@ namespace nawa {
          *   in basepath."/dir1/dir2/file.ext").
          */
         enum class BasePathExtension {
-            BY_FILENAME, BY_PATH
+            BY_FILENAME,
+            BY_PATH
         };
 
         NAWA_DEFAULT_DESTRUCTOR_OVERRIDE_DEF(ForwardFilter);
@@ -71,6 +72,6 @@ namespace nawa {
          */
         NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(ForwardFilter, basePathExtension, BasePathExtension);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_FORWARDFILTER_H
+#endif//NAWA_FORWARDFILTER_H

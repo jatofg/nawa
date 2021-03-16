@@ -27,14 +27,14 @@ using namespace nawa;
 using namespace std;
 
 struct Cookie::Data {
-    string content; /**< Content of the cookie. */
-    optional<time_t> expires; /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
-    optional<unsigned long> maxAge; /**< Set Max-Age attribute. */
-    optional<string> domain; /**< Set Domain attribute. */
-    optional<string> path; /**< Set Path attribute. */
-    bool secure = false; /**< Set Secure attribute. */
-    bool httpOnly = false; /**< Set HttpOnly attribute. */
-    SameSite sameSite = SameSite::OFF;  /**< Set SameSite attribute. 1 for lax, >1 for strict. */
+    string content;                    /**< Content of the cookie. */
+    optional<time_t> expires;          /**< Expiry date as time_t structure. 0 for no explicit expiry (session cookie). */
+    optional<unsigned long> maxAge;    /**< Set Max-Age attribute. */
+    optional<string> domain;           /**< Set Domain attribute. */
+    optional<string> path;             /**< Set Path attribute. */
+    bool secure = false;               /**< Set Secure attribute. */
+    bool httpOnly = false;             /**< Set HttpOnly attribute. */
+    SameSite sameSite = SameSite::OFF; /**< Set SameSite attribute. 1 for lax, >1 for strict. */
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Cookie)

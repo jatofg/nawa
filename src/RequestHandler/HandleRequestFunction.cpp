@@ -28,7 +28,7 @@ using namespace std;
 
 struct HandleRequestFunctionWrapper::Data {
     HandleRequestFunction handleRequestFunction;
-    void *reference = nullptr;
+    void* reference = nullptr;
     DestructionCallbackFunction destructionCallback;
 
     /**
@@ -41,19 +41,19 @@ struct HandleRequestFunctionWrapper::Data {
         }
     }
 
-    Data(HandleRequestFunction handleRequestFunction, void *reference, DestructionCallbackFunction destructionCallback)
-            : handleRequestFunction(move(handleRequestFunction)), reference(reference),
-              destructionCallback(move(destructionCallback)) {}
+    Data(HandleRequestFunction handleRequestFunction, void* reference, DestructionCallbackFunction destructionCallback)
+        : handleRequestFunction(move(handleRequestFunction)), reference(reference),
+          destructionCallback(move(destructionCallback)) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(HandleRequestFunctionWrapper)
 
 nawa::HandleRequestFunctionWrapper::HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction,
-                                                                 void *reference,
+                                                                 void* reference,
                                                                  DestructionCallbackFunction destructionCallback) {
     data = make_unique<Data>(move(handleRequestFunction), reference, move(destructionCallback));
 }
 
-int nawa::HandleRequestFunctionWrapper::operator()(Connection &connection) const {
+int nawa::HandleRequestFunctionWrapper::operator()(Connection& connection) const {
     return data->handleRequestFunction(connection);
 }

@@ -21,12 +21,12 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <mutex>
 #include <nawa/Exception.h>
 #include <nawa/connection/Connection.h>
 #include <nawa/session/Session.h>
 #include <nawa/util/crypto.h>
 #include <random>
-#include <mutex>
 
 using namespace nawa;
 using namespace std;
@@ -36,11 +36,11 @@ namespace {
      * SessionData objects contain all data of one session.
      */
     struct SessionData {
-        mutex dLock; /**< Lock for data. */
-        mutex eLock; /**< Lock for expires.  */
+        mutex dLock;                               /**< Lock for data. */
+        mutex eLock;                               /**< Lock for expires.  */
         unordered_map<std::string, std::any> data; /**< Map containing all values of this session. */
-        time_t expires; /**< Time when this session expires. */
-        const string sourceIP; /**< IP address of the session initiator, for optional IP checking. */
+        time_t expires;                            /**< Time when this session expires. */
+        const string sourceIP;                     /**< IP address of the session initiator, for optional IP checking. */
         /**
          * Construct an empty SessionData object without a source IP.
          */
@@ -64,7 +64,7 @@ namespace {
      * @param remoteAddress Remote address, which will be part of the random input.
      * @return The session ID.
      */
-    string generateID(const string &remoteAddress) {
+    string generateID(string const& remoteAddress) {
         stringstream base;
 
         // Add 2 ints from random_device (should be in fact /dev/urandom), giving us (in general) 64 bits of entropy
@@ -98,25 +98,25 @@ namespace {
             }
         }
     }
-}
+}// namespace
 
 struct Session::Data {
-    nawa::Connection &connection; /**< Reference to the Connection object in order to access objects. */
+    nawa::Connection& connection; /**< Reference to the Connection object in order to access objects. */
     /**
      * Pointer to the session data struct for the current session, if established.
      * Can be used to check whether a session is established by checking shared_ptr::use_count()
      * (used by established()).
      */
     std::shared_ptr<SessionData> currentData;
-    std::string currentID; /**< The current session ID. */
+    std::string currentID;  /**< The current session ID. */
     std::string cookieName; /**< Name of the session cookie, as determined by start(). */
 
-    explicit Data(Connection &connection) : connection(connection) {}
+    explicit Data(Connection& connection) : connection(connection) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Session)
 
-Session::Session(Connection &connection) {
+Session::Session(Connection& connection) {
     data = make_unique<Data>(connection);
 
     // session autostart cannot happen here yet, as connection.config is not yet available (dangling)
@@ -126,7 +126,8 @@ Session::Session(Connection &connection) {
 void Session::start(Cookie properties) {
 
     // if session already started, do not start it again
-    if (established()) return;
+    if (established())
+        return;
 
     // get name of session cookie from config
     data->cookieName = data->connection.config()[{"session", "cookie_name"}];
@@ -143,8 +144,7 @@ void Session::start(Cookie properties) {
         if (!sessionKStr.empty()) {
             try {
                 sessionKeepalive = stoul(sessionKStr);
-            }
-            catch (invalid_argument &e) {
+            } catch (invalid_argument& e) {
                 sessionKeepalive = 1800;
             }
         }
@@ -163,16 +163,15 @@ void Session::start(Cookie properties) {
             if (sessionData.at(sessionCookieStr)->expires <= time(nullptr)) {
                 sessionData.erase(sessionCookieStr);
             }
-                // validate_ip enabled in NAWA config and IP mismatch?
-            else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax")
-                     &&
+            // validate_ip enabled in NAWA config and IP mismatch?
+            else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax") &&
                      sessionData.at(sessionCookieStr)->sourceIP != data->connection.request().env()["remoteAddress"]) {
                 if (sessionValidateIP == "strict") {
                     // in strict mode, session has to be invalidated
                     sessionData.erase(sessionCookieStr);
                 }
             }
-                // session is valid
+            // session is valid
             else {
                 data->currentData = sessionData.at(sessionCookieStr);
                 // reset expiry
@@ -234,8 +233,7 @@ void Session::start(Cookie properties) {
         } else {
             divisor = 100;
         }
-    }
-    catch (invalid_argument &e) {
+    } catch (invalid_argument const& e) {
         divisor = 100;
     }
     random_device rd;
@@ -248,7 +246,7 @@ bool Session::established() const {
     return (data->currentData.use_count() > 0);
 }
 
-bool Session::isSet(const string &key) const {
+bool Session::isSet(string const& key) const {
     if (established()) {
         lock_guard<mutex> lockGuard(data->currentData->dLock);
         return (data->currentData->data.count(key) == 1);
@@ -256,7 +254,7 @@ bool Session::isSet(const string &key) const {
     return false;
 }
 
-any Session::operator[](const string &key) const {
+any Session::operator[](string const& key) const {
     if (established()) {
         lock_guard<mutex> lockGuard(data->currentData->dLock);
         if (data->currentData->data.count(key) == 1) {
@@ -267,7 +265,7 @@ any Session::operator[](const string &key) const {
 }
 
 // doxygen bug requires std:: here
-void Session::set(std::string key, const std::any &value) {
+void Session::set(std::string key, std::any const& value) {
     if (!established()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
@@ -275,7 +273,7 @@ void Session::set(std::string key, const std::any &value) {
     data->currentData->data[move(key)] = value;
 }
 
-void Session::unset(const string &key) {
+void Session::unset(string const& key) {
     if (!established()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
@@ -286,7 +284,8 @@ void Session::unset(const string &key) {
 void Session::invalidate() {
 
     // do nothing if no session has been established
-    if (!established()) return;
+    if (!established())
+        return;
 
     // reset currentData pointer, this will also make established() return false
     data->currentData.reset();
@@ -299,5 +298,4 @@ void Session::invalidate() {
 
     // unset the session cookie, so that a new session can be started
     data->connection.unsetCookie(data->cookieName);
-
 }

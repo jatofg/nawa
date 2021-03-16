@@ -71,9 +71,9 @@ namespace nawa {
          */
         explicit Log(Level level) noexcept;
 
-        Log(const Log &other) noexcept;
+        Log(Log const& other) noexcept;
 
-        Log &operator=(const Log &other) noexcept;
+        Log& operator=(Log const& other) noexcept;
 
         virtual ~Log();
 
@@ -86,7 +86,7 @@ namespace nawa {
          * the logger in a multi-threaded environment.
          * @param os Pointer to the output stream. Make sure that this stream will be available until NAWA terminates.
          */
-        static void setStream(std::ostream *os) noexcept;
+        static void setStream(std::ostream* os) noexcept;
 
         /**
          * Change the output to append to the specified log file. Will throw a nawa::Exception with error code 1 if
@@ -98,7 +98,7 @@ namespace nawa {
          * the logger in a multi-threaded environment.
          * @param filename Path to the log file.
          */
-        static void setOutfile(const std::string &filename);
+        static void setOutfile(std::string const& filename);
 
         /**
          * Set the desired output log level. Only messages with a log level lower or equal the given level will be
@@ -150,34 +150,59 @@ namespace nawa {
          * Write a message to the log using the default log level
          * @param msg The message.
          */
-        void write(const std::string &msg);
+        void write(std::string const& msg);
 
         /**
          * Write a message to the log.
          * @param msg The message.
          * @param logLevel Log level of this message. Messages logged as OFF will be silently ignored.
          */
-        void write(const std::string &msg, Level logLevel);
+        void write(std::string const& msg, Level logLevel);
 
         /**
          * Write a message to the log using the default log level.
          * @param msg The message.
          */
-        void operator()(const std::string &msg);
+        void operator()(std::string const& msg);
 
         /**
          * Write a message to the log.
          * @param msg The message.
          * @param logLevel Log level of this message. Messages logged as OFF will be silently ignored.
          */
-        void operator()(const std::string &msg, Level logLevel);
+        void operator()(std::string const& msg, Level logLevel);
     };
-}
+}// namespace nawa
 
-#define NLOG(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str());}
-#define NLOG_ERROR(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::ERROR);}
-#define NLOG_WARNING(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::WARNING);}
-#define NLOG_INFO(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::INFORMATIONAL);}
-#define NLOG_DEBUG(Logger, Message) {std::ostringstream msgs; msgs << Message; (Logger).write(msgs.str(), nawa::Log::Level::DEBUG);}
+#define NLOG(Logger, Message)       \
+    {                               \
+        std::ostringstream msgs;    \
+        msgs << Message;            \
+        (Logger).write(msgs.str()); \
+    }
+#define NLOG_ERROR(Logger, Message)                          \
+    {                                                        \
+        std::ostringstream msgs;                             \
+        msgs << Message;                                     \
+        (Logger).write(msgs.str(), nawa::Log::Level::ERROR); \
+    }
+#define NLOG_WARNING(Logger, Message)                          \
+    {                                                          \
+        std::ostringstream msgs;                               \
+        msgs << Message;                                       \
+        (Logger).write(msgs.str(), nawa::Log::Level::WARNING); \
+    }
+#define NLOG_INFO(Logger, Message)                                   \
+    {                                                                \
+        std::ostringstream msgs;                                     \
+        msgs << Message;                                             \
+        (Logger).write(msgs.str(), nawa::Log::Level::INFORMATIONAL); \
+    }
+#define NLOG_DEBUG(Logger, Message)                          \
+    {                                                        \
+        std::ostringstream msgs;                             \
+        msgs << Message;                                     \
+        (Logger).write(msgs.str(), nawa::Log::Level::DEBUG); \
+    }
 
-#endif //NAWA_LOG_H
+#endif//NAWA_LOG_H

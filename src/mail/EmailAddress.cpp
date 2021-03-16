@@ -22,15 +22,15 @@
  */
 
 #include <nawa/mail/EmailAddress.h>
-#include <sstream>
 #include <regex>
+#include <sstream>
 
 using namespace nawa;
 using namespace std;
 
 struct EmailAddress::Data {
-    std::string name; /**< The name of the sender or recipient. */
-    std::string address; /**< The email address itself. */
+    string name;    /**< The name of the sender or recipient. */
+    string address; /**< The email address itself. */
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(EmailAddress)
@@ -45,11 +45,11 @@ NAWA_MOVE_CONSTRUCTOR_IMPL(EmailAddress)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(EmailAddress)
 
-EmailAddress::EmailAddress(std::string address) : EmailAddress() {
+EmailAddress::EmailAddress(string address) : EmailAddress() {
     data->address = move(address);
 }
 
-EmailAddress::EmailAddress(std::string name, std::string address) : EmailAddress() {
+EmailAddress::EmailAddress(string name, string address) : EmailAddress() {
     data->name = move(name);
     data->address = move(address);
 }

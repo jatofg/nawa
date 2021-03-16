@@ -44,6 +44,6 @@ namespace nawa::hashing {
         [[nodiscard]] virtual std::shared_ptr<HashingEngine> getEngine(std::string hash) const = 0;
     };
 
-}
+}// namespace nawa::hashing
 
-#endif //NAWA_HASHTYPETABLE_H
+#endif//NAWA_HASHTYPETABLE_H

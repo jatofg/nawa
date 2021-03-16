@@ -40,8 +40,7 @@ int main() {
     Config config;
     try {
         config.read("config.ini");
-    }
-    catch (const Exception &e) {
+    } catch (Exception const& e) {
         cerr << "Could not read config.ini file: " << e.getMessage() << endl;
     }
     // You don't have to use an ini file of course, you could also fill the config manually with all necessary options
@@ -51,13 +50,11 @@ int main() {
     // Now we need a function which handles the requests. It can be any (Connection&) -> int function,
     // here, we use a lambda for simplicity.
     auto handlingFunction = [](Connection& connection) -> int {
-
         // Our simple example app will just print "Hello World!" for every request
         // and therefore do exactly the same thing as examples/helloworld.cpp
         // (but in a more complicated way)
         connection.responseStream() << "Hello World!";
         return 0;
-
     };
 
     // set up the NAWA request handler
@@ -65,8 +62,7 @@ int main() {
     try {
         // The last argument is the concurrency, which is the number of worker threads for processing requests
         requestHandler = RequestHandler::newRequestHandler(handlingFunction, config, 1);
-    }
-    catch (const Exception &e) {
+    } catch (Exception const& e) {
         cerr << "NAWA request handler could not be created: " << e.getMessage() << endl;
     }
 
@@ -84,7 +80,7 @@ int main() {
     // will return immediately, and you can continue to do other things here while requests are being served.
     try {
         requestHandler->start();
-    } catch (const Exception &e) {
+    } catch (Exception const& e) {
         cerr << "NAWA request handling could not be started: " << e.getMessage() << endl;
     }
 

@@ -92,8 +92,7 @@ namespace {
             {507, "Insufficient Storage"},
             {508, "Loop Detected"},
             {510, "Not Extended"},
-            {511, "Network Authentication Required"}
-    };
+            {511, "Network Authentication Required"}};
 }
 
 struct Connection::Data {
@@ -120,7 +119,7 @@ struct Connection::Data {
         clearStream();
     }
 
-    Data(Connection *base, ConnectionInitContainer const &connectionInit) : request(connectionInit.requestInit),
+    Data(Connection* base, ConnectionInitContainer const& connectionInit) : request(connectionInit.requestInit),
                                                                             config(connectionInit.config),
                                                                             session(*base) {}
 };
@@ -132,9 +131,8 @@ void Connection::setResponseBody(string content) {
     data->clearStream();
 }
 
-void
-Connection::sendFile(const string &path, const string &contentType, bool forceDownload,
-                     const string &downloadFilename, bool checkIfModifiedSince) {
+void Connection::sendFile(string const& path, string const& contentType, bool forceDownload,
+                          string const& downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
     ifstream f(path, ifstream::binary);
@@ -155,7 +153,8 @@ Connection::sendFile(const string &path, const string &contentType, bool forceDo
     time_t ifModifiedSince = 0;
     try {
         ifModifiedSince = stoul(data->request.env()["if-modified-since"]);
-    } catch (invalid_argument const &) {} catch (out_of_range const &) {}
+    } catch (invalid_argument const&) {
+    } catch (out_of_range const&) {}
     if (checkIfModifiedSince && ifModifiedSince >= lastModified) {
         setStatus(304);
         setResponseBody(string());
@@ -226,15 +225,15 @@ void Connection::unsetHeader(string key) {
 
 unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) const {
     unordered_multimap<string, string> ret;
-    for (auto const &[key, values]: data->headers) {
-        for (auto const &value: values) {
+    for (auto const& [key, values] : data->headers) {
+        for (auto const& value : values) {
             ret.insert({key, value});
         }
     }
 
     // include cookies if desired
     if (includeCookies)
-        for (auto const &e: data->cookies) {
+        for (auto const& e : data->cookies) {
             stringstream headerVal;
             headerVal << e.first << "=" << e.second.content();
             // Domain option
@@ -285,7 +284,7 @@ string Connection::getResponseBody() {
     return data->bodyString;
 }
 
-Connection::Connection(ConnectionInitContainer const &connectionInit) {
+Connection::Connection(ConnectionInitContainer const& connectionInit) {
     data = make_unique<Data>(this, connectionInit);
     data->flushCallback = connectionInit.flushCallback;
 
@@ -297,7 +296,7 @@ Connection::Connection(ConnectionInitContainer const &connectionInit) {
     }
 }
 
-void Connection::setCookie(const string &key, Cookie cookie) {
+void Connection::setCookie(string const& key, Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
     regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
@@ -307,18 +306,21 @@ void Connection::setCookie(const string &key, Cookie cookie) {
     data->cookies[key] = move(cookie);
 }
 
-void Connection::setCookie(const string &key, string cookieContent) {
+void Connection::setCookie(string const& key, string cookieContent) {
     setCookie(key, Cookie(move(cookieContent)));
 }
 
-void Connection::unsetCookie(const string &key) {
+void Connection::unsetCookie(string const& key) {
     data->cookies.erase(key);
 }
 
 void Connection::flushResponse() {
     // use callback to flush response
-    data->flushCallback(FlushCallbackContainer{.status=data->responseStatus, .headers=getHeaders(true),
-            .body=getResponseBody(), .flushedBefore=data->isFlushed});
+    data->flushCallback(FlushCallbackContainer{
+            .status = data->responseStatus,
+            .headers = getHeaders(true),
+            .body = getResponseBody(),
+            .flushedBefore = data->isFlushed});
     // response has been flushed now
     data->isFlushed = true;
     // also, empty the Connection object, so that content will not be sent more than once
@@ -337,38 +339,39 @@ unsigned int Connection::getStatus() const {
     return data->responseStatus;
 }
 
-nawa::Request const &nawa::Connection::request() const noexcept {
+nawa::Request const& nawa::Connection::request() const noexcept {
     return data->request;
 }
 
-nawa::Session &nawa::Connection::session() noexcept {
+nawa::Session& nawa::Connection::session() noexcept {
     return data->session;
 }
 
-nawa::Session const &nawa::Connection::session() const noexcept {
+nawa::Session const& nawa::Connection::session() const noexcept {
     return data->session;
 }
 
-nawa::Config &nawa::Connection::config() noexcept {
+nawa::Config& nawa::Connection::config() noexcept {
     return data->config;
 }
 
-nawa::Config const &nawa::Connection::config() const noexcept {
+nawa::Config const& nawa::Connection::config() const noexcept {
     return data->config;
 }
 
-std::ostream &nawa::Connection::responseStream() noexcept {
+std::ostream& nawa::Connection::responseStream() noexcept {
     return data->responseStream;
 }
 
-bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
+bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
     // if filters are disabled, do not even check
-    if (!accessFilters.filtersEnabled()) return false;
+    if (!accessFilters.filtersEnabled())
+        return false;
 
     auto requestPath = data->request.env().getRequestPath();
 
     // check block filters
-    for (auto const &flt: accessFilters.blockFilters()) {
+    for (auto const& flt : accessFilters.blockFilters()) {
         // if the filter does not apply (or does in case of an inverted filter), go to the next
         bool matches = flt.matches(requestPath);
         if ((!matches && !flt.invert()) || (matches && flt.invert())) {
@@ -389,7 +392,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
 
     // the ID is used to identify the exact filter for session cookie creation
     int authFilterID = -1;
-    for (auto const &flt: accessFilters.authFilters()) {
+    for (auto const& flt : accessFilters.authFilters()) {
         ++authFilterID;
 
         bool matches = flt.matches(requestPath);
@@ -424,7 +427,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
                 // that's it, the response must be sent to the client directly so it can authenticate
                 return true;
             }
-                // case 2: credentials already sent
+            // case 2: credentials already sent
             else {
                 // split the authorization string, only the last part should contain base64
                 auto authResponse = split_string(data->request.env()["authorization"], ' ', true);
@@ -462,11 +465,10 @@ bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
 
         // if the user is authenticated, we can continue to process forward filters
         break;
-
     }
 
     // check forward filters
-    for (auto const &flt: accessFilters.forwardFilters()) {
+    for (auto const& flt : accessFilters.forwardFilters()) {
         bool matches = flt.matches(requestPath);
         if ((!matches && !flt.invert()) || (matches && flt.invert())) {
             continue;
@@ -475,7 +477,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
         stringstream filePath;
         filePath << flt.basePath();
         if (flt.basePathExtension() == ForwardFilter::BasePathExtension::BY_PATH) {
-            for (auto const &e: requestPath) {
+            for (auto const& e : requestPath) {
                 filePath << '/' << e;
             }
         } else {
@@ -486,8 +488,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const &accessFilters) {
         auto filePathStr = filePath.str();
         try {
             sendFile(filePathStr, "", false, "", true);
-        }
-        catch (Exception &) {
+        } catch (Exception&) {
             // file does not exist, send 404
             setStatus(404);
             if (!flt.response().empty()) {
@@ -520,7 +521,7 @@ std::string FlushCallbackContainer::getFullHttp() const {
     // include headers and cookies, but only when flushing for the first time
     if (!flushedBefore) {
         // Add headers, incl. cookies, to the raw HTTP source
-        for (auto const &e: headers) {
+        for (auto const& e : headers) {
             raw << e.first << ": " << e.second << "\r\n";
         }
         raw << "\r\n";

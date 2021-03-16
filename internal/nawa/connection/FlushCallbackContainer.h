@@ -33,10 +33,10 @@ namespace nawa {
      * Internal container passed to the FlushCallbackFunction.
      */
     struct FlushCallbackContainer {
-        unsigned int status; /**< The HTTP response status as an unsigned integer. */
+        unsigned int status;                                       /**< The HTTP response status as an unsigned integer. */
         std::unordered_multimap<std::string, std::string> headers; /**< The multimap of response headers. */
-        std::string body; /**< The response body. */
-        bool flushedBefore; /**< True if the response has been flushed before, false otherwise. */
+        std::string body;                                          /**< The response body. */
+        bool flushedBefore;                                        /**< True if the response has been flushed before, false otherwise. */
 
         /**
          * Get a textual representation of the HTTP status (such as "200 OK"). Implemented in Connection.cpp.
@@ -53,6 +53,6 @@ namespace nawa {
     };
 
     using FlushCallbackFunction = std::function<void(FlushCallbackContainer)>;
-}
+}// namespace nawa
 
-#endif //NAWA_FLUSHCALLBACKCONTAINER_H
+#endif//NAWA_FLUSHCALLBACKCONTAINER_H

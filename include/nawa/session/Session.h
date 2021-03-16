@@ -44,7 +44,7 @@ namespace nawa {
          * Construct a new Session object. This will just store the Connection reference in the object.
          * @param connection Reference to the current Connection (for getting and setting cookies).
          */
-        explicit Session(Connection &connection);
+        explicit Session(Connection& connection);
 
         /**
          * Start the session (load existing session basing on a cookie sent by the client or create a new one).
@@ -92,7 +92,7 @@ namespace nawa {
          * @param key Key to check.
          * @return True if a value exists for this key, false otherwise. Always false if no session is active.
          */
-        [[nodiscard]] bool isSet(const std::string &key) const;
+        [[nodiscard]] bool isSet(std::string const& key) const;
 
         /**
          * Get the value at the given key (as a std::any object). To actually receive the stored object, use
@@ -103,7 +103,7 @@ namespace nawa {
          * @return Value at key. If no value exists for that key or no session established, a std::any without value
          * will be returned.
          */
-        std::any operator[](const std::string &key) const;
+        std::any operator[](std::string const& key) const;
 
         /**
          * Set key to a value of type std::any. Throws a nawa::Exception with error code 1 if no session has been
@@ -111,7 +111,7 @@ namespace nawa {
          * @param key Key to set.
          * @param value Value to set the key to.
          */
-        void set(std::string key, const std::any &value);
+        void set(std::string key, const std::any& value);
 
         /**
          * Set key to a string value. This function exists for convenience and makes sure that you do not save a
@@ -124,7 +124,7 @@ namespace nawa {
          * @param key Key to set.
          * @param value C-string that will be used as the value (will be stored as a std::string!).
          */
-        void set(std::string key, const char *value) {
+        void set(std::string key, char const* value) {
             set(std::move(key), std::make_any<std::string>(value));
         }
 
@@ -139,7 +139,7 @@ namespace nawa {
          * @param value Value to set the key to.
          */
         template<typename T>
-        void set(std::string key, const T &value) {
+        void set(std::string key, T const& value) {
             set(std::move(key), std::any(value));
         }
 
@@ -148,7 +148,7 @@ namespace nawa {
          * been established.
          * @param key Key to remove.
          */
-        void unset(const std::string &key);
+        void unset(std::string const& key);
 
         /**
          * Terminate and delete the currently existing session along with its data and dequeue the session cookie.
@@ -158,7 +158,6 @@ namespace nawa {
          */
         void invalidate();
     };
-}
+}// namespace nawa
 
-
-#endif //NAWA_SESSION_H
+#endif//NAWA_SESSION_H

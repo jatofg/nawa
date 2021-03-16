@@ -32,14 +32,14 @@ struct request::Post::Data {
     std::shared_ptr<std::string> rawPost;
     std::unordered_multimap<std::string, File> fileMap;
 
-    explicit Data(const RequestInitContainer &requestInit) : contentType(requestInit.postContentType),
+    explicit Data(RequestInitContainer const& requestInit) : contentType(requestInit.postContentType),
                                                              rawPost(requestInit.rawPost),
                                                              fileMap(requestInit.postFiles) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, Post)
 
-request::Post::Post(const RequestInitContainer &requestInit) : GPC(requestInit, GPC::Source::POST) {
+request::Post::Post(RequestInitContainer const& requestInit) : GPC(requestInit, GPC::Source::POST) {
     data = make_unique<Data>(requestInit);
 }
 
@@ -59,13 +59,14 @@ bool request::Post::hasFiles() const {
     return !data->fileMap.empty();
 }
 
-optional<File> request::Post::getFile(const string &key) const {
+optional<File> request::Post::getFile(string const& key) const {
     auto e = data->fileMap.find(key);
-    if (e != data->fileMap.end()) return e->second;
+    if (e != data->fileMap.end())
+        return e->second;
     return nullopt;
 }
 
-vector<File> request::Post::getFileVector(const string &key) const {
+vector<File> request::Post::getFileVector(string const& key) const {
     vector<File> ret;
     auto e = data->fileMap.equal_range(key);
     for (auto it = e.first; it != e.second; ++it) {
@@ -74,10 +75,10 @@ vector<File> request::Post::getFileVector(const string &key) const {
     return ret;
 }
 
-size_t request::Post::countFiles(const string &key) const {
+size_t request::Post::countFiles(string const& key) const {
     return data->fileMap.count(key);
 }
 
-std::unordered_multimap<std::string, File> const &request::Post::getFileMultimap() const {
+std::unordered_multimap<std::string, File> const& request::Post::getFileMultimap() const {
     return data->fileMap;
 }

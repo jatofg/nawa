@@ -46,14 +46,14 @@ namespace nawa::request {
          * Create Env using a RequestInitContainer.
          * @param initContainer The RequestInitContainer.
          */
-        explicit Env(const RequestInitContainer &initContainer);
+        explicit Env(RequestInitContainer const& initContainer);
 
         /**
          * Get an environment variable. For a list of environment variables, see \ref environmentmanual
          * @param envVar Name of the environment variable.
          * @return Content of the environment variable. Empty string if not set.
          */
-        std::string operator[](const std::string &envVar) const;
+        std::string operator[](std::string const& envVar) const;
 
         /**
          * Receive the languages accepted by the client (from HTTP Header). Works with fastcgi request handler only.
@@ -68,6 +68,6 @@ namespace nawa::request {
          */
         [[nodiscard]] std::vector<std::string> getRequestPath() const;
     };
-}
+}// namespace nawa::request
 
-#endif //NAWA_ENV_H
+#endif//NAWA_ENV_H

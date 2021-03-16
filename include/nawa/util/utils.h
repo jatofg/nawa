@@ -38,15 +38,15 @@ namespace nawa {
      * as a string. The vector contains the full match at index 0 and, if capturing groups are used in the expression,
      * the submatches at the following indexes (capturing group 1 at index 1, ...)
      */
-    void regex_replace_callback(std::string &s, const std::regex &rgx,
-                                const std::function<std::string(const std::vector<std::string> &)> &fmt);
+    void regex_replace_callback(std::string& s, std::regex const& rgx,
+                                std::function<std::string(std::vector<std::string> const&)> const& fmt);
 
     /**
      * Apply hex encoding to every byte in a string of bytes.
      * @param in Byte string that should be converted.
      * @return String containing the hexadecimal representation of every byte (thus, twice as long as in).
      */
-    std::string hex_dump(const std::string &in);
+    std::string hex_dump(std::string const& in);
 
     /**
      * Convert every ASCII letter in the given string to lowercase.
@@ -76,7 +76,7 @@ namespace nawa {
      * @param filename The filename.
      * @return String containing the extension, or an empty string if no extension has been found.
      */
-    std::string get_file_extension(const std::string &filename);
+    std::string get_file_extension(std::string const& filename);
 
     /**
      * Get the MIME content type string for a particular file extension. This function checks the extension against a
@@ -101,7 +101,7 @@ namespace nawa {
      * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
      * @return UNIX timestamp value (time_t).
      */
-    time_t read_http_time(const std::string &httpTime);
+    time_t read_http_time(std::string const& httpTime);
 
     /**
      * Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string.
@@ -117,7 +117,7 @@ namespace nawa {
      * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> <tzoffset(5)>".
      * @return UNIX timestamp value (time_t).
      */
-    time_t read_smtp_time(const std::string &smtpTime);
+    time_t read_smtp_time(std::string const& smtpTime);
 
     /**
      * Split a string using a character as a delimiter.
@@ -134,7 +134,7 @@ namespace nawa {
      * @param path Vector representation of a path.
      * @return String representation of the given path.
      */
-    std::string merge_path(const std::vector<std::string> &path);
+    std::string merge_path(std::vector<std::string> const& path);
 
     /**
      * Convert a string representation of a path ("/dir1/dir2") to a vector representation ({"dir1", "dir2"}).
@@ -142,7 +142,7 @@ namespace nawa {
      * @param pathString Sting representation of the path.
      * @return Vector representation of the given path.
      */
-    std::vector<std::string> split_path(const std::string &pathString);
+    std::vector<std::string> split_path(std::string const& pathString);
 
     /**
      * Convert line endings in a string between LF (Unix) and CRLF (Windows/Email).
@@ -150,7 +150,7 @@ namespace nawa {
      * @param ending The new line ending (e.g., "\\n" or "\\r\\n")
      * @return String with converted line endings.
      */
-    std::string convert_line_endings(const std::string &in, const std::string &ending);
+    std::string convert_line_endings(std::string const& in, std::string const& ending);
 
     /**
      * Simple function to read a whole file into a string. Will throw a nawa::Exception with error code 1 if the file
@@ -158,7 +158,7 @@ namespace nawa {
      * @param path Path and filename.
      * @return String containing the whole file.
      */
-    std::string get_file_contents(const std::string &path);
+    std::string get_file_contents(std::string const& path);
 
     /**
      * Replace all occurrences of pattern keys by the corresponding pattern values in the input string.
@@ -166,7 +166,7 @@ namespace nawa {
      * @param patterns Map of key characters (to be replaced in the input string) and value characters (the replacements).
      * @return String with replacements applied.
      */
-    std::string string_replace(std::string input, const std::unordered_map<char, char> &patterns);
+    std::string string_replace(std::string input, std::unordered_map<char, char> const& patterns);
 
     /**
      * Replace all occurrences of pattern keys by the corresponding pattern values in the input string.
@@ -174,14 +174,14 @@ namespace nawa {
      * @param patterns Map of key strings (to be replaced in the input string) and value strings (the replacements).
      * @return String with replacements applied.
      */
-    std::string string_replace(std::string input, const std::unordered_map<std::string, std::string> &patterns);
+    std::string string_replace(std::string input, std::unordered_map<std::string, std::string> const& patterns);
 
     /**
      * Generate a GET key => value multimap out of a query string (the ?k1=v1&k2=v2... part of a URL).
      * @param queryString Query string or URL containing a query string.
      * @return Key => value map containing the GET variables.
      */
-    std::unordered_multimap<std::string, std::string> split_query_string(const std::string &queryString);
+    std::unordered_multimap<std::string, std::string> split_query_string(std::string const& queryString);
 
     /**
      * Parse a block of headers into a map.
@@ -195,7 +195,7 @@ namespace nawa {
      * @param rawCookies The content of the "Cookie" header.
      * @return A multimap of the cookies.
      */
-     std::unordered_multimap<std::string, std::string> parse_cookies(const std::string &rawCookies);
+    std::unordered_multimap<std::string, std::string> parse_cookies(std::string const& rawCookies);
 
     /**
      * Convert any iterable map to an unordered_map.
@@ -209,11 +209,11 @@ namespace nawa {
     template<typename KeyType, typename ValueType, template<typename, typename, typename...> class MapType, typename... Args>
     std::unordered_multimap<KeyType, ValueType> to_unordered_multimap(MapType<KeyType, ValueType, Args...> inputMap) {
         std::unordered_multimap<KeyType, ValueType> ret;
-        for (auto const &[k, v]: inputMap) {
+        for (auto const& [k, v] : inputMap) {
             ret.insert({k, v});
         }
         return ret;
     }
-}
+}// namespace nawa
 
-#endif //NAWA_UTILS_H
+#endif//NAWA_UTILS_H

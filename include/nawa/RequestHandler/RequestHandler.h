@@ -24,12 +24,12 @@
 #ifndef NAWA_REQUESTHANDLER_H
 #define NAWA_REQUESTHANDLER_H
 
+#include <memory>
 #include <nawa/RequestHandler/HandleRequestFunction.h>
 #include <nawa/config/Config.h>
 #include <nawa/filter/AccessFilterList.h>
 #include <nawa/internal/fwdecl.h>
 #include <nawa/internal/macros.h>
-#include <memory>
 #include <optional>
 
 namespace nawa {
@@ -56,7 +56,7 @@ namespace nawa {
          * @return A unique_ptr to the request handler.
          */
         static std::unique_ptr<RequestHandler>
-        newRequestHandler(const std::shared_ptr<HandleRequestFunctionWrapper> &handleRequestFunction, Config config,
+        newRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> const& handleRequestFunction, Config config,
                           int concurrency);
 
         /**
@@ -70,8 +70,7 @@ namespace nawa {
          * @return A unique_ptr to the request handler.
          */
         static std::unique_ptr<RequestHandler>
-        newRequestHandler(HandleRequestFunction handleRequestFunction, Config config,
-                          int concurrency);
+        newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency);
 
         /**
          * Set or replace the handleRequest function of the app (thread-safe, blocking).
@@ -161,8 +160,8 @@ namespace nawa {
          * Internal function which should only be used by request handlers.
          * @param connection The current Connection object.
          */
-        void handleRequest(Connection &connection);
+        void handleRequest(Connection& connection);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_REQUESTHANDLER_H
+#endif//NAWA_REQUESTHANDLER_H

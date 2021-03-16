@@ -33,7 +33,7 @@ struct Request::Data {
     request::Post const post;
     request::GPC const cookie;
 
-    explicit Data(RequestInitContainer const &initContainer) : env(initContainer),
+    explicit Data(RequestInitContainer const& initContainer) : env(initContainer),
                                                                get(initContainer, request::GPC::Source::GET),
                                                                post(initContainer),
                                                                cookie(initContainer, request::GPC::Source::COOKIE) {}
@@ -41,22 +41,22 @@ struct Request::Data {
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Request)
 
-Request::Request(const RequestInitContainer &initContainer) {
+Request::Request(RequestInitContainer const& initContainer) {
     data = make_unique<Data>(initContainer);
 }
 
-request::Env const &nawa::Request::env() const noexcept {
+request::Env const& nawa::Request::env() const noexcept {
     return data->env;
 }
 
-request::GPC const &nawa::Request::get() const noexcept {
+request::GPC const& nawa::Request::get() const noexcept {
     return data->get;
 }
 
-request::Post const &nawa::Request::post() const noexcept {
+request::Post const& nawa::Request::post() const noexcept {
     return data->post;
 }
 
-request::GPC const &nawa::Request::cookie() const noexcept {
+request::GPC const& nawa::Request::cookie() const noexcept {
     return data->cookie;
 }

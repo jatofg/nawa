@@ -77,6 +77,6 @@ namespace nawa {
          */
         NAWA_COMPLEX_DATA_ACCESSORS_DEF(AccessFilterList, forwardFilters, std::vector<ForwardFilter>);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_ACCESSRULES_H
+#endif//NAWA_ACCESSRULES_H

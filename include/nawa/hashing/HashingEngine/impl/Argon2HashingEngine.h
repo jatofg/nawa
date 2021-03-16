@@ -81,6 +81,6 @@ namespace nawa::hashing {
         [[nodiscard]] bool verifyHash(std::string input, std::string hash) const override;
     };
 
-}
+}// namespace nawa::hashing
 
-#endif //NAWA_ARGON2HASHINGENGINE_H
+#endif//NAWA_ARGON2HASHINGENGINE_H

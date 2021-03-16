@@ -40,11 +40,11 @@ AppInit::AppInit(Config config, size_t numThreads) {
     data = make_unique<Data>(move(config), numThreads);
 }
 
-Config &nawa::AppInit::config() {
+Config& nawa::AppInit::config() {
     return data->config;
 }
 
-AccessFilterList &nawa::AppInit::accessFilters() {
+AccessFilterList& nawa::AppInit::accessFilters() {
     return data->accessFilters;
 }
 

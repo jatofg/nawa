@@ -49,7 +49,7 @@ namespace nawa::request {
 
         NAWA_DEFAULT_DESTRUCTOR_DEF(GPC);
 
-        GPC(const RequestInitContainer &requestInit, Source source);
+        GPC(RequestInitContainer const& requestInit, Source source);
 
         /**
          * Get a GET, POST, or COOKIE variable. If the query contains more than one variable of the same name,
@@ -60,27 +60,27 @@ namespace nawa::request {
          * @return Value of the variable. Empty string if not set
          * (or empty - use count() for checking whether the variable is set).
          */
-        std::string operator[](const std::string &gpcVar) const;
+        std::string operator[](std::string const& gpcVar) const;
 
         /**
          * Get all GET, POST, or COOKIE variables with the given name.
          * @param gpcVar Name of the variables.
          * @return Vector of values. Empty if not set.
          */
-        [[nodiscard]] std::vector<std::string> getVector(const std::string &gpcVar) const;
+        [[nodiscard]] std::vector<std::string> getVector(std::string const& gpcVar) const;
 
         /**
          * Get the number of submitted GET, POST, or COOKIE variables with the given name.
          * @param gpcVar Name of the variables.
          * @return Number of occurrences.
          */
-        [[nodiscard]] size_t count(const std::string &gpcVar) const;
+        [[nodiscard]] size_t count(std::string const& gpcVar) const;
 
         /**
          * Get a reference to the GET, POST, or COOKIE multimap.
          * @return Reference to the multimap.
          */
-        [[nodiscard]] std::unordered_multimap<std::string, std::string> const &getMultimap() const;
+        [[nodiscard]] std::unordered_multimap<std::string, std::string> const& getMultimap() const;
 
         /**
          * Get constant begin iterator to the multimap containing all GET, POST, or COOKIE data.
@@ -100,6 +100,6 @@ namespace nawa::request {
          */
         explicit virtual operator bool() const;
     };
-}
+}// namespace nawa::request
 
-#endif //NAWA_GPC_H
+#endif//NAWA_GPC_H

@@ -142,27 +142,27 @@ namespace nawa {
              * Construct a MimePartOrList from a MimePart (also implicitly).
              * @param _mimePart The MimePart object this MimePartOrList should refer to.
              */
-            MimePartOrList(const MimePart &_mimePart);
+            MimePartOrList(MimePart const& _mimePart);
 
             /**
              * Construct a MimePartOrList from a MimePartList (also implicitly).
              * @param _mimePartList The MimePartList object this MimePartOrList should refer to.
              */
-            MimePartOrList(const MimePartList &_mimePartList);
+            MimePartOrList(MimePartList const& _mimePartList);
 
             /**
              * Assign a MimePart object to this MimePartOrList.
              * @param otherMimePart Object to assign.
              * @return This object.
              */
-            MimePartOrList &operator=(MimePart const &otherMimePart);
+            MimePartOrList& operator=(MimePart const& otherMimePart);
 
             /**
              * Assign a MimePartList object to this MimePartOrList.
              * @param otherMimePartList Object to assign.
              * @return This object.
              */
-            MimePartOrList &operator=(MimePartList const &otherMimePartList);
+            MimePartOrList& operator=(MimePartList const& otherMimePartList);
 
             /**
              * Create a MIME part containing data. If this pointer contains a MimePart object, the second pointer
@@ -238,8 +238,8 @@ namespace nawa {
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        [[nodiscard]] std::string getRaw(std::shared_ptr<ReplacementRules> const &replacementRules) const override;
+        [[nodiscard]] std::string getRaw(std::shared_ptr<ReplacementRules> const& replacementRules) const override;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_MIMEEMAIL_H
+#endif//NAWA_MIMEEMAIL_H

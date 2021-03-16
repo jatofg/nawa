@@ -28,19 +28,19 @@
 using namespace nawa;
 using namespace std;
 
-int init(AppInit &appInit) {
+int init(AppInit& appInit) {
 
     return 0;
 }
 
-int handleRequest(Connection &connection) {
+int handleRequest(Connection& connection) {
     // run this a lot of times in parallel (flood requests) to test multi-threading
     // for example with curl: $ curl -b SESSION=... http://t1.local/test?it=[1-100]
     // see sessiontest.sh for an example script
     random_device rd;
     unsigned int cm[1000];
 
-    auto &session = connection.session();
+    auto& session = connection.session();
 
     session.start();
 

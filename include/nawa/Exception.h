@@ -33,8 +33,8 @@ namespace nawa {
      * Exception class that can be used by apps to catch errors resulting from NAWA function calls.
      */
     class Exception : public std::exception {
-        int errorCode; /**< The error code so that the app can distinguish different exceptions from a function. */
-        std::string message; /**< The exception message will be stored here. */
+        int errorCode;            /**< The error code so that the app can distinguish different exceptions from a function. */
+        std::string message;      /**< The exception message will be stored here. */
         std::string debugMessage; /**< The full debug message will be stored here. */
     public:
         /**
@@ -44,10 +44,10 @@ namespace nawa {
          * @param message Optional message describing the problem (the only thing printed when calling getMessage()).
          * @param additionalDebugInfo Optional additional info for debugging.
          */
-        Exception(const std::string &inFunction, int errorCode, const std::string &message = "No message provided.",
-                  const std::string &additionalDebugInfo = std::string())
-                : errorCode(errorCode),
-                  message(message) {
+        Exception(const std::string& inFunction, int errorCode, const std::string& message = "No message provided.",
+                  const std::string& additionalDebugInfo = std::string())
+            : errorCode(errorCode),
+              message(message) {
             std::stringstream mstream;
             mstream << "[NAWA Exception #" << errorCode << " in " << inFunction << "] " << message;
             if (!additionalDebugInfo.empty()) {
@@ -85,10 +85,10 @@ namespace nawa {
          * uncaught Exception leads to termination. Use getMessage to get the message without debug information.
          * @return The full exception message.
          */
-        const char *what() const noexcept override {
+        char const* what() const noexcept override {
             return debugMessage.c_str();
         }
     };
-}
+}// namespace nawa
 
-#endif //NAWA_EXCEPTION_H
+#endif//NAWA_EXCEPTION_H

@@ -77,8 +77,8 @@ namespace nawa {
          * @param replacementRules Replacements that shall be applied in all suitable (body) parts of the email.
          * @return Raw source of the email.
          */
-        [[nodiscard]] virtual std::string getRaw(std::shared_ptr<ReplacementRules> const &replacementRules) const = 0;
+        [[nodiscard]] virtual std::string getRaw(std::shared_ptr<ReplacementRules> const& replacementRules) const = 0;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_EMAIL_H
+#endif//NAWA_EMAIL_H

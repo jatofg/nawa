@@ -25,8 +25,8 @@
 #define NAWA_SMTPMAILER_H
 
 #include <nawa/internal/macros.h>
-#include <nawa/mail/EmailAddress.h>
 #include <nawa/mail/Email/Email.h>
+#include <nawa/mail/EmailAddress.h>
 #include <string>
 
 namespace nawa {
@@ -149,6 +149,6 @@ namespace nawa {
          */
         void processQueue() const;
     };
-}
+}// namespace nawa
 
-#endif //NAWA_SMTPMAILER_H
+#endif//NAWA_SMTPMAILER_H

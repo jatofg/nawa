@@ -42,15 +42,15 @@ namespace nawarun {
     };
 
     // Types of functions that need to be accessed from NAWA applications
-    using init_t = int(nawa::AppInit &); /**< Type for the init() function of NAWA apps. */
-    using handleRequest_t = int(nawa::Connection &); /**< Type for the handleRequest(Connection) function of NAWA apps. */
+    using init_t = int(nawa::AppInit&);             /**< Type for the init() function of NAWA apps. */
+    using handleRequest_t = int(nawa::Connection&); /**< Type for the handleRequest(Connection) function of NAWA apps. */
 
     /**
      * Get the number of threads to use from config.
      * @param config Config
      * @return Number of threads
      */
-    unsigned int getConcurrency(nawa::Config const &config);
+    unsigned int getConcurrency(nawa::Config const& config);
 
     /**
      * Load the init() and handleRequest() functions of an app. Note: the init function also becomes unavailable when
@@ -58,7 +58,7 @@ namespace nawarun {
      * @param config Config
      * @return Pair of init function and smart pointer to wrapper containing the handleRequest function.
      */
-    std::pair<init_t *, std::shared_ptr<nawa::HandleRequestFunctionWrapper>> loadAppFunctions(nawa::Config const &config);
+    std::pair<init_t*, std::shared_ptr<nawa::HandleRequestFunctionWrapper>> loadAppFunctions(nawa::Config const& config);
 
     /**
      * Reload on signal.
@@ -73,13 +73,13 @@ namespace nawarun {
      * @return A tuple with the UID and GID and a list of supplementary groups if privilege downgrade should happen
      * (i.e., nawarun is running as root).
      */
-    std::optional<PrivilegeDowngradeData> preparePrivilegeDowngrade(nawa::Config const &config);
+    std::optional<PrivilegeDowngradeData> preparePrivilegeDowngrade(nawa::Config const& config);
 
     /**
      * Replace nawarun's logger with the given one for testing purposes.
      * @param log Logger
      */
-    void replaceLogger(nawa::Log const &log);
+    void replaceLogger(nawa::Log const& log);
 
     /**
      * Parse command line arguments. If --help or -h is encountered as the first argument, printHelpAndExit() is invoked.
@@ -88,14 +88,14 @@ namespace nawarun {
      * @return A structure containing the path to the config file (optional, as it can be skipped with --no-config-file), and
      * a list of config option overrides (identifier-value pairs, wherein the identifier is a pair of category and key).
      */
-    Parameters parseCommandLine(int argc, char **argv);
+    Parameters parseCommandLine(int argc, char** argv);
 
     /**
      * Run nawarun.
      * @param parameters Parameters
      * @return Return code (0 on success, 1 on failure).
      */
-    int run(Parameters const &parameters);
-}
+    int run(Parameters const& parameters);
+}// namespace nawarun
 
-#endif //NAWA_NAWARUN_H
+#endif//NAWA_NAWARUN_H

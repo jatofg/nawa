@@ -40,15 +40,15 @@ Config loadConfig() {
      */
     try {
         return Config("test.ini");
-    } catch (Exception const &e) {}
+    } catch (Exception const& e) {}
 
     try {
         return Config("../tests/test.ini");
-    } catch (Exception const &e) {}
+    } catch (Exception const& e) {}
 
     try {
         return Config("tests/test.ini");
-    } catch (Exception const &e) {}
+    } catch (Exception const& e) {}
 
     return Config();
 }

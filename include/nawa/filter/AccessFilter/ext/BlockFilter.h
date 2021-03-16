@@ -52,6 +52,6 @@ namespace nawa {
          */
         NAWA_PRIMITIVE_DATA_ACCESSORS_DEF(BlockFilter, status, unsigned int);
     };
-}
+}// namespace nawa
 
-#endif //NAWA_BLOCKFILTER_H
+#endif//NAWA_BLOCKFILTER_H

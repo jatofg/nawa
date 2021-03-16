@@ -25,6 +25,6 @@
 
 using namespace nawarun;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     return run(parseCommandLine(argc, argv));
 }

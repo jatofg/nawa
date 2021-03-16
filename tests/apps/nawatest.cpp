@@ -30,14 +30,14 @@
 using namespace nawa;
 using namespace std;
 
-int init(nawa::AppInit &appInit) {
+int init(nawa::AppInit& appInit) {
 
     // enable access filtering
     appInit.accessFilters().filtersEnabled() = true;
 
     // apply a forward filter for images
     ForwardFilter forwardFilter;
-    forwardFilter.pathFilter() = {{"test",  "images"},
+    forwardFilter.pathFilter() = {{"test", "images"},
                                   {"test2", "images"}};
     forwardFilter.extensionFilter() = {"png", "jpg", "svg"};
     forwardFilter.basePath() = "/home/tobias/Pictures";
@@ -45,7 +45,7 @@ int init(nawa::AppInit &appInit) {
 
     // send 404 error for non-image files in /test{2}/images
     BlockFilter blockFilter;
-    blockFilter.pathFilter() = {{"test",  "images"},
+    blockFilter.pathFilter() = {{"test", "images"},
                                 {"test2", "images"}};
     blockFilter.extensionFilter() = {"png", "jpg", "svg"};
     blockFilter.invertExtensionFilter() = true;
@@ -72,11 +72,11 @@ int init(nawa::AppInit &appInit) {
     return 0;
 }
 
-int handleRequest(Connection &connection) {
+int handleRequest(Connection& connection) {
 
-    auto &resp = connection.responseStream();
-    auto &req = connection.request();
-    auto &session = connection.session();
+    auto& resp = connection.responseStream();
+    auto& req = connection.request();
+    auto& session = connection.session();
 
     // start a session
     session.start();
@@ -89,8 +89,9 @@ int handleRequest(Connection &connection) {
 
     resp << "<!DOCTYPE html>\n"
             "<html><head><title>Test</title></head><body>"
-            "<p>Hello World! HTML string: " << encoding::htmlEncode(decoded, true) << "</p>"
-                                                                                      "<p>Client IP: "
+            "<p>Hello World! HTML string: "
+         << encoding::htmlEncode(decoded, true) << "</p>"
+                                                   "<p>Client IP: "
          << encoding::htmlEncode(req.env()["REMOTE_ADDR"]) << "</p>"
                                                               "<p>Request URI: ("
          << req.env().getRequestPath().size() << " elements): "
@@ -100,8 +101,9 @@ int handleRequest(Connection &connection) {
                                   "<p>SERVER_NAME: "
          << req.env()["SERVER_NAME"]
          << "</p>"
-            "<p>Server software: " << req.env()["SERVER_SOFTWARE"] << "</p>"
-                                                                      "<p>Base URL: "
+            "<p>Server software: "
+         << req.env()["SERVER_SOFTWARE"] << "</p>"
+                                            "<p>Base URL: "
          << req.env()["BASE_URL"] << "</p>"
                                      "<p>Full URL with QS: "
          << req.env()["FULL_URL_WITH_QS"] << "</p>"
@@ -119,7 +121,7 @@ int handleRequest(Connection &connection) {
     vector<gid_t> currentGL(groupCount, 0);
     if (getgroups(groupCount, &currentGL[0]) >= 0) {
         resp << "<p>Current groups: ";
-        for (auto const &e: currentGL) {
+        for (auto const& e : currentGL) {
             resp << e << ", ";
         }
         resp << "</p>";
@@ -135,7 +137,8 @@ int handleRequest(Connection &connection) {
 
     } else {
         session.set("test", "blah blah blah");
-        resp << "<p>There was no session yet, but now there should be one!" << "</p>";
+        resp << "<p>There was no session yet, but now there should be one!"
+             << "</p>";
     }
 
     string encodedDecoded = encoding::htmlDecode(encoded);
