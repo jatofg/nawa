@@ -26,20 +26,20 @@
 using namespace nawa;
 using namespace std;
 
-struct Email::Data {
+struct mail::Email::Data {
     std::unordered_map<std::string, std::string> headers;
 };
 
-NAWA_DEFAULT_DESTRUCTOR_IMPL(Email)
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(mail, Email)
 
-NAWA_DEFAULT_CONSTRUCTOR_IMPL(Email)
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(mail, Email)
 
-NAWA_COPY_CONSTRUCTOR_IMPL(Email)
+NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(mail, Email)
 
-NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Email)
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(mail::Email)
 
-NAWA_MOVE_CONSTRUCTOR_IMPL(Email)
+NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(mail, Email)
 
-NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Email)
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(mail::Email)
 
-NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Email, headers, Email::HeadersMap)
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(mail::Email, headers, mail::Email::HeadersMap)

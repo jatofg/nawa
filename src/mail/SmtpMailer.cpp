@@ -39,7 +39,7 @@ namespace {
      * @param email Email to check and modify.
      * @param from EmailAddress object to set the From header from, if necessary.
      */
-    void addMissingHeaders(shared_ptr<Email>& email, shared_ptr<EmailAddress> const& from) {
+    void addMissingHeaders(shared_ptr<mail::Email>& email, shared_ptr<mail::EmailAddress> const& from) {
         if (!email->headers().count("Date")) {
             email->headers()["Date"] = make_smtp_time(time(nullptr));
         }
@@ -63,14 +63,14 @@ namespace {
      * An element of the sending queue.
      */
     struct QueueElem {
-        std::shared_ptr<const Email> email;
-        std::shared_ptr<const EmailAddress> from;
-        std::vector<EmailAddress> recipients;
-        std::shared_ptr<ReplacementRules> replacementRules;
+        std::shared_ptr<mail::Email const> email;
+        std::shared_ptr<mail::EmailAddress const> from;
+        std::vector<mail::EmailAddress> recipients;
+        std::shared_ptr<mail::ReplacementRules> replacementRules;
     };
 }// namespace
 
-struct SmtpMailer::Data {
+struct mail::SmtpMailer::Data {
     std::string serverDomain;
     unsigned int serverPort;
     TlsMode serverTlsMode;
@@ -90,48 +90,48 @@ struct SmtpMailer::Data {
                                                                              connectionTimeout(connectionTimeout) {}
 };
 
-NAWA_DEFAULT_DESTRUCTOR_IMPL(SmtpMailer)
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(mail, SmtpMailer)
 
-SmtpMailer::SmtpMailer(string serverDomain, unsigned int serverPort, SmtpMailer::TlsMode serverTlsMode,
-                       bool verifyServerTlsCert, string authUsername, string authPassword,
-                       long connectionTimeout) {
+mail::SmtpMailer::SmtpMailer(string serverDomain, unsigned int serverPort, SmtpMailer::TlsMode serverTlsMode,
+                             bool verifyServerTlsCert, string authUsername, string authPassword,
+                             long connectionTimeout) {
     data = make_unique<Data>(move(serverDomain), serverPort, serverTlsMode, verifyServerTlsCert, move(authUsername),
                              move(authPassword), connectionTimeout);
 }
 
-void SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
+void mail::SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
     data->serverDomain = move(domain);
     data->serverPort = port;
     data->serverTlsMode = tlsMode;
     data->verifyServerTlsCert = verifyTlsCert;
 }
 
-void SmtpMailer::setAuth(string username, string password) {
+void mail::SmtpMailer::setAuth(string username, string password) {
     data->authUsername = move(username);
     data->authPassword = move(password);
 }
 
-void SmtpMailer::setConnectionTimeout(long timeout) {
+void mail::SmtpMailer::setConnectionTimeout(long timeout) {
     data->connectionTimeout = timeout;
 }
 
-void SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<EmailAddress> from,
-                         shared_ptr<ReplacementRules> replacementRules) {
+void mail::SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<EmailAddress> from,
+                               shared_ptr<ReplacementRules> replacementRules) {
     bulkEnqueue(move(email), vector<EmailAddress>({move(to)}), move(from),
                 move(replacementRules));
 }
 
-void SmtpMailer::bulkEnqueue(shared_ptr<Email> email, vector<EmailAddress> recipients,
-                             shared_ptr<EmailAddress> from, shared_ptr<ReplacementRules> replacementRules) {
+void mail::SmtpMailer::bulkEnqueue(shared_ptr<Email> email, vector<EmailAddress> recipients,
+                                   shared_ptr<EmailAddress> from, shared_ptr<ReplacementRules> replacementRules) {
     addMissingHeaders(email, from);
     data->queue.push_back(QueueElem{.email = move(email), .from = move(from), .recipients = move(recipients), .replacementRules = move(replacementRules)});
 }
 
-void SmtpMailer::clearQueue() {
+void mail::SmtpMailer::clearQueue() {
     data->queue.clear();
 }
 
-void SmtpMailer::processQueue() const {
+void mail::SmtpMailer::processQueue() const {
     CURL* curl;
     CURLcode res = CURLE_OK;
 

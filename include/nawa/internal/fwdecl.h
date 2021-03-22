@@ -51,11 +51,13 @@ namespace nawa {
     class Log;
 
     // mail
-    class EmailAddress;
-    class SmtpMailer;
-    class Email;
-    class SimpleEmail;
-    class MimeEmail;
+    namespace mail {
+        class EmailAddress;
+        class SmtpMailer;
+        class Email;
+        class SimpleEmail;
+        class MimeEmail;
+    }// namespace mail
 
     // request
     class Request;

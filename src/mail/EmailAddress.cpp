@@ -28,33 +28,33 @@
 using namespace nawa;
 using namespace std;
 
-struct EmailAddress::Data {
+struct mail::EmailAddress::Data {
     string name;    /**< The name of the sender or recipient. */
     string address; /**< The email address itself. */
 };
 
-NAWA_DEFAULT_DESTRUCTOR_IMPL(EmailAddress)
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(mail, EmailAddress)
 
-NAWA_DEFAULT_CONSTRUCTOR_IMPL(EmailAddress)
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(mail, EmailAddress)
 
-NAWA_COPY_CONSTRUCTOR_IMPL(EmailAddress)
+NAWA_COPY_CONSTRUCTOR_IMPL_WITH_NS(mail, EmailAddress)
 
-NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(EmailAddress)
+NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(mail::EmailAddress)
 
-NAWA_MOVE_CONSTRUCTOR_IMPL(EmailAddress)
+NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(mail, EmailAddress)
 
-NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(EmailAddress)
+NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(mail::EmailAddress)
 
-EmailAddress::EmailAddress(string address) : EmailAddress() {
+mail::EmailAddress::EmailAddress(string address) : EmailAddress() {
     data->address = move(address);
 }
 
-EmailAddress::EmailAddress(string name, string address) : EmailAddress() {
+mail::EmailAddress::EmailAddress(string name, string address) : EmailAddress() {
     data->name = move(name);
     data->address = move(address);
 }
 
-string EmailAddress::get(bool includeName) const {
+string mail::EmailAddress::get(bool includeName) const {
     stringstream ret;
     if (includeName) {
         ret << data->name << " ";
@@ -63,11 +63,11 @@ string EmailAddress::get(bool includeName) const {
     return ret.str();
 }
 
-bool EmailAddress::isValid() const {
+bool mail::EmailAddress::isValid() const {
     regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", regex::icase);
     return regex_match(data->address, emCheck);
 }
 
-NAWA_COMPLEX_DATA_ACCESSORS_IMPL(EmailAddress, name, string)
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(mail::EmailAddress, name, string)
 
-NAWA_COMPLEX_DATA_ACCESSORS_IMPL(EmailAddress, address, string)
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(mail::EmailAddress, address, string)

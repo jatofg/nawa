@@ -32,6 +32,7 @@
 #include <nawa/util/utils.h>
 
 using namespace nawa;
+using namespace nawa::mail;
 using namespace std;
 
 int init(AppInit& appInit) {
@@ -122,8 +123,8 @@ int handleRequest(Connection& connection) {
         resp << "\r\n";
 
         // connect to an SMTP server - default is localhost:25 without TLS (good for use on live web/mail servers only)
-        SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
-                        true, "test@example.com", "12345");
+        mail::SmtpMailer smtp("example.com", 587, mail::SmtpMailer::TlsMode::REQUIRE_STARTTLS,
+                              true, "test@example.com", "12345");
         smtp.enqueue(make_shared<SimpleEmail>(email1), to, make_shared<EmailAddress>(from), replacementRules);
         smtp.enqueue(make_shared<MimeEmail>(email2), to, make_shared<EmailAddress>(from), replacementRules);
 

@@ -28,7 +28,7 @@
 #include <nawa/mail/Email/Email.h>
 #include <string>
 
-namespace nawa {
+namespace nawa::mail {
     /**
      * Structure representing a basic email (just headers and payload, excluding the envelope). Please remember to
      * also set the headers in the headers map of the base class Email.
@@ -67,6 +67,6 @@ namespace nawa {
          */
         [[nodiscard]] std::string getRaw(std::shared_ptr<ReplacementRules> const& replacementRules) const override;
     };
-}// namespace nawa
+}// namespace nawa::mail
 
 #endif//NAWA_SIMPLEEMAIL_H

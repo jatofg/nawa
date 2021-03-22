@@ -27,7 +27,7 @@
 #include <nawa/internal/macros.h>
 #include <string>
 
-namespace nawa {
+namespace nawa::mail {
     /**
      * Structure containing the name and email address of a recipient or sender. It contains functions for validation
      * and getting a representation in a standard format that can be used for curl.
@@ -90,6 +90,6 @@ namespace nawa {
          */
         [[nodiscard]] bool isValid() const;
     };
-}// namespace nawa
+}// namespace nawa::mail
 
 #endif//NAWA_EMAILADDRESS_H

@@ -28,7 +28,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace nawa {
+namespace nawa::mail {
     /**
      * Structure representing a MIME email (headers and MIME parts, excluding the envelope).
      */
@@ -240,6 +240,6 @@ namespace nawa {
          */
         [[nodiscard]] std::string getRaw(std::shared_ptr<ReplacementRules> const& replacementRules) const override;
     };
-}// namespace nawa
+}// namespace nawa::mail
 
 #endif//NAWA_MIMEEMAIL_H

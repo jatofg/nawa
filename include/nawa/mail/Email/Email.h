@@ -30,7 +30,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace nawa {
+namespace nawa::mail {
 
     /**
      * Replacement rules for emails are just a string -> string map. All occurrences of the key string should be
@@ -79,6 +79,6 @@ namespace nawa {
          */
         [[nodiscard]] virtual std::string getRaw(std::shared_ptr<ReplacementRules> const& replacementRules) const = 0;
     };
-}// namespace nawa
+}// namespace nawa::mail
 
 #endif//NAWA_EMAIL_H

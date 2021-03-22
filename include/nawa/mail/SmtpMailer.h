@@ -29,7 +29,7 @@
 #include <nawa/mail/EmailAddress.h>
 #include <string>
 
-namespace nawa {
+namespace nawa::mail {
     class SmtpMailer {
         NAWA_PRIVATE_DATA()
 
@@ -149,6 +149,6 @@ namespace nawa {
          */
         void processQueue() const;
     };
-}// namespace nawa
+}// namespace nawa::mail
 
 #endif//NAWA_SMTPMAILER_H

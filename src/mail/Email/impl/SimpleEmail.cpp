@@ -29,28 +29,28 @@
 using namespace nawa;
 using namespace std;
 
-struct SimpleEmail::Data {
+struct mail::SimpleEmail::Data {
     std::string text;
     bool quotedPrintableEncode = true;
 };
 
-NAWA_DEFAULT_DESTRUCTOR_IMPL(SimpleEmail)
+NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(mail, SimpleEmail)
 
-NAWA_DEFAULT_CONSTRUCTOR_IMPL(SimpleEmail)
+NAWA_DEFAULT_CONSTRUCTOR_IMPL_WITH_NS(mail, SimpleEmail)
 
-NAWA_COPY_CONSTRUCTOR_DERIVED_IMPL(SimpleEmail, Email)
+NAWA_COPY_CONSTRUCTOR_DERIVED_IMPL_WITH_NS(mail, SimpleEmail, Email)
 
-NAWA_COPY_ASSIGNMENT_OPERATOR_DERIVED_IMPL(SimpleEmail, Email)
+NAWA_COPY_ASSIGNMENT_OPERATOR_DERIVED_IMPL(mail::SimpleEmail, Email)
 
-NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(SimpleEmail, Email)
+NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL_WITH_NS(mail, SimpleEmail, Email)
 
-NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(SimpleEmail, Email)
+NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(mail::SimpleEmail, Email)
 
-NAWA_COMPLEX_DATA_ACCESSORS_IMPL(SimpleEmail, text, string)
+NAWA_COMPLEX_DATA_ACCESSORS_IMPL(mail::SimpleEmail, text, string)
 
-NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(SimpleEmail, quotedPrintableEncode, bool)
+NAWA_PRIMITIVE_DATA_ACCESSORS_IMPL(mail::SimpleEmail, quotedPrintableEncode, bool)
 
-string SimpleEmail::getRaw(shared_ptr<ReplacementRules> const& replacementRules) const {
+string mail::SimpleEmail::getRaw(shared_ptr<ReplacementRules> const& replacementRules) const {
     stringstream ret;
 
     for (auto const& e : headers()) {

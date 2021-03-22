@@ -31,6 +31,7 @@
 
 using namespace std;
 using namespace nawa;
+using namespace nawa::mail;
 
 namespace {
     Log logger;
@@ -103,8 +104,8 @@ int handleRequest(Connection& connection) {
                        post["message"];
 
         // now use SmtpMailer to send the email to your mailbox
-        SmtpMailer smtp("example.com", 587, SmtpMailer::TlsMode::REQUIRE_STARTTLS,
-                        true, "test@example.com", "12345");
+        mail::SmtpMailer smtp("example.com", 587, mail::SmtpMailer::TlsMode::REQUIRE_STARTTLS,
+                              true, "test@example.com", "12345");
         smtp.enqueue(std::make_shared<SimpleEmail>(email), to, std::make_shared<EmailAddress>(from));
         try {
             smtp.processQueue();
