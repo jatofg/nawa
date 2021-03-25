@@ -127,7 +127,7 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     http::client::response response;
 
     auto checkResponse = [&](string const& method) {
-        auto respLines = split_string(response.body(), '\n');
+        auto respLines = utils::splitString(response.body(), '\n');
         REQUIRE(respLines.size() == 13);
         REQUIRE(respLines[0] == "3");
         REQUIRE(respLines[1] == "127.0.0.1");

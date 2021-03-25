@@ -94,7 +94,7 @@ bool nawa::AccessFilter::matches(vector<string> const& requestPath) const {
     }
 
     if (!data->extensionFilter.empty()) {
-        auto fileExtension = get_file_extension(requestPath.back());
+        auto fileExtension = utils::getFileExtension(requestPath.back());
         bool extensionFilterMatches = false;
         for (auto const& e : data->extensionFilter) {
             if (fileExtension == e) {

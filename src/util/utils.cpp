@@ -121,16 +121,6 @@ namespace {
             {"7z", "application/x-7z-compressed"}};
 
     /**
-     * Check whether current locale is "C" and, if it is not, reset it to "C". This function might not be thread-safe,
-     * but ideally, it should never have to update the locale. The app should not update the locale itself.
-     */
-    //    inline void resetLocale() {
-    //        if(locale() != locale::classic()) {
-    //            locale::global(locale::classic());
-    //        }
-    //    }
-
-    /**
      * Get the day of week as a string. This function is used instead of the %a specifier, as it is locale-independent,
      * and checking and setting the locale is not the best idea (not thread-safe).
      * @param dow Day of week, range [0-6], where 0 is Sun and 6 is Sat.
@@ -220,8 +210,8 @@ namespace {
 }// namespace
 
 // doxygen bug, somehow doxygen does not like std::function
-void nawa::regex_replace_callback(std::string& s, std::regex const& rgx,
-                                  std::function<std::string(std::vector<std::string> const&)> const& fmt) {
+void utils::regexReplaceCallback(std::string& s, std::regex const& rgx,
+                                 std::function<std::string(std::vector<std::string> const&)> const& fmt) {
     // how many submatches do we have to deal with?
     int marks = rgx.mark_count();
     // we want to iterate through all submatches (to collect them in a vector passed to fmt())
@@ -254,7 +244,7 @@ void nawa::regex_replace_callback(std::string& s, std::regex const& rgx,
     s = out.str();
 }
 
-string nawa::hex_dump(string const& in) {
+string utils::hexDump(string const& in) {
     stringstream rets;
     rets << hex << setfill('0');
     for (char c : in) {
@@ -263,17 +253,17 @@ string nawa::hex_dump(string const& in) {
     return rets.str();
 }
 
-string nawa::to_lowercase(string s) {
+string utils::toLowercase(string s) {
     transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;
 }
 
-string nawa::to_uppercase(string s) {
+string utils::toUppercase(string s) {
     transform(s.begin(), s.end(), s.begin(), ::toupper);
     return s;
 }
 
-string nawa::generate_error_page(unsigned int httpStatus) {
+string utils::generateErrorPage(unsigned int httpStatus) {
     string errorStr;
     string explanation;
     switch (httpStatus) {
@@ -350,7 +340,7 @@ string nawa::generate_error_page(unsigned int httpStatus) {
     return ep.str();
 }
 
-string nawa::get_file_extension(string const& filename) {
+string utils::getFileExtension(string const& filename) {
     try {
         return filename.substr(filename.find_last_of('.') + 1);
     } catch (out_of_range&) {}
@@ -358,25 +348,25 @@ string nawa::get_file_extension(string const& filename) {
     return string();
 }
 
-string nawa::content_type_by_extension(string extension) {
-    auto ext = to_lowercase(move(extension));
+string utils::contentTypeByExtension(string extension) {
+    auto ext = toLowercase(move(extension));
     if (contentTypeMap.count(ext) == 1) {
         return contentTypeMap.at(ext);
     }
     return "application/octet-stream";
 }
 
-string nawa::make_http_time(time_t time1) {
+string utils::makeHttpTime(time_t time) {
     stringstream httpTime;
     tm gmt;
-    gmtime_r(&time1, &gmt);
+    gmtime_r(&time, &gmt);
     httpTime << getDayOfWeek(gmt.tm_wday) << put_time(&gmt, ", %d ") << getMonth(gmt.tm_mon);
     httpTime << put_time(&gmt, " %Y %H:%M:%S GMT");
 
     return httpTime.str();
 }
 
-time_t nawa::read_http_time(string const& httpTime) {
+time_t utils::readHttpTime(string const& httpTime) {
     istringstream timeStream(httpTime);
     tm timeStruct;
     timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
@@ -385,17 +375,17 @@ time_t nawa::read_http_time(string const& httpTime) {
     return timegm(&timeStruct);
 }
 
-string nawa::make_smtp_time(time_t time1) {
+string utils::makeSmtpTime(time_t time) {
     stringstream smtpTime;
     tm ltime;
-    localtime_r(&time1, &ltime);
+    localtime_r(&time, &ltime);
     smtpTime << getDayOfWeek(ltime.tm_wday) << put_time(&ltime, ", %e ") << getMonth(ltime.tm_mon);
     smtpTime << put_time(&ltime, " %Y %H:%M:%S %z");
 
     return smtpTime.str();
 }
 
-time_t nawa::read_smtp_time(string const& smtpTime) {
+time_t utils::readSmtpTime(string const& smtpTime) {
     string smtpTimeM = smtpTime;
     tm timeStruct;
 
@@ -425,7 +415,7 @@ time_t nawa::read_smtp_time(string const& smtpTime) {
     return unixTime;
 }
 
-vector<string> nawa::split_string(string str, char delimiter, bool ignoreEmpty) {
+vector<string> utils::splitString(string str, char delimiter, bool ignoreEmpty) {
     vector<string> ret;
     for (size_t pos = 0; !str.empty();) {
         pos = str.find_first_of(delimiter);
@@ -442,7 +432,7 @@ vector<string> nawa::split_string(string str, char delimiter, bool ignoreEmpty) 
     return ret;
 }
 
-string nawa::merge_path(vector<string> const& path) {
+string utils::mergePath(vector<string> const& path) {
     if (path.empty()) {
         return "/";
     }
@@ -453,13 +443,13 @@ string nawa::merge_path(vector<string> const& path) {
     return stringPath.str();
 }
 
-vector<string> nawa::split_path(string const& pathString) {
+vector<string> utils::splitPath(string const& pathString) {
     // remove query string
     string rawPath = pathString.substr(0, pathString.find('?'));
-    return split_string(rawPath, '/', true);
+    return splitString(rawPath, '/', true);
 }
 
-string nawa::convert_line_endings(string const& in, string const& ending) {
+string utils::convertLineEndings(string const& in, string const& ending) {
     stringstream ret;
     for (const auto& c : in) {
         if (c == '\n')
@@ -470,7 +460,7 @@ string nawa::convert_line_endings(string const& in, string const& ending) {
     return ret.str();
 }
 
-string nawa::get_file_contents(string const& path) {
+string utils::getFileContents(string const& path) {
     // open file as binary
     ifstream f(path, ifstream::binary);
 
@@ -491,14 +481,14 @@ string nawa::get_file_contents(string const& path) {
     return ret;
 }
 
-string nawa::string_replace(string input, unordered_map<char, char> const& patterns) {
+string utils::stringReplace(string input, unordered_map<char, char> const& patterns) {
     for (auto const& [key, val] : patterns) {
         replace(input.begin(), input.end(), key, val);
     }
     return input;
 }
 
-string nawa::string_replace(string input, unordered_map<string, string> const& patterns) {
+string utils::stringReplace(string input, unordered_map<string, string> const& patterns) {
     for (auto const& [key, val] : patterns) {
         for (size_t pos = input.find(key); pos != string::npos;) {
             input.replace(pos, key.length(), val);
@@ -508,7 +498,7 @@ string nawa::string_replace(string input, unordered_map<string, string> const& p
     return input;
 }
 
-unordered_multimap<string, string> nawa::split_query_string(string const& queryString) {
+unordered_multimap<string, string> utils::splitQueryString(string const& queryString) {
     string qs;
     size_t qmrkPos = queryString.find_first_of('?');
     unordered_multimap<string, string> ret;
@@ -517,7 +507,7 @@ unordered_multimap<string, string> nawa::split_query_string(string const& queryS
     } else if (qmrkPos == string::npos) {
         qs = queryString;
     }
-    auto pairs = split_string(qs, '&', true);
+    auto pairs = splitString(qs, '&', true);
     for (auto const& p : pairs) {
         size_t eqPos = p.find_first_of('=');
         string k = p.substr(0, eqPos);
@@ -527,18 +517,18 @@ unordered_multimap<string, string> nawa::split_query_string(string const& queryS
     return ret;
 }
 
-unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
+unordered_map<string, string> utils::parseHeaders(string rawHeaders) {
     unordered_map<string, string> ret;
     // filter out carriage returns
     boost::erase_all(rawHeaders, "\r");
     // split
-    auto lines = split_string(rawHeaders, '\n', true);
+    auto lines = splitString(rawHeaders, '\n', true);
     for (auto const& line : lines) {
         auto colonPos = line.find_first_of(':');
         if (line.length() < colonPos + 2) {
             continue;
         }
-        auto key = to_lowercase(line.substr(0, colonPos));
+        auto key = toLowercase(line.substr(0, colonPos));
         auto val = line.substr(colonPos + 1);
         boost::trim_left(val);
         ret[key] = val;
@@ -546,10 +536,10 @@ unordered_map<string, string> nawa::parse_headers(string rawHeaders) {
     return ret;
 }
 
-unordered_multimap<std::string, std::string> nawa::parse_cookies(string const& rawCookies) {
+unordered_multimap<std::string, std::string> utils::parseCookies(string const& rawCookies) {
     unordered_multimap<std::string, std::string> ret;
     // split by ;
-    auto cookies = split_string(rawCookies, ';', true);
+    auto cookies = splitString(rawCookies, ';', true);
     for (auto c : cookies) {
         // remove whitespaces
         boost::trim(c);

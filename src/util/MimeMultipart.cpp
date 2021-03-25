@@ -138,7 +138,7 @@ void MimeMultipart::parse(string const& contentType, string content) {
         }
 
         Part currentPart;
-        currentPart.data->headers = parse_headers(content.substr(0, headersEndPos));
+        currentPart.data->headers = utils::parseHeaders(content.substr(0, headersEndPos));
         currentPart.data->contentType = currentPart.data->headers.count("content-type") ? currentPart.data->headers.at(
                                                                                                   "content-type")
                                                                                         : "";

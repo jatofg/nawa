@@ -22,6 +22,7 @@
  */
 
 #include <cstring>
+#include <fstream>
 #include <nawa/Exception.h>
 #include <nawa/request/File.h>
 

@@ -344,9 +344,9 @@ Parameters nawarun::parseCommandLine(int argc, char** argv) {
         }
 
         if (currentArg.substr(0, 2) == "--") {
-            auto idAndVal = split_string(currentArg.substr(2), '=', true);
+            auto idAndVal = utils::splitString(currentArg.substr(2), '=', true);
             if (idAndVal.size() == 2) {
-                auto categoryAndKey = split_string(idAndVal.at(0), ':', true);
+                auto categoryAndKey = utils::splitString(idAndVal.at(0), ':', true);
                 string const& value = idAndVal.at(1);
                 if (categoryAndKey.size() == 2) {
                     string const& category = categoryAndKey.at(0);

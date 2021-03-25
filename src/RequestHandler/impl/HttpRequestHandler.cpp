@@ -52,7 +52,7 @@ namespace {
     auto sendServerError = [](HttpServer::connection_ptr& httpConn) {
         httpConn->set_status(HttpServer::connection::internal_server_error);
         httpConn->set_headers(unordered_multimap<string, string>({{"content-type", "text/html; charset=utf-8"}}));
-        httpConn->write(generate_error_page(500));
+        httpConn->write(utils::generateErrorPage(500));
     };
 
     inline string getListenAddr(shared_ptr<Config const> const& configPtr) {
@@ -109,7 +109,7 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
 
         string const multipartContentType = "multipart/form-data";
         string const plainTextContentType = "text/plain";
-        auto postContentType = to_lowercase(connectionInit.requestInit.environment["content-type"]);
+        auto postContentType = utils::toLowercase(connectionInit.requestInit.environment["content-type"]);
         auto& requestInit = connectionInit.requestInit;
 
         if (rawPostAccess == RawPostAccess::ALWAYS) {
@@ -118,7 +118,7 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
 
         if (postContentType == "application/x-www-form-urlencoded") {
             requestInit.postContentType = postContentType;
-            requestInit.postVars = split_query_string(postBody);
+            requestInit.postVars = utils::splitQueryString(postBody);
         } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
             try {
                 MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
@@ -166,8 +166,8 @@ struct HttpHandler {
         // TODO accept languages (split), split acceptContentTypes?, acceptCharsets (where to find?)
         //      - consistent names for other elements in req handlers?
         for (auto const& h : request.headers) {
-            if (requestInit.environment.count(to_lowercase(h.name)) == 0) {
-                requestInit.environment[to_lowercase(h.name)] = h.value;
+            if (requestInit.environment.count(utils::toLowercase(h.name)) == 0) {
+                requestInit.environment[utils::toLowercase(h.name)] = h.value;
             }
         }
 
@@ -190,9 +190,9 @@ struct HttpHandler {
         }
 
         if (request.destination.find_first_of('?') != string::npos) {
-            requestInit.getVars = split_query_string(request.destination);
+            requestInit.getVars = utils::splitQueryString(request.destination);
         }
-        requestInit.cookieVars = parse_cookies(requestInit.environment["cookie"]);
+        requestInit.cookieVars = utils::parseCookies(requestInit.environment["cookie"]);
 
         ConnectionInitContainer connectionInit;
         connectionInit.requestInit = move(requestInit);

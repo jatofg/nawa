@@ -24,7 +24,6 @@
 #ifndef NAWA_FILE_H
 #define NAWA_FILE_H
 
-#include <fstream>
 #include <memory>
 #include <nawa/internal/macros.h>
 #include <string>

@@ -109,7 +109,7 @@ bool FastcgippRequestAdapter::response() {
             // parameters starting with HTTP_ are usually HTTP headers
             // convert them so they should match their original name (lowercase), e.g., HTTP_USER_AGENT => user-agent
             if (k.substr(0, 5) == "HTTP_") {
-                envKey = string_replace(to_lowercase(k.substr(5)), {{'_', '-'}});
+                envKey = utils::stringReplace(utils::toLowercase(k.substr(5)), {{'_', '-'}});
             } else {
                 // other FastCGI parameters are used as they are
                 envKey = k;
@@ -124,9 +124,9 @@ bool FastcgippRequestAdapter::response() {
         requestInit.acceptLanguages = renv.acceptLanguages;
 
         // GET, POST, COOKIE vars, raw POST, POST content type
-        requestInit.getVars = to_unordered_multimap(renv.gets);
-        requestInit.postVars = to_unordered_multimap(renv.posts);
-        requestInit.cookieVars = to_unordered_multimap(renv.cookies);
+        requestInit.getVars = utils::toUnorderedMultimap(renv.gets);
+        requestInit.postVars = utils::toUnorderedMultimap(renv.posts);
+        requestInit.cookieVars = utils::toUnorderedMultimap(renv.cookies);
         requestInit.rawPost = rawPost;
         requestInit.postContentType = renv.contentType;
 

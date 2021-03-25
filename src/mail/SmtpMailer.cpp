@@ -41,7 +41,7 @@ namespace {
      */
     void addMissingHeaders(shared_ptr<mail::Email>& email, shared_ptr<mail::EmailAddress> const& from) {
         if (!email->headers().count("Date")) {
-            email->headers()["Date"] = make_smtp_time(time(nullptr));
+            email->headers()["Date"] = utils::makeSmtpTime(time(nullptr));
         }
         if (!email->headers().count("From") && !from->address().empty()) {
             email->headers()["From"] = from->get();

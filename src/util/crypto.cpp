@@ -37,7 +37,7 @@ string crypto::sha1(string const& input, bool hex) {
     SHA1(sha1Base, sha1Size, sha1Hash);
     string ret((char*) sha1Hash, SHA_DIGEST_LENGTH);
     if (hex) {
-        return hex_dump(ret);
+        return utils::hexDump(ret);
     }
     return ret;
 }
@@ -49,7 +49,7 @@ string crypto::sha224(string const& input, bool hex) {
     SHA224(sha2Base, sha2Size, sha2Hash);
     string ret((char*) sha2Hash, SHA224_DIGEST_LENGTH);
     if (hex) {
-        return hex_dump(ret);
+        return utils::hexDump(ret);
     }
     return ret;
 }
@@ -61,7 +61,7 @@ string crypto::sha256(string const& input, bool hex) {
     SHA256(sha2Base, sha2Size, sha2Hash);
     string ret((char*) sha2Hash, SHA256_DIGEST_LENGTH);
     if (hex) {
-        return hex_dump(ret);
+        return utils::hexDump(ret);
     }
     return ret;
 }
@@ -73,7 +73,7 @@ string crypto::sha384(string const& input, bool hex) {
     SHA384(sha2Base, sha2Size, sha2Hash);
     string ret((char*) sha2Hash, SHA384_DIGEST_LENGTH);
     if (hex) {
-        return hex_dump(ret);
+        return utils::hexDump(ret);
     }
     return ret;
 }
@@ -85,7 +85,7 @@ string crypto::sha512(string const& input, bool hex) {
     SHA512(sha2Base, sha2Size, sha2Hash);
     string ret((char*) sha2Hash, SHA512_DIGEST_LENGTH);
     if (hex) {
-        return hex_dump(ret);
+        return utils::hexDump(ret);
     }
     return ret;
 }
@@ -97,7 +97,7 @@ string crypto::md5(string const& input, bool hex) {
     MD5(md5Base, md5Size, md5Hash);
     string ret((char*) md5Hash, MD5_DIGEST_LENGTH);
     if (hex) {
-        return hex_dump(ret);
+        return utils::hexDump(ret);
     }
     return ret;
 }

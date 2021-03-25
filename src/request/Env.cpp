@@ -55,5 +55,5 @@ vector<string> request::Env::getAcceptLanguages() const {
 }
 
 vector<string> request::Env::getRequestPath() const {
-    return split_path(operator[]("REQUEST_URI"));
+    return utils::splitPath(operator[]("REQUEST_URI"));
 }

@@ -30,7 +30,7 @@
 #include <nawa/internal/macros.h>
 #include <nawa/request/Request.h>
 #include <nawa/session/Session.h>
-#include <sstream>
+#include <ostream>
 #include <string>
 #include <unordered_map>
 
@@ -196,7 +196,7 @@ namespace nawa {
         [[nodiscard]] unsigned int getStatus() const;
 
         /**
-         * Get a map of all response headers.
+         * Assemble a map of all response headers.
          * @param includeCookies Also include set-cookie headers for the cookies.
          * @return A map of all headers.
          */

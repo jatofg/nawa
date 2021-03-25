@@ -96,7 +96,7 @@ namespace {
                         ret << "Content-Transfer-Encoding: base64\r\n\r\n";
                         ret << encoding::base64Encode(
                                 (mimePart.allowReplacements() && replacementRules)
-                                        ? string_replace(mimePart.partData(), *replacementRules)
+                                        ? utils::stringReplace(mimePart.partData(), *replacementRules)
                                         : mimePart.partData(),
                                 76, "\r\n");
                         break;
@@ -104,13 +104,13 @@ namespace {
                         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
                         ret << encoding::quotedPrintableEncode(
                                 (mimePart.allowReplacements() && replacementRules)
-                                        ? string_replace(mimePart.partData(), *replacementRules)
+                                        ? utils::stringReplace(mimePart.partData(), *replacementRules)
                                         : mimePart.partData());
                         break;
                     case mail::MimeEmail::MimePart::ApplyEncoding::NONE:
                         ret << "\r\n"
                             << ((mimePart.allowReplacements() && replacementRules)
-                                        ? string_replace(mimePart.partData(), *replacementRules)
+                                        ? utils::stringReplace(mimePart.partData(), *replacementRules)
                                         : mimePart.partData());
                         break;
                 }

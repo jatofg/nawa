@@ -29,6 +29,7 @@
 #include <nawa/util/encoding.h>
 #include <nawa/util/utils.h>
 #include <regex>
+#include <sstream>
 #include <sys/stat.h>
 
 using namespace nawa;
@@ -166,7 +167,7 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
         setHeader("content-type", contentType);
     } else {
         // use the function from utils.h to guess the content type
-        setHeader("content-type", content_type_by_extension(get_file_extension(path)));
+        setHeader("content-type", utils::contentTypeByExtension(utils::getFileExtension(path)));
     }
 
     // set the content-disposition header
@@ -193,7 +194,7 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
 
     // set the last-modified header (if possible)
     if (lastModified > 0) {
-        setHeader("last-modified", make_http_time(lastModified));
+        setHeader("last-modified", utils::makeHttpTime(lastModified));
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
@@ -249,7 +250,7 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
             // Expires option
             optional<time_t> expiry = e.second.expires() ? e.second.expires() : data->cookiePolicy.expires();
             if (expiry) {
-                headerVal << "; Expires=" << make_http_time(*expiry);
+                headerVal << "; Expires=" << utils::makeHttpTime(*expiry);
             }
             // Max-Age option
             optional<unsigned long> maxAge = e.second.maxAge() ? e.second.maxAge()
@@ -383,7 +384,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
         if (!flt.response().empty()) {
             setResponseBody(flt.response());
         } else {
-            setResponseBody(generate_error_page(flt.status()));
+            setResponseBody(utils::generateErrorPage(flt.status()));
         }
         // the request has been blocked, so no more filters have to be applied
         // returning true means: the request has been filtered
@@ -430,10 +431,10 @@ bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
             // case 2: credentials already sent
             else {
                 // split the authorization string, only the last part should contain base64
-                auto authResponse = split_string(data->request.env()["authorization"], ' ', true);
+                auto authResponse = utils::splitString(data->request.env()["authorization"], ' ', true);
                 // here, we should have a vector with size 2 and [0]=="Basic", otherwise sth is wrong
                 if (authResponse.size() == 2 || authResponse.at(0) == "Basic") {
-                    auto credentials = split_string(encoding::base64Decode(authResponse.at(1)), ':', true);
+                    auto credentials = utils::splitString(encoding::base64Decode(authResponse.at(1)), ':', true);
                     // credentials must also have 2 elements, a username and a password,
                     // and the auth function must be callable
                     if (credentials.size() == 2 && flt.authFunction()) {
@@ -456,7 +457,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
             if (!flt.response().empty()) {
                 setResponseBody(flt.response());
             } else {
-                setResponseBody(generate_error_page(403));
+                setResponseBody(utils::generateErrorPage(403));
             }
 
             // request blocked
@@ -494,7 +495,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
             if (!flt.response().empty()) {
                 setResponseBody(flt.response());
             } else {
-                setResponseBody(generate_error_page(404));
+                setResponseBody(utils::generateErrorPage(404));
             }
         }
 

@@ -63,10 +63,10 @@ string mail::SimpleEmail::getRaw(shared_ptr<ReplacementRules> const& replacement
     if (data->quotedPrintableEncode) {
         ret << "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
         ret << encoding::quotedPrintableEncode(
-                replacementRules ? string_replace(data->text, *replacementRules) : data->text);
+                replacementRules ? utils::stringReplace(data->text, *replacementRules) : data->text);
     } else {
         ret << "\r\n"
-            << (replacementRules ? string_replace(data->text, *replacementRules) : data->text);
+            << (replacementRules ? utils::stringReplace(data->text, *replacementRules) : data->text);
     }
 
     return ret.str();

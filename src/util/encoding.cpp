@@ -206,7 +206,7 @@ string encoding::htmlDecode(string input) {
     };
 
     // run replacement
-    regex_replace_callback(input, matchEntity, replaceEntity);
+    utils::regexReplaceCallback(input, matchEntity, replaceEntity);
 
     // unicode replacement
     regex matchUnicode(R"(&#(x([A-Fa-f0-9]{1,5})|([0-9]{1,6}));)");
@@ -229,7 +229,7 @@ string encoding::htmlDecode(string input) {
         u32string outs(1, c);
         return cv.to_bytes(outs);
     };
-    regex_replace_callback(input, matchUnicode, replaceUnicode);
+    utils::regexReplaceCallback(input, matchUnicode, replaceUnicode);
 
     return input;
 }
@@ -261,7 +261,7 @@ string encoding::urlDecode(string input) {
         return string(1, (char) stoul(matches.at(1), nullptr, 16));
     };
 
-    regex_replace_callback(input, matchCode, replaceCode);
+    utils::regexReplaceCallback(input, matchCode, replaceCode);
 
     return input;
 }
@@ -310,7 +310,7 @@ string encoding::quotedPrintableEncode(string const& input, string const& lineEn
                 ret << "=" << lineEnding;
                 lineCount = 0;
             }
-            ret << "=" << to_uppercase(hex_dump(string(1, c)));
+            ret << "=" << utils::toUppercase(utils::hexDump(string(1, c)));
             lineCount += 3;
         }
     }
@@ -327,7 +327,7 @@ string encoding::quotedPrintableDecode(string input) {
                        : string(1, (char) stoul(matches.at(1), nullptr, 16));
     };
 
-    regex_replace_callback(input, matchCode, replaceCode);
+    utils::regexReplaceCallback(input, matchCode, replaceCode);
 
     return input;
 }
@@ -339,7 +339,7 @@ string encoding::makeEncodedWord(string const& input, bool base64, bool onlyIfNe
         ret << "B?" << base64Encode(input);
     } else {
         auto qpEncoded = quotedPrintableEncode(input, "", true, true);
-        if (onlyIfNecessary && qpEncoded == string_replace(input, {{" ", "_"}})) {
+        if (onlyIfNecessary && qpEncoded == utils::stringReplace(input, {{" ", "_"}})) {
             return input;
         }
         ret << "Q?" << qpEncoded;

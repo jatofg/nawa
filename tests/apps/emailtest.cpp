@@ -98,7 +98,7 @@ int handleRequest(Connection& connection) {
     attachmentPart.contentType() = "image/png; name=test.png";
     attachmentPart.contentDisposition() = "attachment; filename=test.png";
     try {
-        attachmentPart.partData() = get_file_contents("/home/tobias/Pictures/testimage.png");
+        attachmentPart.partData() = utils::getFileContents("/home/tobias/Pictures/testimage.png");
     } catch (Exception const& e) {
         resp << "!!! Specified image file could not be loaded: " << e.getMessage() << " !!!\r\n\r\n";
     }
