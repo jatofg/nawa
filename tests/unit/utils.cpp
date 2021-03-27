@@ -27,13 +27,13 @@
 using namespace nawa;
 using namespace std;
 
-TEST_CASE("nawa::Utils functions", "[utils]") {
+TEST_CASE("nawa::utils functions", "[unit][utils]") {
 
     SECTION("Time conversions") {
         time_t currentTime = time(nullptr);
-        REQUIRE(utils::readSmtpTime("Thu,  7 Nov 2019 16:29:50 +0100") == 1573140590);
-        REQUIRE(utils::readHttpTime(utils::makeHttpTime(currentTime)) == currentTime);
-        REQUIRE(utils::readSmtpTime(utils::makeSmtpTime(currentTime)) == currentTime);
+        CHECK(utils::readSmtpTime("Thu,  7 Nov 2019 16:29:50 +0100") == 1573140590);
+        CHECK(utils::readHttpTime(utils::makeHttpTime(currentTime)) == currentTime);
+        CHECK(utils::readSmtpTime(utils::makeSmtpTime(currentTime)) == currentTime);
     }
 
     SECTION("Path splitting") {
@@ -43,9 +43,9 @@ TEST_CASE("nawa::Utils functions", "[utils]") {
         string t4 = "/p1/p2/p3?test=/xyz";
         string t5 = "/p1/p2/p3/?test=/xyz/";
         auto t1_split = utils::splitPath(t1);
-        REQUIRE(t1_split == utils::splitPath(t2));
-        REQUIRE(t1_split == utils::splitPath(t3));
-        REQUIRE(t1_split == utils::splitPath(t4));
-        REQUIRE(t1_split == utils::splitPath(t5));
+        CHECK(t1_split == utils::splitPath(t2));
+        CHECK(t1_split == utils::splitPath(t3));
+        CHECK(t1_split == utils::splitPath(t4));
+        CHECK(t1_split == utils::splitPath(t5));
     }
 }

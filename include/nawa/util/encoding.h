@@ -120,6 +120,22 @@ namespace nawa::encoding {
      * @return Encoded string.
      */
     std::string makeEncodedWord(std::string const& input, bool base64 = false, bool onlyIfNecessary = true);
+
+    /**
+     * Encode a domain in punycode, if it contains non-ASCII characters (otherwise it will be returned as-is). The
+     * return value of this function is undefined for invalid domain names.
+     * @param input Domain to be encoded.
+     * @return Encoded domain.
+     */
+    std::string punycodeEncode(std::string const& input);
+
+    /**
+     * Decode a punycode-encoded domain. If it is not encoded, it will be returned as-is. The return value of this
+     * function is undefined for invalid domain names.
+     * @param input Encoded domain.
+     * @return Decoded domain.
+     */
+    std::string punycodeDecode(std::string const& input);
 }// namespace nawa::encoding
 
 #endif//NAWA_ENCODING_H

@@ -22,11 +22,24 @@
  */
 
 #include <nawa/mail/EmailAddress.h>
+#include <nawa/util/encoding.h>
+#include <nawa/util/utils.h>
 #include <regex>
 #include <sstream>
 
 using namespace nawa;
 using namespace std;
+
+namespace {
+    string applyPunycodeToDomain(string const& address) {
+        auto partsOfAddr = utils::splitString(address, '@', false);
+        if (partsOfAddr.size() != 2) {
+            return address;
+        }
+        partsOfAddr[1] = encoding::punycodeEncode(partsOfAddr[1]);
+        return partsOfAddr[0] + "@" + partsOfAddr[1];
+    }
+}// namespace
 
 struct mail::EmailAddress::Data {
     string name;    /**< The name of the sender or recipient. */
@@ -54,18 +67,26 @@ mail::EmailAddress::EmailAddress(string name, string address) : EmailAddress() {
     data->address = move(address);
 }
 
-string mail::EmailAddress::get(bool includeName) const {
+string mail::EmailAddress::get(bool includeName, bool applyPunycode) const {
     stringstream ret;
-    if (includeName) {
+    if (includeName && !data->name.empty()) {
         ret << data->name << " ";
     }
-    ret << '<' << data->address << '>';
+    string address = data->address;
+    if (applyPunycode) {
+        address = applyPunycodeToDomain(address);
+    }
+    ret << '<' << address << '>';
     return ret.str();
 }
 
 bool mail::EmailAddress::isValid() const {
+    string address = applyPunycodeToDomain(data->address);
+    if (address.empty()) {
+        return false;
+    }
     regex emCheck(R"([a-z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-z0-9.-]+)", regex::icase);
-    return regex_match(data->address, emCheck);
+    return regex_match(address, emCheck);
 }
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(mail::EmailAddress, name, string)

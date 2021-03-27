@@ -204,6 +204,7 @@ with different (less strict) licenses:
 * base64: see `libs/base64/LICENSE` for details
 * inih: New BSD License, see `libs/inih/LICENSE.txt` for details
 * libbcrypt: CC0, see `libs/libbcrypt/COPYING` for details
+* punycode: MIT License, see `libs/punycode/LICENSE` for details
 
 It automatically downloads the following libraries during build configuration:
 * fastcgilite (also LGPL-licensed)

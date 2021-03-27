@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <nawa/util/encoding.h>
 #include <nawa/util/utils.h>
+#include <punycode/punycode.h>
 #include <regex>
 #include <sstream>
 #include <unordered_map>
@@ -345,5 +346,63 @@ string encoding::makeEncodedWord(string const& input, bool base64, bool onlyIfNe
         ret << "Q?" << qpEncoded;
     }
     ret << "?=";
+    return ret.str();
+}
+
+string encoding::punycodeEncode(string const& input) {
+    wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
+    vector<string> partsToBeEncoded = utils::splitString(input, '.', true);
+    stringstream ret;
+    bool firstPart = true;
+    for (auto const& part : partsToBeEncoded) {
+        basic_string<char32_t> wstr = cv.from_bytes(part);
+        string pret(part.size() * 4, '\0');
+        size_t pretSize = pret.size();
+        punycode_encode(reinterpret_cast<uint32_t const*>(wstr.c_str()), wstr.size(), &pret[0], &pretSize);
+        pret.resize(pretSize);
+
+        if (firstPart) {
+            firstPart = false;
+        } else {
+            ret << '.';
+        }
+        if (pret != part) {
+            ret << "xn--";
+        }
+        ret << pret;
+    }
+    return ret.str();
+}
+
+string encoding::punycodeDecode(string const& input) {
+    wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
+    vector<string> partsToBeDecoded = utils::splitString(input, '.', true);
+    stringstream ret;
+    bool firstPart = true;
+    for (string part : partsToBeDecoded) {
+        if (part.substr(0, 4) == "xn--") {
+            part = part.substr(4);
+        } else {
+            if (firstPart) {
+                firstPart = false;
+            } else {
+                ret << '.';
+            }
+            ret << part;
+            continue;
+        }
+
+        basic_string<char32_t> wpret(part.size(), L'\0');
+        size_t wpretSize = wpret.size();
+        punycode_decode(part.c_str(), part.length(), reinterpret_cast<uint32_t*>(&wpret[0]), &wpretSize);
+        wpret.resize(wpretSize);
+
+        if (firstPart) {
+            firstPart = false;
+        } else {
+            ret << '.';
+        }
+        ret << cv.to_bytes(wpret);
+    }
     return ret.str();
 }

@@ -115,6 +115,8 @@ set(NAWA_FILES
         libs/base64/base64.h
         libs/inih/ini.c
         libs/inih/ini.h
+        libs/punycode/punycode.c
+        libs/punycode/punycode.h
 
         src/AppInit.cpp
         src/RequestHandler/HandleRequestFunction.cpp
@@ -206,6 +208,7 @@ endif ()
 if (BuildTests)
     add_executable(unittests
             tests/main.cpp
+            tests/unit/email.cpp
             tests/unit/encoding_crypto.cpp
             tests/unit/utils.cpp)
     target_link_libraries(unittests nawa Catch2::Catch2)

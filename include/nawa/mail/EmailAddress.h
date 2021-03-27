@@ -76,17 +76,19 @@ namespace nawa::mail {
         /**
          * Get the email address in a standard representation, i.e., `<john.doe\@example.com>` without name, or
          * `John Doe <john.doe\@example.com>` with name included.
-         * @param includeName Include the name in the representation.
+         * @param includeName Include the name in the representation (if set).
+         * @param applyPunycode Convert the domain to punycode representation, if it is an IDN.
          * @return String representation.
          */
-        [[nodiscard]] std::string get(bool includeName = true) const;
+        [[nodiscard]] std::string get(bool includeName = true, bool applyPunycode = true) const;
 
         /**
          * Perform a very basic, regex-based validity check on the saved email address. This will only check that it
          * contains an \@ symbol and only valid characters before and after it, so if this function returns true,
          * that does not necessarily mean the email address is valid. To really validate an email address, you should
-         * send a confirmation email to it.
-         * @return True if the email address could be valid, false if it is definitely not valid.
+         * send a confirmation email to it. IDNs are covered by applying punycode, non-ASCII characters in the part
+         * before the '@' will make the validation fail.
+         * @return True if the email address could be valid, false if it might be invalid.
          */
         [[nodiscard]] bool isValid() const;
     };

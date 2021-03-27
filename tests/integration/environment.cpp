@@ -88,7 +88,7 @@ TEST_CASE("Basic request handling (HTTP)", "[basic][http]") {
     http::client::request request(baseUrl);
     http::client::response response;
     REQUIRE_NOTHROW(response = client.get(request));
-    REQUIRE(response.body() == "Hello World!");
+    CHECK(response.body() == "Hello World!");
 }
 
 TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
@@ -129,20 +129,20 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     auto checkResponse = [&](string const& method) {
         auto respLines = utils::splitString(response.body(), '\n');
         REQUIRE(respLines.size() == 13);
-        REQUIRE(respLines[0] == "3");
-        REQUIRE(respLines[1] == "127.0.0.1");
-        REQUIRE(respLines[2] == "/tp0/tp1/test?qse0=v0&qse1=v1");
-        REQUIRE(respLines[4] == method);
-        REQUIRE(respLines[5] == "127.0.0.1");
-        REQUIRE(respLines[6] == port);
-        REQUIRE(respLines[8] == baseUrl);
-        REQUIRE(respLines[9] == baseUrl + "/tp0/tp1/test?qse0=v0&qse1=v1");
-        REQUIRE(respLines[10] == baseUrl + "/tp0/tp1/test");
-        REQUIRE(respLines[11] == "127.0.0.1:" + port);
+        CHECK(respLines[0] == "3");
+        CHECK(respLines[1] == "127.0.0.1");
+        CHECK(respLines[2] == "/tp0/tp1/test?qse0=v0&qse1=v1");
+        CHECK(respLines[4] == method);
+        CHECK(respLines[5] == "127.0.0.1");
+        CHECK(respLines[6] == port);
+        CHECK(respLines[8] == baseUrl);
+        CHECK(respLines[9] == baseUrl + "/tp0/tp1/test?qse0=v0&qse1=v1");
+        CHECK(respLines[10] == baseUrl + "/tp0/tp1/test");
+        CHECK(respLines[11] == "127.0.0.1:" + port);
 
         REQUIRE(response.headers().count("x-test-header") == 1);
-        REQUIRE(response.headers().equal_range("x-test-header").first->second == "test");
-        REQUIRE(response.headers().count("x-second-test") == 0);
+        CHECK(response.headers().equal_range("x-test-header").first->second == "test");
+        CHECK(response.headers().count("x-second-test") == 0);
     };
 
     SECTION("GET request") {

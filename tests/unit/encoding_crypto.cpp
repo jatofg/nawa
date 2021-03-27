@@ -65,7 +65,16 @@ namespace {
     }
 }// namespace
 
-TEST_CASE("nawa::Encoding functions", "[encoding]") {
+TEST_CASE("nawa::encoding functions", "[unit][encoding]") {
+    SECTION("punycode encoding") {
+        string punycodeEncoded = "xn--bcher-kuflich-erwrben-c2b9jut.xy";
+        string punycodeDecoded = "bücher-käuflich-erwérben.xy";
+        string asciiDomain = "example.com";
+        CHECK(encoding::punycodeEncode(punycodeDecoded) == punycodeEncoded);
+        CHECK(encoding::punycodeDecode(punycodeEncoded) == punycodeDecoded);
+        CHECK(encoding::punycodeEncode(asciiDomain) == asciiDomain);
+    }
+
     initializeInputDataIfNotYetDone();
     string decoded = GENERATE(from_range(inputData));
 
@@ -73,46 +82,52 @@ TEST_CASE("nawa::Encoding functions", "[encoding]") {
         string htmlDecoded = R"(<input type="text" value="tä𝔸𝔸𝔸st">)";
         string htmlEncoded = encoding::htmlEncode(htmlDecoded, true);
         string htmlEncoded2 = R"(&lt;input type=&quot;text&quot; value=&quot;t&auml;&Aopf;&#x1D538;&#120120;st&quot;&gt;)";
-        REQUIRE(htmlEncoded.length() > htmlDecoded.length());
-        REQUIRE(encoding::htmlDecode(htmlEncoded) == htmlDecoded);
-        REQUIRE(htmlDecoded == encoding::htmlDecode(htmlEncoded2));
+        CHECK(htmlEncoded.length() > htmlDecoded.length());
+        CHECK(encoding::htmlDecode(htmlEncoded) == htmlDecoded);
+        CHECK(htmlDecoded == encoding::htmlDecode(htmlEncoded2));
         string htmlEncodedRand = encoding::htmlEncode(decoded, true);
         string htmlEncodedRand2 = encoding::htmlEncode(decoded, false);
-        REQUIRE(encoding::htmlDecode(htmlEncodedRand) == decoded);
-        REQUIRE(encoding::htmlDecode(htmlEncodedRand2) == decoded);
+        CHECK(encoding::htmlDecode(htmlEncodedRand) == decoded);
+        CHECK(encoding::htmlDecode(htmlEncodedRand2) == decoded);
     }
 
     SECTION("URL encoding") {
         string urlDecoded = "bla bla bla!??xyzäßédsfsdf ";
         auto urlEncoded = encoding::urlEncode(urlDecoded);
         auto urlEncodedRand = encoding::urlEncode(decoded);
-        REQUIRE(encoding::urlDecode(urlEncoded) == urlDecoded);
-        REQUIRE(encoding::urlDecode(urlEncodedRand) == decoded);
+        CHECK(encoding::urlDecode(urlEncoded) == urlDecoded);
+        CHECK(encoding::urlDecode(urlEncodedRand) == decoded);
     }
 
     SECTION("Base64 encoding") {
         auto base64Encoded = encoding::base64Encode(decoded, 80, "\r\n");
-        REQUIRE(encoding::isBase64(base64Encoded, true));
-        REQUIRE(encoding::base64Decode(base64Encoded) == decoded);
+        CHECK(encoding::isBase64(base64Encoded, true));
+        CHECK(encoding::base64Decode(base64Encoded) == decoded);
     }
 
     SECTION("quoted-printable encoding") {
-        auto hashedPw = crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
-        //auto startTime = chrono::steady_clock::now();
-        REQUIRE(crypto::passwordVerify(decoded, hashedPw));
-        //auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
+        auto quotedPrintableEncoded = encoding::quotedPrintableEncode(decoded);
+        auto quotedPrintableEncodedWithUnixLineEnding = encoding::quotedPrintableEncode(decoded, "\n");
+        auto quotedPrintableEncodedReplaceCrlf = encoding::quotedPrintableEncode(decoded, "\r\n", true);
+        auto quotedPrintableEncodedCustom = encoding::quotedPrintableEncode(decoded, "\r", true);
+        auto qEncoded = encoding::quotedPrintableEncode(decoded, "\r\n", false, true);
+        auto qEncodedReplaceCrlf = encoding::quotedPrintableEncode(decoded, "\r\n", true, true);
+        CHECK(encoding::quotedPrintableDecode(quotedPrintableEncoded) == decoded);
+        CHECK(encoding::quotedPrintableDecode(quotedPrintableEncodedWithUnixLineEnding) == decoded);
+        CHECK(encoding::quotedPrintableDecode(quotedPrintableEncodedReplaceCrlf) == decoded);
+        CHECK(encoding::quotedPrintableDecode(quotedPrintableEncodedCustom) == decoded);
+        CHECK(encoding::quotedPrintableDecode(qEncoded) == decoded);
+        CHECK(encoding::quotedPrintableDecode(qEncodedReplaceCrlf) == decoded);
     }
 }
 
-TEST_CASE("nawa::Crypto functions", "[crypto]") {
+TEST_CASE("nawa::crypto functions", "[unit][crypto]") {
     initializeInputDataIfNotYetDone();
     string decoded = GENERATE(from_range(inputData));
 
     SECTION("bcrypt password hashing") {
         auto hashedPw = crypto::passwordHash(decoded, hashing::BcryptHashingEngine(8));
-        //auto startTime = chrono::steady_clock::now();
-        REQUIRE(crypto::passwordVerify(decoded, hashedPw));
-        //auto elapsed = chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now() - startTime);
+        CHECK(crypto::passwordVerify(decoded, hashedPw));
     }
 
     SECTION("argon2 password hashing") {
@@ -126,8 +141,8 @@ TEST_CASE("nawa::Crypto functions", "[crypto]") {
         auto hashedPw_d = crypto::passwordHash(decoded,
                                                hashing::Argon2HashingEngine(
                                                        hashing::Argon2HashingEngine::Algorithm::ARGON2D));
-        REQUIRE(crypto::passwordVerify(decoded, hashedPw));
-        REQUIRE(crypto::passwordVerify(decoded, hashedPw_i));
-        REQUIRE(crypto::passwordVerify(decoded, hashedPw_d));
+        CHECK(crypto::passwordVerify(decoded, hashedPw));
+        CHECK(crypto::passwordVerify(decoded, hashedPw_i));
+        CHECK(crypto::passwordVerify(decoded, hashedPw_d));
     }
 }
