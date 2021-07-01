@@ -105,11 +105,13 @@ namespace nawa::encoding {
                                       bool replaceCrlf = false, bool qEncoding = false);
 
     /**
-     * Decode a quoted-printable encoded string.
+     * Decode a quoted-printable encoded string. Please note that only the line endings "\\r\\n" and "\\n" are
+     * supported.
      * @param input Encoded string.
+     * @param qEncoding Whether the string is Q-encoded.
      * @return Decoded string.
      */
-    std::string quotedPrintableDecode(std::string input);
+    std::string quotedPrintableDecode(std::string input, bool qEncoding = false);
 
     /**
      * Convert a UTF8-encoded string to the encoded-word syntax for email headers.

@@ -318,7 +318,11 @@ string encoding::quotedPrintableEncode(string const& input, string const& lineEn
     return ret.str();
 }
 
-string encoding::quotedPrintableDecode(string input) {
+string encoding::quotedPrintableDecode(string input, bool qEncoding) {
+    if (qEncoding) {
+        input = utils::stringReplace(input, {{'_', ' '}});
+    }
+
     regex matchCode(R"(=([0-9A-F]{2}|\r?\n))");
 
     // replacement function

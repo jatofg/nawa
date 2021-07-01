@@ -109,15 +109,13 @@ TEST_CASE("nawa::encoding functions", "[unit][encoding]") {
         auto quotedPrintableEncoded = encoding::quotedPrintableEncode(decoded);
         auto quotedPrintableEncodedWithUnixLineEnding = encoding::quotedPrintableEncode(decoded, "\n");
         auto quotedPrintableEncodedReplaceCrlf = encoding::quotedPrintableEncode(decoded, "\r\n", true);
-        auto quotedPrintableEncodedCustom = encoding::quotedPrintableEncode(decoded, "\r", true);
         auto qEncoded = encoding::quotedPrintableEncode(decoded, "\r\n", false, true);
         auto qEncodedReplaceCrlf = encoding::quotedPrintableEncode(decoded, "\r\n", true, true);
         CHECK(encoding::quotedPrintableDecode(quotedPrintableEncoded) == decoded);
         CHECK(encoding::quotedPrintableDecode(quotedPrintableEncodedWithUnixLineEnding) == decoded);
         CHECK(encoding::quotedPrintableDecode(quotedPrintableEncodedReplaceCrlf) == decoded);
-        CHECK(encoding::quotedPrintableDecode(quotedPrintableEncodedCustom) == decoded);
-        CHECK(encoding::quotedPrintableDecode(qEncoded) == decoded);
-        CHECK(encoding::quotedPrintableDecode(qEncodedReplaceCrlf) == decoded);
+        CHECK(encoding::quotedPrintableDecode(qEncoded, true) == decoded);
+        CHECK(encoding::quotedPrintableDecode(qEncodedReplaceCrlf, true) == decoded);
     }
 }
 
