@@ -12,6 +12,7 @@ option(BuildTests "Build tests" OFF)
 option(BuildExamples "Build examples" ON)
 option(BuildDocs "Build docs" ON)
 option(BuildSharedLib "Build shared library" OFF)
+option(BuildNawarun "Build nawarun" ON)
 option(EnableArgon2 "Build with argon2 hashing support" ON)
 
 # only unix-based OS are supported
@@ -202,17 +203,19 @@ set(NAWA_ALL_INCLUDE_DIRS
         $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
 
-add_executable(nawarun
-        src/nawarun/main.cpp
-        internal/nawarun/nawarun.h
-        src/nawarun/nawarun.cpp
-        ${NAWA_FILES})
+if (BuildNawarun)
+    add_executable(nawarun
+            src/nawarun/main.cpp
+            internal/nawarun/nawarun.h
+            src/nawarun/nawarun.cpp
+            ${NAWA_FILES})
 
-target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
-target_include_directories(nawarun PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
+    target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
+    target_include_directories(nawarun PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 
-target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
-target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
+    target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
+    target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
+endif ()
 
 if (BuildSharedLib OR BuildTests)
     add_library(nawa SHARED ${NAWA_FILES})
@@ -221,11 +224,16 @@ if (BuildSharedLib OR BuildTests)
 endif ()
 
 if (BuildTests)
+    set(NAWA_ENCODING_CRYPTO_UNITTEST "")
+    if (EnableArgon2)
+        set(NAWA_ENCODING_CRYPTO_UNITTEST
+                tests/unit/encoding_crypto.cpp)
+    endif ()
     add_executable(unittests
             tests/main.cpp
             tests/unit/email.cpp
-            tests/unit/encoding_crypto.cpp
-            tests/unit/utils.cpp)
+            tests/unit/utils.cpp
+            ${NAWA_ENCODING_CRYPTO_UNITTEST})
     target_link_libraries(unittests nawa Catch2::Catch2)
     target_include_directories(unittests PUBLIC
             ${NAWA_TEST_INCLUDE_DIRS})
@@ -242,49 +250,53 @@ if (BuildTests)
     catch_discover_tests(unittests)
     catch_discover_tests(integrationtests)
 
-    add_library(nawatest SHARED
-            tests/apps/nawatest.cpp)
-    target_include_directories(nawatest PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+    if (BuildNawarun)
+        add_library(nawatest SHARED
+                tests/apps/nawatest.cpp)
+        target_include_directories(nawatest PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
 
-    add_library(sessiontest SHARED
-            tests/apps/sessiontest.cpp)
-    target_include_directories(sessiontest PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+        add_library(sessiontest SHARED
+                tests/apps/sessiontest.cpp)
+        target_include_directories(sessiontest PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
 
-    add_library(emailtest SHARED
-            tests/apps/emailtest.cpp)
-    target_include_directories(emailtest PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+        add_library(emailtest SHARED
+                tests/apps/emailtest.cpp)
+        target_include_directories(emailtest PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
 
-    add_library(gpctest SHARED
-            tests/apps/gpctest.cpp)
-    target_include_directories(gpctest PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+        add_library(gpctest SHARED
+                tests/apps/gpctest.cpp)
+        target_include_directories(gpctest PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
+    endif ()
 endif ()
 
 if (BuildExamples)
-    add_library(helloworld SHARED
-            examples/helloworld.cpp)
-    target_include_directories(helloworld PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+    if (BuildNawarun)
+        add_library(helloworld SHARED
+                examples/helloworld.cpp)
+        target_include_directories(helloworld PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
 
-    add_library(contactform SHARED
-            examples/contactform.cpp)
-    target_include_directories(contactform PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+        add_library(contactform SHARED
+                examples/contactform.cpp)
+        target_include_directories(contactform PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
 
-    add_library(multipage SHARED
-            examples/multipage.cpp)
-    target_include_directories(multipage PUBLIC
-            ${NAWA_INSTALL_INCLUDE_DIRS}
-            ${NAWA_APP_INCLUDE_DIRS})
+        add_library(multipage SHARED
+                examples/multipage.cpp)
+        target_include_directories(multipage PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
+    endif ()
 
     if (BuildSharedLib)
         add_executable(aslibrary examples/aslibrary.cpp)
@@ -297,12 +309,14 @@ endif ()
 
 # install targets, components should be checked again w.r.t. packaging
 include(GNUInstallDirs)
-install(TARGETS nawarun
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-        COMPONENT Runtime)
-install(FILES "${PROJECT_SOURCE_DIR}/config.ini"
-        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/nawa
-        COMPONENT Runtime)
+if (BuildNawarun)
+    install(TARGETS nawarun
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime)
+    install(FILES "${PROJECT_SOURCE_DIR}/config.ini"
+            DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/nawa
+            COMPONENT Runtime)
+endif ()
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/nawa"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT Development)
