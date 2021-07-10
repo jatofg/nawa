@@ -12,6 +12,7 @@ option(BuildTests "Build tests" OFF)
 option(BuildExamples "Build examples" ON)
 option(BuildDocs "Build docs" ON)
 option(BuildSharedLib "Build shared library" OFF)
+option(BuildStaticLib "Build static library" OFF)
 option(BuildNawarun "Build nawarun" ON)
 option(EnableArgon2 "Build with argon2 hashing support" ON)
 
@@ -163,14 +164,15 @@ set(NAWA_FILES
 
 find_package(OpenSSL 1.1.1 REQUIRED)
 find_package(Boost 1.67.0 COMPONENTS system thread REQUIRED)
+find_package(CURL 7.58 REQUIRED)
 
 set(NAWA_LINK_LIBRARIES
         -ldl
-        -lcurl
-        bcrypt
-        fastcgilite
+        CURL::libcurl
         OpenSSL::Crypto
         Boost::system
+        bcrypt
+        fastcgilite
         ${NETLIB_LIBRARIES})
 
 if (EnableArgon2)
@@ -199,6 +201,7 @@ set(NAWA_ALL_INCLUDE_DIRS
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs>
         $<BUILD_INTERFACE:${OPENSSL_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${CURL_INCLUDE_DIRS}>
         $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
@@ -221,6 +224,12 @@ if (BuildSharedLib OR BuildTests)
     add_library(nawa SHARED ${NAWA_FILES})
     target_link_libraries(nawa ${NAWA_LINK_LIBRARIES})
     target_include_directories(nawa PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
+endif ()
+
+if (BuildStaticLib)
+    add_library(nawa_static STATIC ${NAWA_FILES})
+    target_link_libraries(nawa_static ${NAWA_LINK_LIBRARIES})
+    target_include_directories(nawa_static PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 endif ()
 
 if (BuildTests)

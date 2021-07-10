@@ -179,6 +179,7 @@ Create the build configuration:
 **Note: You can pass some arguments to cmake to influence the build configuration:** 
 * Build the tests as well: `-DBuildTests=ON`
 * Build NAWA as shared library: `-DBuildSharedLib=ON`
+* Build the *nawa_static* static library: `-DBuildStaticLib=ON`
 * Do not build nawarun: `-DBuildNawarun=OFF`
 * Disable building the examples: `-DBuildExamples=OFF`
 * Disable building docs: `-DBuildDocs=OFF` (disabled automatically if doxygen is not installed)
