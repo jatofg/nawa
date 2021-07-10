@@ -116,13 +116,22 @@ For automatically starting an app on boot, use `systemctl enable`.
 
 ## Building
 
-NAWA has been tested on Linux only so far, but it might also run on BSD derivates 
-and macOS. 
+NAWA has been tested especially on Linux. The shared library and tests 
+have been tested to also build and run on macOS (1), and 
+they will probably also do on BSD derivates. 
+
+Nawarun currently builds and runs on Linux only.
+
 Windows is not supported and will never be.
 
 **Please note:** All commands in the following instructions should be 
 run as an unprivileged user. Commands which must run as root are 
 prepended with `sudo`.
+
+*(1) Please note that due to a bug in Apple Clang, building will only 
+succeed with gcc, which can be installed using homebrew. Other dependencies 
+may also be installed using homebrew. Turn building nawarun off using 
+the `-DBuildNawarun=OFF` switch, as explained below.*
 
 ### Requirements
 
@@ -170,11 +179,12 @@ Create the build configuration:
 **Note: You can pass some arguments to cmake to influence the build configuration:** 
 * Build the tests as well: `-DBuildTests=ON`
 * Build NAWA as shared library: `-DBuildSharedLib=ON`
+* Do not build nawarun: `-DBuildNawarun=OFF`
 * Disable building the examples: `-DBuildExamples=OFF`
 * Disable building docs: `-DBuildDocs=OFF` (disabled automatically if doxygen is not installed)
 * Disable Argon2 support: `-DEnableArgon2=OFF`
 
-Build nawarun (and tests, the shared library, examples, docs, depending on your 
+Build NAWA (nawarun and the shared library, tests, examples, and docs, depending on your 
 cmake arguments):
 
 `make`
