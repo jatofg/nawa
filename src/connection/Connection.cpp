@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include <nawa/Exception.h>
+#include <nawa/oss.h>
 #include <nawa/connection/Connection.h>
 #include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/filter/AccessFilterList.h>
@@ -147,7 +148,7 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
     struct stat fileStat;
     time_t lastModified = 0;
     if (stat(path.c_str(), &fileStat) == 0) {
-        lastModified = fileStat.st_mtim.tv_sec;
+        lastModified = oss::getLastModifiedTimeOfFile(fileStat);
     }
 
     // check if-modified if requested

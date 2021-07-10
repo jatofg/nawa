@@ -22,12 +22,11 @@
  */
 
 #include <atomic>
-#include <climits>
 #include <iomanip>
 #include <mutex>
 #include <nawa/Exception.h>
+#include <nawa/oss.h>
 #include <nawa/logging/Log.h>
-#include <unistd.h>
 
 using namespace nawa;
 using namespace std;
@@ -64,9 +63,7 @@ Log::Log() noexcept {
         out = &cerr;
 
         // get hostname
-        char chostname[HOST_NAME_MAX + 1];
-        gethostname(chostname, HOST_NAME_MAX + 1);
-        hostnameStr = make_unique<string>(chostname);
+        hostnameStr = make_unique<string>(oss::getSystemHostname());
 
         // get pid
         pid = getpid();
@@ -174,7 +171,7 @@ void Log::write(string const& msg, Level level) {
         lock_guard<mutex> l(outLock);
         if (extendedFormat) {
             *out << put_time(localtime(&now), "%b %d %H:%M:%S ") << *hostnameStr << ' '
-                 << program_invocation_short_name << '[' << pid << "]: ";
+                 << oss::getProgramInvocationName() << '[' << pid << "]: ";
         }
         cerr << "[" << data->appname << "] " << msg << endl;
         out->flush();

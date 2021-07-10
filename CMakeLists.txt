@@ -15,13 +15,22 @@ option(BuildSharedLib "Build shared library" OFF)
 option(EnableArgon2 "Build with argon2 hashing support" ON)
 
 # only unix-based OS are supported
-if (NOT UNIX)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(NAWA_OS "LINUX")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(NAWA_OS "MACOS")
+elseif (UNIX)
+    set(NAWA_OS "OTHER_UNIX")
+else ()
     message(FATAL_ERROR "Unsupported operating system")
+    set(NAWA_OS "UNSUPPORTED")
 endif ()
 
 # configure the file that we need for version checking
 configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
         ${PROJECT_BINARY_DIR}/include/nawa/Application.h)
+configure_file(${PROJECT_SOURCE_DIR}/internal/systemconfig.h.in
+        ${PROJECT_BINARY_DIR}/include/nawa/systemconfig.h)
 
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
@@ -32,7 +41,7 @@ include(FetchContent)
 FetchContent_Declare(
         fastcgilite
         GIT_REPOSITORY https://github.com/jatofg/fastcgipp.git
-        GIT_TAG v3.9.2
+        GIT_TAG v3.9.3
 )
 FetchContent_Declare(
         cppnetlib
@@ -109,6 +118,7 @@ set(NAWA_FILES
         internal/nawa/RequestHandler/impl/HttpRequestHandler.h
         internal/nawa/connection/ConnectionInitContainer.h
         internal/nawa/connection/FlushCallbackContainer.h
+        internal/nawa/oss.h
         internal/nawa/request/RequestInitContainer.h
 
         libs/base64/base64.cpp
@@ -150,13 +160,16 @@ set(NAWA_FILES
         src/util/utils.cpp
         )
 
+find_package(OpenSSL 1.1.1 REQUIRED)
+find_package(Boost 1.67.0 COMPONENTS system thread REQUIRED)
+
 set(NAWA_LINK_LIBRARIES
         -ldl
-        -lcrypto
         -lcurl
-        -lboost_system
         bcrypt
         fastcgilite
+        OpenSSL::Crypto
+        Boost::system
         ${NETLIB_LIBRARIES})
 
 if (EnableArgon2)
@@ -171,6 +184,24 @@ else ()
             src/hashing/HashTypeTable/impl/BcryptOnlyHashTypeTable.cpp)
 endif ()
 
+set(NAWA_APP_INCLUDE_DIRS
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+set(NAWA_TEST_INCLUDE_DIRS
+        ${NAWA_APP_INCLUDE_DIRS}
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>)
+set(NAWA_INSTALL_INCLUDE_DIRS
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>)
+set(NAWA_ALL_INCLUDE_DIRS
+        ${NAWA_INSTALL_INCLUDE_DIRS}
+        ${NAWA_TEST_INCLUDE_DIRS}
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs>
+        $<BUILD_INTERFACE:${OPENSSL_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
+
 add_executable(nawarun
         src/nawarun/main.cpp
         internal/nawarun/nawarun.h
@@ -178,15 +209,7 @@ add_executable(nawarun
         ${NAWA_FILES})
 
 target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
-target_include_directories(nawarun PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs>
-        $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
+target_include_directories(nawarun PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 
 target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
 target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
@@ -194,15 +217,7 @@ target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
 if (BuildSharedLib OR BuildTests)
     add_library(nawa SHARED ${NAWA_FILES})
     target_link_libraries(nawa ${NAWA_LINK_LIBRARIES})
-    target_include_directories(nawa PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs>
-            $<BUILD_INTERFACE:${fastcgilite_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${fastcgilite_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${cppnetlib_SOURCE_DIR}>)
+    target_include_directories(nawa PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 endif ()
 
 if (BuildTests)
@@ -213,18 +228,14 @@ if (BuildTests)
             tests/unit/utils.cpp)
     target_link_libraries(unittests nawa Catch2::Catch2)
     target_include_directories(unittests PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>)
+            ${NAWA_TEST_INCLUDE_DIRS})
 
     add_executable(integrationtests
             tests/main.cpp
             tests/integration/environment.cpp)
     target_link_libraries(integrationtests nawa Catch2::Catch2)
     target_include_directories(integrationtests PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>)
+            ${NAWA_TEST_INCLUDE_DIRS})
 
     include(${catch2_SOURCE_DIR}/contrib/Catch.cmake)
     enable_testing()
@@ -234,61 +245,53 @@ if (BuildTests)
     add_library(nawatest SHARED
             tests/apps/nawatest.cpp)
     target_include_directories(nawatest PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 
     add_library(sessiontest SHARED
             tests/apps/sessiontest.cpp)
     target_include_directories(sessiontest PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 
     add_library(emailtest SHARED
             tests/apps/emailtest.cpp)
     target_include_directories(emailtest PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 
     add_library(gpctest SHARED
             tests/apps/gpctest.cpp)
     target_include_directories(gpctest PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 endif ()
 
 if (BuildExamples)
     add_library(helloworld SHARED
             examples/helloworld.cpp)
     target_include_directories(helloworld PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 
     add_library(contactform SHARED
             examples/contactform.cpp)
     target_include_directories(contactform PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 
     add_library(multipage SHARED
             examples/multipage.cpp)
     target_include_directories(multipage PUBLIC
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+            ${NAWA_INSTALL_INCLUDE_DIRS}
+            ${NAWA_APP_INCLUDE_DIRS})
 
     if (BuildSharedLib)
         add_executable(aslibrary examples/aslibrary.cpp)
         target_link_libraries(aslibrary nawa)
         target_include_directories(aslibrary PUBLIC
-                $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
     endif ()
 endif ()
 
