@@ -167,7 +167,6 @@ find_package(Boost 1.67.0 COMPONENTS system thread REQUIRED)
 find_package(CURL 7.58 REQUIRED)
 
 set(NAWA_LINK_LIBRARIES
-        -ldl
         CURL::libcurl
         OpenSSL::Crypto
         Boost::system
@@ -213,7 +212,9 @@ if (BuildNawarun)
             src/nawarun/nawarun.cpp
             ${NAWA_FILES})
 
-    target_link_libraries(nawarun ${NAWA_LINK_LIBRARIES})
+    target_link_libraries(nawarun
+            -ldl
+            ${NAWA_LINK_LIBRARIES})
     target_include_directories(nawarun PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 
     target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
