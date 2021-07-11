@@ -218,7 +218,11 @@ if (BuildNawarun)
     target_include_directories(nawarun PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 
     target_compile_options(nawarun PUBLIC "-Wl,--export-dynamic")
-    target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
+    if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        target_link_options(nawarun PUBLIC "-Wl,-export_dynamic")
+    else ()
+        target_link_options(nawarun PUBLIC "-Wl,--export-dynamic")
+    endif ()
 endif ()
 
 if (BuildSharedLib OR BuildTests)
@@ -284,6 +288,13 @@ if (BuildTests)
         target_include_directories(gpctest PUBLIC
                 ${NAWA_INSTALL_INCLUDE_DIRS}
                 ${NAWA_APP_INCLUDE_DIRS})
+
+        if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+            set_target_properties(nawatest PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+            set_target_properties(sessiontest PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+            set_target_properties(emailtest PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+            set_target_properties(gpctest PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+        endif ()
     endif ()
 endif ()
 
@@ -306,11 +317,25 @@ if (BuildExamples)
         target_include_directories(multipage PUBLIC
                 ${NAWA_INSTALL_INCLUDE_DIRS}
                 ${NAWA_APP_INCLUDE_DIRS})
+
+        if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+            set_target_properties(helloworld PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+            set_target_properties(contactform PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+            set_target_properties(multipage PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+        endif ()
     endif ()
 
     if (BuildSharedLib)
         add_executable(aslibrary examples/aslibrary.cpp)
         target_link_libraries(aslibrary nawa)
+        target_include_directories(aslibrary PUBLIC
+                ${NAWA_INSTALL_INCLUDE_DIRS}
+                ${NAWA_APP_INCLUDE_DIRS})
+    endif ()
+
+    if (BuildStaticLib)
+        add_executable(aslibrary_static examples/aslibrary.cpp)
+        target_link_libraries(aslibrary_static nawa_static)
         target_include_directories(aslibrary PUBLIC
                 ${NAWA_INSTALL_INCLUDE_DIRS}
                 ${NAWA_APP_INCLUDE_DIRS})

@@ -29,6 +29,7 @@
 #include <optional>
 #include <string>
 #include <tuple>
+#include <unistd.h>
 #include <vector>
 
 namespace nawarun {

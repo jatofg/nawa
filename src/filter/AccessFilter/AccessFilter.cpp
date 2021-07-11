@@ -23,6 +23,7 @@
 
 #include <nawa/filter/AccessFilter/AccessFilter.h>
 #include <nawa/util/utils.h>
+#include <sstream>
 
 using namespace nawa;
 using namespace std;

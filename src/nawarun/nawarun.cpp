@@ -30,12 +30,12 @@
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/config/Config.h>
 #include <nawa/logging/Log.h>
+#include <nawa/oss.h>
 #include <nawa/util/utils.h>
 #include <nawarun/nawarun.h>
 #include <pwd.h>
 #include <stdexcept>
 #include <thread>
-#include <unistd.h>
 
 using namespace nawa;
 using namespace nawarun;
@@ -307,7 +307,7 @@ optional<PrivilegeDowngradeData> nawarun::preparePrivilegeDowngrade(Config const
             int n = 0;
             getgrouplist(username.c_str(), privGID, nullptr, &n);
             supplementaryGroups.resize(n, 0);
-            if (getgrouplist(username.c_str(), privGID, &supplementaryGroups[0], &n) != n) {
+            if (getgrouplist(username.c_str(), privGID, oss::getGIDPtrForGetgrouplist(&supplementaryGroups[0]), &n) != n) {
                 NLOG_WARNING(logger, "WARNING: Could not get supplementary groups for user " << username)
                 supplementaryGroups = {privGID};
             }

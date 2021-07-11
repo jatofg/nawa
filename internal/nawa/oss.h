@@ -56,6 +56,16 @@ namespace nawa::oss {
         return std::string(getprogname());
 #endif
     }
+
+#ifdef NAWA_OS_LINUX
+    inline gid_t* getGIDPtrForGetgrouplist(gid_t* in) {
+        return in;
+    }
+#else
+    inline int* getGIDPtrForGetgrouplist(gid_t* in) {
+        return (int*) in;
+    }
+#endif
 }
 
 #endif//NAWA_OPERATINGSYSTEMSPECIFIC_H
