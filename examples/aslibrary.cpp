@@ -64,6 +64,7 @@ int main() {
         requestHandler = RequestHandler::newRequestHandler(handlingFunction, config, 1);
     } catch (Exception const& e) {
         cerr << "NAWA request handler could not be created: " << e.getMessage() << endl;
+        return 1;
     }
 
     // At this point, you should consider doing a privilege downgrade (if your app is meant to be started as root), as
@@ -82,6 +83,7 @@ int main() {
         requestHandler->start();
     } catch (Exception const& e) {
         cerr << "NAWA request handling could not be started: " << e.getMessage() << endl;
+        return 1;
     }
 
     // You can control request handling at any time by calling:
