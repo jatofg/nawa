@@ -158,4 +158,48 @@ TEST_CASE("Environment and headers (HTTP)", "[headers][http]") {
     }
 }
 
-// TODO: POST, GET, files, env vars, ...
+TEST_CASE("Sessions (HTTP)", "[sessions][http]") {
+    REQUIRE(initializeEnvironmentIfNotYetDone());
+    auto& requestHandler = httpRequestHandler;
+
+    auto handlingFunction = [](Connection& connection) -> int {
+        auto& resp = connection.responseStream();
+        auto& env = connection.request().env();
+        auto& session = connection.session();
+
+        session.start();
+        if (!session.isSet("testKey")) {
+            resp << "not set";
+            session.set("testKey", "testVal");
+        } else {
+            try {
+                resp << any_cast<string>(session["testKey"]);
+            } catch (bad_any_cast const&) {
+                resp << "bad cast";
+            }
+        }
+
+        return 0;
+    };
+
+    REQUIRE_NOTHROW(
+            requestHandler->reconfigure(make_shared<HandleRequestFunctionWrapper>(handlingFunction), nullopt, config));
+    REQUIRE_NOTHROW(requestHandler->start());
+
+    http::client client;
+    http::client::response response;
+
+    http::client::request request(baseUrl);
+    REQUIRE_NOTHROW(response = client.get(request));
+    REQUIRE(response.body() == "not set");
+    auto cookieIterator = response.headers().find("Set-Cookie");
+    REQUIRE(cookieIterator != response.headers().end());
+    auto parsedCookie = utils::parseCookies(cookieIterator->second);
+    auto parsedCookieIt = parsedCookie.find("SESSION");
+    REQUIRE(parsedCookieIt != parsedCookie.end());
+    string sessionId = parsedCookieIt->second;
+
+    request << boost::network::header("Cookie", "SESSION=" + sessionId);
+    REQUIRE_NOTHROW(response = client.get(request));
+    REQUIRE(response.body() == "testVal");
+}

@@ -254,7 +254,7 @@ if (BuildTests)
 
     add_executable(integrationtests
             tests/main.cpp
-            tests/integration/environment.cpp)
+            tests/integration/http.cpp)
     target_link_libraries(integrationtests nawa Catch2::Catch2)
     target_include_directories(integrationtests PUBLIC
             ${NAWA_TEST_INCLUDE_DIRS})
