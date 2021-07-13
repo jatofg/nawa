@@ -139,8 +139,8 @@ the `-DBuildNawarun=OFF` switch, as explained below.*
 
 * OpenSSL >= 1.1.1
 * libcurl4 >= 7.58.0
-* libboost-system >= 1.67
-* libboost-thread >= 1.67
+* libboost-system >= 1.66.0
+* libboost-thread >= 1.66.0
 * libargon2 >= 0~20161029-1.1 (only if built with Argon2 support)
 
 **For building (additionally):**
