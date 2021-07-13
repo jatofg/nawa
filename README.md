@@ -104,7 +104,11 @@ The path to the object file is included in the config file, and NAWA
 will take care of setting everything up and starting the app. You 
 can run it like this:
 
-`nawarun config.ini`
+`nawarun /path/to/config.ini` (or just `nawarun` if the file is named 
+`config.ini` and located in the current working directory).
+
+Run `nawarun -h` or `nawarun --help` for information on command line 
+options (config overrides, starting without config file).
 
 If systemd is present on your system, a systemd service file will 
 also be installed on your system. You can start an app as a 
@@ -116,11 +120,10 @@ For automatically starting an app on boot, use `systemctl enable`.
 
 ## Building
 
-NAWA has been tested especially on Linux. The shared library and tests 
-have been tested to also build and run on macOS (1), and 
-they will probably also do on BSD derivates. 
-
-Nawarun currently builds and runs on Linux only.
+NAWA has been tested especially on Linux, but also runs fine 
+on macOS (both as a library and using nawarun) *(1)*. It will 
+probably also run on other BSD derivates, but this has not 
+been tested.
 
 Windows is not supported and will never be.
 
@@ -130,8 +133,7 @@ prepended with `sudo`.
 
 *(1) Please note that due to a bug in Apple Clang, building will only 
 succeed with gcc, which can be installed using homebrew. Other dependencies 
-may also be installed using homebrew. Turn building nawarun off using 
-the `-DBuildNawarun=OFF` switch, as explained below.*
+may also be installed using homebrew.*
 
 ### Requirements
 

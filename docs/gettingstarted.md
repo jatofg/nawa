@@ -149,8 +149,22 @@ could also do `connection.setResponseBody("Hello World!")`.
 You can find the full source code of this example in the 
 `examples/helloworld.cpp` file.
 
-Now, compile your app and insert the correct path into your 
-`config.ini` file.
+Now, compile your app (as a library) and insert the correct path into your 
+`config.ini` file. If you're using CMake, you can do it like this 
+(assuming that nawa, especially its headers, are installed on your 
+system):
+
+```cmake
+add_library(myapp SHARED myapp.cpp)
+```
+
+Do not link your library against NAWA when writing apps this way. On 
+macOS, you will have to use a special linker flag to avoid linking 
+errors (neither necessary nor working on Linux):
+
+```cmake
+set_target_properties(myapp PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+```
 
 ## Configuring the web server
 
@@ -180,10 +194,14 @@ should be all set for running and accessing your app!
 
 ## Run your app!
 
-In a terminal (assuming you're in 
-the directory where the `config.ini` file is located), run:
+In a terminal (assuming you're in the directory where the 
+`config.ini` file is located), run:
 
-`nawarun config.ini`
+`nawarun`
+
+For more options (providing a path to the config file, 
+command-line config overrides, no-config-file mode), run 
+`nawarun -h` or `nawarun --help`.
 
 Open your web browser and enjoy!
 
