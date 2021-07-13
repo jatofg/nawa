@@ -455,5 +455,5 @@ int nawarun::run(Parameters const& parameters) {
     // the request handler has to be destroyed before unloading the app (using dlclose)
     requestHandlerPtr.reset(nullptr);
 
-    exit(0);
+    return 0;
 }
