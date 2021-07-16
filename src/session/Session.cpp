@@ -36,11 +36,11 @@ namespace {
      * SessionData objects contain all data of one session.
      */
     struct SessionData {
-        mutex dLock;                               /**< Lock for data. */
-        mutex eLock;                               /**< Lock for expires.  */
-        unordered_map<std::string, std::any> data; /**< Map containing all values of this session. */
-        time_t expires;                            /**< Time when this session expires. */
-        const string sourceIP;                     /**< IP address of the session initiator, for optional IP checking. */
+        mutex dLock;                     /**< Lock for data. */
+        mutex eLock;                     /**< Lock for expires.  */
+        unordered_map<string, any> data; /**< Map containing all values of this session. */
+        time_t expires;                  /**< Time when this session expires. */
+        const string sourceIP;           /**< IP address of the session initiator, for optional IP checking. */
         /**
          * Construct an empty SessionData object without a source IP.
          */
@@ -165,7 +165,7 @@ void Session::start(Cookie properties) {
             }
             // validate_ip enabled in NAWA config and IP mismatch?
             else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax") &&
-                     sessionData.at(sessionCookieStr)->sourceIP != data->connection.request().env()["remoteAddress"]) {
+                     sessionData.at(sessionCookieStr)->sourceIP != data->connection.request().env()["REMOTE_ADDR"]) {
                 if (sessionValidateIP == "strict") {
                     // in strict mode, session has to be invalidated
                     sessionData.erase(sessionCookieStr);
@@ -185,9 +185,9 @@ void Session::start(Cookie properties) {
         // generate new session ID string (and check for duplicate - should not really occur)
         lock_guard<mutex> lockGuard(gLock);
         do {
-            sessionCookieStr = generateID(data->connection.request().env()["remoteAddress"]);
+            sessionCookieStr = generateID(data->connection.request().env()["REMOTE_ADDR"]);
         } while (sessionData.count(sessionCookieStr) > 0);
-        data->currentData = make_shared<SessionData>(data->connection.request().env()["remoteAddr"]);
+        data->currentData = make_shared<SessionData>(data->connection.request().env()["REMOTE_ADDR"]);
         data->currentData->expires = time(nullptr) + sessionKeepalive;
         sessionData[sessionCookieStr] = data->currentData;
     }
