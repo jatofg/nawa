@@ -299,3 +299,7 @@ void Session::invalidate() {
     // unset the session cookie, so that a new session can be started
     data->connection.unsetCookie(data->cookieName);
 }
+
+string Session::getID() const {
+    return established() ? data->currentID : string();
+}

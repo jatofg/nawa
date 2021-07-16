@@ -246,6 +246,7 @@ if (BuildTests)
     add_executable(unittests
             tests/main.cpp
             tests/unit/email.cpp
+            tests/unit/sessions.cpp
             tests/unit/utils.cpp
             ${NAWA_ENCODING_CRYPTO_UNITTEST})
     target_link_libraries(unittests nawa Catch2::Catch2)

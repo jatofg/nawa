@@ -157,6 +157,12 @@ namespace nawa {
          * header has already been sent).
          */
         void invalidate();
+
+        /**
+         * Get the session ID of the current session (for testing purposes).
+         * @return The current session ID. Empty if no session is active.
+         */
+        [[nodiscard]] std::string getID() const;
     };
 }// namespace nawa
 

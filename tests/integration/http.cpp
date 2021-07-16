@@ -191,7 +191,7 @@ TEST_CASE("Sessions (HTTP)", "[sessions][http]") {
 
     http::client::request request(baseUrl);
     REQUIRE_NOTHROW(response = client.get(request));
-    REQUIRE(response.body() == "not set");
+    CHECK(response.body() == "not set");
     auto cookieIterator = response.headers().find("Set-Cookie");
     REQUIRE(cookieIterator != response.headers().end());
     auto parsedCookie = utils::parseCookies(cookieIterator->second);
@@ -201,5 +201,5 @@ TEST_CASE("Sessions (HTTP)", "[sessions][http]") {
 
     request << boost::network::header("Cookie", "SESSION=" + sessionId);
     REQUIRE_NOTHROW(response = client.get(request));
-    REQUIRE(response.body() == "testVal");
+    CHECK(response.body() == "testVal");
 }
