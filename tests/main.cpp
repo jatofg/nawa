@@ -59,9 +59,9 @@ Config loadConfig() {
  *          - Config
  *          - Email
  *          - MimeMultipart
- *          - Session
  *          - (Log)
- *          - possibly even Connection, Request
+ *          - cookies (expiry, etc.), check generation, including session cookie config options
+ *          - possibly even Connection, Request => additional headers, etc.
  *      integration:
  *          - (post: sending more than max, files, ...)
  *          - fastcgi
