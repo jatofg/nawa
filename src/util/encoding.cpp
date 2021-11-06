@@ -140,24 +140,24 @@ string encoding::htmlEncode(string input, bool encodeAll) {
         // convert to utf32 to iterate through the characters
         wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
         u32string uinput = cv.from_bytes(input);
-        basic_stringstream<char32_t> uoutputs;
+        ostringstream output;
         char32_t lookahead = '\0';
         for (char32_t c : uinput) {
             if (lookahead != '\0') {
                 // if we have a lookahead, check the htmlLookahead map if there is an entity for that
                 // (there should always be one, if the map is correct)
                 if (htmlLookaheads.count(lookahead) != 1) {
-                    uoutputs << lookahead;
+                    output << cv.to_bytes(lookahead);
                     lookahead = '\0';
                 } else {
                     // check whether the current char matches the second char for the entity
                     auto& currentLA = htmlLookaheads.at(lookahead);
                     if (currentLA.first == c) {
-                        uoutputs << currentLA.second;
+                        output << cv.to_bytes(currentLA.second);
                         lookahead = '\0';
                         continue;
                     } else {
-                        uoutputs << lookahead;
+                        output << cv.to_bytes(lookahead);
                         lookahead = '\0';
                     }
                 }
@@ -167,17 +167,17 @@ string encoding::htmlEncode(string input, bool encodeAll) {
                     // empty entity string means that entity stands for 2 characters
                     lookahead = c;
                 } else {
-                    uoutputs << htmlEntities.at(c);
+                    output << cv.to_bytes(htmlEntities.at(c));
                 }
             } else {
-                uoutputs << c;
+                output << cv.to_bytes(c);
             }
         }
         // if lookahead is not \0, the last char has been (falsely) identified as lookahead
         if (lookahead != '\0') {
-            uoutputs << lookahead;
+            output << cv.to_bytes(lookahead);
         }
-        input = cv.to_bytes(uoutputs.str());
+        input = output.str();
     }
     return input;
 }
@@ -196,13 +196,13 @@ string encoding::htmlDecode(string input) {
         if (htmlDecodeTable.count(entity32) != 1) {
             return matches.at(0);
         } else {
-            basic_stringstream<char32_t> ret;
-            ret << htmlDecodeTable.at(entity32).first;
+            ostringstream ret;
+            ret << cv.to_bytes(htmlDecodeTable.at(entity32).first);
             auto secondChar = htmlDecodeTable.at(entity32).second;
             if (secondChar != '\0') {
-                ret << secondChar;
+                ret << cv.to_bytes(secondChar);
             }
-            return cv.to_bytes(ret.str());
+            return ret.str();
         }
     };
 
