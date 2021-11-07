@@ -96,7 +96,7 @@ namespace nawa {
 
         /**
          * Get the value at the given key (as a std::any object). To actually receive the stored object, use
-         * `std::any_cast` (example: `std::any_cast<std::string>(conn.session["test"])`). You will have to
+         * `std::any_cast` (example: `std::any_cast<std::string>(conn.session()["test"])`). You will have to
          * explicitly state the type of the stored object as a template argument of `std::any_cast`
          * (as C++ is statically typed).
          * @param key Key to get value for.
