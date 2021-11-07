@@ -345,7 +345,7 @@ string utils::getFileExtension(string const& filename) {
         return filename.substr(filename.find_last_of('.') + 1);
     } catch (out_of_range&) {}
 
-    return string();
+    return {};
 }
 
 string utils::contentTypeByExtension(string extension) {

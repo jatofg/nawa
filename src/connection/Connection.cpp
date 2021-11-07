@@ -23,10 +23,10 @@
 
 #include <fstream>
 #include <nawa/Exception.h>
-#include <nawa/oss.h>
 #include <nawa/connection/Connection.h>
 #include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/filter/AccessFilterList.h>
+#include <nawa/oss.h>
 #include <nawa/util/encoding.h>
 #include <nawa/util/utils.h>
 #include <regex>
@@ -98,18 +98,18 @@ namespace {
 }
 
 struct Connection::Data {
-    std::string bodyString;
+    string bodyString;
     unsigned int responseStatus = 200;
-    std::unordered_map<std::string, std::vector<std::string>> headers;
-    std::unordered_map<std::string, Cookie> cookies;
+    unordered_map<string, vector<string>> headers;
+    unordered_map<string, Cookie> cookies;
     Cookie cookiePolicy;
     bool isFlushed = false;
     FlushCallbackFunction flushCallback;
 
-    nawa::Request request;
-    nawa::Session session;
-    nawa::Config config;
-    std::stringstream responseStream;
+    Request request;
+    Session session;
+    Config config;
+    stringstream responseStream;
 
     void clearStream() {
         responseStream.str(string());
@@ -154,7 +154,7 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
     // check if-modified if requested
     time_t ifModifiedSince = 0;
     try {
-        ifModifiedSince = stoul(data->request.env()["if-modified-since"]);
+        ifModifiedSince = stol(data->request.env()["if-modified-since"]);
     } catch (invalid_argument const&) {
     } catch (out_of_range const&) {}
     if (checkIfModifiedSince && ifModifiedSince >= lastModified) {
@@ -341,31 +341,31 @@ unsigned int Connection::getStatus() const {
     return data->responseStatus;
 }
 
-nawa::Request const& nawa::Connection::request() const noexcept {
+Request const& Connection::request() const noexcept {
     return data->request;
 }
 
-nawa::Session& nawa::Connection::session() noexcept {
+Session& Connection::session() noexcept {
     return data->session;
 }
 
-nawa::Session const& nawa::Connection::session() const noexcept {
+Session const& Connection::session() const noexcept {
     return data->session;
 }
 
-nawa::Config& nawa::Connection::config() noexcept {
+Config& Connection::config() noexcept {
     return data->config;
 }
 
-nawa::Config const& nawa::Connection::config() const noexcept {
+Config const& Connection::config() const noexcept {
     return data->config;
 }
 
-std::ostream& nawa::Connection::responseStream() noexcept {
+ostream& Connection::responseStream() noexcept {
     return data->responseStream;
 }
 
-bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
+bool Connection::applyFilters(AccessFilterList const& accessFilters) {
     // if filters are disabled, do not even check
     if (!accessFilters.filtersEnabled())
         return false;
@@ -509,7 +509,7 @@ bool nawa::Connection::applyFilters(AccessFilterList const& accessFilters) {
     return false;
 }
 
-std::string FlushCallbackContainer::getStatusString() const {
+string FlushCallbackContainer::getStatusString() const {
     stringstream hval;
     hval << status;
     if (httpStatusCodes.count(status) == 1) {
@@ -518,7 +518,7 @@ std::string FlushCallbackContainer::getStatusString() const {
     return hval.str();
 }
 
-std::string FlushCallbackContainer::getFullHttp() const {
+string FlushCallbackContainer::getFullHttp() const {
     stringstream raw;
     // include headers and cookies, but only when flushing for the first time
     if (!flushedBefore) {

@@ -47,7 +47,7 @@ string request::Env::operator[](string const& envVar) const {
     if (data->environment.count(envVar)) {
         return data->environment.at(envVar);
     }
-    return string();
+    return {};
 }
 
 vector<string> request::Env::getAcceptLanguages() const {

@@ -32,5 +32,5 @@ shared_ptr<hashing::HashingEngine> hashing::DefaultHashTypeTable::getEngine(stri
     if (hid == "$2a$" || hid == "$2b$" || hid == "$2x$" || hid == "$2y$") {
         return shared_ptr<hashing::HashingEngine>(new hashing::BcryptHashingEngine());
     }
-    return shared_ptr<hashing::HashingEngine>();
+    return {};
 }

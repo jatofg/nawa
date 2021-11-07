@@ -36,5 +36,5 @@ shared_ptr<hashing::HashingEngine> hashing::DefaultHashTypeTable::getEngine(stri
                hash.substr(0, 9) == "$argon2d$") {
         return shared_ptr<hashing::HashingEngine>(new hashing::Argon2HashingEngine());
     }
-    return shared_ptr<hashing::HashingEngine>();
+    return {};
 }

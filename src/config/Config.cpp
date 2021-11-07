@@ -86,7 +86,7 @@ string Config::operator[](pair<string, string> const& key) const {
     if (data->values.count(key) == 1) {
         return data->values.at(key);
     } else {
-        return string();
+        return {};
     }
 }
 

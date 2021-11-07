@@ -261,7 +261,7 @@ any Session::operator[](string const& key) const {
             return data->currentData->data.at(key);
         }
     }
-    return any();
+    return {};
 }
 
 // doxygen bug requires std:: here
