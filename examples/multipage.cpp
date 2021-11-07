@@ -34,41 +34,41 @@ int init(AppInit& appInit) {
 
     // apply forward filters for images below '/test/static/images' and '/test2/static/images ...
     ForwardFilter imageFilter;
-    imageFilter.pathFilter() = {{"test", "static", "images"},
-                                {"test2", "static", "images"}};
-    imageFilter.extensionFilter() = {"png", "jpeg", "jpg", "gif"};
-    imageFilter.basePath() = "/var/www/multipage/images";
+    imageFilter.pathFilter({{"test", "static", "images"},
+                            {"test2", "static", "images"}});
+    imageFilter.extensionFilter({"png", "jpeg", "jpg", "gif"});
+    imageFilter.basePath("/var/www/multipage/images");
     appInit.accessFilters().forwardFilters().push_back(imageFilter);
 
     // and block everything else in these directories
     BlockFilter blockNonImages;
-    blockNonImages.pathFilter() = {{"test", "static", "images"},
-                                   {"test2", "static", "images"}};
-    blockNonImages.extensionFilter() = {"png", "jpeg", "jpg", "gif"};
-    blockNonImages.invertExtensionFilter() = true;
-    blockNonImages.status() = 404;
+    blockNonImages.pathFilter({{"test", "static", "images"},
+                               {"test2", "static", "images"}});
+    blockNonImages.extensionFilter({"png", "jpeg", "jpg", "gif"});
+    blockNonImages.invertExtensionFilter(true);
+    blockNonImages.status(404);
     appInit.accessFilters().blockFilters().push_back(blockNonImages);
 
     // ... and html below '/test/static/html'
     ForwardFilter htmlFilter;
-    htmlFilter.pathFilter() = {{"test", "static", "html"}};
-    htmlFilter.extensionFilter() = {"html", "htm"};
-    htmlFilter.basePath() = "/var/www/multipage/html";
+    htmlFilter.pathFilter({{"test", "static", "html"}});
+    htmlFilter.extensionFilter({"html", "htm"});
+    htmlFilter.basePath("/var/www/multipage/html");
     appInit.accessFilters().forwardFilters().push_back(htmlFilter);
 
     // and also block everything else there
     BlockFilter blockNonHtml;
-    blockNonHtml.pathFilter() = {{"test", "static", "html"}};
-    blockNonHtml.extensionFilter() = {"html", "htm"};
-    blockNonHtml.invertExtensionFilter() = true;
-    blockNonHtml.status() = 404;
+    blockNonHtml.pathFilter({{"test", "static", "html"}});
+    blockNonHtml.extensionFilter({"html", "htm"});
+    blockNonHtml.invertExtensionFilter(true);
+    blockNonHtml.status(404);
     appInit.accessFilters().blockFilters().push_back(blockNonHtml);
 
     // authenticate access to all static resources
     AuthFilter authFilter;
-    authFilter.pathFilter() = {{"test", "static"},
-                               {"test2", "static"}};
-    authFilter.authName() = "Not for everyone!";
+    authFilter.pathFilter({{"test", "static"},
+                           {"test2", "static"}});
+    authFilter.authName("Not for everyone!");
     authFilter.authFunction() = [](std::string user, std::string password) -> bool {
         return (user == "test" && password == "supersecure");
     };

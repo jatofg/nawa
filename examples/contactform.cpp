@@ -95,7 +95,7 @@ int handleRequest(Connection& connection) {
         email.headers()["Content-Type"] = "text/plain; charset=UTF-8";
         // apply Q-encoding to the header, just in case the user used special chars in the subject
         email.headers()["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
-        email.quotedPrintableEncode() = true;
+        email.quotedPrintableEncode(true);
         email.text() = "This contact form was sent via an example nawa application!\r\n\r\n"
                        "Name of the sender: " +
                        post["name"] + "\r\n"

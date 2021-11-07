@@ -2,16 +2,18 @@ Using Docker {#usingdocker}
 ===
 
 **Please note that the Docker images are currently mostly untested
-and only used as a CI. They might not even work anymore. Feel free 
-to report bugs on GitHub if you use them.**
+and only used as a CI. They are no longer available from the GitHub 
+package repository.**
 
-Docker images are built automatically by GitHub and are available 
-[here](https://github.com/jatofg/nawa/packages).
+**This manual page is no longer actively maintained.**
 
-To install them, you need a GitHub account and access 
+~~Docker images are built automatically by GitHub and are available 
+[here](https://github.com/jatofg/nawa/packages).~~
+
+~~To install them, you need a GitHub account and access 
 token (click "Learn more" on the package page for more 
 information). After logging in with docker, use the command on 
-the package page to pull the image.
+the package page to pull the image.~~
 
 To try out NAWA with the Hello World example app, you can start a 
 container like this:

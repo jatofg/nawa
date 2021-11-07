@@ -101,7 +101,7 @@ once (which is possible), the operator will only access one definition
 (usually the first one). Example:
 
 ```cpp
-std::string firstName = connection.request.post["first_name"];
+std::string firstName = connection.request().post()["first_name"];
 ```
 
 To find out how many definitions exist for the name "variable", use  

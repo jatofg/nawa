@@ -24,10 +24,10 @@ Set the necessary headers (at least From, To, and Subject are generally consider
 to be necessary):
 
 ```cpp
-email.headers["From"] = from.get();
-email.headers["To"] = to.get();
-email.headers["Content-Type"] = "text/plain; charset=UTF-8";
-email.headers["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
+email.headers()["From"] = from.get();
+email.headers()["To"] = to.get();
+email.headers()["Content-Type"] = "text/plain; charset=UTF-8";
+email.headers()["Subject"] = encoding::makeEncodedWord("[Contact Form] " + post["subject"]);
 ```
 
 In the last line, so-called Q-encoding is applied to the subject, just in case it 
@@ -37,15 +37,15 @@ sure it doesn't contain any illegal characters which would violate the email
 standards:
 
 ```cpp
-email.quotedPrintableEncode() = true;
+email.quotedPrintableEncode(true);
 ```
 
 And of course, don't forget to set the actual text/body of the email:
 
 ```cpp
-email.text = "This is an example email!\r\n"
-             "Don't forget that according to the standard,\r\n"
-             "you have to use Windows-style CRLF line breaks!";
+email.text() = "This is an example email!\r\n"
+               "Don't forget that according to the standard,\r\n"
+               "you have to use Windows-style CRLF line breaks!";
 ```
 
 Now, create a `nawa::SmtpMailer` object with the credentials of your SMTP 
