@@ -12,7 +12,7 @@ NAWA communicates with the web server via FastCGI and currently uses
 the fastcgi++ lite library for efficient request handling.
 
 ## News
-**New in v0.7**
+**New in v0.8**
 
 The configuration can now be reloaded without restarting and apps (and request handling 
 functions) can be hot-swapped. This allows you to update your app without interrupting 
@@ -44,14 +44,14 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.7/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.8/docs/gettingstarted.html) 
 
 If you don't like the IoC-style approach, you can also use NAWA as a library. 
-[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.7/docs/aslibrarymanual.html)
+[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.8/docs/aslibrarymanual.html)
 
 ### Warning!
 
-This project is still in an early state (version 0.7!). It might, of 
+This project is still in an early state (version 0.8!). It might, of 
 course, still contain bugs. Use it at your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
@@ -131,9 +131,10 @@ Windows is not supported and will never be.
 run as an unprivileged user. Commands which must run as root are 
 prepended with `sudo`.
 
-*(1) Please note that due to a bug in Apple Clang, building will only 
+*(1) ~~Please note that due to a bug in Apple Clang, building will only 
 succeed with gcc, which can be installed using homebrew. Other dependencies 
-may also be installed using homebrew.*
+may also be installed using homebrew.~~  Compiling with Apple Clang works fine 
+on macOS 12, dependencies still have to be installed from homebrew.*
 
 ### Requirements
 
