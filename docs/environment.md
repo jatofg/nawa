@@ -182,14 +182,14 @@ the cookie policy, which you can set by creating a `nawa::Cookie`
 object with the desired attributes, and passing it to 
 `connection.setCookiePolicy()` (`nawa::Connection::setCookiePolicy()`) -- 
 all cookies created for the current response from that point will have 
-these default attributes, and (if there is no custom cookie policy) 
+these default attributes, unless they are overridden.
 
 The default values for the `expires`, `maxAge`, `domain`, `path`, and 
 `sameSite` attributes are used only if the corresponding members of the 
-`nawa::Cookie` object are not set (strings) or 0 (integers). For the 
+`nawa::Cookie` object are not set. For the 
 `secure` and `httpOnly` attributes, the strongest value (`true`) wins 
-(i.e., these attributes are set if either the actual Cookie object, or the 
-cookie policy, or the config demands this).
+(i.e., these attributes are set if either the actual Cookie object or the 
+cookie policy demands this).
 
 After defining your `nawa::Cookie` object, pass it to 
 `connection.setCookie()`:

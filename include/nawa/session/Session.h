@@ -54,7 +54,8 @@ namespace nawa {
          * 1. the Cookie object that may be passed as an optional parameter to this function and will be used as a
          *    template for the cookie. See the param description on how to use it.
          * 2. the configuration in the NAWA configuration file,
-         * 3. and, of course, by the cookie policy that can be set via Connection::setCookiePolicy.
+         * 3. and, of course, by the cookie policy that can be set via Connection::setCookiePolicy (if it contains
+         *    stronger protections than the configuration file).
          *
          * The duration (keep-alive) of the session is defined in the NAWA config file, but can be overridden by setting
          * the attribute maxAge of the parameter object, see below.
@@ -63,16 +64,14 @@ namespace nawa {
          * is impossible then). It is recommended to call start() directly in the beginning of your program.
          *
          * @param properties Template for the cookie sent to the client. You can use it to influence the behavior of
-         * Session and to make sure the cookie is properly secured. The attributes will be used as follows:
+         * Session and to make sure the cookie is properly secured. Setting options in this Cookie object will
+         * override the respective options from the configuration file and the cookie policy.
+         * The attributes will be used as follows:
          * - content: will be ignored (and replaced by the session ID)
          * - expires: set this to > 0 (e.g., to 1), if the Expires and Max-Age attributes should be set for the cookie.
-         *   The value will be replaced by the proper expiry time. If 0, attribute inclusion can still be forced by the
-         *   NAWA configuration or Connection::setCookiePolicy. Please note that if using setCookiePolicy, the attributes
-         *   will be added after Session has set the cookie and the contents will thus be determined by the policy, not
-         *   by the session. This may lead to unwanted behavior, so please make sure that you set this attribute to > 0
-         *   here if you are using setCookiePolicy.
-         * - maxAge: will be used as the session duration (inactive keep-alive, server-side!) if > 0. If expires == 0
-         *   (and is also not overridden by the NAWA config), this attribute will be reset to 0 before setting the cookie.
+         *   The value will be replaced by the proper expiry time.
+         * - maxAge: will be used as the session duration (inactive keep-alive, server-side!) if > 0. If expires == 0,
+         *   this attribute will be reset to 0 before setting the cookie.
          * - secure: send the Secure attribute with the cookie.
          * - httpOnly: send the HttpOnly attribute with the cookie.
          * - sameSite: set the SameSite attribute to lax (if sameSite == 1) or strict (if sameSite > 1).

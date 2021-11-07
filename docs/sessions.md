@@ -16,16 +16,22 @@ file. The values are explained in the comments of the sample config file.
 
 The most relevant options are:
 
-- `cookie_secure`: When on, sessions will only work over secure 
+- `cookie_secure`: If on, sessions will only work over secure 
 connections (HTTPS), as the browser will be instructed not to send 
 the session cookie over unencrypted connections.
-- `cookie_expires`: When on, cookies will have an explicit expiry 
+- `cookie_expires`: If on, cookies will have an explicit expiry 
 date (`keepalive` seconds after the last request), i.e., sessions 
 do not necessarily end when the visitors close their browser. 
 This might make a "cookie banner" necessary for complying with the GDPR.
-- `autostart`: When on, you do not have to call 
+- `autostart`: If on, you do not have to call 
 `connection.session.start();` to start a session -- sessions will be 
 created automatically, and session cookies sent with every request.
+
+When starting the session by calling `nawa::Session::start()` manually
+(see next section), you can pass a `nawa::Cookie` object as a parameter to 
+override the config values with stronger presets. The cookie policy is also 
+taken into consideration if it contains stronger protections than the session 
+configuration.
 
 ## Using sessions
 
