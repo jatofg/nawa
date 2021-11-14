@@ -16,7 +16,7 @@ jobs:
           cd build
           cmake ..
       - name: Build and publish docs
-        uses: langroodi/doxygenize@v1.4
+        uses: langroodi/doxygenize@4186fba316b72a7d790b1fff255f6a1dabc1db31
         with:
           doxygenconf: './docs/build/Doxyfile'
           htmloutput: './docs-out/'

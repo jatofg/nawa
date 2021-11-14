@@ -25,8 +25,8 @@ jobs:
         with:
           name: tests
           path: |
-            unittests
-            integrationtests
+            ./build/unittests
+            ./build/integrationtests
 
   test:
     name: Test (Linux)
@@ -42,6 +42,10 @@ jobs:
           sudo apt-get update
           sudo apt-get -y --no-install-recommends libargon2-1 libboost-system1.71.0 libboost-thread1.71.0 \
           libboost-chrono1.71.0 libboost-date-time1.71.0
+      - name: Set permissions
+        run: |
+          chmod +x unittests
+          chmod +x integrationtests
       - name: Run unit tests
         run: ./unittests
       - name: Run integration tests

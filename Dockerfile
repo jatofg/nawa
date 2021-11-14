@@ -7,7 +7,10 @@ COPY libs /opt/nawasrc/libs
 COPY src /opt/nawasrc/src
 COPY systemd /opt/nawasrc/systemd
 COPY tests /opt/nawasrc/tests
+COPY docs /opt/nawasrc/docs
 COPY CMakeLists.txt /opt/nawasrc/
+COPY version.cmake /opt/nawasrc/
+COPY configure.cmake /opt/nawasrc/
 COPY docker/nawa/config.ini /opt/nawasrc/
 RUN set -eux; \
 	apt-get update; \
