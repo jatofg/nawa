@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.13)
-project(nawa VERSION 0.8)
+project(nawa)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# version
-set(NAWA_VERSION_MAJOR 0)
-set(NAWA_VERSION_MINOR 8)
+include(version.cmake)
 
 # build options
 option(BuildTests "Build tests" OFF)
@@ -28,11 +26,10 @@ else ()
     set(NAWA_OS "UNSUPPORTED")
 endif ()
 
-# configure the file that we need for version checking
-configure_file(${PROJECT_SOURCE_DIR}/include/Application.h.in
-        ${PROJECT_BINARY_DIR}/include/nawa/Application.h)
-configure_file(${PROJECT_SOURCE_DIR}/internal/systemconfig.h.in
-        ${PROJECT_BINARY_DIR}/include/nawa/systemconfig.h)
+set(NAWA_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
+
+# configure the files that depend on the NAWA version and OS-specific code
+include(configure.cmake)
 
 file(GLOB BlowfishCFiles libs/libbcrypt/crypt_blowfish/*.c)
 add_library(bcrypt STATIC libs/libbcrypt/bcrypt.c ${BlowfishCFiles})
@@ -371,15 +368,6 @@ if (BuildSharedLib)
 endif ()
 
 # build documentation
-find_package(Doxygen)
-if (DOXYGEN_FOUND AND BuildDocs)
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" @ONLY)
-    add_custom_target(docs
-            "${DOXYGEN_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
-            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-            COMMENT "Generating Doxygen documentation" VERBATIM)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/docs"
-            DESTINATION ${CMAKE_INSTALL_DOCDIR}
-            OPTIONAL)
-endif ()
+if (BuildDocs)
+    add_subdirectory(docs)
+endif()

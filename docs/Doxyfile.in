@@ -162,7 +162,7 @@ FULL_PATH_NAMES        = YES
 # will be relative from the directory where doxygen is started.
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
-STRIP_FROM_PATH        = "@CMAKE_CURRENT_SOURCE_DIR@" \
+STRIP_FROM_PATH        = "@NAWA_SOURCE_DIR@" \
                          "@CMAKE_CURRENT_BINARY_DIR@"
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
@@ -172,7 +172,7 @@ STRIP_FROM_PATH        = "@CMAKE_CURRENT_SOURCE_DIR@" \
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    = "@CMAKE_CURRENT_SOURCE_DIR@/include" \
+STRIP_FROM_INC_PATH    = "@NAWA_SOURCE_DIR@/include" \
                          "@CMAKE_CURRENT_BINARY_DIR@/include"
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
@@ -705,7 +705,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            = "@CMAKE_CURRENT_SOURCE_DIR@/docs/DoxygenLayout.xml"
+LAYOUT_FILE            = "@CMAKE_CURRENT_SOURCE_DIR@/DoxygenLayout.xml"
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -792,14 +792,14 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/include/nawa" \
+INPUT                  = "@NAWA_SOURCE_DIR@/include/nawa" \
                          "@CMAKE_CURRENT_BINARY_DIR@/include/nawa" \
                          "@CMAKE_CURRENT_BINARY_DIR@/internal" \
-                         "@CMAKE_CURRENT_SOURCE_DIR@/src" \
-                         "@CMAKE_CURRENT_SOURCE_DIR@/examples" \
-                         "@CMAKE_CURRENT_SOURCE_DIR@/tests" \
-                         "@CMAKE_CURRENT_SOURCE_DIR@/README.md" \
-                         "@CMAKE_CURRENT_SOURCE_DIR@/docs"
+                         "@NAWA_SOURCE_DIR@/src" \
+                         "@NAWA_SOURCE_DIR@/examples" \
+                         "@NAWA_SOURCE_DIR@/tests" \
+                         "@NAWA_SOURCE_DIR@/README.md" \
+                         "@NAWA_SOURCE_DIR@/docs"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -877,7 +877,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@/examples"
+EXAMPLE_PATH           = "@NAWA_SOURCE_DIR@/examples"
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -953,7 +953,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = "@CMAKE_CURRENT_SOURCE_DIR@/README.md"
+USE_MDFILE_AS_MAINPAGE = "@NAWA_SOURCE_DIR@/README.md"
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing

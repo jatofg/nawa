@@ -1,0 +1,48 @@
+name: Build
+on: [push, pull_request]
+
+jobs:
+
+  build:
+    name: Build (Linux)
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libssl-dev libargon2-dev libboost-dev \
+          libboost-system-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev libcurl4-openssl-dev
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=RELEASE -DBuildTests=ON -DBuildSharedLib=ON -DBuildStaticLib=ON ..
+          make
+      - name: Save build
+        uses: actions/upload-artifact@v2
+        with:
+          name: tests
+          path: |
+            unittests
+            integrationtests
+
+  test:
+    name: Test (Linux)
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Fetch build
+        uses: actions/download-artifact@v2
+        with:
+          name: tests
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends libargon2-1 libboost-system1.71.0 libboost-thread1.71.0 \
+          libboost-chrono1.71.0 libboost-date-time1.71.0
+      - name: Run unit tests
+        run: ./unittests
+      - name: Run integration tests
+        run: ./integrationtests
