@@ -58,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = "@CMAKE_CURRENT_BINARY_DIR@"
+OUTPUT_DIRECTORY       = "@NAWA_DOXYGEN_BINARY_DIR@"
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -162,8 +162,8 @@ FULL_PATH_NAMES        = YES
 # will be relative from the directory where doxygen is started.
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
-STRIP_FROM_PATH        = "@NAWA_SOURCE_DIR@" \
-                         "@CMAKE_CURRENT_BINARY_DIR@"
+STRIP_FROM_PATH        = "@NAWA_DOXYGEN_SOURCE_DIR@" \
+                         "@NAWA_DOXYGEN_BINARY_DIR@"
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -172,8 +172,8 @@ STRIP_FROM_PATH        = "@NAWA_SOURCE_DIR@" \
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    = "@NAWA_SOURCE_DIR@/include" \
-                         "@CMAKE_CURRENT_BINARY_DIR@/include"
+STRIP_FROM_INC_PATH    = "@NAWA_DOXYGEN_SOURCE_DIR@/include" \
+                         "@NAWA_DOXYGEN_BINARY_DIR@/include"
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
 # less readable) file names. This can be useful is your file systems doesn't
@@ -241,12 +241,6 @@ TAB_SIZE               = 4
 # newlines.
 
 ALIASES                =
-
-# This tag can be used to specify a number of word-keyword mappings (TCL only).
-# A mapping has the form "name=value". For example adding "class=itcl::class"
-# will allow you to use the command class in the itcl::class meaning.
-
-TCL_SUBST              =
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For
@@ -792,14 +786,15 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = "@NAWA_SOURCE_DIR@/include/nawa" \
-                         "@CMAKE_CURRENT_BINARY_DIR@/include/nawa" \
-                         "@CMAKE_CURRENT_BINARY_DIR@/internal" \
-                         "@NAWA_SOURCE_DIR@/src" \
-                         "@NAWA_SOURCE_DIR@/examples" \
-                         "@NAWA_SOURCE_DIR@/tests" \
-                         "@NAWA_SOURCE_DIR@/README.md" \
-                         "@NAWA_SOURCE_DIR@/docs"
+INPUT                  = "@NAWA_DOXYGEN_SOURCE_DIR@/include/nawa" \
+                         "@NAWA_DOXYGEN_BINARY_DIR@/include/nawa" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/internal/nawa" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/internal/nawarun" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/src" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/examples" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/tests" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/README.md" \
+                         "@NAWA_DOXYGEN_SOURCE_DIR@/docs"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -877,7 +872,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = "@NAWA_SOURCE_DIR@/examples"
+EXAMPLE_PATH           = "@NAWA_DOXYGEN_SOURCE_DIR@/examples"
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -953,7 +948,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = "@NAWA_SOURCE_DIR@/README.md"
+USE_MDFILE_AS_MAINPAGE = "@NAWA_DOXYGEN_SOURCE_DIR@/README.md"
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1070,13 +1065,6 @@ CLANG_OPTIONS          =
 # The default value is: YES.
 
 ALPHABETICAL_INDEX     = YES
-
-# The COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns in
-# which the alphabetical index list will be split.
-# Minimum value: 1, maximum value: 20, default value: 5.
-# This tag requires that the tag ALPHABETICAL_INDEX is set to YES.
-
-COLS_IN_ALPHA_INDEX    = 5
 
 # In case all classes in a project start with a common prefix, all classes will
 # be put under the same header in the alphabetical index. The IGNORE_PREFIX tag
@@ -1773,16 +1761,6 @@ LATEX_BATCHMODE        = NO
 
 LATEX_HIDE_INDICES     = NO
 
-# If the LATEX_SOURCE_CODE tag is set to YES then doxygen will include source
-# code with syntax highlighting in the LaTeX output.
-#
-# Note that which sources are shown also depends on other settings such as
-# SOURCE_BROWSER.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_LATEX is set to YES.
-
-LATEX_SOURCE_CODE      = NO
-
 # The LATEX_BIB_STYLE tag can be used to specify the style to use for the
 # bibliography, e.g. plainnat, or ieeetr. See
 # http://en.wikipedia.org/wiki/BibTeX and \cite for more info.
@@ -1854,16 +1832,6 @@ RTF_STYLESHEET_FILE    =
 # This tag requires that the tag GENERATE_RTF is set to YES.
 
 RTF_EXTENSIONS_FILE    =
-
-# If the RTF_SOURCE_CODE tag is set to YES then doxygen will include source code
-# with syntax highlighting in the RTF output.
-#
-# Note that which sources are shown also depends on other settings such as
-# SOURCE_BROWSER.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_RTF is set to YES.
-
-RTF_SOURCE_CODE        = NO
 
 #---------------------------------------------------------------------------
 # Configuration options related to the man page output
@@ -1953,15 +1921,6 @@ GENERATE_DOCBOOK       = NO
 # This tag requires that the tag GENERATE_DOCBOOK is set to YES.
 
 DOCBOOK_OUTPUT         = docbook
-
-# If the DOCBOOK_PROGRAMLISTING tag is set to YES, doxygen will include the
-# program listings (including syntax highlighting and cross-referencing
-# information) to the DOCBOOK output. Note that enabling this will significantly
-# increase the size of the DOCBOOK output.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_DOCBOOK is set to YES.
-
-DOCBOOK_PROGRAMLISTING = NO
 
 #---------------------------------------------------------------------------
 # Configuration options for the AutoGen Definitions output
@@ -2145,12 +2104,6 @@ EXTERNAL_GROUPS        = YES
 
 EXTERNAL_PAGES         = YES
 
-# The PERL_PATH should be the absolute path and name of the perl script
-# interpreter (i.e. the result of 'which perl').
-# The default file (with absolute path) is: /usr/bin/perl.
-
-PERL_PATH              = /usr/bin/perl
-
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
@@ -2163,15 +2116,6 @@ PERL_PATH              = /usr/bin/perl
 # The default value is: YES.
 
 CLASS_DIAGRAMS         = NO
-
-# You can define message sequence charts within doxygen comments using the \msc
-# command. Doxygen will then run the mscgen tool (see:
-# http://www.mcternan.me.uk/mscgen/)) to produce the chart and insert it in the
-# documentation. The MSCGEN_PATH tag allows you to specify the directory where
-# the mscgen tool resides. If left empty the tool is assumed to be found in the
-# default search path.
-
-MSCGEN_PATH            =
 
 # You can include diagrams made with dia in doxygen documentation. Doxygen will
 # then run dia to produce the diagram and insert it in the documentation. The

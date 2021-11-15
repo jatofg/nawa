@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y --no-install-recommends libargon2-1 libboost-system1.71.0 libboost-thread1.71.0 \
+          sudo apt-get install -y --no-install-recommends libargon2-1 libboost-system1.71.0 libboost-thread1.71.0 \
           libboost-chrono1.71.0 libboost-date-time1.71.0
       - name: Set permissions
         run: |

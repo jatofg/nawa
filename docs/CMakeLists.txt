@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
 project(nawa_docs)
 
-include(../version.cmake)
-
 set(NAWA_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
+set(NAWA_DOXYGEN_SOURCE_DIR "${NAWA_SOURCE_DIR}" CACHE STRING "Override NAWA sources directory (relative to target directory)")
+set(NAWA_DOXYGEN_BINARY_DIR "${CMAKE_BINARY_DIR}" CACHE STRING "Override NAWA configured sources directory (relative to target directory)")
+
+include(../version.cmake)
 
 # configured files needed for docs generation
 include(../configure.cmake)

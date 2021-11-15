@@ -1,4 +1,4 @@
-name: build
+name: Docs
 on: push
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
           cd docs
           mkdir build
           cd build
-          cmake ..
+          cmake -DNAWA_DOXYGEN_SOURCE_DIR=. -DNAWA_DOXYGEN_BINARY_DIR=docs/build ..
       - name: Build and publish docs
         uses: langroodi/doxygenize@4186fba316b72a7d790b1fff255f6a1dabc1db31
         with:
