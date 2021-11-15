@@ -222,13 +222,13 @@ if (BuildNawarun)
     endif ()
 endif ()
 
-if (BuildSharedLib OR BuildTests)
+if (BuildSharedLib)
     add_library(nawa SHARED ${NAWA_FILES})
     target_link_libraries(nawa ${NAWA_LINK_LIBRARIES})
     target_include_directories(nawa PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
 endif ()
 
-if (BuildStaticLib)
+if (BuildStaticLib OR BuildTests)
     add_library(nawa_static STATIC ${NAWA_FILES})
     target_link_libraries(nawa_static ${NAWA_LINK_LIBRARIES})
     target_include_directories(nawa_static PUBLIC ${NAWA_ALL_INCLUDE_DIRS})
@@ -246,14 +246,14 @@ if (BuildTests)
             tests/unit/sessions.cpp
             tests/unit/utils.cpp
             ${NAWA_ENCODING_CRYPTO_UNITTEST})
-    target_link_libraries(unittests nawa Catch2::Catch2)
+    target_link_libraries(unittests nawa_static Catch2::Catch2)
     target_include_directories(unittests PUBLIC
             ${NAWA_TEST_INCLUDE_DIRS})
 
     add_executable(integrationtests
             tests/main.cpp
             tests/integration/http.cpp)
-    target_link_libraries(integrationtests nawa Catch2::Catch2)
+    target_link_libraries(integrationtests nawa_static Catch2::Catch2)
     target_include_directories(integrationtests PUBLIC
             ${NAWA_TEST_INCLUDE_DIRS})
 
