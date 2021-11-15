@@ -1,0 +1,2 @@
+/home/runner/work/nawa/nawa/docs/build/CMakeFiles/rebuild_cache.dir
+/home/runner/work/nawa/nawa/docs/build/CMakeFiles/edit_cache.dir

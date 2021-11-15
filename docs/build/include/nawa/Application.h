@@ -1,0 +1,38 @@
+/**
+ * \file Application.h
+ * \brief This file will be configured by CMake and contains the necessary properties to ensure that a loaded app
+ * has been compiled against the same nawa version as the nawarun executable loading it (or, at least, one with a compatible ABI).
+ */
+
+/*
+ * Copyright (C) 2019-2021 Tobias Flaig.
+ *
+ * This file is part of nawa.
+ *
+ * nawa is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License,
+ * version 3, as published by the Free Software Foundation.
+ *
+ * nawa is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef NAWA_APPLICATION_H
+#define NAWA_APPLICATION_H
+#define NAWA_VERSION_MAJOR 0
+#define NAWA_VERSION_MINOR 8
+
+#include <nawa/AppInit.h>
+#include <nawa/connection/Connection.h>
+
+extern "C" const int nawa_version_major = NAWA_VERSION_MAJOR;
+extern "C" const int nawa_version_minor = NAWA_VERSION_MINOR;
+extern "C" int init(nawa::AppInit& appInit);
+extern "C" int handleRequest(nawa::Connection& connection);
+
+#endif //NAWA_APPLICATION_H
