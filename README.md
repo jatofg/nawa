@@ -44,10 +44,10 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction tutorial.](https://www.tobiasflaig.eu/nawa/0.8/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html) 
 
 If you don't like the IoC-style approach, you can also use NAWA as a library. 
-[An introduction can be found here.](https://www.tobiasflaig.eu/nawa/0.8/docs/aslibrarymanual.html)
+[An introduction can be found here.](https://jatofg.github.io/nawa/v0.8/docs/aslibrarymanual.html)
 
 ### Warning!
 
@@ -98,7 +98,7 @@ application, and
 
 You can find an introduction containing a simple "Hello World!" 
 NAWA app here: 
-[Getting started.](https://www.tobiasflaig.eu/nawa/0.8/docs/gettingstarted.html)
+[Getting started.](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html)
 
 The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
@@ -157,7 +157,7 @@ on macOS 12, dependencies still have to be installed from homebrew.*
 * gcc-c++/g++ or clang compiler with C++17 support
 
 For building the docs, doxygen must be installed. However, you can also 
-[access the docs online](https://www.tobiasflaig.eu/nawa/0.8/docs/).
+[access the docs online](https://jatofg.github.io/nawa/v0.8/docs/).
 
 ### Clone, build, and install NAWA
 
