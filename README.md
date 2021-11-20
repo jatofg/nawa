@@ -11,6 +11,11 @@ aspects of requests and responses (GET, POST, cookies, ...).
 NAWA communicates with the web server via FastCGI and currently uses 
 the fastcgi++ lite library for efficient request handling.
 
+It also comes 
+with an integrated development web server (HTTP Request Handler) which can 
+serve your application without depending on dedicated web server software
+(still somehow experimental and unfit for production use).
+
 ## News
 **New in v0.8**
 
