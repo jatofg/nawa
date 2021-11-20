@@ -98,12 +98,14 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a></p>
-<p>NAWA is a framework for web applications written in C++(17). It aims to make writing a natively running web app nearly as easy as writing it in a specialized scripting language (such as PHP). It provides the necessary features, such as sessions, static filters (for providing static elements such as images), and accessing and controlling all aspects of requests and responses (GET, POST, cookies, ...).</p>
+<p>NAWA is a framework for web applications written in C++(17). It aims to make writing native web apps nearly as easy as writing them in specialized scripting languages (such as PHP). It provides the necessary features, such as sessions, request filters (for providing static elements such as images), and accessing and controlling all aspects of requests and responses (GET, POST, cookies, ...). Scroll on for a list of features.</p>
 <p>NAWA communicates with the web server via FastCGI and currently uses the fastcgi++ lite library for efficient request handling.</p>
+<p>It also comes with an integrated development web server (HTTP Request Handler) which can serve your application without depending on dedicated web server software (still somehow experimental and unfit for production use).</p>
 <h1>News</h1>
 <p><b>New in v0.8</b></p>
 <p>The configuration can now be reloaded without restarting and apps (and request handling functions) can be hot-swapped. This allows you to update your app without interrupting request handling. Reloading can be done via systemd or by sending a SIGHUP signal to nawarun. If you are using NAWA as a library, take a look at <code><a class="el" href="classnawa_1_1RequestHandler.html#ac69bd17fb8702c5abcc17935b6a7ef42">nawa::RequestHandler::reconfigure()</a></code>.</p>
-<p>Please note that the project has been extensively restructured, therefore it might be necessary to correct the includes of existing apps.</p>
+<p>Almost all data members of classes have become methods, therefore, it is necessary to update existing apps before upgrading. Please note that the project has been extensively restructured, therefore it might also be necessary to correct the includes of existing apps.</p>
+<p>Additionally, this release adds support for macOS.</p>
 <h1>Example</h1>
 <p>The following example is the complete C++ source code of a NAWA app that answers every request with the "Hello World!". It's that simple.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="Application_8h.html">nawa/Application.h</a>&gt;</span></div>
@@ -128,21 +130,83 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <p>This project is still in an early state (version 0.8!). It might, of course, still contain bugs. Use it at your own risk.</p>
 <p>If you use it, please report any bugs and wishes, so that this project might reach a higher version number at some point :)</p>
 <p>Also, the ABI and API can still change at any time, making modifications to your apps (or, at least, recompilation) necessary. When such changes happen, the version number will be increased, and nawarun will refuse to load apps compiled against an older version.</p>
-<h1>Features (selection)</h1>
+<h1>Main Features</h1>
 <ul>
-<li>Receive GET, POST, COOKIE, and environment data (such as headers) from the request</li>
-<li>Get the POST data in the format you want it: get key-value pairs, receive and store submitted files, and/or access the raw POST data</li>
-<li>Set status, headers, and cookies for the response</li>
-<li>Set defaults, for example for cookie parameters, by using the configuration engine</li>
-<li>Read and store configuration files in the .ini format</li>
-<li>Set the response body, either at once or using C++ streams</li>
-<li>Flush the response before it is complete (given that this is supported by your web server)</li>
-<li>Session management: NAWA will manage session cookies by itself, if you want, and allows you to store and receive session-specific data without having to care about session management yourself</li>
-<li>Cryptographic functions and other useful functions to make your life easier are included (e.g., SHA-1/2 hasing, password hashing, hex encoding, base64 encoding/decoding, date/time format conversions, default page generation, content type guessing, string splitting)</li>
-<li>Support for sending emails through SMTP.</li>
-<li>Set up request filters to forward files and block or authenticate requests.</li>
-<li>Request handling may take place using multiple threads to exploit <br  />
- multi-core CPUs.</li>
+<li>Request Handling Backends (<a href="https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html">learn more</a>)<ul>
+<li>FastCGI (serve requests through web server software)</li>
+<li>HTTP (development web server, not production-ready yet)</li>
+</ul>
+</li>
+<li>Access to request data (<a href="https://jatofg.github.io/nawa/v0.8/docs/environmentmanual.html">learn more</a>)<ul>
+<li>GET, POST, COOKIE variables</li>
+<li>Request headers</li>
+<li>Request details (document root, request method, client IP, ...)</li>
+<li>Environment information (server software, server IP, ...)</li>
+</ul>
+</li>
+<li>Defining the response (<a href="https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html">learn more</a>)<ul>
+<li>Set response body directly or using a stream</li>
+<li>Set response headers</li>
+<li>Set cookies</li>
+<li>Default options for cookie security</li>
+<li>Flush response prematurely</li>
+<li>Respond with files from disk (incl. automatic setting of relevant response headers)</li>
+<li>Automatically generate and send error pages</li>
+</ul>
+</li>
+<li>Sessions (<a href="https://jatofg.github.io/nawa/v0.8/docs/sessionsmanual.html">learn more</a>)<ul>
+<li>Full-featured session management</li>
+<li>Session security options</li>
+<li>Start sessions automatically (optional)</li>
+<li>Set and get session variables of arbitrary types</li>
+</ul>
+</li>
+<li>Request Filters (<a href="https://jatofg.github.io/nawa/v0.8/docs/filtersmanual.html">learn more</a>)<ul>
+<li>Filter requests based on path, file extensions, or regular expressions</li>
+<li>Serve filtered requests with files from disk (forward filter)</li>
+<li>Block filtered requests with error pages</li>
+<li>Require HTTP authentication for filtered requests</li>
+</ul>
+</li>
+<li>Email (<a href="https://jatofg.github.io/nawa/v0.8/docs/emailmanual.html">learn more</a>)<ul>
+<li>Create emails with headers</li>
+<li>MIME email and attachment support</li>
+<li>Automatic quoted-printable or base64 encoding (if desired)</li>
+<li>Q-encoding for subjects</li>
+<li>Replacement rules for personalizing mass emails</li>
+<li>Sending emails via SMTP</li>
+</ul>
+</li>
+<li>Cryptographic functions<ul>
+<li>Password hashing (bcrypt, Argon2)</li>
+<li>Classic hashing (SHA-1, SHA-2, MD5)</li>
+</ul>
+</li>
+<li>Encoding and decoding functions<ul>
+<li>HTML entities</li>
+<li>URL encoding</li>
+<li>Base64, quoted-printable, Q-encoding, encoded-word</li>
+<li>Punycode for internationalized domain names</li>
+</ul>
+</li>
+<li>Utility functions<ul>
+<li>Regular expressions with callback</li>
+<li>Convert strings to uppercase and lowercase</li>
+<li>Generate error pages</li>
+<li>Deduct content types</li>
+<li>HTTP and SMTP time formatting</li>
+<li>String and UNIX path splitting and merging</li>
+<li>Line ending conversion</li>
+<li>Load files into strings</li>
+<li>Parse headers and cookies from raw HTTP</li>
+</ul>
+</li>
+<li>Core features<ul>
+<li>Multi-threaded request handling (configurable)</li>
+<li>Hot-swapping of apps and request handling functions</li>
+<li>Reload configuration without interrupting request handling</li>
+</ul>
+</li>
 </ul>
 <h1>Example</h1>
 <p>A NAWA app consists of:</p>
@@ -159,7 +223,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <p>For automatically starting an app on boot, use <code>systemctl enable</code>.</p>
 <h1>Building</h1>
 <p>NAWA has been tested especially on Linux, but also runs fine on macOS (both as a library and using nawarun) *(1)*. It will probably also run on other BSD derivates, but this has not been tested.</p>
-<p>Windows is not supported and will never be.</p>
+<p>Windows is not supported and never will be.</p>
 <p><b>Please note:</b> All commands in the following instructions should be run as an unprivileged user. Commands which must run as root are prepended with <code>sudo</code>.</p>
 <p>*(1) <strike>Please note that due to a bug in Apple Clang, building will only succeed with gcc, which can be installed using homebrew. Other dependencies may also be installed using homebrew.</strike> Compiling with Apple Clang works fine on macOS 12, dependencies still have to be installed from homebrew.*</p>
 <h2>Requirements</h2>

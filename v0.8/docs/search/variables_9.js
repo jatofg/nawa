@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['nawa_5fversion_5fmajor_943',['nawa_version_major',['../Application_8h.html#acd6c00b0143ef122392f312949f2477e',1,'Application.h']]],
-  ['nawa_5fversion_5fminor_944',['nawa_version_minor',['../Application_8h.html#ae7a1816eb79526674c1a436f09d7cf70',1,'Application.h']]]
+  ['postcontenttype_940',['postContentType',['../namespacenawa.html#a29a676d7acfc50e38a16acfe2e5f4e93',1,'nawa::RequestInitContainer']]],
+  ['postfiles_941',['postFiles',['../namespacenawa.html#ac6d72bf70f59caf85e49a5863f99ef80',1,'nawa::RequestInitContainer']]],
+  ['postvars_942',['postVars',['../namespacenawa.html#adc2171419a739c00d2092d6f876e7cb8',1,'nawa::RequestInitContainer']]]
 ];

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['postcontenttype_945',['postContentType',['../namespacenawa.html#a29a676d7acfc50e38a16acfe2e5f4e93',1,'nawa::RequestInitContainer']]],
-  ['postfiles_946',['postFiles',['../namespacenawa.html#ac6d72bf70f59caf85e49a5863f99ef80',1,'nawa::RequestInitContainer']]],
-  ['postvars_947',['postVars',['../namespacenawa.html#adc2171419a739c00d2092d6f876e7cb8',1,'nawa::RequestInitContainer']]]
+  ['rawpost_943',['rawPost',['../namespacenawa.html#af50b313e9aad0fdfa26ae686752af0f9',1,'nawa::RequestInitContainer']]],
+  ['requestinit_944',['requestInit',['../namespacenawa.html#ac92b0963137f6085d0a5ab9e79d6c0f2',1,'nawa::ConnectionInitContainer']]]
 ];

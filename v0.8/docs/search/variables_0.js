@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['acceptlanguages_927',['acceptLanguages',['../namespacenawa.html#a92e520e48d9534676d900c80ab7e72a5',1,'nawa::RequestInitContainer']]]
+  ['body_923',['body',['../structnawa_1_1FlushCallbackContainer.html#a444132e9687b382cbaa4acdf0124e9d6',1,'nawa::FlushCallbackContainer']]]
 ];

@@ -111,8 +111,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a23dca6a1e808fdcacfd7073420b02078"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7acefe686b149ac34f5a6cef78b98b3c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnawa_1_1request_1_1Env.html#a7acefe686b149ac34f5a6cef78b98b3c">operator[]</a> (std::string const &amp;envVar) const</td></tr>
 <tr class="separator:a7acefe686b149ac34f5a6cef78b98b3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf9e7cd5ace47ad4fbc9ddc33182ca0c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnawa_1_1request_1_1Env.html#acf9e7cd5ace47ad4fbc9ddc33182ca0c">getAcceptLanguages</a> () const</td></tr>
-<tr class="separator:acf9e7cd5ace47ad4fbc9ddc33182ca0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dc97c4bacd63f53895ef275755ca956"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnawa_1_1request_1_1Env.html#a6dc97c4bacd63f53895ef275755ca956">getRequestPath</a> () const</td></tr>
 <tr class="separator:a6dc97c4bacd63f53895ef275755ca956"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -176,7 +174,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00042">42</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00040">40</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
 
 </div>
 </div>
@@ -204,28 +202,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Content of the environment variable. Empty string if not set. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00046">46</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
-
-</div>
-</div>
-<a id="acf9e7cd5ace47ad4fbc9ddc33182ca0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf9e7cd5ace47ad4fbc9ddc33182ca0c">&#9670;&nbsp;</a></span>getAcceptLanguages()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt; string &gt; request::Env::getAcceptLanguages </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Receive the languages accepted by the client (from HTTP Header). Works with fastcgi request handler only. </p><dl class="section return"><dt>Returns</dt><dd>Vector of strings containing the accepted languages. Empty if not set. </dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Please use ["accept-language"] instead to access the header directly. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00053">53</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00044">44</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +222,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p><a class="el" href="classnawa_1_1Request.html">Request</a> path. Use ["REQUEST_URI"] to access it as a string. </p><dl class="section return"><dt>Returns</dt><dd>Vector of strings containing the elements of the path. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00057">57</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Env_8cpp_source.html#l00051">51</a> of file <a class="el" href="Env_8cpp_source.html">Env.cpp</a>.</p>
 
 </div>
 </div>

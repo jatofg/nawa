@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['environment_933',['environment',['../namespacenawa.html#a94f200e22c7ae6fb7412ec08449039c3',1,'nawa::RequestInitContainer']]]
+  ['flushcallback_929',['flushCallback',['../namespacenawa.html#adcfd89c4bf42129c98c3829a78191e08',1,'nawa::ConnectionInitContainer']]],
+  ['flushedbefore_930',['flushedBefore',['../structnawa_1_1FlushCallbackContainer.html#a8c3f9c25a0b749b7ad1be90fab695a53',1,'nawa::FlushCallbackContainer']]]
 ];

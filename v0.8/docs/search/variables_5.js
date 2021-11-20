@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['getvars_936',['getVars',['../namespacenawa.html#a208928325a90204a8ef6728a3615d39d',1,'nawa::RequestInitContainer']]]
+  ['headers_932',['headers',['../structnawa_1_1FlushCallbackContainer.html#a6987705d84b8adb852319eb28c51997b',1,'nawa::FlushCallbackContainer']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['mimepartorlist_942',['MimePartOrList',['../classnawa_1_1mail_1_1MimeEmail_1_1MimePart.html#a7a46c1f9fa6de1a8e4d371cea91b06ac',1,'nawa::mail::MimeEmail::MimePart::MimePartOrList()'],['../classnawa_1_1mail_1_1MimeEmail_1_1MimePartList.html#adb3a57d70c5c3048ba1a1bfa762e9c1c',1,'nawa::mail::MimeEmail::MimePartList::MimePartOrList()']]]
+  ['nawa_5fversion_5fmajor_938',['nawa_version_major',['../Application_8h.html#acd6c00b0143ef122392f312949f2477e',1,'Application.h']]],
+  ['nawa_5fversion_5fminor_939',['nawa_version_minor',['../Application_8h.html#ae7a1816eb79526674c1a436f09d7cf70',1,'Application.h']]]
 ];
