@@ -291,7 +291,6 @@ string encoding::quotedPrintableEncode(string const& input, string const& lineEn
     stringstream ret;
     int lineCount = 0;
     for (const char c : input) {
-        // TODO do not replace =09 (tabulator)? spaces at the end of a line (shoud be encoded =20)?
         if (c >= 32 && c <= 126 && c != 61 && !(qEncoding && (c == 32 || c == 63 || c == 95))) {
             if (!qEncoding && lineCount >= 75) {
                 ret << "=" << lineEnding;

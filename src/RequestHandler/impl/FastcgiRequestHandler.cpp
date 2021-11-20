@@ -131,7 +131,6 @@ bool FastcgippRequestAdapter::response() {
         requestInit.postContentType = renv.contentType;
 
         // POST files
-        // TODO use MimeMultipart
         for (auto const& [k, fcgiFile] : renv.files) {
             requestInit.postFiles.insert({k, File(fcgiFile.data, fcgiFile.size).filename(fcgiFile.filename).contentType(fcgiFile.contentType)});
         }
@@ -221,7 +220,6 @@ FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWra
         logger.write(msg, nawaLevel);
     };
 
-    // TODO it should be possible to change postMax after fastcgilite manager creation
     data->fastcgippManager = make_unique<Fastcgipp::Manager<FastcgippRequestAdapter>>(concurrency, postMax,
                                                                                       static_cast<RequestHandler*>(this));
 

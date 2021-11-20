@@ -163,8 +163,6 @@ struct HttpHandler {
         };
 
         // evaluate request headers
-        // TODO accept languages (split), split acceptContentTypes?, acceptCharsets (where to find?)
-        //      - consistent names for other elements in req handlers?
         for (auto const& h : request.headers) {
             if (requestInit.environment.count(utils::toLowercase(h.name)) == 0) {
                 requestInit.environment[utils::toLowercase(h.name)] = h.value;
@@ -330,7 +328,6 @@ void HttpRequestHandler::stop() noexcept {
 }
 
 void HttpRequestHandler::terminate() noexcept {
-    // TODO find (implement in fork of cpp-netlib) a way to forcefully terminate
     if (data->joined) {
         return;
     }

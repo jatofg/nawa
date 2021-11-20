@@ -32,7 +32,6 @@ using namespace std;
 struct File::Data {
     string filename;
     string contentType;
-    // TODO better solution can be used when shifting fcgi handler to use MimeMultipart
     shared_ptr<char[]> dataPtr;
     size_t size = 0;
 
