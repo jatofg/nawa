@@ -2,11 +2,12 @@ NAWA
 ===
 
 NAWA is a framework for web applications written in C++(17). It aims to 
-make writing a natively running web app nearly as easy as writing it 
-in a specialized scripting language (such as PHP). It provides the 
-necessary features, such as sessions, static filters (for providing 
+make writing native web apps nearly as easy as writing them 
+in specialized scripting languages (such as PHP). It provides the 
+necessary features, such as sessions, request filters (for providing 
 static elements such as images), and accessing and controlling all 
-aspects of requests and responses (GET, POST, cookies, ...).
+aspects of requests and responses (GET, POST, cookies, ...). Scroll on 
+for a list of features.
 
 NAWA communicates with the web server via FastCGI and currently uses 
 the fastcgi++ lite library for efficient request handling.
@@ -25,8 +26,11 @@ request handling. Reloading can be done via systemd or by sending a SIGHUP signa
 nawarun. If you are using NAWA as a library, take a look at 
 `nawa::RequestHandler::reconfigure()`.
 
-Please note that the project has been extensively restructured, therefore it might be 
-necessary to correct the includes of existing apps.
+Almost all data members of classes have become methods, therefore, it is necessary to 
+update existing apps before upgrading. Please note that the project has been extensively 
+restructured, therefore it might also be necessary to correct the includes of existing apps.
+
+Additionally, this release adds support for macOS.
 
 ## Example
 
@@ -67,31 +71,63 @@ modifications to your apps (or, at least, recompilation) necessary. When such
 changes happen, the version number will be increased, and nawarun will refuse to 
 load apps compiled against an older version.
 
-## Features (selection)
+## Main Features
 
-- Receive GET, POST, COOKIE, and environment data (such as headers) 
-from the request
-- Get the POST data in the format you want it: get key-value pairs, 
-receive and store submitted files, and/or access the raw POST data
-- Set status, headers, and cookies for the response
-- Set defaults, for example for cookie parameters, by using the 
-configuration engine
-- Read and store configuration files in the .ini format
-- Set the response body, either at once or using C++ streams
-- Flush the response before it is complete (given that this is 
-supported by your web server)
-- Session management: NAWA will manage session cookies by itself, if 
-you want, and allows you to store and receive session-specific data 
-without having to care about session management yourself
-- Cryptographic functions and other useful functions to make your life 
-easier are included (e.g., SHA-1/2 hasing, password hashing, hex 
-encoding, base64 encoding/decoding, date/time format conversions, 
-default page generation, content type guessing, string splitting)
-- Support for sending emails through SMTP.
-- Set up request filters to forward files and block or authenticate 
-requests.
-- Request handling may take place using multiple threads to exploit  
-multi-core CPUs.
+* Request Handling Backends ([learn more](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html))
+  * FastCGI (serve requests through web server software)
+  * HTTP (development web server, not production-ready yet)
+* Access to request data ([learn more](https://jatofg.github.io/nawa/v0.8/docs/environmentmanual.html))
+  * GET, POST, COOKIE variables
+  * Request headers
+  * Request details (document root, request method, client IP, ...)
+  * Environment information (server software, server IP, ...)
+* Defining the response ([learn more](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html))
+  * Set response body directly or using a stream
+  * Set response headers
+  * Set cookies
+  * Default options for cookie security
+  * Flush response prematurely
+  * Respond with files from disk (incl. automatic setting of relevant response headers)
+  * Automatically generate and send error pages
+* Sessions ([learn more](https://jatofg.github.io/nawa/v0.8/docs/sessionsmanual.html))
+  * Full-featured session management
+  * Session security options
+  * Start sessions automatically (optional)
+  * Set and get session variables of arbitrary types
+* Request Filters ([learn more](https://jatofg.github.io/nawa/v0.8/docs/filtersmanual.html))
+  * Filter requests based on path, file extensions, or regular expressions
+  * Serve filtered requests with files from disk (forward filter)
+  * Block filtered requests with error pages
+  * Require HTTP authentication for filtered requests
+* Email ([learn more](https://jatofg.github.io/nawa/v0.8/docs/emailmanual.html))
+  * Create emails with headers
+  * MIME email and attachment support
+  * Automatic quoted-printable or base64 encoding (if desired)
+  * Q-encoding for subjects
+  * Replacement rules for personalizing mass emails
+  * Sending emails via SMTP
+* Cryptographic functions
+  * Password hashing (bcrypt, Argon2)
+  * Classic hashing (SHA-1, SHA-2, MD5)
+* Encoding and decoding functions
+  * HTML entities
+  * URL encoding
+  * Base64, quoted-printable, Q-encoding, encoded-word
+  * Punycode for internationalized domain names
+* Utility functions
+  * Regular expressions with callback
+  * Convert strings to uppercase and lowercase
+  * Generate error pages
+  * Deduct content types
+  * HTTP and SMTP time formatting
+  * String and UNIX path splitting and merging
+  * Line ending conversion
+  * Load files into strings
+  * Parse headers and cookies from raw HTTP
+* Core features
+  * Multi-threaded request handling (configurable)
+  * Hot-swapping of apps and request handling functions
+  * Reload configuration without interrupting request handling
 
 ## Example
 
@@ -130,7 +166,7 @@ on macOS (both as a library and using nawarun) *(1)*. It will
 probably also run on other BSD derivates, but this has not 
 been tested.
 
-Windows is not supported and will never be.
+Windows is not supported and never will be.
 
 **Please note:** All commands in the following instructions should be 
 run as an unprivileged user. Commands which must run as root are 

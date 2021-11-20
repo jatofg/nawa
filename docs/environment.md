@@ -13,7 +13,7 @@ and the HTTP status.
 
 The request path is probably the most important information you want to 
 access in your application, as it allows you to respond with the correct 
-page. The function `nawa::Request::Env::getRequestPath()`, accessible as 
+page. The function `nawa::request::Env::getRequestPath()`, accessible as 
 `connection.request().env().getRequestPath()`, returns a vector of strings 
 containing all elements of the request URI (without query string).
 
@@ -129,7 +129,7 @@ if (connection.request().post()) {
 ```
 
 All of the above also applies to GET and COOKIE variables. A detailed 
-documentation of the methods is available here: `nawa::Request::GPC`. 
+documentation of the methods is available here: `nawa::request::GPC`. 
 An example can be found in `examples/contactform.cpp`.
 
 ### Special methods for POST data
@@ -140,9 +140,9 @@ via `connection.request().post().getContentType()`.
 
 If files have been submitted (content type `multipart/form-data`), 
 you can access them through `connection.request().post().getFile("key")` 
-(see `nawa::Request::Post::getFile()`). For multiple files with the same name, 
-`nawa::Request::Post::getFileVector()` can be used, or the full multimap can 
-be accessed via `nawa::Request::Post::getFileMultimap()`.
+(see `nawa::request::Post::getFile()`). For multiple files with the same name, 
+`nawa::request::Post::getFileVector()` can be used, or the full multimap can 
+be accessed via `nawa::request::Post::getFileMultimap()`.
 
 Files are represented as `nawa::File` objects, have a look at the documentation 
 of that class to see how to retrieve the file and its meta data.
