@@ -119,10 +119,6 @@ bool FastcgippRequestAdapter::response() {
             }
         }
 
-        // set acceptLanguages
-        // TODO remove in v0.8
-        requestInit.acceptLanguages = renv.acceptLanguages;
-
         // GET, POST, COOKIE vars, raw POST, POST content type
         requestInit.getVars = utils::toUnorderedMultimap(renv.gets);
         requestInit.postVars = utils::toUnorderedMultimap(renv.posts);

@@ -38,10 +38,6 @@ namespace nawa {
          * Environment variables, see \ref environmentmanual
          */
         std::unordered_map<std::string, std::string> environment;
-        /**
-         * Vector containing languages accepted by the browser.
-         */
-        std::vector<std::string> acceptLanguages;
         std::unordered_multimap<std::string, std::string> getVars; /**< The HTTP GET vars. */
         /**
          * The HTTP POST vars, only if it is in standard format (content type `multipart/form-data` or

@@ -31,10 +31,8 @@ using namespace std;
 
 struct request::Env::Data {
     unordered_map<string, string> environment;
-    vector<string> acceptLanguages;
 
-    explicit Data(RequestInitContainer const& initContainer) : environment(initContainer.environment),
-                                                               acceptLanguages(initContainer.acceptLanguages) {}
+    explicit Data(RequestInitContainer const& initContainer) : environment(initContainer.environment) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(request, Env)
@@ -48,10 +46,6 @@ string request::Env::operator[](string const& envVar) const {
         return data->environment.at(envVar);
     }
     return {};
-}
-
-vector<string> request::Env::getAcceptLanguages() const {
-    return data->acceptLanguages;
 }
 
 vector<string> request::Env::getRequestPath() const {
