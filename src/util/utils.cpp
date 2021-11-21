@@ -33,7 +33,7 @@ using namespace nawa;
 using namespace std;
 
 namespace {
-    unordered_map<string, string> contentTypeMap = {
+    unordered_map<string, string> const contentTypeMap = {
             {"aac", "audio/aac"},
             {"arc", "application/x-freearc"},
             {"avi", "video/x-msvideo"},

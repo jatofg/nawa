@@ -37,7 +37,7 @@ using namespace nawa;
 using namespace std;
 
 namespace {
-    const unordered_map<unsigned int, string> httpStatusCodes = {
+    unordered_map<unsigned int, string> const httpStatusCodes = {
             {200, "OK"},
             {201, "Created"},
             {202, "Accepted"},
