@@ -37,6 +37,13 @@ namespace nawa {
     class Session {
         NAWA_PRIVATE_DATA()
 
+        /**
+         * Reset the data map to delete all session data. This function must not be used before shutdown, therefore,
+         * it is just used by the RequestHandler and private. Unfortunately, it is needed in order to avoid a
+         * segfault during shutdown (due to the destruction order).
+         */
+        static void destroy();
+
     public:
         NAWA_DEFAULT_DESTRUCTOR_DEF(Session);
 
@@ -162,6 +169,11 @@ namespace nawa {
          * @return The current session ID. Empty if no session is active.
          */
         [[nodiscard]] std::string getID() const;
+
+        /**
+         * RequestHandler is declared as a friend in order to be able to call destroy().
+         */
+        friend RequestHandler;
     };
 }// namespace nawa
 

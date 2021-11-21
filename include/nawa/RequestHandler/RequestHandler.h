@@ -42,6 +42,7 @@ namespace nawa {
     public:
         /**
          * The overridden virtual destructor must terminate request handling and join worker threads, if not yet done.
+         * It also removes all stored session data to avoid a segfault during shutdown.
          */
         virtual ~RequestHandler();
 

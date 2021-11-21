@@ -41,6 +41,7 @@ namespace {
         unordered_map<string, any> data; /**< Map containing all values of this session. */
         time_t expires;                  /**< Time when this session expires. */
         const string sourceIP;           /**< IP address of the session initiator, for optional IP checking. */
+
         /**
          * Construct an empty SessionData object without a source IP.
          */
@@ -302,4 +303,8 @@ void Session::invalidate() {
 
 string Session::getID() const {
     return established() ? data->currentID : string();
+}
+
+void Session::destroy() {
+    sessionData.clear();
 }

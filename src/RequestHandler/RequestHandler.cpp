@@ -112,4 +112,7 @@ RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, C
                              concurrency);
 }
 
-RequestHandler::~RequestHandler() = default;
+RequestHandler::~RequestHandler() {
+    // Avoid segfault during shutdown by clearing session data from here.
+    Session::destroy();
+}

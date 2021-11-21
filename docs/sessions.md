@@ -7,7 +7,9 @@ and whenever one visitor requests a page, all their session variables
 are available. Therefore, the NAWA session system is similar to the 
 one of PHP.
 
-Of course, the session system is thread-safe.
+The session system is designed to be thread-safe. Stored session data is 
+available during the lifetime of the `nawa::RequestHandler` object (in 
+case of nawarun: while the app is running).
 
 ## Configuration
 
