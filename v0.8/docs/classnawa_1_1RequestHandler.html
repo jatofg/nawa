@@ -195,11 +195,13 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>The overridden virtual destructor must terminate request handling and join worker threads, if not yet done. </p>
+<p>The overridden virtual destructor must terminate request handling and join worker threads, if not yet done. It also removes all stored session data to avoid a segfault during shutdown. </p>
+
+<p class="definition">Definition at line <a class="el" href="RequestHandler_8cpp_source.html#l00115">115</a> of file <a class="el" href="RequestHandler_8cpp_source.html">RequestHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +652,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Restart request handling. Can optionally be supported by request handlers (the default request handlers for FastCGI and HTTP currently do NOT support this). If unsupported, this function does not have to be implemented, and will just do nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="RequestHandler_8h_source.html#l00149">149</a> of file <a class="el" href="RequestHandler_8h_source.html">RequestHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="RequestHandler_8h_source.html#l00150">150</a> of file <a class="el" href="RequestHandler_8h_source.html">RequestHandler.h</a>.</p>
 
 </div>
 </div>

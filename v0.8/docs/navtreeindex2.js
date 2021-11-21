@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classnawa_1_1hashing_1_1Argon2HashingEngine.html#aa36d8fe5c2d8b3f2b94aa75124254bfba82b2185b3a9e804eb54f74f321514b6c":[3,0,0,0,1,0,0],
 "classnawa_1_1hashing_1_1Argon2HashingEngine.html#aae558eca4163a7cade000f7631fdcfdc":[3,0,0,0,1,4],
 "classnawa_1_1hashing_1_1BcryptHashingEngine.html":[3,0,0,0,2],
 "classnawa_1_1hashing_1_1BcryptHashingEngine.html#a0b848898a511390c10f067f204cbaca8":[3,0,0,0,2,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "dir_a441b4aef3cc0960b23a0e337c4beb81.html":[4,0,3,0,3,0],
 "dir_add13a0b91d4ccc1c4576f3621bb8705.html":[4,0,3,0,4],
 "dir_af6fad9a2dc979645a265838461f6bc6.html":[4,0,5,3,1],
-"dir_b2adf195a3b188a8aaddb58026ae4119.html":[4,0,3,0,8],
-"dir_b3320b59a4aa4a7431bc8488b87009bf.html":[4,0,5,4]
+"dir_b2adf195a3b188a8aaddb58026ae4119.html":[4,0,3,0,8]
 };

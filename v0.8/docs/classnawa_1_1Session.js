@@ -11,5 +11,6 @@ var classnawa_1_1Session =
     [ "set", "classnawa_1_1Session.html#ab2a926ddc875c44684f6bb3ea3748398", null ],
     [ "unset", "classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870", null ],
     [ "invalidate", "classnawa_1_1Session.html#a7c5c8a4e83413accd53ee37bd9b8faaf", null ],
-    [ "getID", "classnawa_1_1Session.html#a0e559d705a863f2e2f596e874cdc9862", null ]
+    [ "getID", "classnawa_1_1Session.html#a0e559d705a863f2e2f596e874cdc9862", null ],
+    [ "RequestHandler", "classnawa_1_1Session.html#ac10ceee46fa0ae0f8575d5d873616c3c", null ]
 ];

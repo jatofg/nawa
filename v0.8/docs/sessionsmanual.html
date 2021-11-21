@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('sessionsmanual.html',''); initResizabl
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_docs_sessions"></a></p>
 <p>NAWA has a comfortable session system that allows you to save arbitrary objects. The visitors of your website are identified by using a cookie, and whenever one visitor requests a page, all their session variables are available. Therefore, the NAWA session system is similar to the one of PHP.</p>
-<p>Of course, the session system is thread-safe.</p>
+<p>The session system is designed to be thread-safe. Stored session data is available during the lifetime of the <code><a class="el" href="classnawa_1_1RequestHandler.html">nawa::RequestHandler</a></code> object (in case of nawarun: while the app is running).</p>
 <h1>Configuration</h1>
 <p>The relevant config options are in the <code>[session]</code> section of the config file. The values are explained in the comments of the sample config file.</p>
 <p>The most relevant options are:</p>

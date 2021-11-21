@@ -240,6 +240,7 @@ var NAVTREEINDEX1 =
 "classnawa_1_1Session.html#a911cdbd2693aa057a05edad51cb2f01d":[3,0,0,18,0],
 "classnawa_1_1Session.html#aa7bed16bdb95634e2b9aee92d6f235e7":[3,0,0,18,3],
 "classnawa_1_1Session.html#ab2a926ddc875c44684f6bb3ea3748398":[3,0,0,18,8],
+"classnawa_1_1Session.html#ac10ceee46fa0ae0f8575d5d873616c3c":[3,0,0,18,12],
 "classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870":[3,0,0,18,9],
 "classnawa_1_1Session.html#af19186704540cdf1a99bf262c048daf4":[3,0,0,18,4],
 "classnawa_1_1hashing_1_1Argon2HashingEngine.html":[3,0,0,0,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "classnawa_1_1hashing_1_1Argon2HashingEngine.html#a80faead612e91fdab5d39daa501c70a7":[3,0,0,0,1,1],
 "classnawa_1_1hashing_1_1Argon2HashingEngine.html#aa36d8fe5c2d8b3f2b94aa75124254bfb":[3,0,0,0,1,0],
 "classnawa_1_1hashing_1_1Argon2HashingEngine.html#aa36d8fe5c2d8b3f2b94aa75124254bfba0b06f1bf38e4ec2b1c827b6c31fd6510":[3,0,0,0,1,0,2],
-"classnawa_1_1hashing_1_1Argon2HashingEngine.html#aa36d8fe5c2d8b3f2b94aa75124254bfba4e95e3a2266debc8fd97c478879a9ff1":[3,0,0,0,1,0,1],
-"classnawa_1_1hashing_1_1Argon2HashingEngine.html#aa36d8fe5c2d8b3f2b94aa75124254bfba82b2185b3a9e804eb54f74f321514b6c":[3,0,0,0,1,0,0]
+"classnawa_1_1hashing_1_1Argon2HashingEngine.html#aa36d8fe5c2d8b3f2b94aa75124254bfba4e95e3a2266debc8fd97c478879a9ff1":[3,0,0,0,1,0,1]
 };
