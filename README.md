@@ -183,14 +183,14 @@ on macOS 12, dependencies still have to be installed from homebrew.*
 
 * OpenSSL >= 1.1.1
 * libcurl4 >= 7.58.0
-* libboost-system >= 1.66.0
-* libboost-thread >= 1.66.0
+* libboost-system >= 1.62.0
+* libboost-thread >= 1.62.0
 * libargon2 >= 0~20161029-1.1 (only if built with Argon2 support)
 
 **For building (additionally):**
 
 * libssl (OpenSSL) development files >= 1.1.1
-* (lib)boost, (lib)boost-system, (lib)boost-thread development files >= 1.67
+* (lib)boost, (lib)boost-system, (lib)boost-thread development files >= 1.62
 * libcurl4 development files >= 7.58.0
 * libargon2 development files >= 0~20161029-1.1  (only if building with Argon2 support)
 * git
