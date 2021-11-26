@@ -116,8 +116,8 @@ $(document).ready(function(){initNavTree('contactform_8cpp_source.html',''); ini
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Application_8h.html">nawa/Application.h</a>&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="application_8h.html">nawa/application.h</a>&gt;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Log_8h.html">nawa/logging/Log.h</a>&gt;</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="SimpleEmail_8h.html">nawa/mail/Email/impl/SimpleEmail.h</a>&gt;</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="SmtpMailer_8h.html">nawa/mail/SmtpMailer.h</a>&gt;</span></div>
@@ -132,14 +132,14 @@ $(document).ready(function(){initNavTree('contactform_8cpp_source.html',''); ini
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classnawa_1_1Log.html">Log</a> logger;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="Application_8h.html#ab862d0267d987adef3495419cd96a10b">   40</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="contactform_8cpp.html#a613b569b56b1775da81612652d0dd0f7">init</a>(<a class="code" href="classnawa_1_1AppInit.html">AppInit</a>&amp; appInit) {</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="application_8h.html#ab862d0267d987adef3495419cd96a10b">   40</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="contactform_8cpp.html#a613b569b56b1775da81612652d0dd0f7">init</a>(<a class="code" href="classnawa_1_1AppInit.html">AppInit</a>&amp; appInit) {</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">// set up logging</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    logger.setAppname(<span class="stringliteral">&quot;Contact form app&quot;</span>);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;}</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="Application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">   47</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="contactform_8cpp.html#a5fdb4c2e006d82cb68aa926435168359">handleRequest</a>(<a class="code" href="classnawa_1_1Connection.html">Connection</a>&amp; connection) {</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">   47</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="contactform_8cpp.html#a5fdb4c2e006d82cb68aa926435168359">handleRequest</a>(<a class="code" href="classnawa_1_1Connection.html">Connection</a>&amp; connection) {</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">// make sure cookies are a bit more secure</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    connection.<a class="code" href="classnawa_1_1Connection.html#a051341aa63ae9ebf7268f11d50f26212">setCookiePolicy</a>(<a class="code" href="classnawa_1_1Cookie.html">Cookie</a>().httpOnly(<span class="keyword">true</span>));</div>
@@ -236,13 +236,13 @@ $(document).ready(function(){initNavTree('contactform_8cpp_source.html',''); ini
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;}</div>
-<div class="ttc" id="aApplication_8h_html"><div class="ttname"><a href="Application_8h.html">Application.h</a></div><div class="ttdoc">This file will be configured by CMake and contains the necessary properties to ensure that a loaded a...</div></div>
 <div class="ttc" id="aException_8h_html"><div class="ttname"><a href="Exception_8h.html">Exception.h</a></div><div class="ttdoc">Exception class that can be used by apps to catch errors resulting from nawa function calls.</div></div>
 <div class="ttc" id="aLog_8h_html"><div class="ttname"><a href="Log_8h.html">Log.h</a></div><div class="ttdoc">Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream.</div></div>
 <div class="ttc" id="aLog_8h_html_ad77b0bca31bac9b97e9b50b604565141"><div class="ttname"><a href="Log_8h.html#ad77b0bca31bac9b97e9b50b604565141">NLOG_DEBUG</a></div><div class="ttdeci">#define NLOG_DEBUG(Logger, Message)</div><div class="ttdef"><b>Definition:</b> <a href="Log_8h_source.html#l00201">Log.h:201</a></div></div>
 <div class="ttc" id="aLog_8h_html_aec4f07139f818fa22896dd4faea40c81"><div class="ttname"><a href="Log_8h.html#aec4f07139f818fa22896dd4faea40c81">NLOG_ERROR</a></div><div class="ttdeci">#define NLOG_ERROR(Logger, Message)</div><div class="ttdef"><b>Definition:</b> <a href="Log_8h_source.html#l00183">Log.h:183</a></div></div>
 <div class="ttc" id="aSimpleEmail_8h_html"><div class="ttname"><a href="SimpleEmail_8h.html">SimpleEmail.h</a></div><div class="ttdoc">Structure representing a basic email.</div></div>
 <div class="ttc" id="aSmtpMailer_8h_html"><div class="ttname"><a href="SmtpMailer_8h.html">SmtpMailer.h</a></div><div class="ttdoc">For establishing a connection to an SMTP server and sending emails.</div></div>
+<div class="ttc" id="aapplication_8h_html"><div class="ttname"><a href="application_8h.html">application.h</a></div></div>
 <div class="ttc" id="aclassnawa_1_1AppInit_html"><div class="ttname"><a href="classnawa_1_1AppInit.html">nawa::AppInit</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00032">AppInit.h:32</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Connection_html"><div class="ttname"><a href="classnawa_1_1Connection.html">nawa::Connection</a></div><div class="ttdef"><b>Definition:</b> <a href="Connection_8h_source.html#l00041">Connection.h:41</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Connection_html_a023244e199c40abb7c7a569583eab9b5"><div class="ttname"><a href="classnawa_1_1Connection.html#a023244e199c40abb7c7a569583eab9b5">nawa::Connection::session</a></div><div class="ttdeci">nawa::Session &amp; session() noexcept</div><div class="ttdef"><b>Definition:</b> <a href="Connection_8cpp_source.html#l00348">Connection.cpp:348</a></div></div>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>NAWA: include/nawa/Application.h Source File</title>
+<title>NAWA: include/nawa/application.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -74,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search','.html');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('Application_8h_source.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('application_8h_source.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -94,10 +94,10 @@ $(document).ready(function(){initNavTree('Application_8h_source.html',''); initR
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Application.h</div>  </div>
+<div class="title">application.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="Application_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
+<a href="application_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> * Copyright (C) 2019-2021 Tobias Flaig.</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
@@ -118,26 +118,26 @@ $(document).ready(function(){initNavTree('Application_8h_source.html',''); initR
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#ifndef NAWA_APPLICATION_H</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define NAWA_APPLICATION_H</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="Application_8h.html#a0619a5ee51370e3c920370f29c8e3a66">   27</a></span>&#160;<span class="preprocessor">#define NAWA_VERSION_MAJOR 0</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="Application_8h.html#ae5d1690e7a537d6529d96b787a4334f4">   28</a></span>&#160;<span class="preprocessor">#define NAWA_VERSION_MINOR 8</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="application_8h.html#a0619a5ee51370e3c920370f29c8e3a66">   27</a></span>&#160;<span class="preprocessor">#define NAWA_VERSION_MAJOR 0</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="application_8h.html#ae5d1690e7a537d6529d96b787a4334f4">   28</a></span>&#160;<span class="preprocessor">#define NAWA_VERSION_MINOR 8</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="AppInit_8h.html">nawa/AppInit.h</a>&gt;</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Connection_8h.html">nawa/connection/Connection.h</a>&gt;</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="Application_8h.html#acd6c00b0143ef122392f312949f2477e">   33</a></span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="Application_8h.html#acd6c00b0143ef122392f312949f2477e">nawa_version_major</a> = <a class="code" href="Application_8h.html#a0619a5ee51370e3c920370f29c8e3a66">NAWA_VERSION_MAJOR</a>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="Application_8h.html#ae7a1816eb79526674c1a436f09d7cf70">   34</a></span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="Application_8h.html#ae7a1816eb79526674c1a436f09d7cf70">nawa_version_minor</a> = <a class="code" href="Application_8h.html#ae5d1690e7a537d6529d96b787a4334f4">NAWA_VERSION_MINOR</a>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">int</span> <a class="code" href="Application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a>(<a class="code" href="classnawa_1_1AppInit.html">nawa::AppInit</a>&amp; appInit);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">int</span> <a class="code" href="Application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a>(<a class="code" href="classnawa_1_1Connection.html">nawa::Connection</a>&amp; connection);</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="application_8h.html#acd6c00b0143ef122392f312949f2477e">   33</a></span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="application_8h.html#acd6c00b0143ef122392f312949f2477e">nawa_version_major</a> = <a class="code" href="application_8h.html#a0619a5ee51370e3c920370f29c8e3a66">NAWA_VERSION_MAJOR</a>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="application_8h.html#ae7a1816eb79526674c1a436f09d7cf70">   34</a></span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="application_8h.html#ae7a1816eb79526674c1a436f09d7cf70">nawa_version_minor</a> = <a class="code" href="application_8h.html#ae5d1690e7a537d6529d96b787a4334f4">NAWA_VERSION_MINOR</a>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">int</span> <a class="code" href="application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a>(<a class="code" href="classnawa_1_1AppInit.html">nawa::AppInit</a>&amp; appInit);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">int</span> <a class="code" href="application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a>(<a class="code" href="classnawa_1_1Connection.html">nawa::Connection</a>&amp; connection);</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//NAWA_APPLICATION_H</span></div>
 <div class="ttc" id="aAppInit_8h_html"><div class="ttname"><a href="AppInit_8h.html">AppInit.h</a></div><div class="ttdoc">Structure passed to the init function of nawa apps.</div></div>
-<div class="ttc" id="aApplication_8h_html_a0619a5ee51370e3c920370f29c8e3a66"><div class="ttname"><a href="Application_8h.html#a0619a5ee51370e3c920370f29c8e3a66">NAWA_VERSION_MAJOR</a></div><div class="ttdeci">#define NAWA_VERSION_MAJOR</div><div class="ttdef"><b>Definition:</b> <a href="Application_8h_source.html#l00027">Application.h:27</a></div></div>
-<div class="ttc" id="aApplication_8h_html_ab862d0267d987adef3495419cd96a10b"><div class="ttname"><a href="Application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a></div><div class="ttdeci">int init(nawa::AppInit &amp;appInit)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00040">contactform.cpp:40</a></div></div>
-<div class="ttc" id="aApplication_8h_html_acd6c00b0143ef122392f312949f2477e"><div class="ttname"><a href="Application_8h.html#acd6c00b0143ef122392f312949f2477e">nawa_version_major</a></div><div class="ttdeci">const int nawa_version_major</div><div class="ttdef"><b>Definition:</b> <a href="Application_8h_source.html#l00033">Application.h:33</a></div></div>
-<div class="ttc" id="aApplication_8h_html_ae1c02c6b05b0402ce3a00d450bd99252"><div class="ttname"><a href="Application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a></div><div class="ttdeci">int handleRequest(nawa::Connection &amp;connection)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00047">contactform.cpp:47</a></div></div>
-<div class="ttc" id="aApplication_8h_html_ae5d1690e7a537d6529d96b787a4334f4"><div class="ttname"><a href="Application_8h.html#ae5d1690e7a537d6529d96b787a4334f4">NAWA_VERSION_MINOR</a></div><div class="ttdeci">#define NAWA_VERSION_MINOR</div><div class="ttdef"><b>Definition:</b> <a href="Application_8h_source.html#l00028">Application.h:28</a></div></div>
-<div class="ttc" id="aApplication_8h_html_ae7a1816eb79526674c1a436f09d7cf70"><div class="ttname"><a href="Application_8h.html#ae7a1816eb79526674c1a436f09d7cf70">nawa_version_minor</a></div><div class="ttdeci">const int nawa_version_minor</div><div class="ttdef"><b>Definition:</b> <a href="Application_8h_source.html#l00034">Application.h:34</a></div></div>
 <div class="ttc" id="aConnection_8h_html"><div class="ttname"><a href="Connection_8h.html">Connection.h</a></div><div class="ttdoc">Response object to be passed back to NAWA and accessor to the request.</div></div>
+<div class="ttc" id="aapplication_8h_html_a0619a5ee51370e3c920370f29c8e3a66"><div class="ttname"><a href="application_8h.html#a0619a5ee51370e3c920370f29c8e3a66">NAWA_VERSION_MAJOR</a></div><div class="ttdeci">#define NAWA_VERSION_MAJOR</div><div class="ttdef"><b>Definition:</b> <a href="application_8h_source.html#l00027">application.h:27</a></div></div>
+<div class="ttc" id="aapplication_8h_html_ab862d0267d987adef3495419cd96a10b"><div class="ttname"><a href="application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a></div><div class="ttdeci">int init(nawa::AppInit &amp;appInit)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00040">contactform.cpp:40</a></div></div>
+<div class="ttc" id="aapplication_8h_html_acd6c00b0143ef122392f312949f2477e"><div class="ttname"><a href="application_8h.html#acd6c00b0143ef122392f312949f2477e">nawa_version_major</a></div><div class="ttdeci">const int nawa_version_major</div><div class="ttdef"><b>Definition:</b> <a href="application_8h_source.html#l00033">application.h:33</a></div></div>
+<div class="ttc" id="aapplication_8h_html_ae1c02c6b05b0402ce3a00d450bd99252"><div class="ttname"><a href="application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a></div><div class="ttdeci">int handleRequest(nawa::Connection &amp;connection)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00047">contactform.cpp:47</a></div></div>
+<div class="ttc" id="aapplication_8h_html_ae5d1690e7a537d6529d96b787a4334f4"><div class="ttname"><a href="application_8h.html#ae5d1690e7a537d6529d96b787a4334f4">NAWA_VERSION_MINOR</a></div><div class="ttdeci">#define NAWA_VERSION_MINOR</div><div class="ttdef"><b>Definition:</b> <a href="application_8h_source.html#l00028">application.h:28</a></div></div>
+<div class="ttc" id="aapplication_8h_html_ae7a1816eb79526674c1a436f09d7cf70"><div class="ttname"><a href="application_8h.html#ae7a1816eb79526674c1a436f09d7cf70">nawa_version_minor</a></div><div class="ttdeci">const int nawa_version_minor</div><div class="ttdef"><b>Definition:</b> <a href="application_8h_source.html#l00034">application.h:34</a></div></div>
 <div class="ttc" id="aclassnawa_1_1AppInit_html"><div class="ttname"><a href="classnawa_1_1AppInit.html">nawa::AppInit</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00032">AppInit.h:32</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Connection_html"><div class="ttname"><a href="classnawa_1_1Connection.html">nawa::Connection</a></div><div class="ttdef"><b>Definition:</b> <a href="Connection_8h_source.html#l00041">Connection.h:41</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -145,7 +145,7 @@ $(document).ready(function(){initNavTree('Application_8h_source.html',''); initR
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_22792e8e6aa15aa10345969df5e765b5.html">include</a></li><li class="navelem"><a class="el" href="dir_79d9c8632f216f17f083810bbbdca48c.html">nawa</a></li><li class="navelem"><a class="el" href="Application_8h.html">Application.h</a></li>
+    <li class="navelem"><a class="el" href="dir_22792e8e6aa15aa10345969df5e765b5.html">include</a></li><li class="navelem"><a class="el" href="dir_79d9c8632f216f17f083810bbbdca48c.html">nawa</a></li><li class="navelem"><a class="el" href="application_8h.html">application.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

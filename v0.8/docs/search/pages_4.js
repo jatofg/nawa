@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['manual_2ftutorials_1051',['Manual/Tutorials',['../manual.html',1,'']]]
+  ['manual_2ftutorials_1053',['Manual/Tutorials',['../manual.html',1,'']]]
 ];

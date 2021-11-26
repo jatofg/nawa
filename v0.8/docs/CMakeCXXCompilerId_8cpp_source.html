@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>NAWA: CMakeFiles/3.21.4/CompilerIdCXX/CMakeCXXCompilerId.cpp Source File</title>
+<title>NAWA: CMakeFiles/3.22.0/CompilerIdCXX/CMakeCXXCompilerId.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -834,7 +834,7 @@ $(document).ready(function(){initNavTree('CMakeCXXCompilerId_8cpp_source.html','
 <div class="line"><a name="l00735"></a><span class="lineno"><a class="line" href="CMakeCXXCompilerId_8cpp.html#a34cc889e576a1ae6c84ae9e0a851ba21">  735</a></span>&#160;<span class="preprocessor">#  define CXX_STD __cplusplus</span></div>
 <div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160; </div>
-<div class="line"><a name="l00738"></a><span class="lineno"><a class="line" href="CMakeCXXCompilerId_8cpp.html#a1ce162bad2fe6966ac8b33cc19e120b8">  738</a></span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="CMakeCXXCompilerId_8cpp.html#a1ce162bad2fe6966ac8b33cc19e120b8">info_language_dialect_default</a> = <span class="stringliteral">&quot;INFO&quot;</span> <span class="stringliteral">&quot;:&quot;</span> <span class="stringliteral">&quot;dialect_default[&quot;</span></div>
+<div class="line"><a name="l00738"></a><span class="lineno"><a class="line" href="CMakeCXXCompilerId_8cpp.html#a4607cccf070750927b458473ca82c090">  738</a></span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="CMakeCXXCompilerId_8cpp.html#a4607cccf070750927b458473ca82c090">info_language_standard_default</a> = <span class="stringliteral">&quot;INFO&quot;</span> <span class="stringliteral">&quot;:&quot;</span> <span class="stringliteral">&quot;standard_default[&quot;</span></div>
 <div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;<span class="preprocessor">#if CXX_STD &gt; 202002L</span></div>
 <div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;  <span class="stringliteral">&quot;23&quot;</span></div>
 <div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;<span class="preprocessor">#elif CXX_STD &gt; 201703L</span></div>
@@ -850,35 +850,48 @@ $(document).ready(function(){initNavTree('CMakeCXXCompilerId_8cpp_source.html','
 <div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;<span class="stringliteral">&quot;]&quot;</span>;</div>
 <div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160; </div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;<span class="comment">/*--------------------------------------------------------------------------*/</span></div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160; </div>
-<div class="line"><a name="l00756"></a><span class="lineno"><a class="line" href="CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">  756</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;{</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;  <span class="keywordtype">int</span> require = 0;</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a4b0efeb7a5d59313986b3a0390f050f6">info_compiler</a>[argc];</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a2321403dee54ee23f0c2fa849c60f7d4">info_platform</a>[argc];</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;<span class="preprocessor">#ifdef COMPILER_VERSION_MAJOR</span></div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;  require += info_version[argc];</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;<span class="preprocessor">#ifdef COMPILER_VERSION_INTERNAL</span></div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;  require += info_version_internal[argc];</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;<span class="preprocessor">#ifdef SIMULATE_ID</span></div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;  require += info_simulate[argc];</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;<span class="preprocessor">#ifdef SIMULATE_VERSION_MAJOR</span></div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;  require += info_simulate_version[argc];</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;<span class="preprocessor">#if defined(__CRAYXT_COMPUTE_LINUX_TARGET)</span></div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;  require += info_cray[argc];</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a1ce162bad2fe6966ac8b33cc19e120b8">info_language_dialect_default</a>[argc];</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;  (void)argv;</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;  <span class="keywordflow">return</span> require;</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;}</div>
-<div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00756">CMakeCXXCompilerId.cpp:756</a></div></div>
-<div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a1ce162bad2fe6966ac8b33cc19e120b8"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a1ce162bad2fe6966ac8b33cc19e120b8">info_language_dialect_default</a></div><div class="ttdeci">const char * info_language_dialect_default</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00738">CMakeCXXCompilerId.cpp:738</a></div></div>
+<div class="line"><a name="l00754"></a><span class="lineno"><a class="line" href="CMakeCXXCompilerId_8cpp.html#a0f46a8a39e09d9b803c4766904fd7e99">  754</a></span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="CMakeCXXCompilerId_8cpp.html#a0f46a8a39e09d9b803c4766904fd7e99">info_language_extensions_default</a> = <span class="stringliteral">&quot;INFO&quot;</span> <span class="stringliteral">&quot;:&quot;</span> <span class="stringliteral">&quot;extensions_default[&quot;</span></div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;<span class="comment">// !defined(_MSC_VER) to exclude Clang&#39;s MSVC compatibility mode.</span></div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;<span class="preprocessor">#if (defined(__clang__) || defined(__GNUC__) ||                               \</span></div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;<span class="preprocessor">     defined(__TI_COMPILER_VERSION__)) &amp;&amp;                                     \</span></div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;<span class="preprocessor">  !defined(__STRICT_ANSI__) &amp;&amp; !defined(_MSC_VER)</span></div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  <span class="stringliteral">&quot;ON&quot;</span></div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;  <span class="stringliteral">&quot;OFF&quot;</span></div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;<span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160; </div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;<span class="comment">/*--------------------------------------------------------------------------*/</span></div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160; </div>
+<div class="line"><a name="l00767"></a><span class="lineno"><a class="line" href="CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">  767</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;{</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;  <span class="keywordtype">int</span> require = 0;</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a4b0efeb7a5d59313986b3a0390f050f6">info_compiler</a>[argc];</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a2321403dee54ee23f0c2fa849c60f7d4">info_platform</a>[argc];</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;<span class="preprocessor">#ifdef COMPILER_VERSION_MAJOR</span></div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;  require += info_version[argc];</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;<span class="preprocessor">#ifdef COMPILER_VERSION_INTERNAL</span></div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;  require += info_version_internal[argc];</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;<span class="preprocessor">#ifdef SIMULATE_ID</span></div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;  require += info_simulate[argc];</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;<span class="preprocessor">#ifdef SIMULATE_VERSION_MAJOR</span></div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;  require += info_simulate_version[argc];</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;<span class="preprocessor">#if defined(__CRAYXT_COMPUTE_LINUX_TARGET)</span></div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;  require += info_cray[argc];</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a4607cccf070750927b458473ca82c090">info_language_standard_default</a>[argc];</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;  require += <a class="code" href="CMakeCXXCompilerId_8cpp.html#a0f46a8a39e09d9b803c4766904fd7e99">info_language_extensions_default</a>[argc];</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;  (void)argv;</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;  <span class="keywordflow">return</span> require;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;}</div>
+<div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00767">CMakeCXXCompilerId.cpp:767</a></div></div>
+<div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a0f46a8a39e09d9b803c4766904fd7e99"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a0f46a8a39e09d9b803c4766904fd7e99">info_language_extensions_default</a></div><div class="ttdeci">const char * info_language_extensions_default</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00754">CMakeCXXCompilerId.cpp:754</a></div></div>
 <div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a2321403dee54ee23f0c2fa849c60f7d4"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a2321403dee54ee23f0c2fa849c60f7d4">info_platform</a></div><div class="ttdeci">char const  * info_platform</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00717">CMakeCXXCompilerId.cpp:717</a></div></div>
+<div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a4607cccf070750927b458473ca82c090"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a4607cccf070750927b458473ca82c090">info_language_standard_default</a></div><div class="ttdeci">const char * info_language_standard_default</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00738">CMakeCXXCompilerId.cpp:738</a></div></div>
 <div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a4b0efeb7a5d59313986b3a0390f050f6"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a4b0efeb7a5d59313986b3a0390f050f6">info_compiler</a></div><div class="ttdeci">char const  * info_compiler</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00388">CMakeCXXCompilerId.cpp:388</a></div></div>
 <div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a59647e99d304ed33b15cb284c27ed391"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a59647e99d304ed33b15cb284c27ed391">info_arch</a></div><div class="ttdeci">char const  * info_arch</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00718">CMakeCXXCompilerId.cpp:718</a></div></div>
 <div class="ttc" id="aCMakeCXXCompilerId_8cpp_html_a81dee0709ded976b2e0319239f72d174"><div class="ttname"><a href="CMakeCXXCompilerId_8cpp.html#a81dee0709ded976b2e0319239f72d174">COMPILER_ID</a></div><div class="ttdeci">#define COMPILER_ID</div><div class="ttdef"><b>Definition:</b> <a href="CMakeCXXCompilerId_8cpp_source.html#l00381">CMakeCXXCompilerId.cpp:381</a></div></div>
@@ -889,7 +902,7 @@ $(document).ready(function(){initNavTree('CMakeCXXCompilerId_8cpp_source.html','
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_4d48738af3566abcd20751236d9619ab.html">CMakeFiles</a></li><li class="navelem"><a class="el" href="dir_73e7077b5ba8162cfefc768d7c82def6.html">3.21.4</a></li><li class="navelem"><a class="el" href="dir_95bf6e812ecbda5a0b8e2e772a5ce781.html">CompilerIdCXX</a></li><li class="navelem"><a class="el" href="CMakeCXXCompilerId_8cpp.html">CMakeCXXCompilerId.cpp</a></li>
+    <li class="navelem"><a class="el" href="dir_4d48738af3566abcd20751236d9619ab.html">CMakeFiles</a></li><li class="navelem"><a class="el" href="dir_be56b6cc7946d72b997ff069accb3007.html">3.22.0</a></li><li class="navelem"><a class="el" href="dir_592268ee0ccc9439d97bdccf599a10a8.html">CompilerIdCXX</a></li><li class="navelem"><a class="el" href="CMakeCXXCompilerId_8cpp.html">CMakeCXXCompilerId.cpp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

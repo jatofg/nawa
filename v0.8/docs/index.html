@@ -108,21 +108,21 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <p>Additionally, this release adds support for macOS.</p>
 <h1>Example</h1>
 <p>The following example is the complete C++ source code of a NAWA app that answers every request with the "Hello World!". It's that simple.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="Application_8h.html">nawa/Application.h</a>&gt;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="application_8h.html">nawa/application.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacenawa.html">nawa</a>;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="Application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a>(AppInit &amp;appInit) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a>(AppInit &amp;appInit) {</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="Application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a>(Connection &amp;connection) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a>(Connection &amp;connection) {</div>
 <div class="line">    connection.responseStream() &lt;&lt; <span class="stringliteral">&quot;Hello World!&quot;</span>;</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="aApplication_8h_html"><div class="ttname"><a href="Application_8h.html">Application.h</a></div><div class="ttdoc">This file will be configured by CMake and contains the necessary properties to ensure that a loaded a...</div></div>
-<div class="ttc" id="aApplication_8h_html_ab862d0267d987adef3495419cd96a10b"><div class="ttname"><a href="Application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a></div><div class="ttdeci">int init(nawa::AppInit &amp;appInit)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00040">contactform.cpp:40</a></div></div>
-<div class="ttc" id="aApplication_8h_html_ae1c02c6b05b0402ce3a00d450bd99252"><div class="ttname"><a href="Application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a></div><div class="ttdeci">int handleRequest(nawa::Connection &amp;connection)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00047">contactform.cpp:47</a></div></div>
+<div class="ttc" id="aapplication_8h_html"><div class="ttname"><a href="application_8h.html">application.h</a></div></div>
+<div class="ttc" id="aapplication_8h_html_ab862d0267d987adef3495419cd96a10b"><div class="ttname"><a href="application_8h.html#ab862d0267d987adef3495419cd96a10b">init</a></div><div class="ttdeci">int init(nawa::AppInit &amp;appInit)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00040">contactform.cpp:40</a></div></div>
+<div class="ttc" id="aapplication_8h_html_ae1c02c6b05b0402ce3a00d450bd99252"><div class="ttname"><a href="application_8h.html#ae1c02c6b05b0402ce3a00d450bd99252">handleRequest</a></div><div class="ttdeci">int handleRequest(nawa::Connection &amp;connection)</div><div class="ttdef"><b>Definition:</b> <a href="contactform_8cpp_source.html#l00047">contactform.cpp:47</a></div></div>
 <div class="ttc" id="anamespacenawa_html"><div class="ttname"><a href="namespacenawa.html">nawa</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00031">AppInit.h:31</a></div></div>
 </div><!-- fragment --><p>You want to learn more? <a href="https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html">Read the full introduction tutorial.</a></p>
 <p>If you don't like the IoC-style approach, you can also use NAWA as a library. <a href="https://jatofg.github.io/nawa/v0.8/docs/aslibrarymanual.html">An introduction can be found here.</a></p>
@@ -231,14 +231,14 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <ul>
 <li>OpenSSL &gt;= 1.1.1</li>
 <li>libcurl4 &gt;= 7.58.0</li>
-<li>libboost-system &gt;= 1.66.0</li>
-<li>libboost-thread &gt;= 1.66.0</li>
+<li>libboost-system &gt;= 1.62.0</li>
+<li>libboost-thread &gt;= 1.62.0</li>
 <li>libargon2 &gt;= 0~20161029-1.1 (only if built with Argon2 support)</li>
 </ul>
 <p><b>For building (additionally):</b></p>
 <ul>
 <li>libssl (OpenSSL) development files &gt;= 1.1.1</li>
-<li>(lib)boost, (lib)boost-system, (lib)boost-thread development files &gt;= 1.67</li>
+<li>(lib)boost, (lib)boost-system, (lib)boost-thread development files &gt;= 1.62</li>
 <li>libcurl4 development files &gt;= 7.58.0</li>
 <li>libargon2 development files &gt;= 0~20161029-1.1 (only if building with Argon2 support)</li>
 <li>git</li>

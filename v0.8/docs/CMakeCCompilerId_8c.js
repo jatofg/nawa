@@ -8,10 +8,11 @@ var CMakeCCompilerId_8c =
     [ "ARCHITECTURE_ID", "CMakeCCompilerId_8c.html#aba35d0d200deaeb06aee95ca297acb28", null ],
     [ "DEC", "CMakeCCompilerId_8c.html#ad1280362da42492bbc11aa78cbf776ad", null ],
     [ "HEX", "CMakeCCompilerId_8c.html#a46d5d95daa1bef867bd0179594310ed5", null ],
-    [ "C_DIALECT", "CMakeCCompilerId_8c.html#a07f8e5783674099cd7f5110e22a78cdb", null ],
+    [ "C_VERSION", "CMakeCCompilerId_8c.html#adaee3ee7c5a7a22451ea25e762e1d7d5", null ],
     [ "main", "CMakeCCompilerId_8c.html#a0ddf1224851353fc92bfbff6f499fa97", null ],
     [ "info_compiler", "CMakeCCompilerId_8c.html#a4b0efeb7a5d59313986b3a0390f050f6", null ],
     [ "info_platform", "CMakeCCompilerId_8c.html#a2321403dee54ee23f0c2fa849c60f7d4", null ],
     [ "info_arch", "CMakeCCompilerId_8c.html#a59647e99d304ed33b15cb284c27ed391", null ],
-    [ "info_language_dialect_default", "CMakeCCompilerId_8c.html#a1ce162bad2fe6966ac8b33cc19e120b8", null ]
+    [ "info_language_standard_default", "CMakeCCompilerId_8c.html#a4607cccf070750927b458473ca82c090", null ],
+    [ "info_language_extensions_default", "CMakeCCompilerId_8c.html#a0f46a8a39e09d9b803c4766904fd7e99", null ]
 ];
