@@ -145,7 +145,14 @@ namespace {
                 "If no config file is given, nawarun will try to use config.ini from the current\n"
                 "working directory, unless the --no-config-file option is given. The config file\n"
                 "as well as --no-config-file are only accepted as the last command line argument\n"
-                "after the overrides.\n";
+                "after the overrides.\n\n"
+                "nawarun version "
+             << nawa_version_major << '.' << nawa_version_minor << '\n';
+        exit(0);
+    }
+
+    void printVersionAndExit() {
+        cout << nawa_version_major << '.' << nawa_version_minor << '\n';
         exit(0);
     }
 
@@ -341,6 +348,10 @@ Parameters nawarun::parseCommandLine(int argc, char** argv) {
 
         if (i == 1 && (currentArg == "--help" || currentArg == "-h")) {
             printHelpAndExit();
+        }
+
+        if (i == 1 && (currentArg == "--version" || currentArg == "-v")) {
+            printVersionAndExit();
         }
 
         if (currentArg.substr(0, 2) == "--") {
