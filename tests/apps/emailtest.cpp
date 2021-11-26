@@ -23,8 +23,8 @@
 
 #include <ctime>
 #include <iomanip>
-#include <nawa/Application.h>
 #include <nawa/Exception.h>
+#include <nawa/application.h>
 #include <nawa/mail/Email/impl/MimeEmail.h>
 #include <nawa/mail/Email/impl/SimpleEmail.h>
 #include <nawa/mail/SmtpMailer.h>

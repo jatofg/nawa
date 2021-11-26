@@ -22,7 +22,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/Application.h>
+#include <nawa/application.h>
 #include <random>
 
 using namespace nawa;

@@ -38,7 +38,7 @@ The following example is the complete C++ source code of a NAWA app that
 answers every request with the "Hello World!". It's that simple.
 
 ```cpp
-#include <nawa/Application.h>
+#include <nawa/application.h>
 
 using namespace nawa;
 

@@ -90,7 +90,7 @@ probably be created automatically by your IDE.
 For the start, you just need to include a single header file:
 
 ```cpp
-#include <nawa/Application.h>
+#include <nawa/application.h>
 ```
 
 There are two required functions you need to implement in your app, 

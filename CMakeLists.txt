@@ -353,7 +353,7 @@ endif ()
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/nawa"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT Development)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/nawa/Application.h"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/nawa/application.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nawa
         COMPONENT Development)
 if (EXISTS /etc/systemd/system)

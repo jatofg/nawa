@@ -22,7 +22,7 @@
  */
 
 #include <iostream>
-#include <nawa/Application.h>
+#include <nawa/application.h>
 #include <nawa/session/Session.h>
 #include <nawa/util/encoding.h>
 #include <unistd.h>

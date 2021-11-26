@@ -21,8 +21,8 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <nawa/Application.h>
 #include <nawa/Exception.h>
+#include <nawa/application.h>
 #include <nawa/logging/Log.h>
 #include <nawa/mail/Email/impl/SimpleEmail.h>
 #include <nawa/mail/SmtpMailer.h>
