@@ -405,9 +405,9 @@ time_t utils::readSmtpTime(string const& smtpTime) {
 
     // so we'll have to add/subtract the difference manually
     if (smtpTimeM.length() > 30) {
-        int tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
-        int tzH = stoi(smtpTimeM.substr(27, 2));
-        int tzM = stoi(smtpTimeM.substr(29, 2));
+        long tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
+        long tzH = stol(smtpTimeM.substr(27, 2));
+        long tzM = stol(smtpTimeM.substr(29, 2));
         unixTime += tzAdjust * (tzH * 3600 + tzM * 60);
     }
 
