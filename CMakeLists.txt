@@ -334,7 +334,7 @@ if (BuildExamples)
     if (BuildStaticLib)
         add_executable(aslibrary_static examples/aslibrary.cpp)
         target_link_libraries(aslibrary_static nawa_static)
-        target_include_directories(aslibrary PUBLIC
+        target_include_directories(aslibrary_static PUBLIC
                 ${NAWA_INSTALL_INCLUDE_DIRS}
                 ${NAWA_APP_INCLUDE_DIRS})
     endif ()
