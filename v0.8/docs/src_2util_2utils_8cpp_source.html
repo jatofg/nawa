@@ -488,9 +488,9 @@ $(document).ready(function(){initNavTree('src_2util_2utils_8cpp_source.html','')
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="comment">// so we&#39;ll have to add/subtract the difference manually</span></div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordflow">if</span> (smtpTimeM.length() &gt; 30) {</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keywordtype">int</span> tzAdjust = smtpTimeM[26] == <span class="charliteral">&#39;-&#39;</span> ? 1 : -1;</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordtype">int</span> tzH = stoi(smtpTimeM.substr(27, 2));</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        <span class="keywordtype">int</span> tzM = stoi(smtpTimeM.substr(29, 2));</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keywordtype">long</span> tzAdjust = smtpTimeM[26] == <span class="charliteral">&#39;-&#39;</span> ? 1 : -1;</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordtype">long</span> tzH = stol(smtpTimeM.substr(27, 2));</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        <span class="keywordtype">long</span> tzM = stol(smtpTimeM.substr(29, 2));</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        unixTime += tzAdjust * (tzH * 3600 + tzM * 60);</div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    }</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
