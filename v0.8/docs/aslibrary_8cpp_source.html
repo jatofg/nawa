@@ -120,94 +120,105 @@ $(document).ready(function(){initNavTree('aslibrary_8cpp_source.html',''); initR
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="RequestHandler_8h.html">nawa/RequestHandler/RequestHandler.h</a>&gt;</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Connection_8h.html">nawa/connection/Connection.h</a>&gt;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">using namespace </span><a class="code" href="namespacenawa.html">nawa</a>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">using namespace </span>std;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="aslibrary_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">   32</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="aslibrary_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a>() {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="comment">// You can do the initialization right here, no need for an init function.</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="comment">// Load the config from a config.ini file, placed in the directory from where this app is executed.</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">// Of course, you could also provide an absolute path or let the user provide the location via a command line argument.</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">// The categories privileges, application, and system (except for the request handler) are irrelevant when using</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">// NAWA as a library.</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classnawa_1_1Config.html">Config</a> config;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        config.<a class="code" href="classnawa_1_1Config.html#a3f0d550247bce865ed7d23ff84ba80a5">read</a>(<span class="stringliteral">&quot;config.ini&quot;</span>);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    } <span class="keywordflow">catch</span> (<a class="code" href="classnawa_1_1Exception.html">Exception</a> <span class="keyword">const</span>&amp; e) {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        cerr &lt;&lt; <span class="stringliteral">&quot;Could not read config.ini file: &quot;</span> &lt;&lt; e.<a class="code" href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">getMessage</a>() &lt;&lt; endl;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="comment">// You don&#39;t have to use an ini file of course, you could also fill the config manually with all necessary options</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">// by using config.set(key, value).</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">// Also have a look at the nawa::Config docs for details :)</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// Now we need a function which handles the requests. It can be any (Connection&amp;) -&gt; int function,</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// here, we use a lambda for simplicity.</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">auto</span> handlingFunction = [](<a class="code" href="classnawa_1_1Connection.html">Connection</a>&amp; connection) -&gt; <span class="keywordtype">int</span> {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="comment">// Our simple example app will just print &quot;Hello World!&quot; for every request</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="comment">// and therefore do exactly the same thing as examples/helloworld.cpp</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="comment">// (but in a more complicated way)</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        connection.responseStream() &lt;&lt; <span class="stringliteral">&quot;Hello World!&quot;</span>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    };</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">// set up the NAWA request handler</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    unique_ptr&lt;RequestHandler&gt; requestHandler;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="comment">// The last argument is the concurrency, which is the number of worker threads for processing requests</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        requestHandler = <a class="code" href="classnawa_1_1RequestHandler.html#ac16a6f386255f1e8c0422cbc775e24b9">RequestHandler::newRequestHandler</a>(handlingFunction, config, 1);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    } <span class="keywordflow">catch</span> (<a class="code" href="classnawa_1_1Exception.html">Exception</a> <span class="keyword">const</span>&amp; e) {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        cerr &lt;&lt; <span class="stringliteral">&quot;NAWA request handler could not be created: &quot;</span> &lt;&lt; e.<a class="code" href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">getMessage</a>() &lt;&lt; endl;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="comment">// At this point, you should consider doing a privilege downgrade (if your app is meant to be started as root), as</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">// running with root privileges is a security risk (as you hopefully know).</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">// If you want to use access filtering, create a set of filters like this (that&#39;s optional, of course):</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="classnawa_1_1AccessFilterList.html">AccessFilterList</a> accessFilters;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="comment">// Add filters, as shown in the manual or examples/multipage.cpp</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="comment">// ...</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="comment">// Then pass them to the request handler:</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    requestHandler-&gt;setAccessFilters(accessFilters);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Log_8h.html">nawa/logging/Log.h</a>&gt;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">using namespace </span><a class="code" href="namespacenawa.html">nawa</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">using namespace </span>std;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="aslibrary_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">   33</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="aslibrary_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a>() {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="comment">// You can do the initialization right here, no need for an init function.</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">// Load the config from a config.ini file, placed in the directory from where this app is executed.</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">// Of course, you could also provide an absolute path or let the user provide the location via a command line argument.</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">// The categories privileges, application, and system (except for the request handler) are irrelevant when using</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">// NAWA as a library.</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="classnawa_1_1Config.html">Config</a> config;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        config.<a class="code" href="classnawa_1_1Config.html#a3f0d550247bce865ed7d23ff84ba80a5">read</a>(<span class="stringliteral">&quot;config.ini&quot;</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    } <span class="keywordflow">catch</span> (<a class="code" href="classnawa_1_1Exception.html">Exception</a> <span class="keyword">const</span>&amp; e) {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        cerr &lt;&lt; <span class="stringliteral">&quot;Could not read config.ini file: &quot;</span> &lt;&lt; e.<a class="code" href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">getMessage</a>() &lt;&lt; endl;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">// You don&#39;t have to use an ini file of course, you could also fill the config manually with all necessary options</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">// by using config.set(key, value).</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">// Also have a look at the nawa::config::Config docs for details :)</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// Set up logging. Also have a look at the nawa::logging::Log docs for details, the static functions allow you</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">// to control logging globally. Output may also be redirected to a file.</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classnawa_1_1Log.html#a2d12a792fea40df98b98222f6a981c50">Log::setOutputLevel</a>(<a class="code" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914a059e9861e0400dfbe05c98a841f3f96b">Log::Level::WARNING</a>);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="comment">// Make sure to lock the stream after setting up logging in order to ensure thread safety.</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classnawa_1_1Log.html#a9e6c8f364d4642ae9a1be862044d480c">Log::lockStream</a>();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="comment">// Now we need a function which handles the requests. It can be any (Connection&amp;) -&gt; int function,</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// here, we use a lambda for simplicity.</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">auto</span> handlingFunction = [](<a class="code" href="classnawa_1_1Connection.html">Connection</a>&amp; connection) -&gt; <span class="keywordtype">int</span> {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="comment">// Our simple example app will just print &quot;Hello World!&quot; for every request</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="comment">// and therefore do exactly the same thing as examples/helloworld.cpp</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="comment">// (but in a more complicated way)</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        connection.responseStream() &lt;&lt; <span class="stringliteral">&quot;Hello World!&quot;</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    };</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="comment">// set up the NAWA request handler</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    unique_ptr&lt;RequestHandler&gt; requestHandler;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="comment">// The last argument is the concurrency, which is the number of worker threads for processing requests</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        requestHandler = <a class="code" href="classnawa_1_1RequestHandler.html#ac16a6f386255f1e8c0422cbc775e24b9">RequestHandler::newRequestHandler</a>(handlingFunction, config, 1);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    } <span class="keywordflow">catch</span> (<a class="code" href="classnawa_1_1Exception.html">Exception</a> <span class="keyword">const</span>&amp; e) {</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        cerr &lt;&lt; <span class="stringliteral">&quot;NAWA request handler could not be created: &quot;</span> &lt;&lt; e.<a class="code" href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">getMessage</a>() &lt;&lt; endl;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="comment">// At this point, you should consider doing a privilege downgrade (if your app is meant to be started as root), as</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="comment">// running with root privileges is a security risk (as you hopefully know).</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="comment">// Now we can start handling requests! Request handling will happen in separate threads, the start() function</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="comment">// will return immediately, and you can continue to do other things here while requests are being served.</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        requestHandler-&gt;start();</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    } <span class="keywordflow">catch</span> (<a class="code" href="classnawa_1_1Exception.html">Exception</a> <span class="keyword">const</span>&amp; e) {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        cerr &lt;&lt; <span class="stringliteral">&quot;NAWA request handling could not be started: &quot;</span> &lt;&lt; e.<a class="code" href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">getMessage</a>() &lt;&lt; endl;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">// You can control request handling at any time by calling:</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="comment">// requestHandler-&gt;stop()       to stop accepting new requests and terminating the request handlers as soon as</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="comment">//                              existing ones have been served</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="comment">// requestHandler-&gt;terminate()  to terminate request handling immediately</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="comment">// None of these functions will block until termination has completed, only join() will ever block.</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="comment">// Tip: Use signal handlers to control request handling.</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="comment">// If you want to use access filtering, create a set of filters like this (that&#39;s optional, of course):</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="classnawa_1_1AccessFilterList.html">AccessFilterList</a> accessFilters;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">// Add filters, as shown in the manual or examples/multipage.cpp</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">// ...</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="comment">// Then pass them to the request handler:</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    requestHandler-&gt;setAccessFilters(accessFilters);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="comment">// Now we can start handling requests! Request handling will happen in separate threads, the start() function</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="comment">// will return immediately, and you can continue to do other things here while requests are being served.</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        requestHandler-&gt;start();</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    } <span class="keywordflow">catch</span> (<a class="code" href="classnawa_1_1Exception.html">Exception</a> <span class="keyword">const</span>&amp; e) {</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        cerr &lt;&lt; <span class="stringliteral">&quot;NAWA request handling could not be started: &quot;</span> &lt;&lt; e.<a class="code" href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">getMessage</a>() &lt;&lt; endl;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    }</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="comment">// If you want to hot-swap the config, filters, or request handling function, use:</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="comment">// requestHandler-&gt;reconfigure(handlingFunction, accessFilters, config);</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">// (see docs of nawa::RequestHandler::reconfigure() -- you can use std::nullopt for things you don&#39;t want to</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">// reconfigure)</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">// Now, before your main function returns, make sure to block until request handling has terminated:</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    requestHandler-&gt;join();</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;}</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="comment">// You can control request handling at any time by calling:</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="comment">// requestHandler-&gt;stop()       to stop accepting new requests and terminating the request handlers as soon as</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">//                              existing ones have been served</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">// requestHandler-&gt;terminate()  to terminate request handling immediately</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">// None of these functions will block until termination has completed, only join() will ever block.</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">// Tip: Use signal handlers to control request handling.</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="comment">// If you want to hot-swap the config, filters, or request handling function, use:</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">// requestHandler-&gt;reconfigure(handlingFunction, accessFilters, config);</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="comment">// (see docs of nawa::RequestHandler::reconfigure() -- you can use std::nullopt for things you don&#39;t want to</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="comment">// reconfigure)</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">// Now, before your main function returns, make sure to block until request handling has terminated:</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    requestHandler-&gt;join();</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
 <div class="ttc" id="aConnection_8h_html"><div class="ttname"><a href="Connection_8h.html">Connection.h</a></div><div class="ttdoc">Response object to be passed back to NAWA and accessor to the request.</div></div>
 <div class="ttc" id="aException_8h_html"><div class="ttname"><a href="Exception_8h.html">Exception.h</a></div><div class="ttdoc">Exception class that can be used by apps to catch errors resulting from nawa function calls.</div></div>
+<div class="ttc" id="aLog_8h_html"><div class="ttname"><a href="Log_8h.html">Log.h</a></div><div class="ttdoc">Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream.</div></div>
 <div class="ttc" id="aRequestHandler_8h_html"><div class="ttname"><a href="RequestHandler_8h.html">RequestHandler.h</a></div><div class="ttdoc">Handles and serves incoming requests via the NAWA app.</div></div>
-<div class="ttc" id="aaslibrary_8cpp_html_ae66f6b31b5ad750f1fe042a706a4e3d4"><div class="ttname"><a href="aslibrary_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a></div><div class="ttdeci">int main()</div><div class="ttdef"><b>Definition:</b> <a href="aslibrary_8cpp_source.html#l00032">aslibrary.cpp:32</a></div></div>
+<div class="ttc" id="aaslibrary_8cpp_html_ae66f6b31b5ad750f1fe042a706a4e3d4"><div class="ttname"><a href="aslibrary_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a></div><div class="ttdeci">int main()</div><div class="ttdef"><b>Definition:</b> <a href="aslibrary_8cpp_source.html#l00033">aslibrary.cpp:33</a></div></div>
 <div class="ttc" id="aclassnawa_1_1AccessFilterList_html"><div class="ttname"><a href="classnawa_1_1AccessFilterList.html">nawa::AccessFilterList</a></div><div class="ttdef"><b>Definition:</b> <a href="AccessFilterList_8h_source.html#l00040">AccessFilterList.h:40</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Config_html"><div class="ttname"><a href="classnawa_1_1Config.html">nawa::Config</a></div><div class="ttdef"><b>Definition:</b> <a href="Config_8h_source.html#l00035">Config.h:35</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Config_html_a3f0d550247bce865ed7d23ff84ba80a5"><div class="ttname"><a href="classnawa_1_1Config.html#a3f0d550247bce865ed7d23ff84ba80a5">nawa::Config::read</a></div><div class="ttdeci">void read(std::string const &amp;iniFile)</div><div class="ttdef"><b>Definition:</b> <a href="Config_8cpp_source.html#l00058">Config.cpp:58</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Connection_html"><div class="ttname"><a href="classnawa_1_1Connection.html">nawa::Connection</a></div><div class="ttdef"><b>Definition:</b> <a href="Connection_8h_source.html#l00041">Connection.h:41</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Exception_html"><div class="ttname"><a href="classnawa_1_1Exception.html">nawa::Exception</a></div><div class="ttdef"><b>Definition:</b> <a href="Exception_8h_source.html#l00035">Exception.h:35</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Exception_html_ab92add39d461ca11e2e984af2c0ff844"><div class="ttname"><a href="classnawa_1_1Exception.html#ab92add39d461ca11e2e984af2c0ff844">nawa::Exception::getMessage</a></div><div class="ttdeci">virtual std::string getMessage() const noexcept</div><div class="ttdef"><b>Definition:</b> <a href="Exception_8h_source.html#l00071">Exception.h:71</a></div></div>
+<div class="ttc" id="aclassnawa_1_1Log_html_a2d12a792fea40df98b98222f6a981c50"><div class="ttname"><a href="classnawa_1_1Log.html#a2d12a792fea40df98b98222f6a981c50">nawa::Log::setOutputLevel</a></div><div class="ttdeci">static void setOutputLevel(Level level)</div><div class="ttdef"><b>Definition:</b> <a href="Log_8cpp_source.html#l00136">Log.cpp:136</a></div></div>
+<div class="ttc" id="aclassnawa_1_1Log_html_a75015f9850f0862cf0b39f70304d9914a059e9861e0400dfbe05c98a841f3f96b"><div class="ttname"><a href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914a059e9861e0400dfbe05c98a841f3f96b">nawa::Log::Level::WARNING</a></div><div class="ttdeci">@ WARNING</div></div>
+<div class="ttc" id="aclassnawa_1_1Log_html_a9e6c8f364d4642ae9a1be862044d480c"><div class="ttname"><a href="classnawa_1_1Log.html#a9e6c8f364d4642ae9a1be862044d480c">nawa::Log::lockStream</a></div><div class="ttdeci">static void lockStream() noexcept</div><div class="ttdef"><b>Definition:</b> <a href="Log_8cpp_source.html#l00148">Log.cpp:148</a></div></div>
 <div class="ttc" id="aclassnawa_1_1RequestHandler_html_ac16a6f386255f1e8c0422cbc775e24b9"><div class="ttname"><a href="classnawa_1_1RequestHandler.html#ac16a6f386255f1e8c0422cbc775e24b9">nawa::RequestHandler::newRequestHandler</a></div><div class="ttdeci">static std::unique_ptr&lt; RequestHandler &gt; newRequestHandler(std::shared_ptr&lt; HandleRequestFunctionWrapper &gt; const &amp;handleRequestFunction, Config config, int concurrency)</div><div class="ttdef"><b>Definition:</b> <a href="RequestHandler_8cpp_source.html#l00100">RequestHandler.cpp:100</a></div></div>
 <div class="ttc" id="anamespacenawa_html"><div class="ttname"><a href="namespacenawa.html">nawa</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00031">AppInit.h:31</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

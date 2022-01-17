@@ -368,7 +368,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Convert a time_t value (UNIX timestamp) to a HTTP header compatible date/time string. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Convert a time_t value (UNIX timestamp) to a HTTP header compatible date/time string. May throw an <a class="el" href="classnawa_1_1Exception.html">Exception</a> with error code 1 if interpretation of the UNIX timestamp fails. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>UNIX timestamp as a time_t value. </td></tr>
   </table>
@@ -395,7 +395,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create a time_t value (UNIX timestamp) from a HTTP header date/time string. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Create a time_t value (UNIX timestamp) from a HTTP header date/time string. May throw an <a class="el" href="classnawa_1_1Exception.html">Exception</a> with error code 1 if parsing fails. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">httpTime</td><td>Time string in the format: "&lt;day-name(3)&gt;, &lt;day(2)&gt; &lt;month(3)&gt; &lt;year(4)&gt; &lt;hour(2)&gt;:&lt;minute(2)&gt;:&lt;second(2)&gt; GMT". </td></tr>
   </table>
@@ -403,7 +403,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>UNIX timestamp value (time_t). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00369">369</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00373">373</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -422,7 +422,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string. May throw an <a class="el" href="classnawa_1_1Exception.html">Exception</a> with error code 1 if interpretation of the UNIX timestamp fails. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>UNIX timestamp as a time_t value. </td></tr>
   </table>
@@ -430,7 +430,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Time string in the format "&lt;day-name(3)&gt;, &lt;day(1*2)&gt; &lt;month(3)&gt; &lt;year(4)&gt; &lt;hour(2)&gt;:&lt;minute(2)&gt;:&lt;second(2)&gt; &lt;tzoffset(5)&gt;". </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00378">378</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00392">392</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -449,7 +449,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create a time_t value (UNIX timestamp) from a SMTP header date/time string. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Create a time_t value (UNIX timestamp) from a SMTP header date/time string. May throw an <a class="el" href="classnawa_1_1Exception.html">Exception</a> with error code 1 if parsing fails. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">smtpTime</td><td>Time string in the format: "&lt;day-name(3)&gt;, &lt;day(1*2)&gt; &lt;month(3)&gt; &lt;year(4)&gt; &lt;hour(2)&gt;:&lt;minute(2)&gt;:&lt;second(2)&gt; &lt;tzoffset(5)&gt;". </td></tr>
   </table>
@@ -457,7 +457,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>UNIX timestamp value (time_t). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00388">388</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00405">405</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -502,7 +502,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Vector containing the elements. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00418">418</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00448">448</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -529,7 +529,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String representation of the given path. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00435">435</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00465">465</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -556,7 +556,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Vector representation of the given path. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00446">446</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00476">476</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +594,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String with converted line endings. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00452">452</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00482">482</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -621,7 +621,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String containing the whole file. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00463">463</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00493">493</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -659,7 +659,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String with replacements applied. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00484">484</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00514">514</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -697,7 +697,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String with replacements applied. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00491">491</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00521">521</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -724,7 +724,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Key =&gt; value map containing the GET variables. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00501">501</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00531">531</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -751,7 +751,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Map with key =&gt; value mapping (keys will be transformed to lowercase). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00520">520</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00550">550</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -778,7 +778,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A multimap of the cookies. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00539">539</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2utils_8cpp_source.html#l00569">569</a> of file <a class="el" href="src_2util_2utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -799,7 +799,7 @@ template&lt;typename KeyType , typename ValueType , template&lt; typename, typen
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Convert any iterable map to an unordered_map. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Convert any iterable map to an unordered_multimap. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">KeyType</td><td>Key type (automatically deduced). </td></tr>
     <tr><td class="paramname">ValueType</td><td>Value type (automatically deduced). </td></tr>
@@ -814,9 +814,9 @@ template&lt;typename KeyType , typename ValueType , template&lt; typename, typen
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An unordered_map with the input map's content. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An unordered_multimap with the input map's content. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00210">210</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00214">214</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
