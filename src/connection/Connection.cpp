@@ -26,6 +26,7 @@
 #include <nawa/connection/Connection.h>
 #include <nawa/connection/ConnectionInitContainer.h>
 #include <nawa/filter/AccessFilterList.h>
+#include <nawa/logging/Log.h>
 #include <nawa/oss.h>
 #include <nawa/util/encoding.h>
 #include <nawa/util/utils.h>
@@ -37,6 +38,8 @@ using namespace nawa;
 using namespace std;
 
 namespace {
+    Log logger;
+
     unordered_map<unsigned int, string> const httpStatusCodes = {
             {200, "OK"},
             {201, "Created"},
@@ -95,7 +98,7 @@ namespace {
             {508, "Loop Detected"},
             {510, "Not Extended"},
             {511, "Network Authentication Required"}};
-}
+}// namespace
 
 struct Connection::Data {
     string bodyString;
@@ -195,7 +198,12 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
 
     // set the last-modified header (if possible)
     if (lastModified > 0) {
-        setHeader("last-modified", utils::makeHttpTime(lastModified));
+        try {
+            setHeader("last-modified", utils::makeHttpTime(lastModified));
+        } catch (Exception const& e) {
+            NLOG_ERROR(logger, e.getMessage())
+            NLOG_DEBUG(logger, e.getDebugMessage())
+        }
     }
 
     // resize the bodyString, fill it with \0 chars if needed, make sure char fs [(fs+1)th] is \0, and insert file contents
@@ -251,7 +259,12 @@ unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) c
             // Expires option
             optional<time_t> expiry = e.second.expires() ? e.second.expires() : data->cookiePolicy.expires();
             if (expiry) {
-                headerVal << "; Expires=" << utils::makeHttpTime(*expiry);
+                try {
+                    headerVal << "; Expires=" << utils::makeHttpTime(*expiry);
+                } catch (Exception const& e) {
+                    NLOG_ERROR(logger, e.getMessage())
+                    NLOG_DEBUG(logger, e.getDebugMessage())
+                }
             }
             // Max-Age option
             optional<unsigned long> maxAge = e.second.maxAge() ? e.second.maxAge()

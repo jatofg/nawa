@@ -88,7 +88,8 @@ namespace nawa::utils {
     std::string contentTypeByExtension(std::string extension);
 
     /**
-     * Convert a time_t value (UNIX timestamp) to a HTTP header compatible date/time string.
+     * Convert a time_t value (UNIX timestamp) to a HTTP header compatible date/time string. May throw an Exception
+     * with error code 1 if interpretation of the UNIX timestamp fails.
      * @param time UNIX timestamp as a time_t value.
      * @return Time string in the format
      * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
@@ -96,7 +97,8 @@ namespace nawa::utils {
     std::string makeHttpTime(time_t time);
 
     /**
-     * Create a time_t value (UNIX timestamp) from a HTTP header date/time string.
+     * Create a time_t value (UNIX timestamp) from a HTTP header date/time string. May throw an Exception with
+     * error code 1 if parsing fails.
      * @param httpTime Time string in the format:
      * "<day-name(3)>, <day(2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> GMT".
      * @return UNIX timestamp value (time_t).
@@ -104,7 +106,8 @@ namespace nawa::utils {
     time_t readHttpTime(std::string const& httpTime);
 
     /**
-     * Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string.
+     * Convert a time_t value (UNIX timestamp) to a SMTP header compatible date/time string. May throw an Exception
+     * with error code 1 if interpretation of the UNIX timestamp fails.
      * @param time UNIX timestamp as a time_t value.
      * @return Time string in the format
      * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> <tzoffset(5)>".
@@ -112,7 +115,8 @@ namespace nawa::utils {
     std::string makeSmtpTime(time_t time);
 
     /**
-     * Create a time_t value (UNIX timestamp) from a SMTP header date/time string.
+     * Create a time_t value (UNIX timestamp) from a SMTP header date/time string. May throw an Exception with
+     * error code 1 if parsing fails.
      * @param smtpTime Time string in the format:
      * "<day-name(3)>, <day(1*2)> <month(3)> <year(4)> <hour(2)>:<minute(2)>:<second(2)> <tzoffset(5)>".
      * @return UNIX timestamp value (time_t).
@@ -198,13 +202,13 @@ namespace nawa::utils {
     std::unordered_multimap<std::string, std::string> parseCookies(std::string const& rawCookies);
 
     /**
-     * Convert any iterable map to an unordered_map.
+     * Convert any iterable map to an unordered_multimap.
      * @tparam KeyType Key type (automatically deduced).
      * @tparam ValueType Value type (automatically deduced).
      * @tparam MapType Input map type (automatically deduced).
      * @tparam Args Further template arguments of map type (automatically deduced).
      * @param inputMap The input map to convert.
-     * @return An unordered_map with the input map's content.
+     * @return An unordered_multimap with the input map's content.
      */
     template<typename KeyType, typename ValueType, template<typename, typename, typename...> class MapType, typename... Args>
     std::unordered_multimap<KeyType, ValueType> toUnorderedMultimap(MapType<KeyType, ValueType, Args...> inputMap) {

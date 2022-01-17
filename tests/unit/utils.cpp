@@ -21,6 +21,7 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "nawa/Exception.h"
 #include <catch2/catch.hpp>
 #include <nawa/util/utils.h>
 
@@ -31,9 +32,17 @@ TEST_CASE("nawa::utils functions", "[unit][utils]") {
 
     SECTION("Time conversions") {
         time_t currentTime = time(nullptr);
-        CHECK(utils::readSmtpTime("Thu,  7 Nov 2019 16:29:50 +0100") == 1573140590);
-        CHECK(utils::readHttpTime(utils::makeHttpTime(currentTime)) == currentTime);
-        CHECK(utils::readSmtpTime(utils::makeSmtpTime(currentTime)) == currentTime);
+        time_t smtpTime1;
+        CHECK_NOTHROW(smtpTime1 = utils::readSmtpTime("Thu,  7 Nov 2019 16:29:50 +0100"));
+        CHECK(smtpTime1 == 1573140590);
+        time_t httpTime1;
+        CHECK_NOTHROW(httpTime1 = utils::readHttpTime(utils::makeHttpTime(currentTime)));
+        CHECK(httpTime1 == currentTime);
+        time_t smtpTime2;
+        CHECK_NOTHROW(smtpTime2 = utils::readSmtpTime(utils::makeSmtpTime(currentTime)));
+        CHECK(smtpTime2 == currentTime);
+        CHECK_THROWS_AS(utils::readSmtpTime("test"), Exception);
+        CHECK_THROWS_AS(utils::readHttpTime("test"), Exception);
     }
 
     SECTION("Path splitting") {

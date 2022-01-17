@@ -358,8 +358,12 @@ string utils::contentTypeByExtension(string extension) {
 
 string utils::makeHttpTime(time_t time) {
     stringstream httpTime;
-    tm gmt;
-    gmtime_r(&time, &gmt);
+    tm gmt{};
+    auto retPtr = gmtime_r(&time, &gmt);
+    if (retPtr == nullptr) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Interpretation of UNIX timestamp failed.", strerror(errno));
+    }
+
     httpTime << getDayOfWeek(gmt.tm_wday) << put_time(&gmt, ", %d ") << getMonth(gmt.tm_mon);
     httpTime << put_time(&gmt, " %Y %H:%M:%S GMT");
 
@@ -367,18 +371,31 @@ string utils::makeHttpTime(time_t time) {
 }
 
 time_t utils::readHttpTime(string const& httpTime) {
+    tm timeStruct{};
     istringstream timeStream(httpTime);
-    tm timeStruct;
-    timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
+    timeStream.exceptions(ifstream::failbit);
+    try {
+        timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S GMT");
+    } catch (ios_base::failure const& e) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Parsing of HTTP timestamp failed.", e.what());
+    }
 
     // timegm will interpret the tm as UTC and convert it to a time_t
-    return timegm(&timeStruct);
+    time_t unixTime = timegm(&timeStruct);
+    if (unixTime == -1) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Conversion of parsed HTTP timestamp to a UNIX timestamp failed.", strerror(errno));
+    }
+
+    return unixTime;
 }
 
 string utils::makeSmtpTime(time_t time) {
     stringstream smtpTime;
-    tm ltime;
-    localtime_r(&time, &ltime);
+    tm ltime{};
+    auto retPtr = localtime_r(&time, &ltime);
+    if (retPtr == nullptr) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Interpretation of UNIX timestamp failed.", strerror(errno));
+    }
     smtpTime << getDayOfWeek(ltime.tm_wday) << put_time(&ltime, ", %e ") << getMonth(ltime.tm_mon);
     smtpTime << put_time(&ltime, " %Y %H:%M:%S %z");
 
@@ -387,7 +404,7 @@ string utils::makeSmtpTime(time_t time) {
 
 time_t utils::readSmtpTime(string const& smtpTime) {
     string smtpTimeM = smtpTime;
-    tm timeStruct;
+    tm timeStruct{};
 
     // there seems to be a bug in get_time, %e parsing with leading space does not work, so this fails for
     // days of month < 10:
@@ -398,17 +415,30 @@ time_t utils::readSmtpTime(string const& smtpTime) {
         smtpTimeM[5] = '0';
     }
     istringstream timeStream(smtpTimeM);
-    timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S %z");
+    timeStream.exceptions(ifstream::failbit);
+    try {
+        // time zone modifier %z at the end will also cause trouble, but is not needed anyway (as the TZ is not part of tm)
+        timeStream >> get_time(&timeStruct, "%a, %d %b %Y %H:%M:%S");
+    } catch (ios_base::failure const& e) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Parsing of SMTP timestamp failed.", e.what());
+    }
 
     // timegm will create a time_t, but does not honor the time zone, unfortunately (not part of tm)
     time_t unixTime = timegm(&timeStruct);
+    if (unixTime == -1) {
+        throw Exception(__PRETTY_FUNCTION__, 1, "Conversion of parsed SMTP timestamp to a UNIX timestamp failed.", strerror(errno));
+    }
 
     // so we'll have to add/subtract the difference manually
     if (smtpTimeM.length() > 30) {
-        long tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
-        long tzH = stol(smtpTimeM.substr(27, 2));
-        long tzM = stol(smtpTimeM.substr(29, 2));
-        unixTime += tzAdjust * (tzH * 3600 + tzM * 60);
+        try {
+            long tzAdjust = smtpTimeM[26] == '-' ? 1 : -1;
+            long tzH = stol(smtpTimeM.substr(27, 2));
+            long tzM = stol(smtpTimeM.substr(29, 2));
+            unixTime += tzAdjust * (tzH * 3600 + tzM * 60);
+        } catch (invalid_argument const& e) {
+            throw Exception(__PRETTY_FUNCTION__, 1, "Timezone adjustment in parsing of SMTP timestamp failed.", e.what());
+        }
     }
 
     // mktime will interpret the tm as local time and convert it to a time_t

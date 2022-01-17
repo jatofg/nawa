@@ -25,6 +25,7 @@
 #include <nawa/Exception.h>
 #include <nawa/RequestHandler/RequestHandler.h>
 #include <nawa/connection/Connection.h>
+#include <nawa/logging/Log.h>
 
 using namespace nawa;
 using namespace std;
@@ -45,7 +46,13 @@ int main() {
     }
     // You don't have to use an ini file of course, you could also fill the config manually with all necessary options
     // by using config.set(key, value).
-    // Also have a look at the nawa::Config docs for details :)
+    // Also have a look at the nawa::config::Config docs for details :)
+
+    // Set up logging. Also have a look at the nawa::logging::Log docs for details, the static functions allow you
+    // to control logging globally. Output may also be redirected to a file.
+    Log::setOutputLevel(Log::Level::WARNING);
+    // Make sure to lock the stream after setting up logging in order to ensure thread safety.
+    Log::lockStream();
 
     // Now we need a function which handles the requests. It can be any (Connection&) -> int function,
     // here, we use a lambda for simplicity.
