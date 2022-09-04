@@ -124,8 +124,91 @@ Session::Session(Connection& connection) {
     // thus, it will be triggered by the Connection constructor
 }
 
-void Session::start(Cookie properties) {
+std::string Session::start(std::string sessionId, std::optional<unsigned long> keepalive) {
+    // if session already started, do not start it again
+    if (established()) {
+        return data->currentID;
+    }
 
+    // session duration
+    unsigned long sessionKeepalive = 1800;
+    if (keepalive) {
+        sessionKeepalive = *keepalive;
+    } else {
+        auto sessionKStr = data->connection.config()[{"session", "keepalive"}];
+        if (!sessionKStr.empty()) {
+            try {
+                sessionKeepalive = stoul(sessionKStr);
+            } catch (invalid_argument& e) {
+                sessionKeepalive = 1800;
+            }
+        }
+    }
+
+    if (!sessionId.empty()) {
+        // check for validity
+        // global data map may be accessed concurrently by different threads
+        lock_guard<mutex> lockGuard(gLock);
+        if (sessionData.count(sessionId) == 1) {
+            // read validate_ip setting from config (needed a few lines later)
+            auto sessionValidateIP = data->connection.config()[{"session", "validate_ip"}];
+            // session already expired?
+            if (sessionData.at(sessionId)->expires <= time(nullptr)) {
+                sessionData.erase(sessionId);
+            }
+            // validate_ip enabled in NAWA config and IP mismatch?
+            else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax") &&
+                     sessionData.at(sessionId)->sourceIP != data->connection.request().env()["REMOTE_ADDR"]) {
+                if (sessionValidateIP == "strict") {
+                    // in strict mode, session has to be invalidated
+                    sessionData.erase(sessionId);
+                }
+            }
+            // session is valid
+            else {
+                data->currentData = sessionData.at(sessionId);
+                // reset expiry
+                lock_guard<mutex> currentLock(data->currentData->eLock);
+                data->currentData->expires = time(nullptr) + sessionKeepalive;
+            }
+        }
+    }
+    // if currentData not yet set (sessionCookieStr empty or invalid) -> initiate new session
+    if (data->currentData.use_count() < 1) {
+        // generate new session ID string (and check for duplicate - should not really occur)
+        lock_guard<mutex> lockGuard(gLock);
+        do {
+            sessionId = generateID(data->connection.request().env()["REMOTE_ADDR"]);
+        } while (sessionData.count(sessionId) > 0);
+        data->currentData = make_shared<SessionData>(data->connection.request().env()["REMOTE_ADDR"]);
+        data->currentData->expires = time(nullptr) + sessionKeepalive;
+        sessionData[sessionId] = data->currentData;
+    }
+
+    // save the ID so we can invalidate the session
+    data->currentID = sessionId;
+
+    // run garbage collection in 1/x of invocations
+    unsigned long divisor;
+    try {
+        auto divisorStr = data->connection.config()[{"session", "gc_divisor"}];
+        if (!divisorStr.empty()) {
+            divisor = stoul(divisorStr);
+        } else {
+            divisor = 100;
+        }
+    } catch (invalid_argument const& e) {
+        divisor = 100;
+    }
+    random_device rd;
+    if (rd() % divisor == 0) {
+        collectGarbage();
+    }
+
+    return sessionId;
+}
+
+void Session::start(Cookie properties) {
     // if session already started, do not start it again
     if (established())
         return;
@@ -151,47 +234,9 @@ void Session::start(Cookie properties) {
         }
     }
 
-    // check whether client has submitted a session cookie
-    auto sessionCookieStr = data->connection.request().cookie()[data->cookieName];
-    if (!sessionCookieStr.empty()) {
-        // check for validity
-        // global data map may be accessed concurrently by different threads
-        lock_guard<mutex> lockGuard(gLock);
-        if (sessionData.count(sessionCookieStr) == 1) {
-            // read validate_ip setting from config (needed a few lines later)
-            auto sessionValidateIP = data->connection.config()[{"session", "validate_ip"}];
-            // session already expired?
-            if (sessionData.at(sessionCookieStr)->expires <= time(nullptr)) {
-                sessionData.erase(sessionCookieStr);
-            }
-            // validate_ip enabled in NAWA config and IP mismatch?
-            else if ((sessionValidateIP == "strict" || sessionValidateIP == "lax") &&
-                     sessionData.at(sessionCookieStr)->sourceIP != data->connection.request().env()["REMOTE_ADDR"]) {
-                if (sessionValidateIP == "strict") {
-                    // in strict mode, session has to be invalidated
-                    sessionData.erase(sessionCookieStr);
-                }
-            }
-            // session is valid
-            else {
-                data->currentData = sessionData.at(sessionCookieStr);
-                // reset expiry
-                lock_guard<mutex> currentLock(data->currentData->eLock);
-                data->currentData->expires = time(nullptr) + sessionKeepalive;
-            }
-        }
-    }
-    // if currentData not yet set (sessionCookieStr empty or invalid) -> initiate new session
-    if (data->currentData.use_count() < 1) {
-        // generate new session ID string (and check for duplicate - should not really occur)
-        lock_guard<mutex> lockGuard(gLock);
-        do {
-            sessionCookieStr = generateID(data->connection.request().env()["REMOTE_ADDR"]);
-        } while (sessionData.count(sessionCookieStr) > 0);
-        data->currentData = make_shared<SessionData>(data->connection.request().env()["REMOTE_ADDR"]);
-        data->currentData->expires = time(nullptr) + sessionKeepalive;
-        sessionData[sessionCookieStr] = data->currentData;
-    }
+    // the session ID may be given in a session cookie, if not, the string will be empty
+    // Session::start will use the session, if present, and return a valid session ID
+    string sessionId = start(data->connection.request().cookie()[data->cookieName], sessionKeepalive);
 
     // set the response cookie and its properties according to the Cookie parameter or the NAWA config
     string cookieExpiresStr;
@@ -219,28 +264,11 @@ void Session::start(Cookie properties) {
     }
 
     // save the ID so we can invalidate the session
-    data->currentID = sessionCookieStr;
+    data->currentID = sessionId;
 
     // set the content to the session ID and queue the cookie
-    properties.content(sessionCookieStr);
+    properties.content(sessionId);
     data->connection.setCookie(data->cookieName, properties);
-
-    // run garbage collection in 1/x of invocations
-    unsigned long divisor;
-    try {
-        auto divisorStr = data->connection.config()[{"session", "gc_divisor"}];
-        if (!divisorStr.empty()) {
-            divisor = stoul(divisorStr);
-        } else {
-            divisor = 100;
-        }
-    } catch (invalid_argument const& e) {
-        divisor = 100;
-    }
-    random_device rd;
-    if (rd() % divisor == 0) {
-        collectGarbage();
-    }
 }
 
 bool Session::established() const {

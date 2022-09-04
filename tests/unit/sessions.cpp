@@ -55,6 +55,25 @@ TEST_CASE("nawa::Session class", "[unit][session]") {
         }
     }
 
+    SECTION("Basic session handling without cookies") {
+        string sessionId;
+        {
+            Connection connection(connectionInit);
+            auto& session = connection.session();
+            sessionId = session.start("");
+            CHECK_NOTHROW(session.set("testKey", "testVal"));
+            CHECK(any_cast<string>(session["testKey"]) == "testVal");
+        }
+        {
+            Connection connection(connectionInit);
+            auto& session = connection.session();
+            string newSessionId = session.start(sessionId);
+            REQUIRE(newSessionId == sessionId);
+            REQUIRE(session.getID() == sessionId);
+            CHECK(any_cast<string>(session["testKey"]) == "testVal");
+        }
+    }
+
     SECTION("Session autostart") {
         ConnectionInitContainer connectionInit1 = connectionInit;
         connectionInit1.config.set({"session", "autostart"}, "on");

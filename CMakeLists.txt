@@ -159,6 +159,7 @@ set(NAWA_FILES
         src/util/utils.cpp
         )
 
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL 1.1.1 REQUIRED)
 find_package(Boost 1.62.0 COMPONENTS system thread REQUIRED)
 find_package(CURL 7.58 REQUIRED)

@@ -54,7 +54,23 @@ namespace nawa {
         explicit Session(Connection& connection);
 
         /**
-         * Start the session (load existing session basing on a cookie sent by the client or create a new one).
+         * Start the session based on a given session ID (if possible). If a session is already
+         * active, this function will just return the current session ID.
+         *
+         * Please note that in order to start a new session without sending a session cookie,
+         * this overload has to be used, e.g., by passing an empty string for sessionId.
+         *
+         * @param sessionId The session ID. If empty or if no session with the given ID exists,
+         * a new session with a new session ID will be generated.
+         * @param keepalive Session duration in seconds. Overrides the value in the NAWA config file
+         * if present.
+         * @return The new session ID (may differ from the given sessionId if no session with the
+         * given ID is valid).
+         */
+        std::string start(std::string sessionId, std::optional<unsigned long> keepalive = std::nullopt);
+
+        /**
+         * Start the session (load existing session based on a cookie sent by the client or create a new one).
          * This will send a session cookie to the client. The properties/attributes of the session cookie are determined
          * by, with decreasing precedence,\n
          *

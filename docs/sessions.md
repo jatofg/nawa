@@ -47,6 +47,17 @@ the `nawa::Connection` object you get as a parameter of your
 You can use `connection.session().established()` to check whether a 
 session has already been started.
 
+To use sessions without cookies, e.g., in an API, use the overload of
+`Connection::Session::start()` taking the session ID as its first parameter.
+If a session with the given ID exists or is valid, this session will be used,
+otherwise, a new session will be started. This overload returns the actual
+session ID of the new or existing session.
+
+To start a new session without
+setting a cookie, you can pass an empty string as the session ID:
+
+`std::string sessionId = connection.session().start("");`
+
 ### Setting variables
 
 Use the `nawa::Session::set()` function to set a variable. It takes 

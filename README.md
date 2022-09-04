@@ -18,6 +18,11 @@ serve your application without depending on dedicated web server software
 (still somehow experimental and unfit for production use).
 
 ## News
+**New in v0.9**
+
+Sessions can now be used without cookies by manually passing the session ID when starting
+the session. A new overload of `nawa::Session::start()` has been added for this purpose.
+
 **New in v0.8**
 
 The configuration can now be reloaded without restarting and apps (and request handling 
@@ -53,14 +58,14 @@ int handleRequest(Connection &connection) {
 ```
 
 You want to learn more? 
-[Read the full introduction tutorial.](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html) 
+[Read the full introduction tutorial.](https://jatofg.github.io/nawa/v0.9/docs/gettingstarted.html) 
 
 If you don't like the IoC-style approach, you can also use NAWA as a library. 
-[An introduction can be found here.](https://jatofg.github.io/nawa/v0.8/docs/aslibrarymanual.html)
+[An introduction can be found here.](https://jatofg.github.io/nawa/v0.9/docs/aslibrarymanual.html)
 
 ### Warning!
 
-This project is still in an early state (version 0.8!). It might, of 
+This project is still in an early state (version 0.9!). It might, of 
 course, still contain bugs. Use it at your own risk.
 
 If you use it, please report any bugs and wishes, so that this project 
@@ -73,15 +78,15 @@ load apps compiled against an older version.
 
 ## Main Features
 
-* Request Handling Backends ([learn more](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html))
+* Request Handling Backends ([learn more](https://jatofg.github.io/nawa/v0.9/docs/gettingstarted.html))
   * FastCGI (serve requests through web server software)
   * HTTP (development web server, not production-ready yet)
-* Access to request data ([learn more](https://jatofg.github.io/nawa/v0.8/docs/environmentmanual.html))
+* Access to request data ([learn more](https://jatofg.github.io/nawa/v0.9/docs/environmentmanual.html))
   * GET, POST, COOKIE variables
   * Request headers
   * Request details (document root, request method, client IP, ...)
   * Environment information (server software, server IP, ...)
-* Defining the response ([learn more](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html))
+* Defining the response ([learn more](https://jatofg.github.io/nawa/v0.9/docs/gettingstarted.html))
   * Set response body directly or using a stream
   * Set response headers
   * Set cookies
@@ -89,17 +94,17 @@ load apps compiled against an older version.
   * Flush response prematurely
   * Respond with files from disk (incl. automatic setting of relevant response headers)
   * Automatically generate and send error pages
-* Sessions ([learn more](https://jatofg.github.io/nawa/v0.8/docs/sessionsmanual.html))
+* Sessions ([learn more](https://jatofg.github.io/nawa/v0.9/docs/sessionsmanual.html))
   * Full-featured session management
   * Session security options
   * Start sessions automatically (optional)
   * Set and get session variables of arbitrary types
-* Request Filters ([learn more](https://jatofg.github.io/nawa/v0.8/docs/filtersmanual.html))
+* Request Filters ([learn more](https://jatofg.github.io/nawa/v0.9/docs/filtersmanual.html))
   * Filter requests based on path, file extensions, or regular expressions
   * Serve filtered requests with files from disk (forward filter)
   * Block filtered requests with error pages
   * Require HTTP authentication for filtered requests
-* Email ([learn more](https://jatofg.github.io/nawa/v0.8/docs/emailmanual.html))
+* Email ([learn more](https://jatofg.github.io/nawa/v0.9/docs/emailmanual.html))
   * Create emails with headers
   * MIME email and attachment support
   * Automatic quoted-printable or base64 encoding (if desired)
@@ -139,7 +144,7 @@ application, and
 
 You can find an introduction containing a simple "Hello World!" 
 NAWA app here: 
-[Getting started.](https://jatofg.github.io/nawa/v0.8/docs/gettingstarted.html)
+[Getting started.](https://jatofg.github.io/nawa/v0.9/docs/gettingstarted.html)
 
 The path to the object file is included in the config file, and NAWA 
 will take care of setting everything up and starting the app. You 
@@ -198,7 +203,7 @@ on macOS 12, dependencies still have to be installed from homebrew.*
 * gcc-c++/g++ or clang compiler with C++17 support
 
 For building the docs, doxygen must be installed. However, you can also 
-[access the docs online](https://jatofg.github.io/nawa/v0.8/docs/).
+[access the docs online](https://jatofg.github.io/nawa/v0.9/docs/).
 
 ### Clone, build, and install NAWA
 
