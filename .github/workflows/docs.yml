@@ -16,7 +16,7 @@ jobs:
           cd build
           cmake -DNAWA_DOXYGEN_SOURCE_DIR=. -DNAWA_DOXYGEN_BINARY_DIR=docs/build ..
       - name: Build and publish docs
-        uses: jatofg/doxygenize@fa747c405b8ec6891fa187ace0d468e46ce56f67
+        uses: jatofg/doxygenize@1d9cb9a12f2dca4e655e1f1f05d79739dd7d1071
         with:
           doxygenconf: './docs/build/Doxyfile'
           htmloutput: './docs/build/docs_html/'
