@@ -1,10 +1,5 @@
-/**
- * \file Connection.cpp
- * \brief Implementation of the Connection and FlushCallbackContainer classes.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Connection.cpp
+ * \brief Implementation of the Connection and FlushCallbackContainer classes.
  */
 
 #include <fstream>
@@ -131,13 +131,13 @@ struct Connection::Data {
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(Connection)
 
-void Connection::setResponseBody(string content) {
-    data->bodyString = move(content);
+void Connection::setResponseBody(std::string content) {
+    data->bodyString = std::move(content);
     data->clearStream();
 }
 
-void Connection::sendFile(string const& path, string const& contentType, bool forceDownload,
-                          string const& downloadFilename, bool checkIfModifiedSince) {
+void Connection::sendFile(std::string const& path, std::string const& contentType, bool forceDownload,
+                          std::string const& downloadFilename, bool checkIfModifiedSince) {
 
     // open file as binary
     ifstream f(path, ifstream::binary);
@@ -148,7 +148,7 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
     }
 
     // get time of last modification
-    struct stat fileStat;
+    struct stat fileStat {};
     time_t lastModified = 0;
     if (stat(path.c_str(), &fileStat) == 0) {
         lastModified = oss::getLastModifiedTimeOfFile(fileStat);
@@ -215,25 +215,25 @@ void Connection::sendFile(string const& path, string const& contentType, bool fo
     data->clearStream();
 }
 
-void Connection::setHeader(string key, string value) {
+void Connection::setHeader(std::string key, std::string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    data->headers[key] = {move(value)};
+    data->headers[key] = {std::move(value)};
 }
 
-void Connection::addHeader(string key, string value) {
+void Connection::addHeader(std::string key, std::string value) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
-    data->headers[key].push_back(move(value));
+    data->headers[key].push_back(std::move(value));
 }
 
-void Connection::unsetHeader(string key) {
+void Connection::unsetHeader(std::string key) {
     // convert to lowercase
     transform(key.begin(), key.end(), key.begin(), ::tolower);
     data->headers.erase(key);
 }
 
-unordered_multimap<string, string> Connection::getHeaders(bool includeCookies) const {
+std::unordered_multimap<std::string, std::string> Connection::getHeaders(bool includeCookies) const {
     unordered_multimap<string, string> ret;
     for (auto const& [key, values] : data->headers) {
         for (auto const& value : values) {
@@ -311,21 +311,21 @@ Connection::Connection(ConnectionInitContainer const& connectionInit) {
     }
 }
 
-void Connection::setCookie(string const& key, Cookie cookie) {
+void Connection::setCookie(std::string const& key, Cookie cookie) {
     // check key and value using regex, according to ietf rfc 6265
     regex matchKey(R"([A-Za-z0-9!#$%&'*+\-.^_`|~]*)");
     regex matchContent(R"([A-Za-z0-9!#$%&'()*+\-.\/:<=>?@[\]^_`{|}~]*)");
     if (!regex_match(key, matchKey) || !regex_match(cookie.content(), matchContent)) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Invalid characters in key or value");
     }
-    data->cookies[key] = move(cookie);
+    data->cookies[key] = std::move(cookie);
 }
 
-void Connection::setCookie(string const& key, string cookieContent) {
-    setCookie(key, Cookie(move(cookieContent)));
+void Connection::setCookie(std::string const& key, std::string cookieContent) {
+    setCookie(key, Cookie(std::move(cookieContent)));
 }
 
-void Connection::unsetCookie(string const& key) {
+void Connection::unsetCookie(std::string const& key) {
     data->cookies.erase(key);
 }
 
@@ -347,7 +347,7 @@ void Connection::setStatus(unsigned int status) {
 }
 
 void Connection::setCookiePolicy(Cookie policy) {
-    data->cookiePolicy = move(policy);
+    data->cookiePolicy = std::move(policy);
 }
 
 unsigned int Connection::getStatus() const {
@@ -522,7 +522,7 @@ bool Connection::applyFilters(AccessFilterList const& accessFilters) {
     return false;
 }
 
-string FlushCallbackContainer::getStatusString() const {
+std::string FlushCallbackContainer::getStatusString() const {
     stringstream hval;
     hval << status;
     if (httpStatusCodes.count(status) == 1) {
@@ -531,7 +531,7 @@ string FlushCallbackContainer::getStatusString() const {
     return hval.str();
 }
 
-string FlushCallbackContainer::getFullHttp() const {
+std::string FlushCallbackContainer::getFullHttp() const {
     stringstream raw;
     // include headers and cookies, but only when flushing for the first time
     if (!flushedBefore) {

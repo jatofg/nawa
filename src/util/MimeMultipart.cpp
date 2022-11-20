@@ -1,10 +1,5 @@
-/**
- * \file MimeMultipart.cpp
- * \brief Implementation of the MimeMultipart class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file MimeMultipart.cpp
+ * \brief Implementation of the MimeMultipart class.
  */
 
 #include <boost/algorithm/string.hpp>
@@ -79,11 +79,11 @@ NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart::Part, content, string)
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(MimeMultipart, parts, vector<MimeMultipart::Part>)
 
-MimeMultipart::MimeMultipart(string const& contentType, string content) : MimeMultipart() {
-    parse(contentType, move(content));
+MimeMultipart::MimeMultipart(std::string const& contentType, std::string content) : MimeMultipart() {
+    parse(contentType, std::move(content));
 }
 
-void MimeMultipart::parse(string const& contentType, string content) {
+void MimeMultipart::parse(std::string const& contentType, std::string content) {
     regex findBoundary(R"X(boundary="?([A-Za-z0-9'()+_,\-.\/:=? ]+)"?)X");
     smatch boundaryMatch;
     if (!regex_search(contentType, boundaryMatch, findBoundary) || boundaryMatch.size() != 2) {

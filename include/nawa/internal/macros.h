@@ -1,10 +1,5 @@
-/**
- * \file macros.h
- * \brief Macros for frequently used patterns.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file macros.h
+ * \brief Macros for frequently used patterns.
  */
 
 #ifndef NAWA_MACROS_H
@@ -86,42 +86,42 @@
 
 #define NAWA_MOVE_CONSTRUCTOR_DEF(Class) Class(Class&& other) noexcept
 #define NAWA_MOVE_CONSTRUCTOR_IMPL(Class) \
-    Class::Class(Class&& other) noexcept : data(move(other.data)) {}
+    Class::Class(Class&& other) noexcept : data(std::move(other.data)) {}
 #define NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(Namespace, Class) \
-    Namespace::Class::Class(Namespace::Class&& other) noexcept : data(move(other.data)) {}
+    Namespace::Class::Class(Namespace::Class&& other) noexcept : data(std::move(other.data)) {}
 #define NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL(Class, Parent) \
-    Class::Class(Class&& other) noexcept : Parent(move(other)), data(move(other.data)) {}
+    Class::Class(Class&& other) noexcept : Parent(std::move(other)), data(std::move(other.data)) {}
 #define NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL_WITH_NS(Namespace, Class, Parent) \
-    Namespace::Class::Class(Namespace::Class&& other) noexcept : Parent(move(other)), data(move(other.data)) {}
+    Namespace::Class::Class(Namespace::Class&& other) noexcept : Parent(std::move(other)), data(std::move(other.data)) {}
 
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF(Class) Class& operator=(Class&& other) noexcept
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Class)     \
     Class& Class::operator=(Class&& other) noexcept { \
         if (this != &other) {                         \
-            data = move(other.data);                  \
+            data = std::move(other.data);             \
         }                                             \
         return *this;                                 \
     }
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL_WITH_NS(Namespace, Class)                   \
     Namespace::Class& Namespace::Class::operator=(Namespace::Class&& other) noexcept { \
         if (this != &other) {                                                          \
-            data = move(other.data);                                                   \
+            data = std::move(other.data);                                              \
         }                                                                              \
         return *this;                                                                  \
     }
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL(Class, Parent) \
     Class& Class::operator=(Class&& other) noexcept {             \
         if (this != &other) {                                     \
-            data = move(other.data);                              \
-            Parent::operator=(move(other));                       \
+            data = std::move(other.data);                         \
+            Parent::operator=(std::move(other));                  \
         }                                                         \
         return *this;                                             \
     }
 #define NAWA_MOVE_ASSIGNMENT_OPERATOR_DERIVED_IMPL_WITH_NS(Namespace, Class, Parent)   \
     Namespace::Class& Namespace::Class::operator=(Namespace::Class&& other) noexcept { \
         if (this != &other) {                                                          \
-            data = move(other.data);                                                   \
-            Parent::operator=(move(other));                                            \
+            data = std::move(other.data);                                              \
+            Parent::operator=(std::move(other));                                       \
         }                                                                              \
         return *this;                                                                  \
     }
@@ -145,7 +145,7 @@
     Type& Class::Member() noexcept { return data->Member; }             \
     Type const& Class::Member() const noexcept { return data->Member; } \
     Class& Class::Member(Type value) noexcept {                         \
-        data->Member = move(value);                                     \
+        data->Member = std::move(value);                                \
         return *this;                                                   \
     }
 

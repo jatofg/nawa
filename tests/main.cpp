@@ -1,10 +1,5 @@
-/**
- * \file main.cpp
- * \brief Main file for unit tests.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file main.cpp
+ * \brief Main file for unit tests.
  */
 
 #define CATCH_CONFIG_MAIN
@@ -50,7 +50,7 @@ Config loadConfig() {
         return Config("tests/test.ini");
     } catch (Exception const& e) {}
 
-    return Config();
+    return {};
 }
 
 /**

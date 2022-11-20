@@ -1,10 +1,5 @@
-/**
- * \file HandleRequestFunction.cpp
- * \brief Implementation of the HandleRequestFunction class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file HandleRequestFunction.cpp
+ * \brief Implementation of the HandleRequestFunction class.
  */
 
 #include <nawa/RequestHandler/HandleRequestFunction.h>
@@ -42,8 +42,8 @@ struct HandleRequestFunctionWrapper::Data {
     }
 
     Data(HandleRequestFunction handleRequestFunction, void* reference, DestructionCallbackFunction destructionCallback)
-        : handleRequestFunction(move(handleRequestFunction)), reference(reference),
-          destructionCallback(move(destructionCallback)) {}
+        : handleRequestFunction(std::move(handleRequestFunction)), reference(reference),
+          destructionCallback(std::move(destructionCallback)) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(HandleRequestFunctionWrapper)
@@ -51,7 +51,7 @@ NAWA_DEFAULT_DESTRUCTOR_IMPL(HandleRequestFunctionWrapper)
 nawa::HandleRequestFunctionWrapper::HandleRequestFunctionWrapper(HandleRequestFunction handleRequestFunction,
                                                                  void* reference,
                                                                  DestructionCallbackFunction destructionCallback) {
-    data = make_unique<Data>(move(handleRequestFunction), reference, move(destructionCallback));
+    data = make_unique<Data>(std::move(handleRequestFunction), reference, std::move(destructionCallback));
 }
 
 int nawa::HandleRequestFunctionWrapper::operator()(Connection& connection) const {

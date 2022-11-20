@@ -1,11 +1,5 @@
-/**
- * \file sessiontest.cpp
- * \brief Test simultaneous access to session variables in multi-threading environments. Use curl, for example, to 
- * simulate simultaneous accesses (see tests/sessiontest.sh for an example).
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -20,6 +14,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file sessiontest.cpp
+ * \brief Test simultaneous access to session variables in multi-threading environments. Use curl, for example, to
+ * simulate simultaneous accesses (see tests/sessiontest.sh for an example).
  */
 
 #include <nawa/application.h>

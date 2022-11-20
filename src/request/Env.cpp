@@ -1,10 +1,5 @@
-/**
- * \file Env.cpp
- * \brief Implementation of the request::Env class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Env.cpp
+ * \brief Implementation of the request::Env class.
  */
 
 #include <nawa/request/Env.h>
@@ -41,13 +41,13 @@ request::Env::Env(RequestInitContainer const& initContainer) {
     data = make_unique<Data>(initContainer);
 }
 
-string request::Env::operator[](string const& envVar) const {
+std::string request::Env::operator[](std::string const& envVar) const {
     if (data->environment.count(envVar)) {
         return data->environment.at(envVar);
     }
     return {};
 }
 
-vector<string> request::Env::getRequestPath() const {
+std::vector<std::string> request::Env::getRequestPath() const {
     return utils::splitPath(operator[]("REQUEST_URI"));
 }

@@ -1,10 +1,5 @@
-/**
- * \file FastcgiRequestHandler.cpp
- * \brief Implementation of the FastcgiRequestHandler class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file FastcgiRequestHandler.cpp
+ * \brief Implementation of the FastcgiRequestHandler class.
  */
 
 #include <fastcgi++/log.hpp>
@@ -133,7 +133,7 @@ bool FastcgippRequestAdapter::response() {
     }
 
     ConnectionInitContainer connectionInit;
-    connectionInit.requestInit = move(requestInit);
+    connectionInit.requestInit = std::move(requestInit);
     connectionInit.config = *requestHandler->getConfig();
 
     connectionInit.flushCallback = [this](FlushCallbackContainer flushInfo) {
@@ -174,12 +174,12 @@ struct FastcgiRequestHandler::Data {
     bool joined = false;
 };
 
-FastcgiRequestHandler::FastcgiRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
+FastcgiRequestHandler::FastcgiRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
                                              Config config, int concurrency) {
     data = make_unique<Data>();
 
-    setAppRequestHandler(move(handleRequestFunction));
-    setConfig(move(config));
+    setAppRequestHandler(std::move(handleRequestFunction));
+    setConfig(std::move(config));
     auto configPtr = getConfig();
 
     size_t postMax = 0;

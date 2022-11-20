@@ -1,10 +1,5 @@
-/**
- * \file HttpRequestHandler.cpp
- * \brief Implementation of the HttpRequestHandler class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file HttpRequestHandler.cpp
+ * \brief Implementation of the HttpRequestHandler class.
  */
 
 #include <boost/network/protocol/http/server.hpp>
@@ -75,7 +75,7 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
 
     InputConsumingHttpHandler(RequestHandler* requestHandler, ConnectionInitContainer connectionInit,
                               ssize_t maxPostSize, size_t expectedSize, RawPostAccess rawPostAccess)
-        : requestHandler(requestHandler), connectionInit(move(connectionInit)), maxPostSize(maxPostSize),
+        : requestHandler(requestHandler), connectionInit(std::move(connectionInit)), maxPostSize(maxPostSize),
           expectedSize(expectedSize), rawPostAccess(rawPostAccess) {}
 
     void operator()(HttpServer::connection::input_range input, boost::system::error_code ec,
@@ -121,21 +121,21 @@ struct InputConsumingHttpHandler : public enable_shared_from_this<InputConsuming
             requestInit.postVars = utils::splitQueryString(postBody);
         } else if (postContentType.substr(0, multipartContentType.length()) == multipartContentType) {
             try {
-                MimeMultipart postData(connectionInit.requestInit.environment["content-type"], move(postBody));
+                MimeMultipart postData(connectionInit.requestInit.environment["content-type"], std::move(postBody));
                 for (auto const& p : postData.parts()) {
                     // find out whether the part is a file
                     if (!p.filename().empty() || (!p.contentType().empty() &&
                                                   p.contentType().substr(0, plainTextContentType.length()) !=
                                                           plainTextContentType)) {
                         File pf = File(p.content()).contentType(p.contentType()).filename(p.filename());
-                        requestInit.postFiles.insert({p.partName(), move(pf)});
+                        requestInit.postFiles.insert({p.partName(), std::move(pf)});
                     } else {
                         requestInit.postVars.insert({p.partName(), p.content()});
                     }
                 }
             } catch (Exception const&) {}
         } else if (rawPostAccess == RawPostAccess::NONSTANDARD) {
-            requestInit.rawPost = make_shared<string>(move(postBody));
+            requestInit.rawPost = make_shared<string>(std::move(postBody));
         }
 
         // finally handle the request
@@ -193,7 +193,7 @@ struct HttpHandler {
         requestInit.cookieVars = utils::parseCookies(requestInit.environment["cookie"]);
 
         ConnectionInitContainer connectionInit;
-        connectionInit.requestInit = move(requestInit);
+        connectionInit.requestInit = std::move(requestInit);
         connectionInit.config = (*configPtr);
 
         connectionInit.flushCallback = [httpConn](FlushCallbackContainer flushInfo) {
@@ -222,7 +222,7 @@ struct HttpHandler {
                 }
 
                 auto inputConsumingHandler = make_shared<InputConsumingHttpHandler>(requestHandler,
-                                                                                    move(connectionInit), maxPostSize,
+                                                                                    std::move(connectionInit), maxPostSize,
                                                                                     contentLength, rawPostAccess);
                 httpConn->read([inputConsumingHandler](HttpServer::connection::input_range input,
                                                        boost::system::error_code ec, size_t bytesTransferred,
@@ -249,13 +249,13 @@ struct HttpRequestHandler::Data {
     bool joined = false;
 };
 
-HttpRequestHandler::HttpRequestHandler(shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
+HttpRequestHandler::HttpRequestHandler(std::shared_ptr<HandleRequestFunctionWrapper> handleRequestFunction,
                                        Config config,
                                        int concurrency) {
     data = make_unique<Data>();
 
-    setAppRequestHandler(move(handleRequestFunction));
-    setConfig(move(config));
+    setAppRequestHandler(std::move(handleRequestFunction));
+    setConfig(std::move(config));
     auto configPtr = getConfig();
 
     logger.setAppname("HttpRequestHandler");

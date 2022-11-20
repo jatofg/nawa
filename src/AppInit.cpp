@@ -1,10 +1,5 @@
-/**
- * \file AppInit.cpp
- * \brief Implementation of the AppInit class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -21,6 +16,11 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file AppInit.cpp
+ * \brief Implementation of the AppInit class.
+ */
+
 #include <nawa/AppInit.h>
 
 using namespace nawa;
@@ -31,13 +31,13 @@ struct AppInit::Data {
     AccessFilterList accessFilters;
     size_t numThreads;
 
-    Data(Config config, size_t numThreads) : config(move(config)), numThreads(numThreads) {}
+    Data(Config config, size_t numThreads) : config(std::move(config)), numThreads(numThreads) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(AppInit)
 
 AppInit::AppInit(Config config, size_t numThreads) {
-    data = make_unique<Data>(move(config), numThreads);
+    data = make_unique<Data>(std::move(config), numThreads);
 }
 
 Config& nawa::AppInit::config() {

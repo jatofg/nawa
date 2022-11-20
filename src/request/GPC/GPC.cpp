@@ -1,10 +1,5 @@
-/**
- * \file GPC.cpp
- * \brief Implementation of the request::GPC class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -21,6 +16,11 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file GPC.cpp
+ * \brief Implementation of the request::GPC class.
+ */
+
 #include <nawa/request/GPC/GPC.h>
 #include <nawa/request/RequestInitContainer.h>
 
@@ -29,7 +29,7 @@ using namespace std;
 
 struct request::GPC::Data {
     Source source;
-    std::unordered_multimap<std::string, std::string> dataMap;
+    unordered_multimap<string, string> dataMap;
 
     explicit Data(Source source) : source(source) {}
 };
@@ -51,7 +51,7 @@ request::GPC::GPC(RequestInitContainer const& requestInit, Source source) {
     }
 }
 
-string request::GPC::operator[](string const& gpcVar) const {
+std::string request::GPC::operator[](std::string const& gpcVar) const {
     auto e = data->dataMap.find(gpcVar);
     if (e != data->dataMap.end())
         return e->second;
@@ -59,7 +59,7 @@ string request::GPC::operator[](string const& gpcVar) const {
         return "";
 }
 
-vector<string> request::GPC::getVector(string const& gpcVar) const {
+std::vector<std::string> request::GPC::getVector(std::string const& gpcVar) const {
     vector<string> ret;
     auto e = data->dataMap.equal_range(gpcVar);
     for (auto it = e.first; it != e.second; ++it) {
@@ -68,19 +68,19 @@ vector<string> request::GPC::getVector(string const& gpcVar) const {
     return ret;
 }
 
-size_t request::GPC::count(string const& gpcVar) const {
+size_t request::GPC::count(std::string const& gpcVar) const {
     return data->dataMap.count(gpcVar);
 }
 
-unordered_multimap<string, string> const& request::GPC::getMultimap() const {
+std::unordered_multimap<std::string, std::string> const& request::GPC::getMultimap() const {
     return data->dataMap;
 }
 
-unordered_multimap<string, string>::const_iterator request::GPC::begin() const {
+std::unordered_multimap<std::string, std::string>::const_iterator request::GPC::begin() const {
     return data->dataMap.begin();
 }
 
-unordered_multimap<string, string>::const_iterator request::GPC::end() const {
+std::unordered_multimap<std::string, std::string>::const_iterator request::GPC::end() const {
     return data->dataMap.end();
 }
 

@@ -1,10 +1,5 @@
-/**
- * \file Cookie.cpp
- * \brief Implementation of the Cookie class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Cookie.cpp
+ * \brief Implementation of the Cookie class.
  */
 
 #include <nawa/connection/Cookie.h>
@@ -49,8 +49,8 @@ NAWA_MOVE_CONSTRUCTOR_IMPL(Cookie)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Cookie)
 
-Cookie::Cookie(string c) : Cookie() {
-    data->content = move(c);
+Cookie::Cookie(std::string c) : Cookie() {
+    data->content = std::move(c);
 }
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(Cookie, content, string)

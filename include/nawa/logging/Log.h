@@ -1,10 +1,5 @@
-/**
- * \file Log.h
- * \brief Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Log.h
+ * \brief Simple class for (not (yet) thread-safe) logging to stderr or to any other output stream
  */
 
 #ifndef NAWA_LOG_H

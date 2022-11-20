@@ -1,10 +1,5 @@
-/**
- * \file AccessFilter.cpp
- * \brief Implementation of the AccessFilter class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file AccessFilter.cpp
+ * \brief Implementation of the AccessFilter class.
  */
 
 #include <nawa/filter/AccessFilter/AccessFilter.h>
@@ -67,7 +67,7 @@ NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, regexFilter, regex)
 
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(AccessFilter, response, string)
 
-bool nawa::AccessFilter::matches(vector<string> const& requestPath) const {
+bool nawa::AccessFilter::matches(std::vector<std::string> const& requestPath) const {
     if (!data->pathFilter.empty()) {
         // one of the paths in the path filter must match for the path filter to match
         bool pathFilterMatches = false;

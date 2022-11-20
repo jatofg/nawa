@@ -1,10 +1,5 @@
-/**
- * \file emailtest.cpp
- * \brief Tests for SmtpMailer. Replace the email addresses and login data with existing ones to test.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file emailtest.cpp
+ * \brief Tests for SmtpMailer. Replace the email addresses and login data with existing ones to test.
  */
 
 #include <ctime>
@@ -46,7 +46,7 @@ int handleRequest(Connection& connection) {
 
     resp << "SMTP time: ";
     time_t currentTime = time(nullptr);
-    tm ltime;
+    tm ltime{};
     localtime_r(&currentTime, &ltime);
     resp << put_time(&ltime, "%a, %e %b %Y %H:%M:%S %z") << "\r\n\r\n";
 

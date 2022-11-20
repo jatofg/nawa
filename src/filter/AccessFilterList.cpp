@@ -1,10 +1,5 @@
-/**
- * \file AccessFilterList.cpp
- * \brief Implementation of the AccessFilterList class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -21,6 +16,11 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file AccessFilterList.cpp
+ * \brief Implementation of the AccessFilterList class.
+ */
+
 #include <nawa/filter/AccessFilterList.h>
 
 using namespace nawa;
@@ -28,9 +28,9 @@ using namespace std;
 
 struct AccessFilterList::Data {
     bool filtersEnabled = false;
-    std::vector<BlockFilter> blockFilters;
-    std::vector<AuthFilter> authFilters;
-    std::vector<ForwardFilter> forwardFilters;
+    vector<BlockFilter> blockFilters;
+    vector<AuthFilter> authFilters;
+    vector<ForwardFilter> forwardFilters;
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(AccessFilterList)

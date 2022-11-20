@@ -1,10 +1,5 @@
-/**
- * \file utils.cpp
- * \brief Implementation of the Utils class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file utils.cpp
+ * \brief Implementation of the Utils class.
  */
 
 #include <boost/algorithm/string.hpp>
@@ -244,7 +244,7 @@ void utils::regexReplaceCallback(std::string& s, std::regex const& rgx,
     s = out.str();
 }
 
-string utils::hexDump(string const& in) {
+std::string utils::hexDump(std::string const& in) {
     stringstream rets;
     rets << hex << setfill('0');
     for (char c : in) {
@@ -253,17 +253,17 @@ string utils::hexDump(string const& in) {
     return rets.str();
 }
 
-string utils::toLowercase(string s) {
+std::string utils::toLowercase(std::string s) {
     transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;
 }
 
-string utils::toUppercase(string s) {
+std::string utils::toUppercase(std::string s) {
     transform(s.begin(), s.end(), s.begin(), ::toupper);
     return s;
 }
 
-string utils::generateErrorPage(unsigned int httpStatus) {
+std::string utils::generateErrorPage(unsigned int httpStatus) {
     string errorStr;
     string explanation;
     switch (httpStatus) {
@@ -340,7 +340,7 @@ string utils::generateErrorPage(unsigned int httpStatus) {
     return ep.str();
 }
 
-string utils::getFileExtension(string const& filename) {
+std::string utils::getFileExtension(std::string const& filename) {
     try {
         return filename.substr(filename.find_last_of('.') + 1);
     } catch (out_of_range&) {}
@@ -348,15 +348,15 @@ string utils::getFileExtension(string const& filename) {
     return {};
 }
 
-string utils::contentTypeByExtension(string extension) {
-    auto ext = toLowercase(move(extension));
+std::string utils::contentTypeByExtension(std::string extension) {
+    auto ext = toLowercase(std::move(extension));
     if (contentTypeMap.count(ext) == 1) {
         return contentTypeMap.at(ext);
     }
     return "application/octet-stream";
 }
 
-string utils::makeHttpTime(time_t time) {
+std::string utils::makeHttpTime(time_t time) {
     stringstream httpTime;
     tm gmt{};
     auto retPtr = gmtime_r(&time, &gmt);
@@ -370,7 +370,7 @@ string utils::makeHttpTime(time_t time) {
     return httpTime.str();
 }
 
-time_t utils::readHttpTime(string const& httpTime) {
+time_t utils::readHttpTime(std::string const& httpTime) {
     tm timeStruct{};
     istringstream timeStream(httpTime);
     timeStream.exceptions(ifstream::failbit);
@@ -389,7 +389,7 @@ time_t utils::readHttpTime(string const& httpTime) {
     return unixTime;
 }
 
-string utils::makeSmtpTime(time_t time) {
+std::string utils::makeSmtpTime(time_t time) {
     stringstream smtpTime;
     tm ltime{};
     auto retPtr = localtime_r(&time, &ltime);
@@ -402,7 +402,7 @@ string utils::makeSmtpTime(time_t time) {
     return smtpTime.str();
 }
 
-time_t utils::readSmtpTime(string const& smtpTime) {
+time_t utils::readSmtpTime(std::string const& smtpTime) {
     string smtpTimeM = smtpTime;
     tm timeStruct{};
 
@@ -445,7 +445,7 @@ time_t utils::readSmtpTime(string const& smtpTime) {
     return unixTime;
 }
 
-vector<string> utils::splitString(string str, char delimiter, bool ignoreEmpty) {
+std::vector<std::string> utils::splitString(std::string str, char delimiter, bool ignoreEmpty) {
     vector<string> ret;
     for (size_t pos = 0; !str.empty();) {
         pos = str.find_first_of(delimiter);
@@ -462,7 +462,7 @@ vector<string> utils::splitString(string str, char delimiter, bool ignoreEmpty) 
     return ret;
 }
 
-string utils::mergePath(vector<string> const& path) {
+std::string utils::mergePath(std::vector<std::string> const& path) {
     if (path.empty()) {
         return "/";
     }
@@ -473,13 +473,13 @@ string utils::mergePath(vector<string> const& path) {
     return stringPath.str();
 }
 
-vector<string> utils::splitPath(string const& pathString) {
+std::vector<std::string> utils::splitPath(std::string const& pathString) {
     // remove query string
     string rawPath = pathString.substr(0, pathString.find('?'));
     return splitString(rawPath, '/', true);
 }
 
-string utils::convertLineEndings(string const& in, string const& ending) {
+std::string utils::convertLineEndings(std::string const& in, std::string const& ending) {
     stringstream ret;
     for (const auto& c : in) {
         if (c == '\n')
@@ -490,7 +490,7 @@ string utils::convertLineEndings(string const& in, string const& ending) {
     return ret.str();
 }
 
-string utils::getFileContents(string const& path) {
+std::string utils::getFileContents(std::string const& path) {
     // open file as binary
     ifstream f(path, ifstream::binary);
 
@@ -511,14 +511,14 @@ string utils::getFileContents(string const& path) {
     return ret;
 }
 
-string utils::stringReplace(string input, unordered_map<char, char> const& patterns) {
+std::string utils::stringReplace(std::string input, std::unordered_map<char, char> const& patterns) {
     for (auto const& [key, val] : patterns) {
         replace(input.begin(), input.end(), key, val);
     }
     return input;
 }
 
-string utils::stringReplace(string input, unordered_map<string, string> const& patterns) {
+std::string utils::stringReplace(std::string input, std::unordered_map<std::string, std::string> const& patterns) {
     for (auto const& [key, val] : patterns) {
         for (size_t pos = input.find(key); pos != string::npos;) {
             input.replace(pos, key.length(), val);
@@ -528,7 +528,7 @@ string utils::stringReplace(string input, unordered_map<string, string> const& p
     return input;
 }
 
-unordered_multimap<string, string> utils::splitQueryString(string const& queryString) {
+std::unordered_multimap<std::string, std::string> utils::splitQueryString(std::string const& queryString) {
     string qs;
     size_t qmrkPos = queryString.find_first_of('?');
     unordered_multimap<string, string> ret;
@@ -547,7 +547,7 @@ unordered_multimap<string, string> utils::splitQueryString(string const& querySt
     return ret;
 }
 
-unordered_map<string, string> utils::parseHeaders(string rawHeaders) {
+std::unordered_map<std::string, std::string> utils::parseHeaders(std::string rawHeaders) {
     unordered_map<string, string> ret;
     // filter out carriage returns
     boost::erase_all(rawHeaders, "\r");
@@ -566,8 +566,8 @@ unordered_map<string, string> utils::parseHeaders(string rawHeaders) {
     return ret;
 }
 
-unordered_multimap<std::string, std::string> utils::parseCookies(string const& rawCookies) {
-    unordered_multimap<std::string, std::string> ret;
+std::unordered_multimap<std::string, std::string> utils::parseCookies(std::string const& rawCookies) {
+    unordered_multimap<string, string> ret;
     // split by ;
     auto cookies = splitString(rawCookies, ';', true);
     for (auto c : cookies) {

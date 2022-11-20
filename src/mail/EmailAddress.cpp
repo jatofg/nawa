@@ -1,10 +1,5 @@
-/**
- * \file EmailAddress.cpp
- * \brief Implementation of the EmailAddress class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file EmailAddress.cpp
+ * \brief Implementation of the EmailAddress class.
  */
 
 #include <nawa/mail/EmailAddress.h>
@@ -58,16 +58,16 @@ NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS(mail, EmailAddress)
 
 NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(mail::EmailAddress)
 
-mail::EmailAddress::EmailAddress(string address) : EmailAddress() {
-    data->address = move(address);
+mail::EmailAddress::EmailAddress(std::string address) : EmailAddress() {
+    data->address = std::move(address);
 }
 
-mail::EmailAddress::EmailAddress(string name, string address) : EmailAddress() {
-    data->name = move(name);
-    data->address = move(address);
+mail::EmailAddress::EmailAddress(std::string name, std::string address) : EmailAddress() {
+    data->name = std::move(name);
+    data->address = std::move(address);
 }
 
-string mail::EmailAddress::get(bool includeName, bool applyPunycode) const {
+std::string mail::EmailAddress::get(bool includeName, bool applyPunycode) const {
     stringstream ret;
     if (includeName && !data->name.empty()) {
         ret << data->name << " ";

@@ -50,7 +50,7 @@ FetchContent_Declare(
 FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG v2.13.1
+        GIT_TAG v2.13.9
 )
 
 # if Debian would ship cmake 3.14 instead of 3.13, we could just do the following

@@ -1,10 +1,5 @@
-/**
- * \file Argon2HashingEngine.cpp
- * \brief Implementation of the hashing::Argon2HashingEngine class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Argon2HashingEngine.cpp
+ * \brief Implementation of the hashing::Argon2HashingEngine class.
  */
 
 #include <argon2.h>
@@ -42,18 +42,18 @@ struct hashing::Argon2HashingEngine::Data {
 
     Data(Algorithm algorithm, uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism, string salt, size_t hashLen)
         : algorithm(algorithm), timeCost(timeCost), memoryCost(memoryCost), parallelism(parallelism),
-          salt(move(salt)), hashLen(hashLen) {}
+          salt(std::move(salt)), hashLen(hashLen) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(hashing, Argon2HashingEngine)
 
 hashing::Argon2HashingEngine::Argon2HashingEngine(hashing::Argon2HashingEngine::Algorithm algorithm,
                                                   uint32_t timeCost, uint32_t memoryCost, uint32_t parallelism,
-                                                  string salt, size_t hashLen) {
-    data = make_unique<Data>(algorithm, timeCost, memoryCost, parallelism, move(salt), hashLen);
+                                                  std::string salt, size_t hashLen) {
+    data = make_unique<Data>(algorithm, timeCost, memoryCost, parallelism, std::move(salt), hashLen);
 }
 
-string hashing::Argon2HashingEngine::generateHash(string input) const {
+std::string hashing::Argon2HashingEngine::generateHash(std::string input) const {
 
     // check validity of parameters
     if (!data->salt.empty() && data->salt.length() < ARGON2_MIN_SALT_LENGTH) {
@@ -118,10 +118,10 @@ string hashing::Argon2HashingEngine::generateHash(string input) const {
                         string("Argon2 error: ") + argon2_error_message(errorCode));
     }
 
-    return string(c_hash);
+    return {c_hash};
 }
 
-bool hashing::Argon2HashingEngine::verifyHash(string input, string hash) const {
+bool hashing::Argon2HashingEngine::verifyHash(std::string input, std::string hash) const {
 
     // split the hash and create a new object with the properties of the hash
     regex rgx(

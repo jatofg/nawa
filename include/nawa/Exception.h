@@ -1,10 +1,5 @@
-/**
- * \file Exception.h
- * \brief Exception class that can be used by apps to catch errors resulting from nawa function calls.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Exception.h
+ * \brief Exception class that can be used by apps to catch errors resulting from nawa function calls.
  */
 
 #ifndef NAWA_EXCEPTION_H

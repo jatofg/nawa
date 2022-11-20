@@ -1,10 +1,5 @@
-/**
- * \file Config.cpp
- * \brief Implementation of the Config class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Config.cpp
+ * \brief Implementation of the Config class.
  */
 
 #include <boost/functional/hash.hpp>
@@ -47,15 +47,15 @@ NAWA_MOVE_ASSIGNMENT_OPERATOR_IMPL(Config)
 
 NAWA_DEFAULT_CONSTRUCTOR_IMPL(Config)
 
-Config::Config(initializer_list<pair<pair<string, string>, string>> init) : Config() {
+Config::Config(std::initializer_list<std::pair<std::pair<std::string, std::string>, std::string>> init) : Config() {
     data->values.insert(init.begin(), init.end());
 }
 
-Config::Config(string const& iniFile) : Config() {
+Config::Config(std::string const& iniFile) : Config() {
     read(iniFile);
 }
 
-void Config::read(string const& iniFile) {
+void Config::read(std::string const& iniFile) {
     auto valueHandler = [](void* obj, char const* section, char const* name, char const* value) -> int {
         auto _this = (Config*) obj;
         pair<string, string> keyToInsert(section, name);
@@ -78,11 +78,11 @@ void Config::override(std::vector<std::pair<std::pair<std::string, std::string>,
     }
 }
 
-bool Config::isSet(pair<string, string> const& key) const {
+bool Config::isSet(std::pair<std::string, std::string> const& key) const {
     return (data->values.count(key) == 1);
 }
 
-string Config::operator[](pair<string, string> const& key) const {
+std::string Config::operator[](std::pair<std::string, std::string> const& key) const {
     if (data->values.count(key) == 1) {
         return data->values.at(key);
     } else {
@@ -92,9 +92,9 @@ string Config::operator[](pair<string, string> const& key) const {
 
 // doxygen bug requires std:: here
 void Config::set(std::pair<string, string> key, std::string value) {
-    data->values[move(key)] = move(value);
+    data->values[std::move(key)] = std::move(value);
 }
 
-void Config::set(string section, string key, string value) {
-    set(pair<string, string>(move(section), move(key)), move(value));
+void Config::set(std::string section, std::string key, std::string value) {
+    set(pair<string, string>(std::move(section), std::move(key)), std::move(value));
 }

@@ -1,10 +1,5 @@
-/**
- * \file File.cpp
- * \brief Implementation of the File class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -21,6 +16,11 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file File.cpp
+ * \brief Implementation of the File class.
+ */
+
 #include <cstring>
 #include <fstream>
 #include <nawa/Exception.h>
@@ -35,7 +35,7 @@ struct File::Data {
     shared_ptr<char[]> dataPtr;
     size_t size = 0;
 
-    Data(shared_ptr<char[]> dataPtr, size_t size) : dataPtr(move(dataPtr)), size(size) {}
+    Data(shared_ptr<char[]> dataPtr, size_t size) : dataPtr(std::move(dataPtr)), size(size) {}
 };
 
 NAWA_DEFAULT_DESTRUCTOR_IMPL(File)
@@ -53,24 +53,24 @@ NAWA_COMPLEX_DATA_ACCESSORS_IMPL(File, filename, string)
 NAWA_COMPLEX_DATA_ACCESSORS_IMPL(File, contentType, string)
 
 File::File(std::shared_ptr<char[]> dataPtr, size_t size) {
-    data = make_unique<Data>(move(dataPtr), size);
+    data = make_unique<Data>(std::move(dataPtr), size);
 }
 
 File::File(std::string const& data) {
     shared_ptr<char[]> dataPtr(new char[data.size()]);
     memcpy(dataPtr.get(), data.c_str(), data.size());
-    this->data = make_unique<Data>(move(dataPtr), data.size());
+    this->data = make_unique<Data>(std::move(dataPtr), data.size());
 }
 
 size_t File::size() const noexcept {
     return data->size;
 }
 
-string File::toString() const {
-    return string(data->dataPtr.get(), data->size);
+std::string File::toString() const {
+    return {data->dataPtr.get(), data->size};
 }
 
-void File::writeToDisk(string const& path) const {
+void File::writeToDisk(std::string const& path) const {
     ofstream outfile;
     ios_base::iostate exceptionMask = outfile.exceptions() | ios::failbit;
     outfile.exceptions(exceptionMask);

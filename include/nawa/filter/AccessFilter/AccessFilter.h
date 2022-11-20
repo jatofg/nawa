@@ -1,10 +1,5 @@
-/**
- * \file AccessFilter.h
- * \brief Options to check the path and invoke certain actions before forwarding the request to the app.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file AccessFilter.h
+ * \brief Options to check the path and invoke certain actions before forwarding the request to the app.
  */
 
 #ifndef NAWA_ACCESSFILTER_H

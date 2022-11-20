@@ -1,10 +1,5 @@
-/**
- * \file BcryptHashingEngine.h
- * \brief Hashing engine for password hashing using Argon2.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file BcryptHashingEngine.h
+ * \brief Hashing engine for password hashing using Argon2.
  */
 
 #ifndef NAWA_ARGON2HASHINGENGINE_H

@@ -1,10 +1,5 @@
-/**
- * \file MimeEmail.cpp
- * \brief Implementation of the MimeEmail class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file MimeEmail.cpp
+ * \brief Implementation of the MimeEmail class.
  */
 
 #include <nawa/mail/Email/impl/MimeEmail.h>
@@ -295,7 +295,7 @@ mail::MimeEmail::MimePartOrList& mail::MimeEmail::MimePartOrList::operator=(Mime
     return *this;
 }
 
-string mail::MimeEmail::getRaw(shared_ptr<ReplacementRules> const& replacementRules) const {
+std::string mail::MimeEmail::getRaw(shared_ptr<ReplacementRules> const& replacementRules) const {
     stringstream ret;
     for (auto const& e : headers()) {
         if (e.first == "MIME-Version" || e.first == "Content-Type")

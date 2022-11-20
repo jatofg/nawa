@@ -1,10 +1,5 @@
-/**
- * \file Log.cpp
- * \brief Implementation of the Log class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -21,12 +16,17 @@
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file Log.cpp
+ * \brief Implementation of the Log class.
+ */
+
 #include <atomic>
 #include <iomanip>
 #include <mutex>
 #include <nawa/Exception.h>
-#include <nawa/oss.h>
 #include <nawa/logging/Log.h>
+#include <nawa/oss.h>
 
 using namespace nawa;
 using namespace std;
@@ -50,8 +50,8 @@ namespace {
 }// namespace
 
 struct Log::Data {
-    std::string appname; /**< Name of the current app, appears in brackets in the log. */
-    Level defaultLevel;  /**< Default log level of this logger object. */
+    string appname;     /**< Name of the current app, appears in brackets in the log. */
+    Level defaultLevel; /**< Default log level of this logger object. */
 
     explicit Data(Level defaultLevel = Level::INFORMATIONAL) : defaultLevel(defaultLevel) {}
 };
@@ -75,8 +75,8 @@ Log::Log() noexcept {
     ++instanceCount;
 }
 
-Log::Log(string appname, Level level) noexcept : Log() {
-    data->appname = move(appname);
+Log::Log(std::string appname, Level level) noexcept : Log() {
+    data->appname = std::move(appname);
     data->defaultLevel = level;
 }
 
@@ -113,13 +113,13 @@ Log::~Log() {
     }
 }
 
-void Log::setStream(ostream* os) noexcept {
+void Log::setStream(std::ostream* os) noexcept {
     if (!locked) {
         out = os;
     }
 }
 
-void Log::setOutfile(string const& filename) {
+void Log::setOutfile(std::string const& filename) {
     if (!locked) {
         if (logFile.is_open()) {
             logFile.close();
@@ -153,19 +153,19 @@ bool Log::isLocked() noexcept {
     return locked;
 }
 
-void Log::setAppname(string appname) noexcept {
-    data->appname = move(appname);
+void Log::setAppname(std::string appname) noexcept {
+    data->appname = std::move(appname);
 }
 
 void Log::setDefaultLogLevel(Level level) noexcept {
     data->defaultLevel = level;
 }
 
-void Log::write(string const& msg) {
+void Log::write(std::string const& msg) {
     write(msg, data->defaultLevel);
 }
 
-void Log::write(string const& msg, Level level) {
+void Log::write(std::string const& msg, Level level) {
     if (level <= outputLevel && outputLevel != Level::OFF && level != Level::OFF) {
         auto now = time(nullptr);
         lock_guard<mutex> l(outLock);
@@ -178,10 +178,10 @@ void Log::write(string const& msg, Level level) {
     }
 }
 
-void Log::operator()(string const& msg) {
+void Log::operator()(std::string const& msg) {
     write(msg, data->defaultLevel);
 }
 
-void Log::operator()(string const& msg, Level level) {
+void Log::operator()(std::string const& msg, Level level) {
     write(msg, level);
 }

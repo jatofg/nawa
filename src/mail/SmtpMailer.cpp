@@ -1,10 +1,5 @@
-/**
- * \file SmtpMailer.cpp
- * \brief Implementation of the SmtpMailer class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file SmtpMailer.cpp
+ * \brief Implementation of the SmtpMailer class.
  */
 
 #include <curl/curl.h>
@@ -51,7 +51,7 @@ namespace {
             stringstream mid;
             stringstream base;
             random_device rd;
-            timespec mtime;
+            timespec mtime{};
             clock_gettime(CLOCK_REALTIME, &mtime);
             base << mtime.tv_sec << mtime.tv_nsec << from->address() << rd();
             mid << '<' << crypto::md5(base.str(), true) << '@' << from->address().substr(atPos + 1) << '>';
@@ -81,12 +81,12 @@ struct mail::SmtpMailer::Data {
     std::vector<QueueElem> queue;
 
     Data(string serverDomain, unsigned int serverPort, TlsMode serverTlsMode, bool verifyServerTlsCert,
-         string authUsername, string authPassword, long connectionTimeout) : serverDomain(move(serverDomain)),
+         string authUsername, string authPassword, long connectionTimeout) : serverDomain(std::move(serverDomain)),
                                                                              serverPort(serverPort),
                                                                              serverTlsMode(serverTlsMode),
                                                                              verifyServerTlsCert(verifyServerTlsCert),
-                                                                             authUsername(move(authUsername)),
-                                                                             authPassword(move(authPassword)),
+                                                                             authUsername(std::move(authUsername)),
+                                                                             authPassword(std::move(authPassword)),
                                                                              connectionTimeout(connectionTimeout) {}
 };
 
@@ -95,36 +95,36 @@ NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(mail, SmtpMailer)
 mail::SmtpMailer::SmtpMailer(string serverDomain, unsigned int serverPort, SmtpMailer::TlsMode serverTlsMode,
                              bool verifyServerTlsCert, string authUsername, string authPassword,
                              long connectionTimeout) {
-    data = make_unique<Data>(move(serverDomain), serverPort, serverTlsMode, verifyServerTlsCert, move(authUsername),
-                             move(authPassword), connectionTimeout);
+    data = make_unique<Data>(std::move(serverDomain), serverPort, serverTlsMode, verifyServerTlsCert, std::move(authUsername),
+                             std::move(authPassword), connectionTimeout);
 }
 
-void mail::SmtpMailer::setServer(string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
-    data->serverDomain = move(domain);
+void mail::SmtpMailer::setServer(std::string domain, unsigned int port, SmtpMailer::TlsMode tlsMode, bool verifyTlsCert) {
+    data->serverDomain = std::move(domain);
     data->serverPort = port;
     data->serverTlsMode = tlsMode;
     data->verifyServerTlsCert = verifyTlsCert;
 }
 
-void mail::SmtpMailer::setAuth(string username, string password) {
-    data->authUsername = move(username);
-    data->authPassword = move(password);
+void mail::SmtpMailer::setAuth(std::string username, std::string password) {
+    data->authUsername = std::move(username);
+    data->authPassword = std::move(password);
 }
 
 void mail::SmtpMailer::setConnectionTimeout(long timeout) {
     data->connectionTimeout = timeout;
 }
 
-void mail::SmtpMailer::enqueue(shared_ptr<Email> email, EmailAddress to, shared_ptr<EmailAddress> from,
-                               shared_ptr<ReplacementRules> replacementRules) {
-    bulkEnqueue(move(email), vector<EmailAddress>({move(to)}), move(from),
-                move(replacementRules));
+void mail::SmtpMailer::enqueue(std::shared_ptr<Email> email, EmailAddress to, std::shared_ptr<EmailAddress> from,
+                               std::shared_ptr<ReplacementRules> replacementRules) {
+    bulkEnqueue(std::move(email), vector<EmailAddress>({std::move(to)}), std::move(from),
+                std::move(replacementRules));
 }
 
-void mail::SmtpMailer::bulkEnqueue(shared_ptr<Email> email, vector<EmailAddress> recipients,
-                                   shared_ptr<EmailAddress> from, shared_ptr<ReplacementRules> replacementRules) {
+void mail::SmtpMailer::bulkEnqueue(std::shared_ptr<Email> email, std::vector<EmailAddress> recipients,
+                                   std::shared_ptr<EmailAddress> from, std::shared_ptr<ReplacementRules> replacementRules) {
     addMissingHeaders(email, from);
-    data->queue.push_back(QueueElem{.email = move(email), .from = move(from), .recipients = move(recipients), .replacementRules = move(replacementRules)});
+    data->queue.push_back(QueueElem{.email = std::move(email), .from = std::move(from), .recipients = std::move(recipients), .replacementRules = std::move(replacementRules)});
 }
 
 void mail::SmtpMailer::clearQueue() {
@@ -133,7 +133,7 @@ void mail::SmtpMailer::clearQueue() {
 
 void mail::SmtpMailer::processQueue() const {
     CURL* curl;
-    CURLcode res = CURLE_OK;
+    CURLcode res;
 
     curl = curl_easy_init();
     if (curl) {

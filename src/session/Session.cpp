@@ -1,10 +1,5 @@
-/**
- * \file Session.cpp
- * \brief Implementation of the Session class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Session.cpp
+ * \brief Implementation of the Session class.
  */
 
 #include <mutex>
@@ -51,7 +51,7 @@ namespace {
          * Construct an empty SessionData object with a source IP.
          * @param sIP IP address of the session initiator.
          */
-        explicit SessionData(string sIP) : expires(0), sourceIP(move(sIP)) {}
+        explicit SessionData(string sIP) : expires(0), sourceIP(std::move(sIP)) {}
     };
 
     mutex gLock; /**< Lock for data. */
@@ -275,7 +275,7 @@ bool Session::established() const {
     return (data->currentData.use_count() > 0);
 }
 
-bool Session::isSet(string const& key) const {
+bool Session::isSet(std::string const& key) const {
     if (established()) {
         lock_guard<mutex> lockGuard(data->currentData->dLock);
         return (data->currentData->data.count(key) == 1);
@@ -283,7 +283,7 @@ bool Session::isSet(string const& key) const {
     return false;
 }
 
-any Session::operator[](string const& key) const {
+std::any Session::operator[](std::string const& key) const {
     if (established()) {
         lock_guard<mutex> lockGuard(data->currentData->dLock);
         if (data->currentData->data.count(key) == 1) {
@@ -299,10 +299,10 @@ void Session::set(std::string key, std::any const& value) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
     lock_guard<mutex> lockGuard(data->currentData->dLock);
-    data->currentData->data[move(key)] = value;
+    data->currentData->data[std::move(key)] = value;
 }
 
-void Session::unset(string const& key) {
+void Session::unset(std::string const& key) {
     if (!established()) {
         throw Exception(__PRETTY_FUNCTION__, 1, "Session not established.");
     }
@@ -329,7 +329,7 @@ void Session::invalidate() {
     data->connection.unsetCookie(data->cookieName);
 }
 
-string Session::getID() const {
+std::string Session::getID() const {
     return established() ? data->currentID : string();
 }
 

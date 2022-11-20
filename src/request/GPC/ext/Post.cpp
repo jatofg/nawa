@@ -1,10 +1,5 @@
-/**
- * \file Post.cpp
- * \brief Implementation of the request::Post class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file Post.cpp
+ * \brief Implementation of the request::Post class.
  */
 
 #include <nawa/request/GPC/ext/Post.h>
@@ -47,11 +47,11 @@ request::Post::operator bool() const {
     return !(getMultimap().empty() && data->fileMap.empty());
 }
 
-shared_ptr<string const> request::Post::getRaw() const {
+shared_ptr<std::string const> request::Post::getRaw() const {
     return data->rawPost;
 }
 
-string request::Post::getContentType() const {
+std::string request::Post::getContentType() const {
     return data->contentType;
 }
 
@@ -59,14 +59,14 @@ bool request::Post::hasFiles() const {
     return !data->fileMap.empty();
 }
 
-optional<File> request::Post::getFile(string const& key) const {
+std::optional<File> request::Post::getFile(std::string const& key) const {
     auto e = data->fileMap.find(key);
     if (e != data->fileMap.end())
         return e->second;
     return nullopt;
 }
 
-vector<File> request::Post::getFileVector(string const& key) const {
+std::vector<File> request::Post::getFileVector(std::string const& key) const {
     vector<File> ret;
     auto e = data->fileMap.equal_range(key);
     for (auto it = e.first; it != e.second; ++it) {
@@ -75,7 +75,7 @@ vector<File> request::Post::getFileVector(string const& key) const {
     return ret;
 }
 
-size_t request::Post::countFiles(string const& key) const {
+size_t request::Post::countFiles(std::string const& key) const {
     return data->fileMap.count(key);
 }
 

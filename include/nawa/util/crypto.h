@@ -1,10 +1,5 @@
-/**
- * \file crypto.h
- * \brief A bunch of useful cryptographic functions (esp. hashing), acting as a wrapper to C crypto libraries.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file crypto.h
+ * \brief A bunch of useful cryptographic functions (esp. hashing), acting as a wrapper to C crypto libraries.
  */
 
 #ifndef NAWA_CRYPTO_H

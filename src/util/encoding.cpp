@@ -1,10 +1,5 @@
-/**
- * \file encoding.cpp
- * \brief Implementation of the Encoding class.
- */
-
 /*
- * Copyright (C) 2019-2021 Tobias Flaig.
+ * Copyright (C) 2019-2022 Tobias Flaig.
  *
  * This file is part of nawa.
  *
@@ -19,6 +14,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with nawa.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file encoding.cpp
+ * \brief Implementation of the Encoding class.
  */
 
 #include <base64/base64.h>
@@ -130,7 +130,7 @@ namespace {
 
 }// namespace
 
-string encoding::htmlEncode(string input, bool encodeAll) {
+std::string encoding::htmlEncode(std::string input, bool encodeAll) {
     if (!encodeAll) {
         boost::replace_all(input, "&", "&amp;");
         boost::replace_all(input, "\"", "&quot;");
@@ -182,7 +182,7 @@ string encoding::htmlEncode(string input, bool encodeAll) {
     return input;
 }
 
-string encoding::htmlDecode(string input) {
+std::string encoding::htmlDecode(std::string input) {
 
     if (htmlDecodeTable.empty())
         initializeHtmlDecodeTable();
@@ -235,7 +235,7 @@ string encoding::htmlDecode(string input) {
     return input;
 }
 
-string encoding::urlEncode(string const& input) {
+std::string encoding::urlEncode(std::string const& input) {
     stringstream out;
 
     // check if character is valid, unreserved URL character, otherwise apply url encoding
@@ -253,7 +253,7 @@ string encoding::urlEncode(string const& input) {
     return out.str();
 }
 
-string encoding::urlDecode(string input) {
+std::string encoding::urlDecode(std::string input) {
     // match url codes by regex
     regex matchCode(R"(%([0-9A-F]{2}))");
 
@@ -267,7 +267,7 @@ string encoding::urlDecode(string input) {
     return input;
 }
 
-bool encoding::isBase64(string const& input, bool allowWhitespaces) {
+bool encoding::isBase64(std::string const& input, bool allowWhitespaces) {
     regex rgx;
     if (allowWhitespaces) {
         rgx.assign(R"([A-Za-z0-9\+/ \t\n\r]+={0,2})");
@@ -277,17 +277,17 @@ bool encoding::isBase64(string const& input, bool allowWhitespaces) {
     return regex_match(input, rgx);
 }
 
-string
-encoding::base64Encode(string const& input, size_t breakAfter, string const& breakSequence) {
+std::string
+encoding::base64Encode(std::string const& input, size_t breakAfter, std::string const& breakSequence) {
     return base64_encode(reinterpret_cast<unsigned char const*>(input.c_str()), input.length(), breakAfter,
                          breakSequence);
 }
 
-string encoding::base64Decode(string const& input) {
+std::string encoding::base64Decode(std::string const& input) {
     return base64_decode(input);
 }
 
-string encoding::quotedPrintableEncode(string const& input, string const& lineEnding, bool replaceCrlf, bool qEncoding) {
+std::string encoding::quotedPrintableEncode(std::string const& input, std::string const& lineEnding, bool replaceCrlf, bool qEncoding) {
     stringstream ret;
     int lineCount = 0;
     for (const char c : input) {
@@ -317,7 +317,7 @@ string encoding::quotedPrintableEncode(string const& input, string const& lineEn
     return ret.str();
 }
 
-string encoding::quotedPrintableDecode(string input, bool qEncoding) {
+std::string encoding::quotedPrintableDecode(std::string input, bool qEncoding) {
     if (qEncoding) {
         input = utils::stringReplace(input, {{'_', ' '}});
     }
@@ -336,7 +336,7 @@ string encoding::quotedPrintableDecode(string input, bool qEncoding) {
     return input;
 }
 
-string encoding::makeEncodedWord(string const& input, bool base64, bool onlyIfNecessary) {
+std::string encoding::makeEncodedWord(std::string const& input, bool base64, bool onlyIfNecessary) {
     stringstream ret;
     ret << "=?utf-8?";
     if (base64) {
@@ -352,7 +352,7 @@ string encoding::makeEncodedWord(string const& input, bool base64, bool onlyIfNe
     return ret.str();
 }
 
-string encoding::punycodeEncode(string const& input) {
+std::string encoding::punycodeEncode(std::string const& input) {
     wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
     vector<string> partsToBeEncoded = utils::splitString(input, '.', true);
     stringstream ret;
@@ -377,7 +377,7 @@ string encoding::punycodeEncode(string const& input) {
     return ret.str();
 }
 
-string encoding::punycodeDecode(string const& input) {
+std::string encoding::punycodeDecode(std::string const& input) {
     wstring_convert<codecvt_utf8<char32_t>, char32_t> cv;
     vector<string> partsToBeDecoded = utils::splitString(input, '.', true);
     stringstream ret;
