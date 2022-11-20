@@ -12,5 +12,5 @@ var classnawa_1_1mail_1_1SimpleEmail =
     [ "quotedPrintableEncode", "classnawa_1_1mail_1_1SimpleEmail.html#aa3fde33393190dbbb22ba52c5f875162", null ],
     [ "quotedPrintableEncode", "classnawa_1_1mail_1_1SimpleEmail.html#ab528f107aa8f99f93c5a8e04edcc8b0d", null ],
     [ "quotedPrintableEncode", "classnawa_1_1mail_1_1SimpleEmail.html#a073f7355aa990fd4b65128fec68a045c", null ],
-    [ "getRaw", "classnawa_1_1mail_1_1SimpleEmail.html#a68b7a7d46bc96072a47fee78ff760d98", null ]
+    [ "getRaw", "classnawa_1_1mail_1_1SimpleEmail.html#a4e38122a4ca357dfae636b71579c486d", null ]
 ];

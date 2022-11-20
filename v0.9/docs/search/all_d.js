@@ -49,7 +49,7 @@ var searchData=
   ['nawarun_2ecpp_46',['nawarun.cpp',['../nawarun_8cpp.html',1,'']]],
   ['nawarun_2eh_47',['nawarun.h',['../nawarun_8h.html',1,'']]],
   ['nawatest_2ecpp_48',['nawatest.cpp',['../nawatest_8cpp.html',1,'']]],
-  ['newrequesthandler_49',['newRequestHandler',['../classnawa_1_1RequestHandler.html#ac16a6f386255f1e8c0422cbc775e24b9',1,'nawa::RequestHandler::newRequestHandler(std::shared_ptr&lt; HandleRequestFunctionWrapper &gt; const &amp;handleRequestFunction, Config config, int concurrency)'],['../classnawa_1_1RequestHandler.html#a1a47fa5b468fdef045bc029cc63cbe5d',1,'nawa::RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency)']]],
+  ['newrequesthandler_49',['newRequestHandler',['../classnawa_1_1RequestHandler.html#a8319775c0f440f6a39fd754d03c1224b',1,'nawa::RequestHandler::newRequestHandler(std::shared_ptr&lt; HandleRequestFunctionWrapper &gt; const &amp;handleRequestFunction, Config config, int concurrency)'],['../classnawa_1_1RequestHandler.html#a60bfe01750d5cf158266d226124ca375',1,'nawa::RequestHandler::newRequestHandler(HandleRequestFunction handleRequestFunction, Config config, int concurrency)']]],
   ['nlog_50',['NLOG',['../Log_8h.html#a6e6d5259137cfd948952deb0a5947de0',1,'Log.h']]],
   ['nlog_5fdebug_51',['NLOG_DEBUG',['../Log_8h.html#ad77b0bca31bac9b97e9b50b604565141',1,'Log.h']]],
   ['nlog_5ferror_52',['NLOG_ERROR',['../Log_8h.html#aec4f07139f818fa22896dd4faea40c81',1,'Log.h']]],

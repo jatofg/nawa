@@ -7,6 +7,6 @@ var classnawa_1_1hashing_1_1Argon2HashingEngine =
     ] ],
     [ "~Argon2HashingEngine", "classnawa_1_1hashing_1_1Argon2HashingEngine.html#a04c1c1539385432e351054f17105d612", null ],
     [ "Argon2HashingEngine", "classnawa_1_1hashing_1_1Argon2HashingEngine.html#a74fce123c5da890b4f46b0129438afe4", null ],
-    [ "generateHash", "classnawa_1_1hashing_1_1Argon2HashingEngine.html#a02bb369cfa84a189112a251d4a9b5b27", null ],
+    [ "generateHash", "classnawa_1_1hashing_1_1Argon2HashingEngine.html#a4388a74281ee4c1c326e3bdff2af233e", null ],
     [ "verifyHash", "classnawa_1_1hashing_1_1Argon2HashingEngine.html#aae558eca4163a7cade000f7631fdcfdc", null ]
 ];

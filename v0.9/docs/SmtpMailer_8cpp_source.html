@@ -95,25 +95,24 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
   <div class="headertitle"><div class="title">SmtpMailer.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="SmtpMailer_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">/*</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * Copyright (C) 2019-2021 Tobias Flaig.</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * This file is part of nawa.</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<a href="SmtpMailer_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright (C) 2019-2022 Tobias Flaig.</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * This file is part of nawa.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;curl/curl.h&gt;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;<a class="code" href="EmailAddress_8h.html">nawa/mail/EmailAddress.h</a>&gt;</span></div>
@@ -128,7 +127,7 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="keyword">namespace </span>{</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">void</span> addMissingHeaders(shared_ptr&lt;mail::Email&gt;&amp; email, shared_ptr&lt;mail::EmailAddress&gt; <span class="keyword">const</span>&amp; from) {</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="keywordflow">if</span> (!email-&gt;headers().count(<span class="stringliteral">&quot;Date&quot;</span>)) {</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>            email-&gt;headers()[<span class="stringliteral">&quot;Date&quot;</span>] = <a class="code hl_function" href="namespacenawa_1_1utils.html#ad9e4389e601e4a83d8373885a51b75b5">utils::makeSmtpTime</a>(time(<span class="keyword">nullptr</span>));</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>            email-&gt;headers()[<span class="stringliteral">&quot;Date&quot;</span>] = <a class="code hl_function" href="namespacenawa_1_1utils.html#ad764644fb8e2846ef2b2f268a37a3054">utils::makeSmtpTime</a>(time(<span class="keyword">nullptr</span>));</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        }</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordflow">if</span> (!email-&gt;headers().count(<span class="stringliteral">&quot;From&quot;</span>) &amp;&amp; !from-&gt;address().empty()) {</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            email-&gt;headers()[<span class="stringliteral">&quot;From&quot;</span>] = from-&gt;get();</div>
@@ -138,10 +137,10 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>            stringstream mid;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>            stringstream base;</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>            random_device rd;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            timespec mtime;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            timespec mtime{};</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>            clock_gettime(CLOCK_REALTIME, &amp;mtime);</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>            base &lt;&lt; mtime.tv_sec &lt;&lt; mtime.tv_nsec &lt;&lt; from-&gt;address() &lt;&lt; rd();</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            mid &lt;&lt; <span class="charliteral">&#39;&lt;&#39;</span> &lt;&lt; <a class="code hl_function" href="namespacenawa_1_1crypto.html#a4f23cac6da53e3fe2d37b247ea12b2ee">crypto::md5</a>(base.str(), <span class="keyword">true</span>) &lt;&lt; <span class="charliteral">&#39;@&#39;</span> &lt;&lt; from-&gt;address().substr(atPos + 1) &lt;&lt; <span class="charliteral">&#39;&gt;&#39;</span>;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            mid &lt;&lt; <span class="charliteral">&#39;&lt;&#39;</span> &lt;&lt; <a class="code hl_function" href="namespacenawa_1_1crypto.html#aa00b58872471af7d8030fd0fa34b0509">crypto::md5</a>(base.str(), <span class="keyword">true</span>) &lt;&lt; <span class="charliteral">&#39;@&#39;</span> &lt;&lt; from-&gt;address().substr(atPos + 1) &lt;&lt; <span class="charliteral">&#39;&gt;&#39;</span>;</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>            email-&gt;headers()[<span class="stringliteral">&quot;Message-ID&quot;</span>] = mid.str();</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        }</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    }</div>
@@ -165,12 +164,12 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    std::vector&lt;QueueElem&gt; queue;</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    Data(<span class="keywordtype">string</span> serverDomain, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> serverPort, TlsMode serverTlsMode, <span class="keywordtype">bool</span> verifyServerTlsCert,</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>         <span class="keywordtype">string</span> authUsername, <span class="keywordtype">string</span> authPassword, <span class="keywordtype">long</span> connectionTimeout) : serverDomain(move(serverDomain)),</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>         <span class="keywordtype">string</span> authUsername, <span class="keywordtype">string</span> authPassword, <span class="keywordtype">long</span> connectionTimeout) : serverDomain(std::move(serverDomain)),</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>                                                                             serverPort(serverPort),</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                                                                             serverTlsMode(serverTlsMode),</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                                                                             verifyServerTlsCert(verifyServerTlsCert),</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                                                                             authUsername(move(authUsername)),</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                                                                             authPassword(move(authPassword)),</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                                                                             authUsername(std::move(authUsername)),</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                                                                             authPassword(std::move(authPassword)),</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                                                                             connectionTimeout(connectionTimeout) {}</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>};</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
@@ -179,36 +178,36 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a7e22846e1690c1960c39f60c58c0815d">   95</a></span>mail::<a class="code hl_class" href="classnawa_1_1mail_1_1SmtpMailer.html">SmtpMailer</a>::<a class="code hl_class" href="classnawa_1_1mail_1_1SmtpMailer.html">SmtpMailer</a>(<span class="keywordtype">string</span> serverDomain, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> serverPort, <a class="code hl_class" href="classnawa_1_1mail_1_1SmtpMailer.html">SmtpMailer</a>::<a class="code hl_enumeration" href="classnawa_1_1mail_1_1SmtpMailer.html#a5fac0713102a5c8040385abbf7998fae">TlsMode</a> serverTlsMode,</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>                             <span class="keywordtype">bool</span> verifyServerTlsCert, <span class="keywordtype">string</span> authUsername, <span class="keywordtype">string</span> authPassword,</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>                             <span class="keywordtype">long</span> connectionTimeout) {</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    data = make_unique&lt;Data&gt;(move(serverDomain), serverPort, serverTlsMode, verifyServerTlsCert, move(authUsername),</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                             move(authPassword), connectionTimeout);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    data = make_unique&lt;Data&gt;(std::move(serverDomain), serverPort, serverTlsMode, verifyServerTlsCert, std::move(authUsername),</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                             std::move(authPassword), connectionTimeout);</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>}</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a44ccc57c61ea25fab4060df8cdde2857">  102</a></span><span class="keywordtype">void</span> mail::SmtpMailer::setServer(<span class="keywordtype">string</span> domain, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> port, <a class="code hl_enumeration" href="classnawa_1_1mail_1_1SmtpMailer.html#a5fac0713102a5c8040385abbf7998fae">SmtpMailer::TlsMode</a> tlsMode, <span class="keywordtype">bool</span> verifyTlsCert) {</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    data-&gt;serverDomain = move(domain);</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a44ccc57c61ea25fab4060df8cdde2857">  102</a></span><span class="keywordtype">void</span> mail::SmtpMailer::setServer(std::string domain, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> port, <a class="code hl_enumeration" href="classnawa_1_1mail_1_1SmtpMailer.html#a5fac0713102a5c8040385abbf7998fae">SmtpMailer::TlsMode</a> tlsMode, <span class="keywordtype">bool</span> verifyTlsCert) {</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    data-&gt;serverDomain = std::move(domain);</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    data-&gt;serverPort = port;</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    data-&gt;serverTlsMode = tlsMode;</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    data-&gt;verifyServerTlsCert = verifyTlsCert;</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>}</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#ab96c49f6102fea761bfe2b4588ab61d0">  109</a></span><span class="keywordtype">void</span> mail::SmtpMailer::setAuth(<span class="keywordtype">string</span> username, <span class="keywordtype">string</span> password) {</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    data-&gt;authUsername = move(username);</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    data-&gt;authPassword = move(password);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#ab96c49f6102fea761bfe2b4588ab61d0">  109</a></span><span class="keywordtype">void</span> mail::SmtpMailer::setAuth(std::string username, std::string password) {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    data-&gt;authUsername = std::move(username);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    data-&gt;authPassword = std::move(password);</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>}</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a02519320bbda660335f062b4d823fda9">  114</a></span><span class="keywordtype">void</span> mail::SmtpMailer::setConnectionTimeout(<span class="keywordtype">long</span> timeout) {</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    data-&gt;connectionTimeout = timeout;</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>}</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#ab622d666783783137625d050bf0e4b76">  118</a></span><span class="keywordtype">void</span> mail::SmtpMailer::enqueue(shared_ptr&lt;Email&gt; email, <a class="code hl_class" href="classnawa_1_1mail_1_1EmailAddress.html">EmailAddress</a> to, shared_ptr&lt;EmailAddress&gt; from,</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>                               shared_ptr&lt;ReplacementRules&gt; replacementRules) {</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    bulkEnqueue(move(email), vector&lt;EmailAddress&gt;({move(to)}), move(from),</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>                move(replacementRules));</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#ab622d666783783137625d050bf0e4b76">  118</a></span><span class="keywordtype">void</span> mail::SmtpMailer::enqueue(std::shared_ptr&lt;Email&gt; email, <a class="code hl_class" href="classnawa_1_1mail_1_1EmailAddress.html">EmailAddress</a> to, std::shared_ptr&lt;EmailAddress&gt; from,</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>                               std::shared_ptr&lt;ReplacementRules&gt; replacementRules) {</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    bulkEnqueue(std::move(email), vector&lt;EmailAddress&gt;({std::move(to)}), std::move(from),</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>                std::move(replacementRules));</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>}</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a1f8d98533a09c273fe2d82df8de82489">  124</a></span><span class="keywordtype">void</span> mail::SmtpMailer::bulkEnqueue(shared_ptr&lt;Email&gt; email, vector&lt;EmailAddress&gt; recipients,</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                   shared_ptr&lt;EmailAddress&gt; from, shared_ptr&lt;ReplacementRules&gt; replacementRules) {</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a1f8d98533a09c273fe2d82df8de82489">  124</a></span><span class="keywordtype">void</span> mail::SmtpMailer::bulkEnqueue(std::shared_ptr&lt;Email&gt; email, std::vector&lt;EmailAddress&gt; recipients,</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                   std::shared_ptr&lt;EmailAddress&gt; from, std::shared_ptr&lt;ReplacementRules&gt; replacementRules) {</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    addMissingHeaders(email, from);</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    data-&gt;queue.push_back(QueueElem{.email = move(email), .from = move(from), .recipients = move(recipients), .replacementRules = move(replacementRules)});</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    data-&gt;queue.push_back(QueueElem{.email = std::move(email), .from = std::move(from), .recipients = std::move(recipients), .replacementRules = std::move(replacementRules)});</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>}</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a377b147bda9388d12a43efc9494bb085">  130</a></span><span class="keywordtype">void</span> mail::SmtpMailer::clearQueue() {</div>
@@ -217,7 +216,7 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="classnawa_1_1mail_1_1SmtpMailer.html#a1cd9d0de2fcfce2201a30280cb111cfc">  134</a></span><span class="keywordtype">void</span> mail::SmtpMailer::processQueue()<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    CURL* curl;</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    CURLcode res = CURLE_OK;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    CURLcode res;</div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
 <div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    curl = curl_easy_init();</div>
 <div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    <span class="keywordflow">if</span> (curl) {</div>
@@ -307,8 +306,8 @@ $(document).ready(function(){initNavTree('SmtpMailer_8cpp_source.html',''); init
 <div class="ttc" id="aclassnawa_1_1mail_1_1SmtpMailer_html_a5fac0713102a5c8040385abbf7998fae"><div class="ttname"><a href="classnawa_1_1mail_1_1SmtpMailer.html#a5fac0713102a5c8040385abbf7998fae">nawa::mail::SmtpMailer::TlsMode</a></div><div class="ttdeci">TlsMode</div><div class="ttdef"><b>Definition:</b> <a href="SmtpMailer_8h_source.html#l00045">SmtpMailer.h:45</a></div></div>
 <div class="ttc" id="acrypto_8h_html"><div class="ttname"><a href="crypto_8h.html">crypto.h</a></div><div class="ttdoc">A bunch of useful cryptographic functions (esp. hashing), acting as a wrapper to C crypto libraries.</div></div>
 <div class="ttc" id="amacros_8h_html_aeda5f1c11c5c969c1f4f0c3483652326"><div class="ttname"><a href="macros_8h.html#aeda5f1c11c5c969c1f4f0c3483652326">NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS</a></div><div class="ttdeci">#define NAWA_DEFAULT_DESTRUCTOR_IMPL_WITH_NS(Namespace, Class)</div><div class="ttdef"><b>Definition:</b> <a href="macros_8h_source.html#l00037">macros.h:37</a></div></div>
-<div class="ttc" id="anamespacenawa_1_1crypto_html_a4f23cac6da53e3fe2d37b247ea12b2ee"><div class="ttname"><a href="namespacenawa_1_1crypto.html#a4f23cac6da53e3fe2d37b247ea12b2ee">nawa::crypto::md5</a></div><div class="ttdeci">std::string md5(std::string const &amp;input, bool hex=true)</div><div class="ttdef"><b>Definition:</b> <a href="crypto_8cpp_source.html#l00093">crypto.cpp:93</a></div></div>
-<div class="ttc" id="anamespacenawa_1_1utils_html_ad9e4389e601e4a83d8373885a51b75b5"><div class="ttname"><a href="namespacenawa_1_1utils.html#ad9e4389e601e4a83d8373885a51b75b5">nawa::utils::makeSmtpTime</a></div><div class="ttdeci">std::string makeSmtpTime(time_t time)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00392">utils.cpp:392</a></div></div>
+<div class="ttc" id="anamespacenawa_1_1crypto_html_aa00b58872471af7d8030fd0fa34b0509"><div class="ttname"><a href="namespacenawa_1_1crypto.html#aa00b58872471af7d8030fd0fa34b0509">nawa::crypto::md5</a></div><div class="ttdeci">std::string md5(std::string const &amp;input, bool hex=true)</div><div class="ttdef"><b>Definition:</b> <a href="crypto_8cpp_source.html#l00093">crypto.cpp:93</a></div></div>
+<div class="ttc" id="anamespacenawa_1_1utils_html_ad764644fb8e2846ef2b2f268a37a3054"><div class="ttname"><a href="namespacenawa_1_1utils.html#ad764644fb8e2846ef2b2f268a37a3054">nawa::utils::makeSmtpTime</a></div><div class="ttdeci">std::string makeSmtpTime(time_t time)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00392">utils.cpp:392</a></div></div>
 <div class="ttc" id="anamespacenawa_html"><div class="ttname"><a href="namespacenawa.html">nawa</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00031">AppInit.h:31</a></div></div>
 <div class="ttc" id="autils_8h_html"><div class="ttname"><a href="utils_8h.html">utils.h</a></div><div class="ttdoc">Contains useful functions that improve the readability and facilitate maintenance of the NAWA code.</div></div>
 </div><!-- fragment --></div><!-- contents -->

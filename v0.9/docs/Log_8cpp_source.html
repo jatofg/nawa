@@ -95,31 +95,30 @@ $(document).ready(function(){initNavTree('Log_8cpp_source.html',''); initResizab
   <div class="headertitle"><div class="title">Log.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="Log_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">/*</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * Copyright (C) 2019-2021 Tobias Flaig.</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * This file is part of nawa.</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<a href="Log_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright (C) 2019-2022 Tobias Flaig.</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * This file is part of nawa.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;atomic&gt;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;iomanip&gt;</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#include &lt;<a class="code" href="oss_8h.html">nawa/oss.h</a>&gt;</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#include &lt;<a class="code" href="Log_8h.html">nawa/logging/Log.h</a>&gt;</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#include &lt;<a class="code" href="Log_8h.html">nawa/logging/Log.h</a>&gt;</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#include &lt;<a class="code" href="oss_8h.html">nawa/oss.h</a>&gt;</span></div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespacenawa.html">nawa</a>;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="keyword">using namespace </span>std;</div>
@@ -143,8 +142,8 @@ $(document).ready(function(){initNavTree('Log_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>}<span class="comment">// namespace</span></div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">struct </span>Log::Data {</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    std::string appname; </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    Level defaultLevel;  </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordtype">string</span> appname;     </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    Level defaultLevel; </div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keyword">explicit</span> Data(Level defaultLevel = Level::INFORMATIONAL) : defaultLevel(defaultLevel) {}</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>};</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
@@ -167,8 +166,8 @@ $(document).ready(function(){initNavTree('Log_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    ++instanceCount;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>}</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a723640dd2587dea87525fc999d19587d">   78</a></span><a class="code hl_function" href="classnawa_1_1Log.html#a8c71feece5ef171400b820a8d092b75c">Log::Log</a>(<span class="keywordtype">string</span> appname, <a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) noexcept : <a class="code hl_class" href="classnawa_1_1Log.html">Log</a>() {</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    data-&gt;appname = move(appname);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a723640dd2587dea87525fc999d19587d">   78</a></span><a class="code hl_function" href="classnawa_1_1Log.html#a8c71feece5ef171400b820a8d092b75c">Log::Log</a>(std::string appname, <a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) noexcept : <a class="code hl_class" href="classnawa_1_1Log.html">Log</a>() {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    data-&gt;appname = std::move(appname);</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    data-&gt;defaultLevel = level;</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>}</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
@@ -205,13 +204,13 @@ $(document).ready(function(){initNavTree('Log_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    }</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>}</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#ac2a1fb5a584099abedbb7b97725a1754">  116</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#ac2a1fb5a584099abedbb7b97725a1754">Log::setStream</a>(ostream* os) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#ac2a1fb5a584099abedbb7b97725a1754">  116</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#ac2a1fb5a584099abedbb7b97725a1754">Log::setStream</a>(std::ostream* os) <span class="keyword">noexcept</span> {</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">if</span> (!locked) {</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        out = os;</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    }</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>}</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a73bad29002fa0728a46e691061b27e43">  122</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a73bad29002fa0728a46e691061b27e43">Log::setOutfile</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; filename) {</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a73bad29002fa0728a46e691061b27e43">  122</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a73bad29002fa0728a46e691061b27e43">Log::setOutfile</a>(std::string <span class="keyword">const</span>&amp; filename) {</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="keywordflow">if</span> (!locked) {</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="keywordflow">if</span> (logFile.is_open()) {</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>            logFile.close();</div>
@@ -245,19 +244,19 @@ $(document).ready(function(){initNavTree('Log_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    <span class="keywordflow">return</span> locked;</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>}</div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#ab834e8b5dbf1845c81f7a4836567b5ad">  156</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#ab834e8b5dbf1845c81f7a4836567b5ad">Log::setAppname</a>(<span class="keywordtype">string</span> appname) <span class="keyword">noexcept</span> {</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    data-&gt;appname = move(appname);</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#ab834e8b5dbf1845c81f7a4836567b5ad">  156</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#ab834e8b5dbf1845c81f7a4836567b5ad">Log::setAppname</a>(std::string appname) <span class="keyword">noexcept</span> {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    data-&gt;appname = std::move(appname);</div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>}</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a8c457d1d4cdb4ceb01dd98258b292f4d">  160</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a8c457d1d4cdb4ceb01dd98258b292f4d">Log::setDefaultLogLevel</a>(<a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) <span class="keyword">noexcept</span> {</div>
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    data-&gt;defaultLevel = level;</div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>}</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">  164</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">Log::write</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; msg) {</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">  164</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">Log::write</a>(std::string <span class="keyword">const</span>&amp; msg) {</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">write</a>(msg, data-&gt;defaultLevel);</div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>}</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#aeffbba8fe97f2e27b9df8d6eac17c0aa">  168</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">Log::write</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; msg, <a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) {</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#aeffbba8fe97f2e27b9df8d6eac17c0aa">  168</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">Log::write</a>(std::string <span class="keyword">const</span>&amp; msg, <a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) {</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    <span class="keywordflow">if</span> (level &lt;= outputLevel &amp;&amp; outputLevel != <a class="code hl_enumvalue" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914a88559a0cfd8250c9d65970cc145c92d4">Level::OFF</a> &amp;&amp; level != <a class="code hl_enumvalue" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914a88559a0cfd8250c9d65970cc145c92d4">Level::OFF</a>) {</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        <span class="keyword">auto</span> now = time(<span class="keyword">nullptr</span>);</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>        lock_guard&lt;mutex&gt; l(outLock);</div>
@@ -270,11 +269,11 @@ $(document).ready(function(){initNavTree('Log_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    }</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>}</div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span> </div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a33544269de53f2b961698d00ca414a97">  181</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a33544269de53f2b961698d00ca414a97">Log::operator()</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; msg) {</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#a33544269de53f2b961698d00ca414a97">  181</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a33544269de53f2b961698d00ca414a97">Log::operator()</a>(std::string <span class="keyword">const</span>&amp; msg) {</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">write</a>(msg, data-&gt;defaultLevel);</div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>}</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span> </div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#ab49de6cc4adfb4627d87614f7daf6871">  185</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a33544269de53f2b961698d00ca414a97">Log::operator()</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; msg, <a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) {</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno"><a class="line" href="classnawa_1_1Log.html#ab49de6cc4adfb4627d87614f7daf6871">  185</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Log.html#a33544269de53f2b961698d00ca414a97">Log::operator()</a>(std::string <span class="keyword">const</span>&amp; msg, <a class="code hl_enumeration" href="classnawa_1_1Log.html#a75015f9850f0862cf0b39f70304d9914">Level</a> level) {</div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <a class="code hl_function" href="classnawa_1_1Log.html#aaa62ab301403293e7e654f5d6cdda60c">write</a>(msg, level);</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>}</div>
 <div class="ttc" id="aException_8h_html"><div class="ttname"><a href="Exception_8h.html">Exception.h</a></div><div class="ttdoc">Exception class that can be used by apps to catch errors resulting from nawa function calls.</div></div>

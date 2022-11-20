@@ -4,7 +4,7 @@ var classnawa_1_1RequestHandler =
     [ "~RequestHandler", "classnawa_1_1RequestHandler.html#a33488d8c2fa1f2c15193c9918960171a", null ],
     [ "setAppRequestHandler", "classnawa_1_1RequestHandler.html#afa509f34389b090247ba4449b505b3dd", null ],
     [ "setAccessFilters", "classnawa_1_1RequestHandler.html#aaa69ef57817e4557cba64d845eef2235", null ],
-    [ "getConfig", "classnawa_1_1RequestHandler.html#a51d141c29edeb02d4e890b4753a6c550", null ],
+    [ "getConfig", "classnawa_1_1RequestHandler.html#a92aa235134a929e1bcf9a0a7a2a2268e", null ],
     [ "setConfig", "classnawa_1_1RequestHandler.html#a9f2a89e27baf8806a69da262903d1f0c", null ],
     [ "reconfigure", "classnawa_1_1RequestHandler.html#ac58db9a6ef43ff4c9e1121dbfe35dc30", null ],
     [ "reconfigure", "classnawa_1_1RequestHandler.html#a31d24479b32e3c313a9abbc22327699c", null ],

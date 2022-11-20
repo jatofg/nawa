@@ -95,25 +95,24 @@ $(document).ready(function(){initNavTree('AccessFilter_8cpp_source.html',''); in
   <div class="headertitle"><div class="title">AccessFilter.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="AccessFilter_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">/*</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * Copyright (C) 2019-2021 Tobias Flaig.</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * This file is part of nawa.</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<a href="AccessFilter_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright (C) 2019-2022 Tobias Flaig.</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * This file is part of nawa.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;<a class="code" href="AccessFilter_8h.html">nawa/filter/AccessFilter/AccessFilter.h</a>&gt;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;<a class="code" href="utils_8h.html">nawa/util/utils.h</a>&gt;</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;sstream&gt;</span></div>
@@ -160,7 +159,7 @@ $(document).ready(function(){initNavTree('AccessFilter_8cpp_source.html',''); in
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><a class="code hl_define" href="macros_8h.html#a7f512c5963a0e240d3c2b10718b3b957">NAWA_COMPLEX_DATA_ACCESSORS_IMPL</a>(<a class="code hl_class" href="classnawa_1_1AccessFilter.html">AccessFilter</a>, response, <span class="keywordtype">string</span>)</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classnawa_1_1AccessFilter.html#a8e2cab76eb68e111d9442352355db272">   70</a></span><span class="keywordtype">bool</span> <a class="code hl_namespace" href="namespacenawa.html">nawa</a>::<a class="code hl_class" href="classnawa_1_1AccessFilter.html">AccessFilter</a>::matches(vector&lt;<span class="keywordtype">string</span>&gt; const&amp; requestPath)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classnawa_1_1AccessFilter.html#a8e2cab76eb68e111d9442352355db272">   70</a></span><span class="keywordtype">bool</span> <a class="code hl_namespace" href="namespacenawa.html">nawa</a>::<a class="code hl_class" href="classnawa_1_1AccessFilter.html">AccessFilter</a>::matches(std::vector&lt;std::<span class="keywordtype">string</span>&gt; const&amp; requestPath)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keywordflow">if</span> (!data-&gt;pathFilter.empty()) {</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="comment">// one of the paths in the path filter must match for the path filter to match</span></div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="keywordtype">bool</span> pathFilterMatches = <span class="keyword">false</span>;</div>
@@ -188,7 +187,7 @@ $(document).ready(function(){initNavTree('AccessFilter_8cpp_source.html',''); in
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    }</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordflow">if</span> (!data-&gt;extensionFilter.empty()) {</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keyword">auto</span> fileExtension = <a class="code hl_function" href="namespacenawa_1_1utils.html#aa524e3201361695307cd52f9e7986138">utils::getFileExtension</a>(requestPath.back());</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keyword">auto</span> fileExtension = <a class="code hl_function" href="namespacenawa_1_1utils.html#a2ade13f6c903a7680236fac641ba9d20">utils::getFileExtension</a>(requestPath.back());</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <span class="keywordtype">bool</span> extensionFilterMatches = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span>&amp; e : data-&gt;extensionFilter) {</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>            <span class="keywordflow">if</span> (fileExtension == e) {</div>
@@ -226,7 +225,7 @@ $(document).ready(function(){initNavTree('AccessFilter_8cpp_source.html',''); in
 <div class="ttc" id="amacros_8h_html_aa15d288cee1184ff7e4806b288059dc1"><div class="ttname"><a href="macros_8h.html#aa15d288cee1184ff7e4806b288059dc1">NAWA_DEFAULT_CONSTRUCTOR_IMPL</a></div><div class="ttdeci">#define NAWA_DEFAULT_CONSTRUCTOR_IMPL(Class)</div><div class="ttdef"><b>Definition:</b> <a href="macros_8h_source.html#l00040">macros.h:40</a></div></div>
 <div class="ttc" id="amacros_8h_html_aa1e02127a21ffd7823a2bcecc019ab8c"><div class="ttname"><a href="macros_8h.html#aa1e02127a21ffd7823a2bcecc019ab8c">NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL</a></div><div class="ttdeci">#define NAWA_COPY_ASSIGNMENT_OPERATOR_IMPL(Class)</div><div class="ttdef"><b>Definition:</b> <a href="macros_8h_source.html#l00056">macros.h:56</a></div></div>
 <div class="ttc" id="amacros_8h_html_ab95144f0d4464444ee1fbb89e23b50db"><div class="ttname"><a href="macros_8h.html#ab95144f0d4464444ee1fbb89e23b50db">NAWA_MOVE_CONSTRUCTOR_IMPL</a></div><div class="ttdeci">#define NAWA_MOVE_CONSTRUCTOR_IMPL(Class)</div><div class="ttdef"><b>Definition:</b> <a href="macros_8h_source.html#l00088">macros.h:88</a></div></div>
-<div class="ttc" id="anamespacenawa_1_1utils_html_aa524e3201361695307cd52f9e7986138"><div class="ttname"><a href="namespacenawa_1_1utils.html#aa524e3201361695307cd52f9e7986138">nawa::utils::getFileExtension</a></div><div class="ttdeci">std::string getFileExtension(std::string const &amp;filename)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00343">utils.cpp:343</a></div></div>
+<div class="ttc" id="anamespacenawa_1_1utils_html_a2ade13f6c903a7680236fac641ba9d20"><div class="ttname"><a href="namespacenawa_1_1utils.html#a2ade13f6c903a7680236fac641ba9d20">nawa::utils::getFileExtension</a></div><div class="ttdeci">std::string getFileExtension(std::string const &amp;filename)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00343">utils.cpp:343</a></div></div>
 <div class="ttc" id="anamespacenawa_html"><div class="ttname"><a href="namespacenawa.html">nawa</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00031">AppInit.h:31</a></div></div>
 <div class="ttc" id="autils_8h_html"><div class="ttname"><a href="utils_8h.html">utils.h</a></div><div class="ttdoc">Contains useful functions that improve the readability and facilitate maintenance of the NAWA code.</div></div>
 </div><!-- fragment --></div><!-- contents -->

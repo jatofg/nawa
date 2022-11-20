@@ -95,25 +95,24 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
   <div class="headertitle"><div class="title">Session.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="Session_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">/*</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * Copyright (C) 2019-2021 Tobias Flaig.</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * This file is part of nawa.</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<a href="Session_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright (C) 2019-2022 Tobias Flaig.</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * This file is part of nawa.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;mutex&gt;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;<a class="code" href="Connection_8h.html">nawa/connection/Connection.h</a>&gt;</span></div>
@@ -133,7 +132,7 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="keyword">const</span> <span class="keywordtype">string</span> sourceIP;           </div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        SessionData() : expires(0) {}</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keyword">explicit</span> SessionData(<span class="keywordtype">string</span> sIP) : expires(0), sourceIP(move(sIP)) {}</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keyword">explicit</span> SessionData(<span class="keywordtype">string</span> sIP) : expires(0), sourceIP(std::move(sIP)) {}</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    };</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    mutex gLock; </div>
@@ -150,7 +149,7 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        base &lt;&lt; remoteAddress;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="comment">// Calculate and return hex-formatted SHA1</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="namespacenawa_1_1crypto.html#a56f67fe611e7583cf2d2a870bbcdb37c">crypto::sha1</a>(base.str(), <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="namespacenawa_1_1crypto.html#a972b43a748f1b4f6759bc60120c01dc1">crypto::sha1</a>(base.str(), <span class="keyword">true</span>);</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    }</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordtype">void</span> collectGarbage() {</div>
@@ -339,7 +338,7 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    <span class="keywordflow">return</span> (data-&gt;currentData.use_count() &gt; 0);</div>
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>}</div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#af19186704540cdf1a99bf262c048daf4">  278</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="classnawa_1_1Session.html#af19186704540cdf1a99bf262c048daf4">Session::isSet</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; key)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#af19186704540cdf1a99bf262c048daf4">  278</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="classnawa_1_1Session.html#af19186704540cdf1a99bf262c048daf4">Session::isSet</a>(std::string <span class="keyword">const</span>&amp; key)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classnawa_1_1Session.html#aa7bed16bdb95634e2b9aee92d6f235e7">established</a>()) {</div>
 <div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        lock_guard&lt;mutex&gt; lockGuard(data-&gt;currentData-&gt;dLock);</div>
 <div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>        <span class="keywordflow">return</span> (data-&gt;currentData-&gt;data.count(key) == 1);</div>
@@ -347,7 +346,7 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>}</div>
 <div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#a72d5ab13fed67d347fa3615bd4476f09">  286</a></span>any <a class="code hl_function" href="classnawa_1_1Session.html#a72d5ab13fed67d347fa3615bd4476f09">Session::operator[]</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; key)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#a1770c8c2befab5760ca6309af69aeed9">  286</a></span>std::any <a class="code hl_function" href="classnawa_1_1Session.html#a1770c8c2befab5760ca6309af69aeed9">Session::operator[]</a>(std::string <span class="keyword">const</span>&amp; key)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classnawa_1_1Session.html#aa7bed16bdb95634e2b9aee92d6f235e7">established</a>()) {</div>
 <div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>        lock_guard&lt;mutex&gt; lockGuard(data-&gt;currentData-&gt;dLock);</div>
 <div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>        <span class="keywordflow">if</span> (data-&gt;currentData-&gt;data.count(key) == 1) {</div>
@@ -363,10 +362,10 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classnawa_1_1Exception.html">Exception</a>(__PRETTY_FUNCTION__, 1, <span class="stringliteral">&quot;Session not established.&quot;</span>);</div>
 <div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    }</div>
 <div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    lock_guard&lt;mutex&gt; lockGuard(data-&gt;currentData-&gt;dLock);</div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    data-&gt;currentData-&gt;data[move(key)] = value;</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    data-&gt;currentData-&gt;data[std::move(key)] = value;</div>
 <div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>}</div>
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870">  305</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870">Session::unset</a>(<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; key) {</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870">  305</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870">Session::unset</a>(std::string <span class="keyword">const</span>&amp; key) {</div>
 <div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classnawa_1_1Session.html#aa7bed16bdb95634e2b9aee92d6f235e7">established</a>()) {</div>
 <div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classnawa_1_1Exception.html">Exception</a>(__PRETTY_FUNCTION__, 1, <span class="stringliteral">&quot;Session not established.&quot;</span>);</div>
 <div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    }</div>
@@ -393,7 +392,7 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    data-&gt;connection.unsetCookie(data-&gt;cookieName);</div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>}</div>
 <div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span> </div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#a0e559d705a863f2e2f596e874cdc9862">  332</a></span><span class="keywordtype">string</span> <a class="code hl_function" href="classnawa_1_1Session.html#a0e559d705a863f2e2f596e874cdc9862">Session::getID</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno"><a class="line" href="classnawa_1_1Session.html#ac86923a5b848e1e2be066ae2d0317c7b">  332</a></span>std::string <a class="code hl_function" href="classnawa_1_1Session.html#ac86923a5b848e1e2be066ae2d0317c7b">Session::getID</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classnawa_1_1Session.html#aa7bed16bdb95634e2b9aee92d6f235e7">established</a>() ? data-&gt;currentID : string();</div>
 <div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>}</div>
 <div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span> </div>
@@ -416,17 +415,17 @@ $(document).ready(function(){initNavTree('Session_8cpp_source.html',''); initRes
 <div class="ttc" id="aclassnawa_1_1Cookie_html_ae1a772c335cbd95bf52a94e4775d1b08"><div class="ttname"><a href="classnawa_1_1Cookie.html#ae1a772c335cbd95bf52a94e4775d1b08">nawa::Cookie::maxAge</a></div><div class="ttdeci">std::optional&lt; unsigned long &gt; &amp; maxAge() noexcept</div></div>
 <div class="ttc" id="aclassnawa_1_1Exception_html"><div class="ttname"><a href="classnawa_1_1Exception.html">nawa::Exception</a></div><div class="ttdef"><b>Definition:</b> <a href="Exception_8h_source.html#l00035">Exception.h:35</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html"><div class="ttname"><a href="classnawa_1_1Session.html">nawa::Session</a></div><div class="ttdef"><b>Definition:</b> <a href="Session_8h_source.html#l00037">Session.h:37</a></div></div>
-<div class="ttc" id="aclassnawa_1_1Session_html_a0e559d705a863f2e2f596e874cdc9862"><div class="ttname"><a href="classnawa_1_1Session.html#a0e559d705a863f2e2f596e874cdc9862">nawa::Session::getID</a></div><div class="ttdeci">std::string getID() const</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00332">Session.cpp:332</a></div></div>
+<div class="ttc" id="aclassnawa_1_1Session_html_a1770c8c2befab5760ca6309af69aeed9"><div class="ttname"><a href="classnawa_1_1Session.html#a1770c8c2befab5760ca6309af69aeed9">nawa::Session::operator[]</a></div><div class="ttdeci">std::any operator[](std::string const &amp;key) const</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00286">Session.cpp:286</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html_a5527f724b5eec1bae35b466c5791e4c2"><div class="ttname"><a href="classnawa_1_1Session.html#a5527f724b5eec1bae35b466c5791e4c2">nawa::Session::set</a></div><div class="ttdeci">void set(std::string key, const std::any &amp;value)</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00297">Session.cpp:297</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html_a62dea076417704c14ed69f7744ad555c"><div class="ttname"><a href="classnawa_1_1Session.html#a62dea076417704c14ed69f7744ad555c">nawa::Session::start</a></div><div class="ttdeci">std::string start(std::string sessionId, std::optional&lt; unsigned long &gt; keepalive=std::nullopt)</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00127">Session.cpp:127</a></div></div>
-<div class="ttc" id="aclassnawa_1_1Session_html_a72d5ab13fed67d347fa3615bd4476f09"><div class="ttname"><a href="classnawa_1_1Session.html#a72d5ab13fed67d347fa3615bd4476f09">nawa::Session::operator[]</a></div><div class="ttdeci">std::any operator[](std::string const &amp;key) const</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00286">Session.cpp:286</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html_a7c5c8a4e83413accd53ee37bd9b8faaf"><div class="ttname"><a href="classnawa_1_1Session.html#a7c5c8a4e83413accd53ee37bd9b8faaf">nawa::Session::invalidate</a></div><div class="ttdeci">void invalidate()</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00313">Session.cpp:313</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html_aa7bed16bdb95634e2b9aee92d6f235e7"><div class="ttname"><a href="classnawa_1_1Session.html#aa7bed16bdb95634e2b9aee92d6f235e7">nawa::Session::established</a></div><div class="ttdeci">bool established() const</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00274">Session.cpp:274</a></div></div>
+<div class="ttc" id="aclassnawa_1_1Session_html_ac86923a5b848e1e2be066ae2d0317c7b"><div class="ttname"><a href="classnawa_1_1Session.html#ac86923a5b848e1e2be066ae2d0317c7b">nawa::Session::getID</a></div><div class="ttdeci">std::string getID() const</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00332">Session.cpp:332</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html_ae707fa680ababe663fab9feb1ba14870"><div class="ttname"><a href="classnawa_1_1Session.html#ae707fa680ababe663fab9feb1ba14870">nawa::Session::unset</a></div><div class="ttdeci">void unset(std::string const &amp;key)</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00305">Session.cpp:305</a></div></div>
 <div class="ttc" id="aclassnawa_1_1Session_html_af19186704540cdf1a99bf262c048daf4"><div class="ttname"><a href="classnawa_1_1Session.html#af19186704540cdf1a99bf262c048daf4">nawa::Session::isSet</a></div><div class="ttdeci">bool isSet(std::string const &amp;key) const</div><div class="ttdef"><b>Definition:</b> <a href="Session_8cpp_source.html#l00278">Session.cpp:278</a></div></div>
 <div class="ttc" id="acrypto_8h_html"><div class="ttname"><a href="crypto_8h.html">crypto.h</a></div><div class="ttdoc">A bunch of useful cryptographic functions (esp. hashing), acting as a wrapper to C crypto libraries.</div></div>
 <div class="ttc" id="amacros_8h_html_a234daf22f19646e14048d5a50d1ed99a"><div class="ttname"><a href="macros_8h.html#a234daf22f19646e14048d5a50d1ed99a">NAWA_DEFAULT_DESTRUCTOR_IMPL</a></div><div class="ttdeci">#define NAWA_DEFAULT_DESTRUCTOR_IMPL(Class)</div><div class="ttdef"><b>Definition:</b> <a href="macros_8h_source.html#l00036">macros.h:36</a></div></div>
-<div class="ttc" id="anamespacenawa_1_1crypto_html_a56f67fe611e7583cf2d2a870bbcdb37c"><div class="ttname"><a href="namespacenawa_1_1crypto.html#a56f67fe611e7583cf2d2a870bbcdb37c">nawa::crypto::sha1</a></div><div class="ttdeci">std::string sha1(std::string const &amp;input, bool hex=true)</div><div class="ttdef"><b>Definition:</b> <a href="crypto_8cpp_source.html#l00033">crypto.cpp:33</a></div></div>
+<div class="ttc" id="anamespacenawa_1_1crypto_html_a972b43a748f1b4f6759bc60120c01dc1"><div class="ttname"><a href="namespacenawa_1_1crypto.html#a972b43a748f1b4f6759bc60120c01dc1">nawa::crypto::sha1</a></div><div class="ttdeci">std::string sha1(std::string const &amp;input, bool hex=true)</div><div class="ttdef"><b>Definition:</b> <a href="crypto_8cpp_source.html#l00033">crypto.cpp:33</a></div></div>
 <div class="ttc" id="anamespacenawa_html"><div class="ttname"><a href="namespacenawa.html">nawa</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00031">AppInit.h:31</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

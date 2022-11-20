@@ -145,13 +145,13 @@ Macros</h2></td></tr>
 <tr class="separator:af0fb0ded9a2408207310bb7dbf875358"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92f6b36cb4c3facb84522c17a5235af8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a92f6b36cb4c3facb84522c17a5235af8">NAWA_MOVE_CONSTRUCTOR_DEF</a>(Class)&#160;&#160;&#160;Class(Class&amp;&amp; other) noexcept</td></tr>
 <tr class="separator:a92f6b36cb4c3facb84522c17a5235af8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab95144f0d4464444ee1fbb89e23b50db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ab95144f0d4464444ee1fbb89e23b50db">NAWA_MOVE_CONSTRUCTOR_IMPL</a>(Class)&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : data(move(other.data)) {}</td></tr>
+<tr class="memitem:ab95144f0d4464444ee1fbb89e23b50db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ab95144f0d4464444ee1fbb89e23b50db">NAWA_MOVE_CONSTRUCTOR_IMPL</a>(Class)&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : data(std::move(other.data)) {}</td></tr>
 <tr class="separator:ab95144f0d4464444ee1fbb89e23b50db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a391f5724b1a93318fdf4c07c6dbd669a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a391f5724b1a93318fdf4c07c6dbd669a">NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS</a>(Namespace,  Class)&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : data(move(other.data)) {}</td></tr>
+<tr class="memitem:a391f5724b1a93318fdf4c07c6dbd669a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a391f5724b1a93318fdf4c07c6dbd669a">NAWA_MOVE_CONSTRUCTOR_IMPL_WITH_NS</a>(Namespace,  Class)&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : data(std::move(other.data)) {}</td></tr>
 <tr class="separator:a391f5724b1a93318fdf4c07c6dbd669a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20840e6dbda73b01cfaf63d0c89c7c23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a20840e6dbda73b01cfaf63d0c89c7c23">NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL</a>(Class,  Parent)&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : Parent(move(other)), data(move(other.data)) {}</td></tr>
+<tr class="memitem:a20840e6dbda73b01cfaf63d0c89c7c23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a20840e6dbda73b01cfaf63d0c89c7c23">NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL</a>(Class,  Parent)&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : Parent(std::move(other)), data(std::move(other.data)) {}</td></tr>
 <tr class="separator:a20840e6dbda73b01cfaf63d0c89c7c23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bed9186804928167a04edf8217591a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a9bed9186804928167a04edf8217591a7">NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL_WITH_NS</a>(Namespace,  Class,  Parent)&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : Parent(move(other)), data(move(other.data)) {}</td></tr>
+<tr class="memitem:a9bed9186804928167a04edf8217591a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a9bed9186804928167a04edf8217591a7">NAWA_MOVE_CONSTRUCTOR_DERIVED_IMPL_WITH_NS</a>(Namespace,  Class,  Parent)&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : Parent(std::move(other)), data(std::move(other.data)) {}</td></tr>
 <tr class="separator:a9bed9186804928167a04edf8217591a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcccb1363aa55d0d32466c60e5e9d45b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afcccb1363aa55d0d32466c60e5e9d45b">NAWA_MOVE_ASSIGNMENT_OPERATOR_DEF</a>(Class)&#160;&#160;&#160;Class&amp; operator=(Class&amp;&amp; other) noexcept</td></tr>
 <tr class="separator:afcccb1363aa55d0d32466c60e5e9d45b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -687,7 +687,7 @@ Macros</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">Class</td><td>)</td>
-          <td>&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : data(move(other.data)) {}</td>
+          <td>&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : data(std::move(other.data)) {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -717,7 +717,7 @@ Macros</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : data(move(other.data)) {}</td>
+          <td></td><td>&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : data(std::move(other.data)) {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -747,7 +747,7 @@ Macros</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : Parent(move(other)), data(move(other.data)) {}</td>
+          <td></td><td>&#160;&#160;&#160;    Class::Class(Class&amp;&amp; other) noexcept : Parent(std::move(other)), data(std::move(other.data)) {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -783,7 +783,7 @@ Macros</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : Parent(move(other)), data(move(other.data)) {}</td>
+          <td></td><td>&#160;&#160;&#160;    Namespace::Class::Class(Namespace::Class&amp;&amp; other) noexcept : Parent(std::move(other)), data(std::move(other.data)) {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -829,7 +829,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    Class&amp; Class::operator=(Class&amp;&amp; other) <span class="keyword">noexcept</span> { \</div>
 <div class="line">        if (<span class="keyword">this</span> != &amp;other) {                         \</div>
-<div class="line">            data = move(other.data);                  \</div>
+<div class="line">            data = std::move(other.data);             \</div>
 <div class="line">        }                                             \</div>
 <div class="line">        return *<span class="keyword">this</span>;                                 \</div>
 <div class="line">    }</div>
@@ -865,7 +865,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    Namespace::Class&amp; Namespace::Class::operator=(Namespace::Class&amp;&amp; other) <span class="keyword">noexcept</span> { \</div>
 <div class="line">        if (<span class="keyword">this</span> != &amp;other) {                                                          \</div>
-<div class="line">            data = move(other.data);                                                   \</div>
+<div class="line">            data = std::move(other.data);                                              \</div>
 <div class="line">        }                                                                              \</div>
 <div class="line">        return *<span class="keyword">this</span>;                                                                  \</div>
 <div class="line">    }</div>
@@ -901,8 +901,8 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    Class&amp; Class::operator=(Class&amp;&amp; other) <span class="keyword">noexcept</span> {             \</div>
 <div class="line">        if (<span class="keyword">this</span> != &amp;other) {                                     \</div>
-<div class="line">            data = move(other.data);                              \</div>
-<div class="line">            Parent::operator=(move(other));                       \</div>
+<div class="line">            data = std::move(other.data);                         \</div>
+<div class="line">            Parent::operator=(std::move(other));                  \</div>
 <div class="line">        }                                                         \</div>
 <div class="line">        return *<span class="keyword">this</span>;                                             \</div>
 <div class="line">    }</div>
@@ -944,8 +944,8 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    Namespace::Class&amp; Namespace::Class::operator=(Namespace::Class&amp;&amp; other) <span class="keyword">noexcept</span> { \</div>
 <div class="line">        if (<span class="keyword">this</span> != &amp;other) {                                                          \</div>
-<div class="line">            data = move(other.data);                                                   \</div>
-<div class="line">            Parent::operator=(move(other));                                            \</div>
+<div class="line">            data = std::move(other.data);                                              \</div>
+<div class="line">            Parent::operator=(std::move(other));                                       \</div>
 <div class="line">        }                                                                              \</div>
 <div class="line">        return *<span class="keyword">this</span>;                                                                  \</div>
 <div class="line">    }</div>
@@ -1108,7 +1108,7 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    Type&amp; Class::Member() noexcept { <span class="keywordflow">return</span> data-&gt;Member; }             \</div>
 <div class="line">    Type <span class="keyword">const</span>&amp; Class::Member() const noexcept { <span class="keywordflow">return</span> data-&gt;Member; } \</div>
 <div class="line">    Class&amp; Class::Member(Type value) <span class="keyword">noexcept</span> {                         \</div>
-<div class="line">        data-&gt;Member = move(value);                                     \</div>
+<div class="line">        data-&gt;Member = std::move(value);                                \</div>
 <div class="line">        return *<span class="keyword">this</span>;                                                   \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->

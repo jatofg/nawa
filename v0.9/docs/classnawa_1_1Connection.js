@@ -20,7 +20,7 @@ var classnawa_1_1Connection =
     [ "sendFile", "classnawa_1_1Connection.html#aa6f3a6f0fb721766891cc673b2799705", null ],
     [ "getResponseBody", "classnawa_1_1Connection.html#a9641d8f595e7224d8b3a9ccf12558f02", null ],
     [ "getStatus", "classnawa_1_1Connection.html#a34560d92b232db97d0c872f4c7674921", null ],
-    [ "getHeaders", "classnawa_1_1Connection.html#a1384cdee1c05f515a3ec9ec4ee879078", null ],
+    [ "getHeaders", "classnawa_1_1Connection.html#a8d48109d4b041c4991c0878ba001562d", null ],
     [ "flushResponse", "classnawa_1_1Connection.html#a2d9a08887616fdcb9e0b1a359019cc74", null ],
     [ "applyFilters", "classnawa_1_1Connection.html#a948c23ab6fd31621921dab8d376a214c", null ]
 ];

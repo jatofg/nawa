@@ -95,25 +95,24 @@ $(document).ready(function(){initNavTree('http_8cpp_source.html',''); initResiza
   <div class="headertitle"><div class="title">http.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="http_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">/*</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * Copyright (C) 2019-2021 Tobias Flaig.</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> * This file is part of nawa.</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<a href="http_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright (C) 2019-2022 Tobias Flaig.</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * This file is part of nawa.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> * nawa is free software: you can redistribute it and/or modify</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * it under the terms of the GNU Lesser General Public License,</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * version 3, as published by the Free Software Foundation.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * nawa is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * GNU Lesser General Public License for more details.</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * You should have received a copy of the GNU Lesser General Public License</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * along with nawa.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;boost/network/protocol/http/client.hpp&gt;</span></div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;catch2/catch.hpp&gt;</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;<a class="code" href="Exception_8h.html">nawa/Exception.h</a>&gt;</span></div>
@@ -216,7 +215,7 @@ $(document).ready(function(){initNavTree('http_8cpp_source.html',''); initResiza
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    http::client::response response;</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keyword">auto</span> checkResponse = [&amp;](<span class="keywordtype">string</span> <span class="keyword">const</span>&amp; method) {</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keyword">auto</span> respLines = <a class="code hl_function" href="namespacenawa_1_1utils.html#aaaad8d394037417eb955dd32a78b4468">utils::splitString</a>(response.body(), <span class="charliteral">&#39;\n&#39;</span>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keyword">auto</span> respLines = <a class="code hl_function" href="namespacenawa_1_1utils.html#aadd71a267d33a27bafff6fb6b8b2096a">utils::splitString</a>(response.body(), <span class="charliteral">&#39;\n&#39;</span>);</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        REQUIRE(respLines.size() == 13);</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        CHECK(respLines[0] == <span class="stringliteral">&quot;3&quot;</span>);</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        CHECK(respLines[1] == <span class="stringliteral">&quot;127.0.0.1&quot;</span>);</div>
@@ -283,7 +282,7 @@ $(document).ready(function(){initNavTree('http_8cpp_source.html',''); initResiza
 <div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    CHECK(response.body() == <span class="stringliteral">&quot;not set&quot;</span>);</div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <span class="keyword">auto</span> cookieIterator = response.headers().find(<span class="stringliteral">&quot;Set-Cookie&quot;</span>);</div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    REQUIRE(cookieIterator != response.headers().end());</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    <span class="keyword">auto</span> parsedCookie = <a class="code hl_function" href="namespacenawa_1_1utils.html#a6c694aec5d19b76e1a837211f1b5a68f">utils::parseCookies</a>(cookieIterator-&gt;second);</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    <span class="keyword">auto</span> parsedCookie = <a class="code hl_function" href="namespacenawa_1_1utils.html#afd9c6bbe207be2fe3d0227308754661e">utils::parseCookies</a>(cookieIterator-&gt;second);</div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <span class="keyword">auto</span> parsedCookieIt = parsedCookie.find(<span class="stringliteral">&quot;SESSION&quot;</span>);</div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    REQUIRE(parsedCookieIt != parsedCookie.end());</div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="keywordtype">string</span> sessionId = parsedCookieIt-&gt;second;</div>
@@ -300,8 +299,8 @@ $(document).ready(function(){initNavTree('http_8cpp_source.html',''); initResiza
 <div class="ttc" id="aclassnawa_1_1Connection_html"><div class="ttname"><a href="classnawa_1_1Connection.html">nawa::Connection</a></div><div class="ttdef"><b>Definition:</b> <a href="Connection_8h_source.html#l00041">Connection.h:41</a></div></div>
 <div class="ttc" id="ahttp_8cpp_html_a5943a7b43a1a4d978884871afba97b6b"><div class="ttname"><a href="http_8cpp.html#a5943a7b43a1a4d978884871afba97b6b">TEST_CASE</a></div><div class="ttdeci">TEST_CASE(&quot;Basic request handling (HTTP)&quot;, &quot;[basic][http]&quot;)</div><div class="ttdef"><b>Definition:</b> <a href="http_8cpp_source.html#l00074">http.cpp:74</a></div></div>
 <div class="ttc" id="ahttp_8cpp_html_ab26193127f4ca0b161e01645d7c9b47c"><div class="ttname"><a href="http_8cpp.html#ab26193127f4ca0b161e01645d7c9b47c">loadConfig</a></div><div class="ttdeci">Config loadConfig()</div><div class="ttdef"><b>Definition:</b> <a href="tests_2main_8cpp_source.html#l00034">main.cpp:34</a></div></div>
-<div class="ttc" id="anamespacenawa_1_1utils_html_a6c694aec5d19b76e1a837211f1b5a68f"><div class="ttname"><a href="namespacenawa_1_1utils.html#a6c694aec5d19b76e1a837211f1b5a68f">nawa::utils::parseCookies</a></div><div class="ttdeci">std::unordered_multimap&lt; std::string, std::string &gt; parseCookies(std::string const &amp;rawCookies)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00569">utils.cpp:569</a></div></div>
-<div class="ttc" id="anamespacenawa_1_1utils_html_aaaad8d394037417eb955dd32a78b4468"><div class="ttname"><a href="namespacenawa_1_1utils.html#aaaad8d394037417eb955dd32a78b4468">nawa::utils::splitString</a></div><div class="ttdeci">std::vector&lt; std::string &gt; splitString(std::string str, char delimiter, bool ignoreEmpty=false)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00448">utils.cpp:448</a></div></div>
+<div class="ttc" id="anamespacenawa_1_1utils_html_aadd71a267d33a27bafff6fb6b8b2096a"><div class="ttname"><a href="namespacenawa_1_1utils.html#aadd71a267d33a27bafff6fb6b8b2096a">nawa::utils::splitString</a></div><div class="ttdeci">std::vector&lt; std::string &gt; splitString(std::string str, char delimiter, bool ignoreEmpty=false)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00448">utils.cpp:448</a></div></div>
+<div class="ttc" id="anamespacenawa_1_1utils_html_afd9c6bbe207be2fe3d0227308754661e"><div class="ttname"><a href="namespacenawa_1_1utils.html#afd9c6bbe207be2fe3d0227308754661e">nawa::utils::parseCookies</a></div><div class="ttdeci">std::unordered_multimap&lt; std::string, std::string &gt; parseCookies(std::string const &amp;rawCookies)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2utils_8cpp_source.html#l00569">utils.cpp:569</a></div></div>
 <div class="ttc" id="anamespacenawa_html"><div class="ttname"><a href="namespacenawa.html">nawa</a></div><div class="ttdef"><b>Definition:</b> <a href="AppInit_8h_source.html#l00031">AppInit.h:31</a></div></div>
 <div class="ttc" id="autils_8h_html"><div class="ttname"><a href="utils_8h.html">utils.h</a></div><div class="ttdoc">Contains useful functions that improve the readability and facilitate maintenance of the NAWA code.</div></div>
 </div><!-- fragment --></div><!-- contents -->
