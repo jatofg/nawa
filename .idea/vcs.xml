@@ -4,6 +4,10 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/catch2-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/cppnetlib-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/cppnetlib-src/deps/cxxopts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/cppnetlib-src/deps/googlemock" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/cppnetlib-src/deps/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/cppnetlib-src/libs/network/doc/_ext/breathe" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/fastcgilite-src" vcs="Git" />
   </component>
 </project>
