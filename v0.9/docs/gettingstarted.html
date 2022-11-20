@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('gettingstarted.html',''); initResizabl
 <p >For our simple example, you just need a single C++ file, which will probably be created automatically by your IDE.</p>
 <p >For the start, you just need to include a single header file:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="application_8h.html">nawa/application.h</a>&gt;</span></div>
-<div class="ttc" id="aapplication_8h_html"><div class="ttname"><a href="application_8h.html">application.h</a></div></div>
+<div class="ttc" id="aapplication_8h_html"><div class="ttname"><a href="application_8h.html">application.h</a></div><div class="ttdoc">This file will be configured by CMake and contains the necessary properties to ensure that a loaded a...</div></div>
 </div><!-- fragment --><p >There are two required functions you need to implement in your app, <code>init</code> and <code>handleRequest</code>.</p>
 <p >In the <code>init</code> function, you can alter the config (at least the options concerning your own app), set up static filters, and do any initialization you might want to do. If the return value is not 0, NAWA will terminate with an error, this can be useful, e.g., if the config file doesn't contain all necessary options needed by your app, or if your app encountered another problem during initialization.</p>
 <p >The <code>init</code> function is run once before request handling starts, and request handling will not start until your <code>init</code> function has returned. So you should refrain from including long-running tasks. You can, however, start threads and processes that should run in the background.</p>
