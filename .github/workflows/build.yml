@@ -1,11 +1,11 @@
 name: Build
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
 
   build:
     name: Build (Linux)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
   test:
     name: Test (Linux)
     needs: build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Fetch build
         uses: actions/download-artifact@v2
@@ -40,8 +40,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libargon2-1 libboost-system1.71.0 libboost-thread1.71.0 \
-          libboost-chrono1.71.0 libboost-date-time1.71.0
+          sudo apt-get install -y --no-install-recommends libargon2-1 libboost-system1.74.0 libboost-thread1.74.0 \
+          libboost-chrono1.74.0 libboost-date-time1.74.0
       - name: Set permissions
         run: |
           chmod +x unittests

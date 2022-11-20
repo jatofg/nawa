@@ -17,7 +17,7 @@
  */
 
 /**
- * \file Application.h
+ * \file application.h
  * \brief This file will be configured by CMake and contains the necessary properties to ensure that a loaded app
  * has been compiled against the same nawa version as the nawarun executable loading it (or, at least, one with a compatible ABI).
  */
