@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Fetch build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: tests
       - name: Install dependencies
